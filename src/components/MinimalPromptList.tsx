@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Hash, Package, Calendar, User, MoreHorizontal, Plus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Hash, Package, Calendar, User, MoreHorizontal, Plus, Edit, Copy, Trash2, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
-import { Workspace } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { PromptDetailDialog } from '@/components/PromptDetailDialog';
+import { PromptContextMenu } from '@/components/PromptContextMenu';
+import { Workspace, Prompt, PromptStatus } from '@/types';
 
 interface MinimalPromptListProps {
   workspace: Workspace;
@@ -18,9 +23,13 @@ interface MinimalPromptListProps {
 }
 
 export function MinimalPromptList({ workspace, selectedProductId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
-  const { prompts, loading } = usePrompts(workspace.id);
+  const { prompts, loading, refetch } = usePrompts(workspace.id);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
+  const { toast } = useToast();
+  
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   // Filter prompts
   const filteredPrompts = prompts.filter(prompt => {
@@ -45,6 +54,129 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
       epic
     };
   });
+
+  const handlePromptClick = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setDetailDialogOpen(true);
+  };
+
+  const handleEdit = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setDetailDialogOpen(true);
+  };
+
+  const statusOptions = [
+    { value: 'todo', label: 'Todo', variant: 'outline' as const },
+    { value: 'in_progress', label: 'In Progress', variant: 'secondary' as const },
+    { value: 'done', label: 'Done', variant: 'default' as const }
+  ];
+
+  const handleStatusChange = async (prompt: Prompt, newStatus: PromptStatus) => {
+    if (newStatus === prompt.status) return;
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', prompt.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Status updated',
+        description: `Prompt moved to ${statusOptions.find(s => s.value === newStatus)?.label}`
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update status',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDuplicate = async (prompt: Prompt) => {
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .insert({
+          workspace_id: prompt.workspace_id,
+          title: `${prompt.title} (Copy)`,
+          description: prompt.description,
+          status: 'todo',
+          priority: prompt.priority,
+          product_id: prompt.product_id,
+          epic_id: prompt.epic_id,
+          order_index: 0
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Prompt duplicated',
+        description: 'A copy has been created'
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error duplicating prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to duplicate prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDelete = async (prompt: Prompt) => {
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .delete()
+        .eq('id', prompt.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Prompt deleted',
+        description: 'The prompt has been removed'
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error deleting prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCopy = async (prompt: Prompt) => {
+    try {
+      const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
+      await navigator.clipboard.writeText(content);
+      
+      toast({
+        title: 'Copied to clipboard',
+        description: 'Prompt content has been copied'
+      });
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to copy to clipboard',
+        variant: 'destructive'
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -110,63 +242,166 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
       {/* Prompt List */}
       <div className="space-y-3">
         {promptsWithInfo.map((prompt) => (
-          <Card key={prompt.id} className="hover:shadow-sm transition-shadow cursor-pointer">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-foreground mb-2 truncate">
-                    {prompt.title}
-                  </h3>
-                  
-                  {prompt.description && (
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {prompt.description}
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {prompt.product && (
-                      <div className="flex items-center gap-1">
-                        <Package className="h-3 w-3" />
-                        <span>{prompt.product.name}</span>
-                      </div>
+          <PromptContextMenu
+            key={prompt.id}
+            prompt={prompt}
+            onEdit={() => handleEdit(prompt)}
+            onUpdate={() => refetch()}
+          >
+            <Card className="hover:shadow-sm transition-shadow cursor-pointer">
+              <CardContent className="p-4">
+                <div 
+                  className="flex items-start justify-between"
+                  onClick={() => handlePromptClick(prompt)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-foreground mb-2 truncate">
+                      {prompt.title}
+                    </h3>
+                    
+                    {prompt.description && (
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {prompt.description}
+                      </p>
                     )}
                     
-                    {prompt.epic && (
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      {prompt.product && (
+                        <div className="flex items-center gap-1">
+                          <Package className="h-3 w-3" />
+                          <span>{prompt.product.name}</span>
+                        </div>
+                      )}
+                      
+                      {prompt.epic && (
+                        <div className="flex items-center gap-1">
+                          <Hash className="h-3 w-3" />
+                          <span>{prompt.epic.name}</span>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-1">
-                        <Hash className="h-3 w-3" />
-                        <span>{prompt.epic.name}</span>
+                        <Calendar className="h-3 w-3" />
+                        <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
                       </div>
-                    )}
-                    
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-2 ml-4">
-                  <Badge 
-                    variant={
-                      prompt.status === 'done' ? 'default' : 
-                      prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                    }
-                    className="text-xs"
-                  >
-                    {prompt.status === 'in_progress' ? 'In Progress' : 
-                     prompt.status === 'done' ? 'Done' : 'Todo'}
-                  </Badge>
                   
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2 ml-4">
+                    {/* Status Badge - Click to cycle through statuses */}
+                    <Badge 
+                      variant={
+                        prompt.status === 'done' ? 'default' : 
+                        prompt.status === 'in_progress' ? 'secondary' : 'outline'
+                      }
+                      className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
+                        const nextIndex = (currentIndex + 1) % statusOptions.length;
+                        const nextStatus = statusOptions[nextIndex].value as PromptStatus;
+                        handleStatusChange(prompt, nextStatus);
+                      }}
+                    >
+                      {prompt.status === 'in_progress' ? 'In Progress' : 
+                       prompt.status === 'done' ? 'Done' : 'Todo'}
+                    </Badge>
+                    
+                    {/* Actions Dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem onClick={(e) => {
+                          e.preventDefault();
+                          handleEdit(prompt);
+                        }} className="flex items-center gap-2">
+                          <Edit className="h-4 w-4" />
+                          Edit prompt
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem onClick={(e) => {
+                          e.preventDefault();
+                          handleCopy(prompt);
+                        }} className="flex items-center gap-2">
+                          <Copy className="h-4 w-4" />
+                          Copy content
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem onClick={(e) => {
+                          e.preventDefault();
+                          handleDuplicate(prompt);
+                        }} className="flex items-center gap-2">
+                          <Copy className="h-4 w-4" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuSeparator />
+                        
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="flex items-center gap-2">
+                            <ArrowRight className="h-4 w-4" />
+                            Change status
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent className="w-48">
+                            {statusOptions.map((option) => (
+                              <DropdownMenuItem
+                                key={option.value}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleStatusChange(prompt, option.value as PromptStatus);
+                                }}
+                                disabled={option.value === prompt.status}
+                                className="flex items-center justify-between"
+                              >
+                                <span>{option.label}</span>
+                                <Badge variant={option.variant} className="text-xs">
+                                  {option.value === prompt.status ? 'Current' : ''}
+                                </Badge>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        
+                        <DropdownMenuSeparator />
+                        
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(prompt);
+                          }}
+                          className="flex items-center gap-2 text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete prompt
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </PromptContextMenu>
         ))}
       </div>
+
+      {/* Detail Dialog */}
+      <PromptDetailDialog
+        prompt={selectedPrompt}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onUpdate={() => refetch()}
+        products={products}
+        epics={epics}
+      />
     </div>
   );
 }
