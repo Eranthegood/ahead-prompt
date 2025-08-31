@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PromptCard } from '@/components/PromptCard';
-import { Workspace, Prompt, PromptStatus } from '@/types';
+import { usePrompts } from '@/hooks/usePrompts';
+import { Workspace, PromptStatus } from '@/types';
 import { Plus, MoreHorizontal } from 'lucide-react';
 
 interface KanbanBoardProps {
@@ -19,34 +18,7 @@ const COLUMNS: { status: PromptStatus; title: string; color: string }[] = [
 ];
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchPrompts();
-  }, [workspace.id]);
-
-  const fetchPrompts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('*')
-        .eq('workspace_id', workspace.id)
-        .order('order_index');
-
-      if (error) throw error;
-      setPrompts((data || []) as Prompt[]);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error fetching prompts',
-        description: error?.message
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { prompts, loading, createPrompt, updatePromptStatus } = usePrompts(workspace.id);
 
   const getPromptsByStatus = (status: PromptStatus) => {
     return prompts.filter(prompt => prompt.status === status);
@@ -56,66 +28,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
     return getPromptsByStatus(status).length;
   };
 
-  const createPrompt = async (status: PromptStatus) => {
-    try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .insert({
-          workspace_id: workspace.id,
-          title: 'New Prompt',
-          status,
-          order_index: getStatusCount(status),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setPrompts(prev => [...prev, data as Prompt]);
-      toast({
-        title: 'Prompt created',
-        description: 'Start building your next feature!'
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error creating prompt',
-        description: error?.message
-      });
-    }
-  };
-
-  const updatePromptStatus = async (promptId: string, newStatus: PromptStatus) => {
-    try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({ 
-          status: newStatus,
-          order_index: getStatusCount(newStatus)
-        })
-        .eq('id', promptId);
-
-      if (error) throw error;
-
-      setPrompts(prev =>
-        prev.map(prompt =>
-          prompt.id === promptId 
-            ? { ...prompt, status: newStatus }
-            : prompt
-        )
-      );
-
-      toast({
-        title: 'Prompt moved',
-        description: `Moved to ${newStatus.replace('_', ' ')}`
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error updating prompt',
-        description: error?.message
-      });
-    }
+  const handleCreatePrompt = async (status: PromptStatus) => {
+    await createPrompt({
+      title: 'New Prompt',
+      status,
+    });
   };
 
   if (loading) {
@@ -155,7 +72,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => createPrompt(column.status)}
+                    onClick={() => handleCreatePrompt(column.status)}
                     className="text-muted-foreground hover:text-foreground"
                   >
                     <Plus className="w-4 h-4" />
@@ -165,11 +82,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
               
               <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                 {getPromptsByStatus(column.status).map((prompt) => (
-                  <PromptCard 
-                    key={prompt.id} 
+                  <PromptCard
+                    key={prompt.id}
                     prompt={prompt}
                     onStatusChange={updatePromptStatus}
-                    onUpdate={fetchPrompts}
+                    onUpdate={() => {}} // No longer needed with real-time updates
                   />
                 ))}
                 
@@ -179,7 +96,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => createPrompt(column.status)}
+                      onClick={() => handleCreatePrompt(column.status)}
                       className="mt-2"
                     >
                       <Plus className="w-4 h-4 mr-2" />

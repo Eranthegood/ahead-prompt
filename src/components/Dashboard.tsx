@@ -1,25 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EpicSidebar } from '@/components/EpicSidebar';
 import { KanbanBoard } from '@/components/KanbanBoard';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { CommandPalette } from '@/components/CommandPalette';
+import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { usePrompts } from '@/hooks/usePrompts';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Hash, BookOpen } from 'lucide-react';
 
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('board');
+  const [epics, setEpics] = useState([]);
   const { workspace, loading } = useWorkspace();
+  const { createPrompt } = usePrompts(workspace?.id);
+
+  // Fetch epics for the QuickPromptDialog
+  useEffect(() => {
+    const fetchEpics = async () => {
+      if (!workspace?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('epics')
+          .select('id, name, color')
+          .eq('workspace_id', workspace.id);
+        
+        if (error) throw error;
+        setEpics(data || []);
+      } catch (error) {
+        console.error('Error fetching epics:', error);
+      }
+    };
+
+    fetchEpics();
+  }, [workspace?.id]);
 
   // Set up global shortcuts
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-    'q': () => setCommandPaletteOpen(true),
+    'q': () => setQuickPromptOpen(true), // Quick prompt creation
   });
 
   if (loading) {
@@ -80,6 +107,14 @@ const Dashboard = () => {
           onOpenChange={setCommandPaletteOpen}
           workspace={workspace}
           onNavigate={(tab) => setActiveTab(tab)}
+        />
+
+        <QuickPromptDialog
+          isOpen={quickPromptOpen}
+          onClose={() => setQuickPromptOpen(false)}
+          onSave={createPrompt}
+          workspace={workspace}
+          epics={epics}
         />
       </div>
     </SidebarProvider>
