@@ -23,29 +23,52 @@ interface MinimalSidebarProps {
   showCompletedItems: boolean;
   onToggleCompletedItems: (show: boolean) => void;
   onQuickAdd: () => void;
+  searchQuery: string;
 }
 
-export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd }: MinimalSidebarProps) {
+export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
 
-  // Simple organization
+  // Filter function to match search and exclude completed
+  const getActivePrompts = (productFilter?: string) => {
+    return prompts.filter(prompt => {
+      const matchesSearch = !searchQuery || 
+        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesProduct = !productFilter || productFilter === 'all' || 
+        prompt.product_id === productFilter;
+
+      const isActive = prompt.status !== 'done';
+
+      return matchesSearch && matchesProduct && isActive;
+    });
+  };
+
+  // Get active prompts count for "All Prompts"
+  const allActivePromptsCount = getActivePrompts('all').length;
+
+  // Simple organization with filtered counts
   const productsWithCounts = products.map(product => {
-    const productEpics = epics.filter(epic => epic.product_id === product.id);
-    const productPrompts = prompts.filter(prompt => prompt.product_id === product.id);
+    const activePromptsCount = getActivePrompts(product.id).length;
     
     return {
       ...product,
-      epicCount: productEpics.length,
-      promptCount: productPrompts.length
+      promptCount: activePromptsCount
     };
   });
 
-  // Get completed prompts sorted by completion date (most recent first)
+  // Get completed prompts with search filter
   const completedPrompts = prompts
-    .filter(p => p.status === 'done')
+    .filter(p => {
+      const matchesSearch = !searchQuery || 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      return p.status === 'done' && matchesSearch;
+    })
     .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
 
   return (
@@ -81,7 +104,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             <FileText className="mr-3 h-4 w-4" />
             All Prompts
             <Badge variant="secondary" className="ml-auto">
-              {prompts.length}
+              {allActivePromptsCount}
             </Badge>
           </Button>
         </div>

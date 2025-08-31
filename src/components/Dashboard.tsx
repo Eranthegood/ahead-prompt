@@ -73,6 +73,7 @@ const Dashboard = () => {
           showCompletedItems={preferences.showCompletedItems}
           onToggleCompletedItems={handleToggleCompletedItems}
           onQuickAdd={handleQuickAdd}
+          searchQuery={searchQuery}
         />
         
         <div className="flex-1 flex flex-col">
