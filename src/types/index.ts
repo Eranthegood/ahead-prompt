@@ -101,27 +101,33 @@ export interface Database {
         Row: {
           id: string;
           workspace_id: string;
+          product_id: string | null;
           title: string;
           content: string;
           tags: string[];
+          category: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           workspace_id: string;
+          product_id?: string | null;
           title: string;
           content: string;
           tags?: string[];
+          category?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           workspace_id?: string;
+          product_id?: string | null;
           title?: string;
           content?: string;
           tags?: string[];
+          category?: string;
           created_at?: string;
           updated_at?: string;
         };

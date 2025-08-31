@@ -279,7 +279,7 @@ const ProductPage = () => {
             </TabsContent>
 
             <TabsContent value="knowledge">
-              <KnowledgeBase workspace={workspace} />
+              <KnowledgeBase workspace={workspace} product={product} />
             </TabsContent>
           </Tabs>
         </div>

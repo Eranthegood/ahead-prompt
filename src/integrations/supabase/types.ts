@@ -64,27 +64,33 @@ export type Database = {
       }
       knowledge_items: {
         Row: {
+          category: string | null
           content: string
           created_at: string
           id: string
+          product_id: string | null
           tags: string[] | null
           title: string
           updated_at: string
           workspace_id: string
         }
         Insert: {
+          category?: string | null
           content: string
           created_at?: string
           id?: string
+          product_id?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
           workspace_id: string
         }
         Update: {
+          category?: string | null
           content?: string
           created_at?: string
           id?: string
+          product_id?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
