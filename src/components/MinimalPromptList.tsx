@@ -256,9 +256,10 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                     />
                     
                     {prompt.description && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {prompt.description}
-                      </p>
+                      <div 
+                        className="text-sm text-muted-foreground mb-3 line-clamp-2"
+                        dangerouslySetInnerHTML={{ __html: prompt.description }}
+                      />
                     )}
                     
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -433,9 +434,10 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                     />
                     
                     {prompt.description && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {prompt.description}
-                      </p>
+                      <div 
+                        className="text-sm text-muted-foreground mb-3 line-clamp-2"
+                        dangerouslySetInnerHTML={{ __html: prompt.description }}
+                      />
                     )}
                     
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
