@@ -2,73 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Vibe Plan Forge - Dark Theme Design System */
+/* Minimalist Design System - Todoist Inspired */
 
 @layer base {
   :root {
-    /* Dark theme inspired by Todoist */
-    --background: 220 13% 9%;
-    --foreground: 220 9% 96%;
+    /* Clean light theme */
+    --background: 0 0% 99%;
+    --foreground: 0 0% 15%;
 
-    --card: 220 15% 11%;
-    --card-foreground: 220 9% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
 
-    --popover: 220 15% 11%;
-    --popover-foreground: 220 9% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
 
-    /* Vibe purple theme */
-    --primary: 260 90% 65%;
+    /* Minimal color palette */
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 98%;
-    --primary-muted: 260 40% 20%;
-    --primary-glow: 260 90% 75%;
+    --primary-muted: 0 84% 90%;
 
-    --secondary: 220 15% 13%;
-    --secondary-foreground: 220 9% 96%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 220 15% 13%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 260 40% 20%;
-    --accent-foreground: 260 90% 75%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    /* Status colors for Kanban */
-    --status-todo: 220 20% 18%;
-    --status-todo-foreground: 220 9% 70%;
-    --status-progress: 45 93% 47%;
-    --status-progress-foreground: 45 100% 6%;
-    --status-done: 142 76% 36%;
-    --status-done-foreground: 142 100% 6%;
+    --border: 0 0% 92%;
+    --input: 0 0% 96%;
+    --ring: 0 84% 60%;
 
-    /* Epic colors */
-    --epic-purple: 260 90% 65%;
-    --epic-blue: 217 91% 60%;
-    --epic-green: 142 76% 36%;
-    --epic-orange: 25 95% 53%;
-    --epic-pink: 330 81% 60%;
+    --radius: 0.375rem;
 
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 260 90% 65%;
-
-    --radius: 0.75rem;
-
-    /* Sidebar for epic organization */
-    --sidebar-background: 220 15% 8%;
-    --sidebar-foreground: 220 9% 96%;
-    --sidebar-primary: 260 90% 65%;
+    /* Sidebar - very minimal */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 0 84% 60%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 220 15% 13%;
-    --sidebar-accent-foreground: 220 9% 96%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 260 90% 65%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 0 84% 60%;
+  }
 
-    /* Gradients and effects */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
-    --shadow-card: 0 4px 12px hsl(220 20% 5% / 0.4);
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 84% 60%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 84% 60%;
+
+    --sidebar-background: 0 0% 3.9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 84% 60%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 14.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 14.9%;
+    --sidebar-ring: 0 84% 60%;
   }
 }
 
