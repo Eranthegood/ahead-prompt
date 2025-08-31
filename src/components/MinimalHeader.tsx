@@ -20,7 +20,6 @@ export function MinimalHeader({ workspace, searchQuery, onSearchChange, onQuickA
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
-        <h1 className="text-xl font-semibold text-foreground">{workspace.name}</h1>
       </div>
 
       <div className="flex-1 max-w-md mx-8">
