@@ -39,6 +39,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasContent, setHasContent] = useState(false);
   const { toast } = useToast();
 
   // Rich text editor
@@ -50,6 +51,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         class: 'prose prose-sm max-w-none focus:outline-none min-h-[300px] p-4',
       },
     },
+    onUpdate: ({ editor }) => {
+      setHasContent(!editor.isEmpty);
+    },
   });
 
   // Filter epics by selected product (either from props or local selection)
@@ -59,17 +63,21 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     : epics;
   
   // Validation: Check if either epic or product is selected
-  const hasValidAssignment = selectedEpic !== 'none' || 
-    (selectedProductId || selectedProduct !== 'none');
+  const hasValidAssignment = (selectedEpic !== 'none') || !!selectedProductId || (selectedProduct !== 'none');
 
   // Reset form when dialog opens
   useEffect(() => {
     if (isOpen && editor) {
       editor.commands.setContent('');
       setSelectedEpic('none');
+      setHasContent(false);
       // Set default product if no selectedProductId
       setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
-      setTimeout(() => editor?.commands.focus(), 100);
+      setTimeout(() => {
+        if (editor.view) {
+          editor.commands.focus();
+        }
+      }, 100);
     }
   }, [isOpen, editor, selectedProductId, products]);
 
@@ -110,11 +118,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       setIsGenerating(false);
       setIsLoading(true);
 
+      const resolvedProductId = selectedEpic === 'none'
+        ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
+        : undefined;
+
       const promptData: CreatePromptData = {
         title: 'Nouvelle idée', // Default title
         description: response.transformedPrompt || content,
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-        product_id: selectedEpic === 'none' ? (selectedProductId || selectedProduct !== 'none' ? selectedProduct : undefined) : undefined,
+        product_id: resolvedProductId,
       };
 
       await onSave(promptData);
@@ -131,11 +143,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       setIsGenerating(false);
       setIsLoading(true);
       try {
+        const resolvedProductId = selectedEpic === 'none'
+          ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
+          : undefined;
+
         const promptData: CreatePromptData = {
           title: 'Nouvelle idée',
           description: content,
           epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-          product_id: selectedEpic === 'none' ? (selectedProductId || selectedProduct !== 'none' ? selectedProduct : undefined) : undefined,
+          product_id: resolvedProductId,
         };
 
         await onSave(promptData);
@@ -325,7 +341,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             </Button>
             <Button 
               onClick={handleSave} 
-              disabled={isLoading || isGenerating || !editor.getHTML() || editor.getHTML() === '<p></p>' || !hasValidAssignment}
+              disabled={!hasContent || !hasValidAssignment || isLoading || isGenerating}
             >
               {isGenerating ? (
                 <>
