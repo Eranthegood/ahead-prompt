@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Zap, MoreHorizontal, Target, CheckCircle2 } from 'lucide-react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import type { Workspace, PromptStatus, Epic } from '@/types';
 
 interface CreatePromptData {
@@ -14,7 +15,7 @@ interface CreatePromptData {
   status?: PromptStatus;
   priority?: number;
   epic_id?: string;
-  product_id?: string; // Add product_id option
+  product_id?: string;
 }
 
 interface QuickPromptDialogProps {
@@ -28,10 +29,10 @@ interface QuickPromptDialogProps {
 }
 
 const priorities = [
-  { value: 1, label: 'P1', color: 'bg-red-500' },
-  { value: 2, label: 'P2', color: 'bg-orange-500' },
-  { value: 3, label: 'P3', color: 'bg-yellow-500' },
-  { value: 4, label: 'P4', color: 'bg-green-500' },
+  { value: 1, label: 'Faible', color: 'bg-gray-500', shortcut: '1' },
+  { value: 2, label: 'Normale', color: 'bg-yellow-500', shortcut: '2' },
+  { value: 3, label: 'Élevée', color: 'bg-orange-500', shortcut: '3' },
+  { value: 4, label: 'Urgente', color: 'bg-red-500', shortcut: '4' },
 ];
 
 const statuses: { value: PromptStatus; label: string; icon: any }[] = [
@@ -49,14 +50,29 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   epics = [],
   selectedProductId,
 }) => {
+  const { preferences, savePromptSettings } = useUserPreferences();
+  
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<number>(3);
-  const [status, setStatus] = useState<PromptStatus>('todo');
+  const [priority, setPriority] = useState<number>(2);  // Default to "Normale"
+  const [status, setStatus] = useState<PromptStatus>(preferences.lastPromptStatus as PromptStatus);
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const epicSelectRef = useRef<HTMLButtonElement>(null);
+
+  // Convert number priority to string for preferences
+  const getPriorityString = (num: number) => {
+    const priorityMap = { 1: 'low', 2: 'medium', 3: 'high', 4: 'urgent' };
+    return priorityMap[num as keyof typeof priorityMap] || 'medium';
+  };
+
+  // Convert string priority to number
+  const getPriorityNumber = (str: string) => {
+    const priorityMap = { 'low': 1, 'medium': 2, 'high': 3, 'urgent': 4 };
+    return priorityMap[str as keyof typeof priorityMap] || 2;
+  };
 
   // Filter epics by selected product
   const filteredEpics = selectedProductId 
@@ -66,30 +82,50 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // 🎯 Auto-focus and reset on open
   useEffect(() => {
     if (isOpen) {
-      // Reset form
+      // Reset form but use user preferences for status/priority
       setTitle('');
       setDescription('');
-      setPriority(3);
-      setStatus('todo');
+      setPriority(getPriorityNumber(preferences.lastPromptPriority));
+      setStatus(preferences.lastPromptStatus as PromptStatus);
       setSelectedEpic('none');
 
-      // Focus with delay to avoid rendering issues
+      // Smart focus: epic selector if product selected and epics available, otherwise title
       setTimeout(() => {
-        titleInputRef.current?.focus();
+        if (selectedProductId && filteredEpics.length > 0) {
+          epicSelectRef.current?.click();
+        } else {
+          titleInputRef.current?.focus();
+        }
       }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, preferences, selectedProductId, filteredEpics.length]);
 
-  // ⌨️ Keyboard shortcuts
+  // ⌨️ Enhanced keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    } else if (e.key === 'Enter' && title.trim()) {
-      // Enter = save, Ctrl+Enter = force save
-      if (e.ctrlKey || e.metaKey || !e.shiftKey) {
+    // Don't trigger shortcuts when typing in inputs
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      // Allow Ctrl+Enter to save from input fields
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && title.trim()) {
         e.preventDefault();
         handleSave();
       }
+      return;
+    }
+
+    // Priority shortcuts (1-4)
+    if (e.key >= '1' && e.key <= '4') {
+      e.preventDefault();
+      const priorityNumber = parseInt(e.key);
+      setPriority(priorityNumber);
+      return;
+    }
+
+    // Other shortcuts
+    if (e.key === 'Escape') {
+      onClose();
+    } else if (e.key === 'Enter' && title.trim()) {
+      e.preventDefault();
+      handleSave();
     }
   };
 
@@ -99,6 +135,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
     setIsLoading(true);
     try {
+      // Save user preferences for next time
+      savePromptSettings(status, getPriorityString(priority));
+
       const promptData: CreatePromptData = {
         title: title.trim(),
         description: description.trim() || undefined,
@@ -194,7 +233,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
             {/* Priority selector */}
             <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
-              <SelectTrigger className="w-20 h-9 text-sm">
+              <SelectTrigger className="w-32 h-9 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -202,7 +241,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   <SelectItem key={p.value} value={p.value.toString()} className="text-sm">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${p.color}`} />
-                      {p.label}
+                      <span>{p.label}</span>
+                      <span className="text-xs text-muted-foreground">({p.shortcut})</span>
                     </div>
                   </SelectItem>
                 ))}
@@ -212,7 +252,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             {/* Epic selector */}
             {filteredEpics.length > 0 && (
               <Select value={selectedEpic} onValueChange={setSelectedEpic}>
-                <SelectTrigger className="flex-1 h-9 text-sm">
+                <SelectTrigger ref={epicSelectRef} className="flex-1 h-9 text-sm">
                   <SelectValue placeholder="Epic..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,7 +290,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             <div className="text-xs text-muted-foreground">
               <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Enter</kbd> pour créer
               <span className="mx-2">•</span>
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> pour annuler
+              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">1-4</kbd> priorité
+              <span className="mx-2">•</span>
+              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> annuler
             </div>
 
             <div className="flex gap-2">

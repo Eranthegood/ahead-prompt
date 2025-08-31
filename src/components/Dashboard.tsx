@@ -7,6 +7,7 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useEpics } from '@/hooks/useEpics';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
 
@@ -18,6 +19,7 @@ const Dashboard = () => {
   
   const { workspace, loading } = useWorkspace();
   const { createPrompt } = usePrompts(workspace?.id);
+  const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
 
   // Set up global shortcuts
   useGlobalShortcuts({
@@ -90,7 +92,7 @@ const Dashboard = () => {
           onClose={() => setQuickPromptOpen(false)}
           onSave={createPrompt}
           workspace={workspace}
-          epics={[]} // Simplified - no epic pre-selection
+          epics={epics}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
         />
       </div>
