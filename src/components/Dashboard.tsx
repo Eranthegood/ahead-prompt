@@ -42,10 +42,6 @@ const Dashboard = () => {
     setQuickPromptOpen(true);
   };
 
-  const handleTitlesUpdated = () => {
-    refetchPrompts?.();
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -85,7 +81,6 @@ const Dashboard = () => {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onQuickAdd={handleQuickAdd}
-            onTitlesUpdated={handleTitlesUpdated}
           />
           
           <MinimalPromptList 
