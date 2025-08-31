@@ -120,65 +120,45 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
         {/* Completed Prompts */}
         {showCompletedItems && (
           <SidebarGroup className="mt-6">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Achevé</h3>
-                {completedPrompts.length > 3 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-5 px-1 text-xs"
-                    onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}
-                  >
-                    {isCompletedExpanded ? (
-                      <>
-                        <ChevronUp className="h-3 w-3 mr-1" />
-                        moins
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-3 w-3 mr-1" />
-                        plus
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0"
-                onClick={() => onToggleCompletedItems(false)}
-                title="Masquer les éléments achevés"
-              >
-                <EyeOff className="h-3 w-3" />
-              </Button>
+            <div className="mb-3 flex items-center justify-between cursor-pointer" onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
+              <h3 className="text-sm font-medium text-muted-foreground">Achevé ({completedPrompts.length})</h3>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isCompletedExpanded ? 'rotate-180' : ''}`} />
             </div>
             
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                {completedPrompts.length === 0 ? (
-                  <div className="py-2 px-3 text-center">
-                    <p className="text-xs text-muted-foreground">Aucun prompt terminé</p>
-                  </div>
-                ) : (
-                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isCompletedExpanded ? 'max-h-96' : 'max-h-32'
-                  }`}>
-                    {(isCompletedExpanded ? completedPrompts : completedPrompts.slice(0, 3)).map((prompt) => (
-                      <SidebarMenuItem key={prompt.id}>
-                        <SidebarMenuButton className="w-full justify-start text-xs">
-                          <div className="flex items-center gap-2 w-full">
-                            <CheckCircle className="h-3 w-3 text-success" />
-                            <span className="truncate flex-1">{prompt.title}</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </div>
-                )}
-              </SidebarMenu>
-            </SidebarGroupContent>
+            {isCompletedExpanded && (
+              <SidebarGroupContent>
+                <SidebarMenu className="space-y-1">
+                  {completedPrompts.length === 0 ? (
+                    <div className="py-2 px-3 text-center">
+                      <p className="text-xs text-muted-foreground">Aucun prompt terminé</p>
+                    </div>
+                  ) : (
+                    <>
+                      {completedPrompts.slice(0, 3).map((prompt) => (
+                        <SidebarMenuItem key={prompt.id}>
+                          <SidebarMenuButton className="w-full justify-start text-xs">
+                            <div className="flex items-center gap-2 w-full">
+                              <CheckCircle className="h-3 w-3 text-success" />
+                              <span className="truncate flex-1">{prompt.title}</span>
+                            </div>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                      {completedPrompts.length > 3 && (
+                        <SidebarMenuItem>
+                          <SidebarMenuButton 
+                            className="w-full justify-center text-xs text-muted-foreground hover:text-foreground"
+                            onClick={() => onProductSelect('completed')}
+                          >
+                            Voir tous les {completedPrompts.length} prompts
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )}
+                    </>
+                  )}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            )}
           </SidebarGroup>
         )}
 
