@@ -1,295 +1,368 @@
 import React, { useState } from 'react';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+import { useNavigate } from 'react-router-dom';
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarGroup, 
+  SidebarGroupContent, 
+  SidebarGroupLabel, 
+  SidebarMenu, 
+  SidebarMenuButton, 
+  SidebarMenuItem, 
   SidebarTrigger,
-  useSidebar,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useAuth } from '@/hooks/useAuth';
+import { ProductContextMenu } from '@/components/ProductContextMenu';
+import { EpicContextMenu } from '@/components/EpicContextMenu';
 import { 
-  Hash, 
-  Package, 
-  Target, 
+  ChevronRight, 
   ChevronDown, 
-  ChevronRight
+  User, 
+  Package, 
+  Hash, 
+  FileText,
+  Plus
 } from 'lucide-react';
-import type { Workspace } from '@/types';
+import { Workspace, Product, Epic } from '@/types';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface EpicSidebarProps {
   workspace: Workspace;
   selectedProductId?: string;
-  onProductSelect?: (productId: string | 'all') => void;
+  onProductSelect: (productId: string) => void;
 }
 
-export const EpicSidebar: React.FC<EpicSidebarProps> = ({ 
-  workspace, 
-  selectedProductId, 
-  onProductSelect 
-}) => {
+export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: EpicSidebarProps) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
+  
+  const { products, loading: productsLoading, deleteProduct } = useProducts(workspace.id);
+  const { epics, loading: epicsLoading, createEpic, deleteEpic } = useEpics(workspace.id);
+  const { prompts, loading: promptsLoading, createPrompt } = usePrompts(workspace.id);
+  
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+  const [expandedEpics, setExpandedEpics] = useState<Set<string>>(new Set());
 
-  // Use real-time hooks
-  const { products, loading: productsLoading } = useProducts(workspace.id);
-  const { epics } = useEpics(workspace.id);
-  const { prompts } = usePrompts(workspace.id);
-
-  // Group epics by product
-  const epicsByProduct = epics.reduce((acc, epic) => {
-    const productId = epic.product_id;
-    if (!acc[productId]) {
-      acc[productId] = [];
-    }
-    acc[productId].push(epic);
-    return acc;
-  }, {} as Record<string, typeof epics>);
-
-  // Count prompts by epic and by product
-  const promptCounts = {
-    byEpic: prompts.reduce((acc, prompt) => {
-      if (prompt.epic_id) {
-        acc[prompt.epic_id] = (acc[prompt.epic_id] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>),
-    byProduct: prompts.reduce((acc, prompt) => {
-      if (prompt.product_id) {
-        acc[prompt.product_id] = (acc[prompt.product_id] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>),
-    total: prompts.length
-  };
-
-  // Calculate data for products with epics
-  const productsWithEpics = products.map(product => {
-    const productEpics = epicsByProduct[product.id] || [];
-    const directPromptCount = promptCounts.byProduct[product.id] || 0;
-    const epicPromptCount = productEpics.reduce((sum, epic) => {
-      return sum + (promptCounts.byEpic[epic.id] || 0);
+  // Group data by hierarchy
+  const productsWithData = products.map(product => {
+    const productEpics = epics.filter(epic => epic.product_id === product.id);
+    const directPrompts = prompts.filter(prompt => prompt.product_id === product.id && !prompt.epic_id);
+    
+    const epicsWithPrompts = productEpics.map(epic => {
+      const epicPrompts = prompts.filter(prompt => prompt.epic_id === epic.id);
+      return {
+        ...epic,
+        prompts: epicPrompts.slice(-3), // Last 3 prompts
+        totalPrompts: epicPrompts.length
+      };
+    });
+    
+    const totalPrompts = directPrompts.length + productEpics.reduce((sum, epic) => {
+      return sum + prompts.filter(prompt => prompt.epic_id === epic.id).length;
     }, 0);
     
     return {
       ...product,
-      epics: productEpics.map(epic => ({
-        ...epic,
-        promptCount: promptCounts.byEpic[epic.id] || 0
-      })),
-      epicCount: productEpics.length,
-      promptCount: directPromptCount + epicPromptCount
+      epics: epicsWithPrompts,
+      directPrompts,
+      totalPrompts
     };
   });
 
   const toggleProductExpansion = (productId: string) => {
-    setExpandedProducts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(productId)) {
-        newSet.delete(productId);
-      } else {
-        newSet.add(productId);
-      }
-      return newSet;
-    });
+    const newExpanded = new Set(expandedProducts);
+    if (newExpanded.has(productId)) {
+      newExpanded.delete(productId);
+    } else {
+      newExpanded.add(productId);
+    }
+    setExpandedProducts(newExpanded);
   };
 
-  const handleProductSelect = (productId: string | 'all') => {
-    onProductSelect?.(productId);
-    if (productId !== 'all') {
-      setExpandedProducts(prev => new Set(prev).add(productId));
+  const toggleEpicExpansion = (epicId: string) => {
+    const newExpanded = new Set(expandedEpics);
+    if (newExpanded.has(epicId)) {
+      newExpanded.delete(epicId);
+    } else {
+      newExpanded.add(epicId);
+    }
+    setExpandedEpics(newExpanded);
+  };
+
+  const handleNavigateToProduct = (productId: string) => {
+    navigate(`/product/${productId}`);
+  };
+
+  const handleAddEpic = (productId: string) => {
+    // TODO: Open epic creation dialog with pre-selected product
+    console.log('Add epic to product:', productId);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    // TODO: Open product edit dialog
+    console.log('Edit product:', product);
+  };
+
+  const handleDeleteProduct = async (product: Product) => {
+    if (window.confirm(`Are you sure you want to delete "${product.name}"? This will also delete all associated epics and prompts.`)) {
+      await deleteProduct(product.id);
     }
   };
 
-  if (productsLoading) {
+  const handleAddPrompt = (epicId: string) => {
+    // TODO: Open prompt creation dialog with pre-selected epic
+    console.log('Add prompt to epic:', epicId);
+  };
+
+  const handleEditEpic = (epic: Epic) => {
+    // TODO: Open epic edit dialog
+    console.log('Edit epic:', epic);
+  };
+
+  const handleDeleteEpic = async (epic: Epic) => {
+    if (window.confirm(`Are you sure you want to delete "${epic.name}"? This will also delete all associated prompts.`)) {
+      await deleteEpic(epic.id);
+    }
+  };
+
+  if (productsLoading || epicsLoading || promptsLoading) {
     return (
-      <Sidebar className={collapsed ? "w-14" : "w-72"}>
-        <SidebarTrigger className="m-2 self-end" />
+      <Sidebar className="border-r">
+        <SidebarTrigger className="m-2" />
         <SidebarContent>
-          <div className="p-4">
-            <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-muted rounded w-3/4" />
-              <div className="h-4 bg-muted rounded w-1/2" />
-              <div className="h-4 bg-muted rounded w-2/3" />
-            </div>
-          </div>
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              <Skeleton className="h-4 w-32" />
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full" />
+                ))}
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
       </Sidebar>
     );
   }
 
+  const displayName = user?.email?.split('@')[0] || 'User';
+
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-72"}>
-      <SidebarTrigger className="m-2 self-end" />
-      
-      <SidebarContent className="px-2">
-        {/* All Prompts Section */}
+    <Sidebar className="border-r">
+      <SidebarTrigger className="m-2" />
+      <SidebarContent>
+        {/* Workspace Header */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground px-2">
-            Navigation
+          <SidebarGroupLabel className="flex items-center gap-2 px-2 py-3">
+            <User className="h-4 w-4" />
+            {!collapsed && (
+              <div className="flex flex-col min-w-0">
+                <span className="font-medium truncate">{displayName}</span>
+                <span className="text-xs text-muted-foreground truncate">
+                  {workspace.name}
+                </span>
+              </div>
+            )}
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  asChild
-                  isActive={selectedProductId === 'all' || !selectedProductId}
-                >
-                  <button
-                    onClick={() => handleProductSelect('all')}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent"
-                  >
-                    <Hash className="w-4 h-4 shrink-0" />
-                    {!collapsed && (
-                      <>
-                        <span className="flex-1 text-left">Tous les prompts</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {promptCounts.total}
-                        </Badge>
-                      </>
-                    )}
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Products Section */}
+        {/* Products Hierarchy */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground px-2">
-            Produits
-          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {productsWithEpics.map((product) => (
-                <SidebarMenuItem key={product.id}>
-                  <Collapsible
-                    open={expandedProducts.has(product.id)}
-                    onOpenChange={() => toggleProductExpansion(product.id)}
-                  >
-                    {/* Product Header */}
-                    <div className="flex items-center">
-                      <CollapsibleTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start p-0 h-auto"
-                        >
-                          <SidebarMenuButton 
-                            isActive={selectedProductId === product.id}
-                            className="flex-1"
-                          >
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleProductSelect(product.id);
-                              }}
-                              className="w-full flex items-center gap-3 px-3 py-2 text-sm"
-                            >
-                              {expandedProducts.has(product.id) ? (
-                                <ChevronDown className="w-3 h-3 shrink-0" />
-                              ) : (
-                                <ChevronRight className="w-3 h-3 shrink-0" />
-                              )}
+            <SidebarMenu>
+              {productsWithData.length === 0 ? (
+                <div className="px-2 py-4 text-center">
+                  <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No products yet</p>
+                  {!collapsed && (
+                    <Button size="sm" variant="outline" className="mt-2" onClick={() => console.log('Create product')}>
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Product
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                productsWithData.map((product) => (
+                  <SidebarMenuItem key={product.id}>
+                    <Collapsible
+                      open={expandedProducts.has(product.id)}
+                      onOpenChange={() => toggleProductExpansion(product.id)}
+                    >
+                      <ProductContextMenu
+                        product={product}
+                        onAddEpic={handleAddEpic}
+                        onEditProduct={handleEditProduct}
+                        onDeleteProduct={handleDeleteProduct}
+                        onNavigateToProduct={handleNavigateToProduct}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton className="w-full justify-between">
+                            <div className="flex items-center gap-2 min-w-0">
                               <div 
-                                className="w-2 h-2 rounded-full shrink-0" 
-                                style={{ backgroundColor: product.color }}
+                                className="w-3 h-3 rounded-full flex-shrink-0" 
+                                style={{ backgroundColor: product.color || '#3B82F6' }}
                               />
                               {!collapsed && (
                                 <>
-                                  <span className="flex-1 text-left truncate">
-                                    {product.name}
-                                  </span>
-                                  <Badge variant="outline" className="text-xs">
-                                    {product.promptCount}
-                                  </Badge>
+                                  <Package className="h-4 w-4 flex-shrink-0" />
+                                  <span className="truncate">{product.name}</span>
                                 </>
                               )}
-                            </button>
-                          </SidebarMenuButton>
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
-
-                    {/* Epics List */}
-                    <CollapsibleContent className="ml-4">
-                      {product.epics.length > 0 ? (
-                        <div className="space-y-1 py-1">
-                          {product.epics.map((epic) => (
-                            <SidebarMenuButton key={epic.id} className="w-full">
-                              <button className="w-full flex items-center gap-3 px-3 py-1.5 text-sm rounded-md hover:bg-accent/50">
-                                <Target className="w-3 h-3 shrink-0 text-muted-foreground" />
-                                {!collapsed && (
-                                  <>
-                                    <div 
-                                      className="w-1.5 h-1.5 rounded-full shrink-0" 
-                                      style={{ backgroundColor: epic.color }}
-                                    />
-                                    <span className="flex-1 text-left truncate text-muted-foreground">
-                                      {epic.name}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {epic.promptCount}
-                                    </span>
-                                  </>
+                            </div>
+                            {!collapsed && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Badge variant="secondary" className="text-xs">
+                                  {product.totalPrompts}
+                                </Badge>
+                                {expandedProducts.has(product.id) ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
                                 )}
-                              </button>
-                            </SidebarMenuButton>
-                          ))}
-                        </div>
-                      ) : (
-                        !collapsed && (
-                          <div className="px-3 py-2 text-xs text-muted-foreground">
-                            Aucun epic
-                          </div>
-                        )
+                              </div>
+                            )}
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                      </ProductContextMenu>
+                      
+                      {!collapsed && (
+                        <CollapsibleContent className="ml-4">
+                          <SidebarMenu>
+                            {/* Product Epics */}
+                            {product.epics.map((epic) => (
+                              <SidebarMenuItem key={epic.id}>
+                                <Collapsible
+                                  open={expandedEpics.has(epic.id)}
+                                  onOpenChange={() => toggleEpicExpansion(epic.id)}
+                                >
+                                  <EpicContextMenu
+                                    epic={epic}
+                                    onAddPrompt={handleAddPrompt}
+                                    onEditEpic={handleEditEpic}
+                                    onDeleteEpic={handleDeleteEpic}
+                                  >
+                                    <CollapsibleTrigger asChild>
+                                      <SidebarMenuButton className="w-full justify-between">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <div 
+                                            className="w-2 h-2 rounded-full flex-shrink-0" 
+                                            style={{ backgroundColor: epic.color || '#8B5CF6' }}
+                                          />
+                                          <Hash className="h-4 w-4 flex-shrink-0" />
+                                          <span className="truncate">{epic.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                          <Badge variant="outline" className="text-xs">
+                                            {epic.totalPrompts}
+                                          </Badge>
+                                          {epic.prompts.length > 0 && (
+                                            expandedEpics.has(epic.id) ? (
+                                              <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                              <ChevronRight className="h-4 w-4" />
+                                            )
+                                          )}
+                                        </div>
+                                      </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                  </EpicContextMenu>
+                                  
+                                  <CollapsibleContent className="ml-4">
+                                    <SidebarMenu>
+                                      {epic.prompts.map((prompt) => (
+                                        <SidebarMenuItem key={prompt.id}>
+                                          <SidebarMenuButton className="w-full justify-between">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                              <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                                              <span className="truncate text-sm">{prompt.title}</span>
+                                            </div>
+                                            <Badge 
+                                              variant={
+                                                prompt.status === 'done' ? 'default' : 
+                                                prompt.status === 'in_progress' ? 'secondary' : 'outline'
+                                              }
+                                              className="text-xs"
+                                            >
+                                              {prompt.status === 'in_progress' ? 'WIP' : 
+                                               prompt.status === 'done' ? 'Done' : 'Todo'}
+                                            </Badge>
+                                          </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                      ))}
+                                      {epic.totalPrompts > 3 && (
+                                        <SidebarMenuItem>
+                                          <SidebarMenuButton className="text-muted-foreground">
+                                            <div className="flex items-center gap-2">
+                                              <Plus className="h-3 w-3 flex-shrink-0" />
+                                              <span className="text-xs">
+                                                {epic.totalPrompts - 3} more prompts
+                                              </span>
+                                            </div>
+                                          </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                      )}
+                                    </SidebarMenu>
+                                  </CollapsibleContent>
+                                </Collapsible>
+                              </SidebarMenuItem>
+                            ))}
+                            
+                            {/* Direct Prompts */}
+                            {product.directPrompts.slice(-3).map((prompt) => (
+                              <SidebarMenuItem key={prompt.id}>
+                                <SidebarMenuButton className="w-full justify-between">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                                    <span className="truncate text-sm">{prompt.title}</span>
+                                  </div>
+                                  <Badge 
+                                    variant={
+                                      prompt.status === 'done' ? 'default' : 
+                                      prompt.status === 'in_progress' ? 'secondary' : 'outline'
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {prompt.status === 'in_progress' ? 'WIP' : 
+                                     prompt.status === 'done' ? 'Done' : 'Todo'}
+                                  </Badge>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            ))}
+                            
+                            {product.directPrompts.length > 3 && (
+                              <SidebarMenuItem>
+                                <SidebarMenuButton className="text-muted-foreground">
+                                  <div className="flex items-center gap-2">
+                                    <Plus className="h-3 w-3 flex-shrink-0" />
+                                    <span className="text-xs">
+                                      {product.directPrompts.length - 3} more direct prompts
+                                    </span>
+                                  </div>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            )}
+                          </SidebarMenu>
+                        </CollapsibleContent>
                       )}
-                    </CollapsibleContent>
-                  </Collapsible>
-                </SidebarMenuItem>
-              ))}
-              
-              {productsWithEpics.length === 0 && !collapsed && (
-                <div className="px-3 py-6 text-center text-muted-foreground">
-                  <Package className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs">Aucun produit</p>
-                  <p className="text-xs">Créez votre premier produit</p>
-                </div>
+                    </Collapsible>
+                  </SidebarMenuItem>
+                ))
               )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {!collapsed && (
-          <div className="mt-auto p-4 border-t border-border">
-            <div className="text-xs text-muted-foreground space-y-1">
-              <div className="flex justify-between">
-                <span>Produits:</span>
-                <span>{productsWithEpics.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Épics:</span>
-                <span>{productsWithEpics.reduce((sum, p) => sum + p.epicCount, 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Prompts:</span>
-                <span>{promptCounts.total}</span>
-              </div>
-            </div>
-          </div>
-        )}
       </SidebarContent>
     </Sidebar>
   );
-};
+}
