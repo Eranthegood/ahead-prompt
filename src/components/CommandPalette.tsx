@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Workspace, Prompt, Epic } from '@/types';
+import { Workspace, Prompt, Epic, KnowledgeItem } from '@/types';
 import { 
   Search, 
   Plus, 
@@ -25,16 +25,19 @@ interface CommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   workspace: Workspace;
+  onNavigate?: (tab: string) => void;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ 
   open, 
   onOpenChange, 
-  workspace 
+  workspace,
+  onNavigate 
 }) => {
   const [query, setQuery] = useState('');
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [epics, setEpics] = useState<Epic[]>([]);
+  const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -49,7 +52,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     
     setLoading(true);
     try {
-      const [promptsResult, epicsResult] = await Promise.all([
+      const [promptsResult, epicsResult, knowledgeResult] = await Promise.all([
         supabase
           .from('prompts')
           .select('*')
@@ -62,13 +65,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           .eq('workspace_id', workspace.id)
           .ilike('name', `%${query}%`)
           .limit(3),
+        supabase
+          .from('knowledge_items')
+          .select('*')
+          .eq('workspace_id', workspace.id)
+          .or(`title.ilike.%${query}%, content.ilike.%${query}%`)
+          .limit(3),
       ]);
 
       if (promptsResult.error) throw promptsResult.error;
       if (epicsResult.error) throw epicsResult.error;
+      if (knowledgeResult.error) throw knowledgeResult.error;
 
       setPrompts((promptsResult.data || []) as Prompt[]);
       setEpics(epicsResult.data || []);
+      setKnowledgeItems(knowledgeResult.data || []);
     } catch (error: any) {
       console.error('Search error:', error);
     } finally {
@@ -121,8 +132,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     onOpenChange(false);
   };
 
+  const copyKnowledgeForLovable = (item: KnowledgeItem) => {
+    const knowledgeText = `Knowledge Context: ${item.title}\n\n${item.content}`;
+    navigator.clipboard.writeText(knowledgeText);
+    
+    toast({
+      title: 'Knowledge copied',
+      description: 'Use this as context in your Lovable prompts!'
+    });
+    
+    onOpenChange(false);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && query.trim() && prompts.length === 0) {
+    if (e.key === 'Enter' && query.trim() && prompts.length === 0 && knowledgeItems.length === 0) {
       e.preventDefault();
       createPrompt();
     }
@@ -131,7 +154,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput 
-        placeholder="Search prompts, create new ones..."
+        placeholder="Search prompts, knowledge, create new ones..."
         value={query}
         onValueChange={setQuery}
         onKeyDown={handleKeyDown}
@@ -170,7 +193,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             <Plus className="mr-2 h-4 w-4" />
             Create new prompt
           </CommandItem>
-          <CommandItem onSelect={() => {/* TODO: Open knowledge base */}}>
+          <CommandItem onSelect={() => onNavigate?.('knowledge')}>
             <FileText className="mr-2 h-4 w-4" />
             Open knowledge base
           </CommandItem>
@@ -191,6 +214,33 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     <p className="font-medium">{prompt.title}</p>
                     <p className="text-xs text-muted-foreground capitalize">
                       {prompt.status.replace('_', ' ')}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Copy className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Copy</span>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        {/* Found Knowledge Items */}
+        {knowledgeItems.length > 0 && (
+          <CommandGroup heading="Knowledge Base">
+            {knowledgeItems.map((item) => (
+              <CommandItem 
+                key={item.id}
+                onSelect={() => copyKnowledgeForLovable(item)}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {item.content.substring(0, 60)}...
                     </p>
                   </div>
                 </div>
