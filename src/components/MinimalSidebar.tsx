@@ -371,8 +371,20 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                             
                             {/* Show "No epics" when expanded but empty */}
                             {expandedProducts.has(product.id) && product.epics.length === 0 && (
-                              <div className="text-xs text-muted-foreground py-2 px-2">
-                                No epics yet
+                              <div className="py-2 px-2">
+                                <p className="text-xs text-muted-foreground mb-2">No epics yet</p>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="w-full text-xs h-7"
+                                  onClick={() => {
+                                    setSelectedProductForEpic(product.id);
+                                    setIsCreateEpicOpen(true);
+                                  }}
+                                >
+                                  <Plus className="h-3 w-3 mr-1" />
+                                  Create Epic
+                                </Button>
                               </div>
                             )}
                           </div>
