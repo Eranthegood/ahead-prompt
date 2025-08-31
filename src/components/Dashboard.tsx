@@ -25,6 +25,7 @@ const Dashboard = () => {
     'ctrl+k': () => setCommandPaletteOpen(true),
     'cmd+n': () => setQuickPromptOpen(true),
     'ctrl+n': () => setQuickPromptOpen(true),
+    'q': () => setQuickPromptOpen(true),
   });
 
   const handleQuickAdd = () => {
