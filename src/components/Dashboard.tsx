@@ -25,10 +25,21 @@ const Dashboard = () => {
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
 
+  // Debug: Track command palette state changes
+  React.useEffect(() => {
+    console.log('Command palette state changed:', commandPaletteOpen);
+  }, [commandPaletteOpen]);
+
   // Set up global shortcuts
   useGlobalShortcuts({
-    'cmd+k': () => setCommandPaletteOpen(true),
-    'ctrl+k': () => setCommandPaletteOpen(true),
+    'cmd+k': () => {
+      console.log('Opening command palette via cmd+k');
+      setCommandPaletteOpen(true);
+    },
+    'ctrl+k': () => {
+      console.log('Opening command palette via ctrl+k');
+      setCommandPaletteOpen(true);
+    },
     'cmd+n': () => setQuickPromptOpen(true),
     'ctrl+n': () => setQuickPromptOpen(true),
     'q': () => setQuickPromptOpen(true),

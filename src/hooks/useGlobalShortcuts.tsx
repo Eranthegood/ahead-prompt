@@ -28,9 +28,19 @@ export function useGlobalShortcuts(shortcuts: ShortcutMap) {
       if (event.shiftKey) shortcutString += 'shift+';
       shortcutString += key;
 
+      // Debug logging to help troubleshoot
+      console.log('Key pressed:', {
+        key: event.key,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shortcutString,
+        availableShortcuts: Object.keys(shortcuts)
+      });
+
       // Execute if shortcut exists
       const callback = shortcuts[shortcutString];
       if (callback) {
+        console.log('Executing shortcut:', shortcutString);
         event.preventDefault();
         callback();
       }
