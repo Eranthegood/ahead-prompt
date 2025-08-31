@@ -160,6 +160,140 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     }
   };
 
+  // Duplicate prompt with optimistic update
+  const duplicatePrompt = async (prompt: Prompt): Promise<void> => {
+    // Create optimistic duplicate
+    const duplicatePrompt: Prompt = {
+      id: `temp-${Date.now()}`,
+      workspace_id: prompt.workspace_id,
+      title: `${prompt.title} (Copy)`,
+      description: prompt.description,
+      status: 'todo',
+      priority: prompt.priority,
+      epic_id: prompt.epic_id,
+      product_id: prompt.product_id,
+      order_index: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Add immediately to UI
+    setPrompts(prev => [duplicatePrompt, ...prev]);
+
+    try {
+      const { data, error } = await supabase
+        .from('prompts')
+        .insert({
+          workspace_id: prompt.workspace_id,
+          title: `${prompt.title} (Copy)`,
+          description: prompt.description,
+          status: 'todo',
+          priority: prompt.priority,
+          product_id: prompt.product_id,
+          epic_id: prompt.epic_id,
+          order_index: 0
+        })
+        .select()
+        .single();
+
+      if (error) {
+        // Rollback on error
+        setPrompts(prev => prev.filter(p => p.id !== duplicatePrompt.id));
+        throw error;
+      }
+
+      // Replace with real data
+      const realPrompt = { ...data, status: data.status as PromptStatus };
+      setPrompts(prev => prev.map(p => p.id === duplicatePrompt.id ? realPrompt : p));
+
+      toast({
+        title: 'Prompt dupliqué',
+        description: 'Une copie a été créée'
+      });
+    } catch (error) {
+      console.error('Error duplicating prompt:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de dupliquer le prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Delete prompt with optimistic update
+  const deletePrompt = async (promptId: string): Promise<void> => {
+    // Store for potential rollback
+    const promptToDelete = prompts.find(p => p.id === promptId);
+    
+    // Optimistic delete
+    setPrompts(prev => prev.filter(p => p.id !== promptId));
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .delete()
+        .eq('id', promptId);
+
+      if (error) {
+        // Rollback on error
+        if (promptToDelete) {
+          setPrompts(prev => [promptToDelete, ...prev]);
+        }
+        throw error;
+      }
+
+      toast({
+        title: 'Prompt supprimé',
+        description: 'Le prompt a été supprimé'
+      });
+    } catch (error) {
+      console.error('Error deleting prompt:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer le prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Update prompt with optimistic update
+  const updatePrompt = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
+    // Optimistic update
+    setPrompts(prev => prev.map(p => 
+      p.id === promptId 
+        ? { ...p, ...updates, updated_at: new Date().toISOString() }
+        : p
+    ));
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', promptId);
+
+      if (error) {
+        // Rollback on error
+        await fetchPrompts();
+        throw error;
+      }
+
+      toast({
+        title: 'Prompt mis à jour',
+        description: 'Les modifications ont été sauvegardées'
+      });
+    } catch (error) {
+      console.error('Error updating prompt:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
   // Real-time subscription
   useEffect(() => {
     fetchPrompts();
@@ -179,16 +313,16 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         setPrompts(prevPrompts => {
           switch (eventType) {
             case 'INSERT':
-              // Add new prompt if not already present (avoid duplicates from optimistic updates)
-              if (newRecord && !prevPrompts.find(p => p.id === newRecord.id)) {
+              // Only add if it's not a temporary optimistic update
+              if (newRecord && !newRecord.id.startsWith('temp-') && !prevPrompts.find(p => p.id === newRecord.id)) {
                 return [newRecord as Prompt, ...prevPrompts];
               }
               break;
 
             case 'UPDATE':
-              // Update existing prompt
+              // Update existing prompt, prioritize real data over optimistic updates
               return prevPrompts.map(prompt => {
-                if (prompt.id === newRecord.id) {
+                if (prompt.id === newRecord.id && !prompt.id.startsWith('temp-')) {
                   return { ...prompt, ...newRecord, status: newRecord.status as PromptStatus };
                 }
                 return prompt;
@@ -213,6 +347,9 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     loading,
     createPrompt,
     updatePromptStatus,
+    duplicatePrompt,
+    deletePrompt,
+    updatePrompt,
     refetch: fetchPrompts,
   };
 };

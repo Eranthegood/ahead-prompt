@@ -24,7 +24,7 @@ interface MinimalPromptListProps {
 }
 
 export function MinimalPromptList({ workspace, selectedProductId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
-  const { prompts, loading, refetch } = usePrompts(workspace.id);
+  const { prompts, loading, updatePromptStatus, duplicatePrompt, deletePrompt } = usePrompts(workspace.id);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
@@ -74,90 +74,15 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
 
   const handleStatusChange = async (prompt: Prompt, newStatus: PromptStatus) => {
     if (newStatus === prompt.status) return;
-
-    try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', prompt.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Status updated',
-        description: `Prompt moved to ${statusOptions.find(s => s.value === newStatus)?.label}`
-      });
-
-      refetch();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update status',
-        variant: 'destructive'
-      });
-    }
+    await updatePromptStatus(prompt.id, newStatus);
   };
 
   const handleDuplicate = async (prompt: Prompt) => {
-    try {
-      const { error } = await supabase
-        .from('prompts')
-        .insert({
-          workspace_id: prompt.workspace_id,
-          title: `${prompt.title} (Copy)`,
-          description: prompt.description,
-          status: 'todo',
-          priority: prompt.priority,
-          product_id: prompt.product_id,
-          epic_id: prompt.epic_id,
-          order_index: 0
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Prompt duplicated',
-        description: 'A copy has been created'
-      });
-
-      refetch();
-    } catch (error) {
-      console.error('Error duplicating prompt:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to duplicate prompt',
-        variant: 'destructive'
-      });
-    }
+    await duplicatePrompt(prompt);
   };
 
   const handleDelete = async (prompt: Prompt) => {
-    try {
-      const { error } = await supabase
-        .from('prompts')
-        .delete()
-        .eq('id', prompt.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Prompt deleted',
-        description: 'The prompt has been removed'
-      });
-
-      refetch();
-    } catch (error) {
-      console.error('Error deleting prompt:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete prompt',
-        variant: 'destructive'
-      });
-    }
+    await deletePrompt(prompt.id);
   };
 
   const handleCopy = async (prompt: Prompt) => {
@@ -290,7 +215,7 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
             key={prompt.id}
             prompt={prompt}
             onEdit={() => handleEdit(prompt)}
-            onUpdate={() => refetch()}
+            onUpdate={() => {}}
           >
             <Card className="hover:shadow-sm transition-shadow cursor-pointer">
               <CardContent className="p-4">
@@ -450,7 +375,6 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
         prompt={selectedPrompt}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
-        onUpdate={() => refetch()}
         products={products}
         epics={epics}
       />

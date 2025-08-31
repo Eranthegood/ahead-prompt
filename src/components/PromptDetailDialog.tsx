@@ -10,6 +10,7 @@ import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { usePrompts } from '@/hooks/usePrompts';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { Prompt, Product, Epic } from '@/types';
 
@@ -17,18 +18,18 @@ interface PromptDetailDialogProps {
   prompt: Prompt | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdate: () => void;
   products: Product[];
   epics: Epic[];
 }
 
-export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, products, epics }: PromptDetailDialogProps) {
+export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics }: PromptDetailDialogProps) {
   const [productId, setProductId] = useState<string>('none');
   const [epicId, setEpicId] = useState<string>('none');
   const [saving, setSaving] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isRegenerating, setIsRegenerating] = useState(false);
   const { toast } = useToast();
+  const { updatePrompt } = usePrompts();
 
   // Rich text editor
   const editor = useEditor({
@@ -110,33 +111,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({
-          title: 'Idée modifiée', // Default title
-          description: content,
-          product_id: productId === 'none' ? null : productId,
-          epic_id: epicId === 'none' ? null : epicId,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', prompt.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Prompt mis à jour',
-        description: 'Les modifications ont été sauvegardées'
+      await updatePrompt(prompt.id, {
+        title: 'Idée modifiée',
+        description: content,
+        product_id: productId === 'none' ? null : productId,
+        epic_id: epicId === 'none' ? null : epicId,
       });
 
-      onUpdate();
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating prompt:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour le prompt',
-        variant: 'destructive'
-      });
     } finally {
       setSaving(false);
     }
