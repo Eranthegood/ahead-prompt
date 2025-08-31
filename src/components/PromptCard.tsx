@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PromptTransformService } from '@/services/promptTransformService';
 import { Prompt, PromptStatus } from '@/types';
 import { 
   Copy, 
@@ -15,7 +16,8 @@ import {
   ArrowRight, 
   ArrowLeft,
   Trash2,
-  Circle
+  Circle,
+  Sparkles
 } from 'lucide-react';
 
 interface PromptCardProps {
@@ -100,6 +102,44 @@ export const PromptCard: React.FC<PromptCardProps> = ({
       title: 'Copied to clipboard!',
       description: 'Paste this into Lovable chat to start building'
     });
+  };
+
+  const copyGeneratedPrompt = async () => {
+    try {
+      const rawText = `${prompt.title}${prompt.description ? '\n\n' + prompt.description : ''}`;
+      
+      toast({
+        title: 'Generating prompt...',
+        description: 'Please wait while we generate your prompt'
+      });
+
+      const response = await PromptTransformService.transformPrompt(rawText);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      if (response.transformedPrompt) {
+        await navigator.clipboard.writeText(response.transformedPrompt);
+        
+        toast({
+          title: 'Generated prompt copied!',
+          description: 'AI-generated prompt is ready to paste into Lovable'
+        });
+      } else {
+        throw new Error('No generated prompt received');
+      }
+    } catch (error) {
+      console.error('Error generating prompt:', error);
+      toast({
+        title: 'Error generating prompt',
+        description: 'Copying original content instead',
+        variant: 'destructive'
+      });
+      
+      // Fallback to original copy
+      copyForLovable();
+    }
   };
 
   const movePrompt = (direction: 'next' | 'prev') => {
@@ -225,8 +265,18 @@ export const PromptCard: React.FC<PromptCardProps> = ({
               variant="ghost"
               onClick={copyForLovable}
               className="h-6 px-2 text-primary hover:text-primary-glow"
+              title="Copy original content"
             >
               <Copy className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={copyGeneratedPrompt}
+              className="h-6 px-2 text-primary hover:text-primary-glow"
+              title="Copy generated prompt"
+            >
+              <Sparkles className="w-3 h-3" />
             </Button>
             <Button
               size="sm"

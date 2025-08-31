@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Hash, Package, Calendar, User, MoreHorizontal, Plus, Edit, Copy, Trash2, ArrowRight } from 'lucide-react';
+import { Hash, Package, Calendar, User, MoreHorizontal, Plus, Edit, Copy, Trash2, ArrowRight, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useProducts } from '@/hooks/useProducts';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
+import { PromptTransformService } from '@/services/promptTransformService';
 import { Workspace, Prompt, PromptStatus } from '@/types';
 
 interface MinimalPromptListProps {
@@ -178,6 +179,49 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
     }
   };
 
+  const handleCopyGenerated = async (prompt: Prompt) => {
+    try {
+      const rawText = `${prompt.title}\n\n${prompt.description || ''}`.trim();
+      
+      toast({
+        title: 'Generating prompt...',
+        description: 'Please wait while we generate your prompt'
+      });
+
+      const response = await PromptTransformService.transformPrompt(rawText);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      if (response.transformedPrompt) {
+        await navigator.clipboard.writeText(response.transformedPrompt);
+        
+        toast({
+          title: 'Generated prompt copied',
+          description: 'AI-generated prompt has been copied to clipboard'
+        });
+      } else {
+        throw new Error('No generated prompt received');
+      }
+    } catch (error) {
+      console.error('Error generating and copying prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate prompt. Copying original content instead.',
+        variant: 'destructive'
+      });
+      
+      // Fallback to copying original content
+      try {
+        const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
+        await navigator.clipboard.writeText(content);
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4 p-6">
@@ -334,6 +378,14 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
                         }} className="flex items-center gap-2">
                           <Copy className="h-4 w-4" />
                           Copy content
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem onClick={(e) => {
+                          e.preventDefault();
+                          handleCopyGenerated(prompt);
+                        }} className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4" />
+                          Copy generated prompt
                         </DropdownMenuItem>
                         
                         <DropdownMenuItem onClick={(e) => {
