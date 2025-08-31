@@ -40,6 +40,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasContent, setHasContent] = useState(false);
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const { toast } = useToast();
 
   // Rich text editor
@@ -71,6 +72,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       editor.commands.setContent('');
       setSelectedEpic('none');
       setHasContent(false);
+      setGeneratedPrompt('');
       // Set default product if no selectedProductId
       setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
       setTimeout(() => {
@@ -108,6 +110,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       
       if (response.error) {
         throw new Error(response.error);
+      }
+
+      // Store the generated prompt
+      if (response.transformedPrompt) {
+        setGeneratedPrompt(response.transformedPrompt);
       }
 
       setIsGenerating(false);
@@ -187,9 +194,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 flex flex-col">
-          {/* Formatting toolbar */}
-          <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+        <div className="space-y-4 flex flex-col lg:flex-row lg:gap-6">
+          {/* Left side - Editor */}
+          <div className="space-y-4 flex-1">
+            {/* Formatting toolbar */}
+            <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
             <Button
               variant="ghost"
               size="sm"
@@ -248,104 +257,131 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             >
               <ListOrdered className="h-4 w-4" />
             </Button>
-          </div>
+            </div>
 
-          {/* Rich text editor */}
-          <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
-            <EditorContent 
-              editor={editor}
-              className="w-full h-full"
-            />
-          </div>
+            {/* Rich text editor */}
+            <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
+              <EditorContent 
+                editor={editor}
+                className="w-full h-full"
+              />
+            </div>
 
-          {/* Product and Epic assignment */}
-          <div className="space-y-4">
-            {!selectedProductId && products.length > 0 && (
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                  Produit
-                </label>
-                <Select value={selectedProduct} onValueChange={(value) => {
-                  setSelectedProduct(value);
-                  if (value !== 'none') {
-                    setSelectedEpic('none');
-                  }
-                }}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Sélectionner un produit..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                    <SelectItem value="none">
-                      <span className="text-muted-foreground">Aucun produit</span>
-                    </SelectItem>
-                    {products.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-2 h-2 rounded-full" 
-                            style={{ backgroundColor: product.color }}
-                          />
-                          {product.name}
-                        </div>
+            {/* Product and Epic assignment */}
+            <div className="space-y-4">
+              {!selectedProductId && products.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Produit
+                  </label>
+                  <Select value={selectedProduct} onValueChange={(value) => {
+                    setSelectedProduct(value);
+                    if (value !== 'none') {
+                      setSelectedEpic('none');
+                    }
+                  }}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Sélectionner un produit..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                      <SelectItem value="none">
+                        <span className="text-muted-foreground">Aucun produit</span>
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            
-            {filteredEpics.length > 0 && (
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                  Epic {!hasValidAssignment && <span className="text-destructive">(ou sélectionnez un produit)</span>}
-                </label>
-                <Select value={selectedEpic} onValueChange={(value) => {
-                  setSelectedEpic(value);
-                  if (value !== 'none') {
-                    setSelectedProduct('none');
-                  }
-                }}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Sélectionner un epic..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                    <SelectItem value="none">
-                      <span className="text-muted-foreground">Aucun epic</span>
-                    </SelectItem>
-                    {filteredEpics.map((epic) => (
-                      <SelectItem key={epic.id} value={epic.id}>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-2 h-2 rounded-full" 
-                            style={{ backgroundColor: epic.color }}
-                          />
-                          {epic.name}
-                        </div>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-2 h-2 rounded-full" 
+                              style={{ backgroundColor: product.color }}
+                            />
+                            {product.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
+              {filteredEpics.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Epic {!hasValidAssignment && <span className="text-destructive">(ou sélectionnez un produit)</span>}
+                  </label>
+                  <Select value={selectedEpic} onValueChange={(value) => {
+                    setSelectedEpic(value);
+                    if (value !== 'none') {
+                      setSelectedProduct('none');
+                    }
+                  }}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Sélectionner un epic..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                      <SelectItem value="none">
+                        <span className="text-muted-foreground">Aucun epic</span>
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+                      {filteredEpics.map((epic) => (
+                        <SelectItem key={epic.id} value={epic.id}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-2 h-2 rounded-full" 
+                              style={{ backgroundColor: epic.color }}
+                            />
+                            {epic.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={onClose}>
-              Annuler
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={!hasContent || !hasValidAssignment || isLoading || isGenerating}
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Génération...
-                </>
-              ) : isLoading ? 'Création...' : 'Créer'}
-            </Button>
-          </div>
+          {/* Right side - Generated Prompt */}
+          {generatedPrompt && (
+            <div className="lg:w-80 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-muted-foreground">Prompt généré</h3>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(generatedPrompt);
+                      toast({ title: 'Copié !', description: 'Le prompt a été copié dans le presse-papier.' });
+                    }}
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </Button>
+                </div>
+              </div>
+              <div className="border rounded-md bg-muted/20 p-4 text-sm">
+                <div dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={!hasContent || !hasValidAssignment || isLoading || isGenerating}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Génération...
+              </>
+            ) : isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
