@@ -16,10 +16,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2 } from 'lucide-react';
 import { Workspace } from '@/types';
 
 interface MinimalSidebarProps {
@@ -44,18 +45,26 @@ const PRODUCT_COLORS = [
 ];
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
-  const { products, createProduct } = useProducts(workspace.id);
-  const { epics } = useEpics(workspace.id);
+  const { products, createProduct, deleteProduct } = useProducts(workspace.id);
+  const { epics, createEpic } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+  const [isCreateEpicOpen, setIsCreateEpicOpen] = useState(false);
+  const [selectedProductForEpic, setSelectedProductForEpic] = useState<string>('');
   const [newProductData, setNewProductData] = useState({
     name: '',
     description: '',
     color: '#3B82F6',
   });
+  const [newEpicData, setNewEpicData] = useState({
+    name: '',
+    description: '',
+    color: '#8B5CF6',
+  });
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingEpic, setIsCreatingEpic] = useState(false);
 
   // Filter function to match search and exclude completed
   const getActivePrompts = (productFilter?: string, epicFilter?: string) => {
@@ -153,6 +162,41 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     }
   };
 
+  const handleCreateEpic = async () => {
+    if (!newEpicData.name.trim() || !selectedProductForEpic) return;
+
+    setIsCreatingEpic(true);
+    try {
+      const newEpic = await createEpic({
+        name: newEpicData.name.trim(),
+        description: newEpicData.description.trim() || undefined,
+        color: newEpicData.color,
+        product_id: selectedProductForEpic,
+      });
+
+      if (newEpic) {
+        setIsCreateEpicOpen(false);
+        setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
+        setSelectedProductForEpic('');
+        // Expand the product to show the new epic
+        setExpandedProducts(prev => new Set(prev).add(selectedProductForEpic));
+      }
+    } finally {
+      setIsCreatingEpic(false);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.')) {
+      await deleteProduct(productId);
+      // If the deleted product was selected, reset selection
+      if (selectedProductId === productId) {
+        onProductSelect('all');
+        onEpicSelect(undefined);
+      }
+    }
+  };
+
   return (
     <>
       <Sidebar className="w-64 border-r border-border">
@@ -246,26 +290,50 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                             </Button>
                           </CollapsibleTrigger>
                           
-                          <SidebarMenuButton 
-                            className="flex-1 justify-between"
-                            onClick={() => {
-                              onProductSelect(product.id);
-                              onEpicSelect(undefined); // Clear epic selection when product is selected
-                            }}
-                            isActive={selectedProductId === product.id && !selectedEpicId}
-                          >
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-2 h-2 rounded-full" 
-                                style={{ backgroundColor: product.color || '#6B7280' }}
-                              />
-                              <Package className="h-3 w-3" />
-                              <span className="truncate text-sm">{product.name}</span>
-                            </div>
-                            <Badge variant="secondary" className="text-xs">
-                              {product.promptCount}
-                            </Badge>
-                          </SidebarMenuButton>
+                          <ContextMenu>
+                            <ContextMenuTrigger asChild>
+                              <SidebarMenuButton 
+                                className="flex-1 justify-between"
+                                onClick={() => {
+                                  onProductSelect(product.id);
+                                  onEpicSelect(undefined); // Clear epic selection when product is selected
+                                }}
+                                isActive={selectedProductId === product.id && !selectedEpicId}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-2 h-2 rounded-full" 
+                                    style={{ backgroundColor: product.color || '#6B7280' }}
+                                  />
+                                  <Package className="h-3 w-3" />
+                                  <span className="truncate text-sm">{product.name}</span>
+                                </div>
+                                <Badge variant="secondary" className="text-xs">
+                                  {product.promptCount}
+                                </Badge>
+                              </SidebarMenuButton>
+                            </ContextMenuTrigger>
+                            <ContextMenuContent className="w-48 bg-popover border border-border shadow-lg z-50">
+                              <ContextMenuItem 
+                                onClick={() => {
+                                  setSelectedProductForEpic(product.id);
+                                  setIsCreateEpicOpen(true);
+                                }}
+                                className="flex items-center gap-2"
+                              >
+                                <Hash className="h-4 w-4" />
+                                Créer un epic
+                              </ContextMenuItem>
+                              <ContextMenuSeparator />
+                              <ContextMenuItem 
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="flex items-center gap-2 text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Supprimer le produit
+                              </ContextMenuItem>
+                            </ContextMenuContent>
+                          </ContextMenu>
                         </div>
 
                         {/* Epic List */}
@@ -459,6 +527,99 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 disabled={!newProductData.name.trim() || isCreating}
               >
                 {isCreating ? 'Création...' : 'Créer'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Epic Dialog */}
+      <Dialog open={isCreateEpicOpen} onOpenChange={setIsCreateEpicOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Hash className="w-5 h-5" />
+              Nouvel Epic
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="epic-name">Nom de l'epic</Label>
+              <Input
+                id="epic-name"
+                value={newEpicData.name}
+                onChange={(e) => setNewEpicData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Ex: Authentification, Dashboard..."
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="epic-description">Description (optionnel)</Label>
+              <Textarea
+                id="epic-description"
+                value={newEpicData.description}
+                onChange={(e) => setNewEpicData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Décrivez brièvement cet epic..."
+                rows={3}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label>Couleur</Label>
+              <div className="flex items-center gap-2 mt-2">
+                {[
+                  { value: '#8B5CF6', label: 'Violet' },
+                  { value: '#10B981', label: 'Vert' },
+                  { value: '#3B82F6', label: 'Bleu' },
+                  { value: '#F59E0B', label: 'Orange' },
+                  { value: '#EF4444', label: 'Rouge' },
+                  { value: '#6B7280', label: 'Gris' },
+                ].map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    onClick={() => setNewEpicData(prev => ({ ...prev, color: color.value }))}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      newEpicData.color === color.value 
+                        ? 'border-primary scale-110' 
+                        : 'border-muted hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    title={color.label}
+                  />
+                ))}
+                <div className="flex items-center gap-2 ml-2">
+                  <Palette className="w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="color"
+                    value={newEpicData.color}
+                    onChange={(e) => setNewEpicData(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-8 h-8 rounded border cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsCreateEpicOpen(false);
+                  setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
+                  setSelectedProductForEpic('');
+                }}
+                disabled={isCreatingEpic}
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={handleCreateEpic}
+                disabled={!newEpicData.name.trim() || isCreatingEpic}
+              >
+                {isCreatingEpic ? 'Création...' : 'Créer'}
               </Button>
             </div>
           </div>
