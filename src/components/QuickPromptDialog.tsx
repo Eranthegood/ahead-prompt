@@ -5,8 +5,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Zap, MoreHorizontal, Target, CheckCircle2 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Zap, MoreHorizontal, Target, CheckCircle2, Sparkles, Copy, Clock } from 'lucide-react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { PromptTransformService, type PromptHistory } from '@/services/promptTransformService';
+import { PromptHistoryPanel } from '@/components/PromptHistoryPanel';
+import { useToast } from '@/components/ui/use-toast';
 import type { Workspace, PromptStatus, Epic } from '@/types';
 
 interface CreatePromptData {
@@ -51,6 +56,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   selectedProductId,
 }) => {
   const { preferences, savePromptSettings } = useUserPreferences();
+  const { toast } = useToast();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -58,6 +64,13 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [status, setStatus] = useState<PromptStatus>(preferences.lastPromptStatus as PromptStatus);
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // AI Transform states
+  const [rawIdea, setRawIdea] = useState('');
+  const [transformedPrompt, setTransformedPrompt] = useState('');
+  const [isTransforming, setIsTransforming] = useState(false);
+  const [promptHistory, setPromptHistory] = useState<PromptHistory[]>([]);
+  const [activeTab, setActiveTab] = useState('create');
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const epicSelectRef = useRef<HTMLButtonElement>(null);
@@ -88,6 +101,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       setPriority(getPriorityNumber(preferences.lastPromptPriority));
       setStatus(preferences.lastPromptStatus as PromptStatus);
       setSelectedEpic('none');
+      
+      // Reset AI states
+      setRawIdea('');
+      setTransformedPrompt('');
+      setActiveTab('create');
+      
+      // Load prompt history
+      loadPromptHistory();
 
       // Smart focus: epic selector if product selected and epics available, otherwise title
       setTimeout(() => {
@@ -99,6 +120,93 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       }, 100);
     }
   }, [isOpen, preferences, selectedProductId, filteredEpics.length]);
+
+  // Load prompt history
+  const loadPromptHistory = () => {
+    setPromptHistory(PromptTransformService.getHistory());
+  };
+
+  // AI Transform function
+  const handleTransformIdea = async () => {
+    if (!rawIdea.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer une idée à transformer",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsTransforming(true);
+    try {
+      const result = await PromptTransformService.transformPrompt(rawIdea);
+      
+      if (result.error) {
+        toast({
+          title: "Erreur de transformation",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setTransformedPrompt(result.transformedPrompt);
+      loadPromptHistory(); // Refresh history
+      
+      toast({
+        title: "Prompt généré !",
+        description: "Votre idée a été transformée en prompt structuré",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de transformer l'idée",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTransforming(false);
+    }
+  };
+
+  // Copy prompt function
+  const handleCopyPrompt = async (prompt: string) => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      toast({
+        title: "Copié !",
+        description: "Le prompt a été copié dans le presse-papiers",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de copier le prompt",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Use generated prompt as title/description
+  const handleUseGeneratedPrompt = () => {
+    if (!transformedPrompt) return;
+    
+    // Extract title from markdown (first # line)
+    const lines = transformedPrompt.split('\n');
+    const titleLine = lines.find(line => line.startsWith('# '));
+    const title = titleLine ? titleLine.replace('# ', '').trim() : 'Nouveau prompt';
+    
+    // Use the rest as description
+    const description = transformedPrompt;
+    
+    setTitle(title);
+    setDescription(description);
+    setActiveTab('create');
+    
+    toast({
+      title: "Prompt appliqué",
+      description: "Le prompt généré a été utilisé comme titre et description",
+    });
+  };
 
   // ⌨️ Enhanced keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -174,7 +282,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-[500px] bg-card/95 backdrop-blur-sm border-border/50"
+        className="sm:max-w-[700px] bg-card/95 backdrop-blur-sm border-border/50"
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
@@ -184,126 +292,227 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* 🎯 Title - Large input */}
-          <div>
-            <Input
-              ref={titleInputRef}
-              placeholder="Titre du prompt..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium h-12 border-none bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground"
-              maxLength={100}
-            />
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="create" className="text-sm">
+              <Zap className="w-4 h-4 mr-2" />
+              Créer
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="text-sm">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Générer IA
+            </TabsTrigger>
+            <TabsTrigger value="history" className="text-sm">
+              <Clock className="w-4 h-4 mr-2" />
+              Historique
+            </TabsTrigger>
+          </TabsList>
 
-          {/* 📝 Description - Optional */}
-          <div>
-            <Textarea
-              placeholder="Description (optionnel)..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="border-border/50 bg-muted/30 resize-none"
-              maxLength={500}
-            />
-          </div>
+          <TabsContent value="create" className="space-y-4 mt-4">
+            {/* 🎯 Title - Large input */}
+            <div>
+              <Input
+                ref={titleInputRef}
+                placeholder="Titre du prompt..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="text-lg font-medium h-12 border-none bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground"
+                maxLength={100}
+              />
+            </div>
 
-          {/* ⚡ Quick selectors */}
-          <div className="flex items-center gap-3 pt-2">
-            {/* Status selector */}
-            <Select value={status} onValueChange={(value: PromptStatus) => setStatus(value)}>
-              <SelectTrigger className="w-32 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((s) => {
-                  const IconComponent = s.icon;
-                  return (
-                    <SelectItem key={s.value} value={s.value} className="text-sm">
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="w-4 h-4" />
-                        {s.label}
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            {/* 📝 Description - Optional */}
+            <div>
+              <Textarea
+                placeholder="Description (optionnel)..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="border-border/50 bg-muted/30 resize-none"
+                maxLength={500}
+              />
+            </div>
 
-            {/* Priority selector */}
-            <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
-              <SelectTrigger className="w-32 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {priorities.map((p) => (
-                  <SelectItem key={p.value} value={p.value.toString()} className="text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${p.color}`} />
-                      <span>{p.label}</span>
-                      <span className="text-xs text-muted-foreground">({p.shortcut})</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Epic selector */}
-            {filteredEpics.length > 0 && (
-              <Select value={selectedEpic} onValueChange={setSelectedEpic}>
-                <SelectTrigger ref={epicSelectRef} className="flex-1 h-9 text-sm">
-                  <SelectValue placeholder="Epic..." />
+            {/* ⚡ Quick selectors */}
+            <div className="flex items-center gap-3 pt-2">
+              {/* Status selector */}
+              <Select value={status} onValueChange={(value: PromptStatus) => setStatus(value)}>
+                <SelectTrigger className="w-32 h-9 text-sm">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none" className="text-sm">
-                    <span className="text-muted-foreground">Aucun epic</span>
-                  </SelectItem>
-                  {filteredEpics.map((epic) => (
-                    <SelectItem key={epic.id} value={epic.id} className="text-sm">
+                  {statuses.map((s) => {
+                    const IconComponent = s.icon;
+                    return (
+                      <SelectItem key={s.value} value={s.value} className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="w-4 h-4" />
+                          {s.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+
+              {/* Priority selector */}
+              <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
+                <SelectTrigger className="w-32 h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorities.map((p) => (
+                    <SelectItem key={p.value} value={p.value.toString()} className="text-sm">
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="w-2 h-2 rounded-full" 
-                          style={{ backgroundColor: epic.color }}
-                        />
-                        {epic.name}
+                        <div className={`w-2 h-2 rounded-full ${p.color}`} />
+                        <span>{p.label}</span>
+                        <span className="text-xs text-muted-foreground">({p.shortcut})</span>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            )}
 
-            {/* More options button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleMoreOptions}
-              className="h-9 px-2 text-muted-foreground hover:text-foreground"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </div>
+              {/* Epic selector */}
+              {filteredEpics.length > 0 && (
+                <Select value={selectedEpic} onValueChange={setSelectedEpic}>
+                  <SelectTrigger ref={epicSelectRef} className="flex-1 h-9 text-sm">
+                    <SelectValue placeholder="Epic..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none" className="text-sm">
+                      <span className="text-muted-foreground">Aucun epic</span>
+                    </SelectItem>
+                    {filteredEpics.map((epic) => (
+                      <SelectItem key={epic.id} value={epic.id} className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-2 h-2 rounded-full" 
+                            style={{ backgroundColor: epic.color }}
+                          />
+                          {epic.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
 
-          {/* 🚀 Action buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-border/50">
-            <div className="text-xs text-muted-foreground">
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Enter</kbd> pour créer
-              <span className="mx-2">•</span>
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">1-4</kbd> priorité
-              <span className="mx-2">•</span>
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> annuler
-            </div>
-
-            <div className="flex gap-2">
+              {/* More options button */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
-                disabled={isLoading}
+                onClick={handleMoreOptions}
+                className="h-9 px-2 text-muted-foreground hover:text-foreground"
               >
-                Annuler
+                <MoreHorizontal className="w-4 h-4" />
               </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-4 mt-4">
+            {/* Raw idea input */}
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Décrivez votre idée brute
+              </label>
+              <Textarea
+                placeholder="Ex: Je veux créer une app de gestion de tâches avec des collaborateurs, notifications en temps réel et tableaux de bord personnalisables..."
+                value={rawIdea}
+                onChange={(e) => setRawIdea(e.target.value)}
+                rows={4}
+                className="border-border/50 bg-muted/30 resize-none"
+                maxLength={1000}
+              />
+            </div>
+
+            {/* Transform button */}
+            <div className="flex gap-2">
+              <Button
+                onClick={handleTransformIdea}
+                disabled={!rawIdea.trim() || isTransforming}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {isTransforming ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border border-current border-t-transparent rounded-full animate-spin" />
+                    Génération...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Générer avec IA
+                  </div>
+                )}
+              </Button>
+            </div>
+
+            {/* Generated prompt preview */}
+            {transformedPrompt && (
+              <Card className="p-4 bg-accent/20 border-accent/30">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium text-accent-foreground">
+                    Prompt généré
+                  </h4>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopyPrompt(transformedPrompt)}
+                      className="h-8 text-xs"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copier
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleUseGeneratedPrompt}
+                      className="h-8 text-xs"
+                    >
+                      <Zap className="w-3 h-3 mr-1" />
+                      Utiliser
+                    </Button>
+                  </div>
+                </div>
+                <div className="bg-background/50 rounded-md p-3 max-h-[200px] overflow-y-auto">
+                  <pre className="text-sm text-foreground whitespace-pre-wrap font-mono">
+                    {transformedPrompt}
+                  </pre>
+                </div>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="history" className="mt-4">
+            <PromptHistoryPanel
+              history={promptHistory}
+              onHistoryUpdate={loadPromptHistory}
+              onCopyPrompt={handleCopyPrompt}
+            />
+          </TabsContent>
+        </Tabs>
+
+        {/* 🚀 Action buttons */}
+        <div className="flex items-center justify-between pt-4 border-t border-border/50">
+          <div className="text-xs text-muted-foreground">
+            <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Enter</kbd> pour créer
+            <span className="mx-2">•</span>
+            <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">1-4</kbd> priorité
+            <span className="mx-2">•</span>
+            <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> annuler
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Annuler
+            </Button>
+            {activeTab === 'create' && (
               <Button
                 size="sm"
                 onClick={handleSave}
@@ -322,7 +531,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   </div>
                 )}
               </Button>
-            </div>
+            )}
           </div>
         </div>
       </DialogContent>
