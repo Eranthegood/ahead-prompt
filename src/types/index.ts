@@ -61,6 +61,7 @@ export interface Database {
           id: string;
           workspace_id: string;
           epic_id: string | null;
+          product_id: string | null;
           title: string;
           description: string | null;
           status: 'todo' | 'in_progress' | 'done';
@@ -73,6 +74,7 @@ export interface Database {
           id?: string;
           workspace_id: string;
           epic_id?: string | null;
+          product_id?: string | null;
           title: string;
           description?: string | null;
           status?: 'todo' | 'in_progress' | 'done';
@@ -85,6 +87,7 @@ export interface Database {
           id?: string;
           workspace_id?: string;
           epic_id?: string | null;
+          product_id?: string | null;
           title?: string;
           description?: string | null;
           status?: 'todo' | 'in_progress' | 'done';

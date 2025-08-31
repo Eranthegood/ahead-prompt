@@ -9,6 +9,7 @@ interface CreatePromptData {
   status?: PromptStatus;
   priority?: number;
   epic_id?: string;
+  product_id?: string; // Add product_id option
 }
 
 export const usePrompts = (workspaceId?: string, selectedProductId?: string) => {
@@ -63,6 +64,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       status: promptData.status || 'todo',
       priority: promptData.priority || 3,
       epic_id: promptData.epic_id || null,
+      product_id: promptData.product_id || null,
       order_index: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -80,6 +82,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         status: promptData.status || 'todo',
         priority: promptData.priority || 3,
         epic_id: promptData.epic_id || undefined,
+        product_id: promptData.product_id || undefined,
         order_index: 0,
       };
 

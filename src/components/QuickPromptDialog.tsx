@@ -14,6 +14,7 @@ interface CreatePromptData {
   status?: PromptStatus;
   priority?: number;
   epic_id?: string;
+  product_id?: string; // Add product_id option
 }
 
 interface QuickPromptDialogProps {
@@ -104,6 +105,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         priority,
         status,
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
+        product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
       };
 
       await onSave(promptData);
@@ -123,6 +125,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       priority,
       status,
       epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
+      product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
     };
 
     onOpenExtended?.(promptData);

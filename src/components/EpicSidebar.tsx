@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -16,32 +15,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useProducts } from '@/hooks/useProducts';
-import { supabase } from '@/integrations/supabase/client';
+import { useEpics } from '@/hooks/useEpics';
+import { usePrompts } from '@/hooks/usePrompts';
 import { 
   Hash, 
   Package, 
   Target, 
   ChevronDown, 
-  ChevronRight, 
-  Plus,
-  Circle
+  ChevronRight
 } from 'lucide-react';
-import type { Workspace, Product, Epic } from '@/types';
+import type { Workspace } from '@/types';
 
 interface EpicSidebarProps {
   workspace: Workspace;
   selectedProductId?: string;
   onProductSelect?: (productId: string | 'all') => void;
-}
-
-interface ProductWithEpics extends Product {
-  epics: EpicWithPromptCount[];
-  epicCount: number;
-  promptCount: number;
-}
-
-interface EpicWithPromptCount extends Epic {
-  promptCount: number;
 }
 
 export const EpicSidebar: React.FC<EpicSidebarProps> = ({ 
@@ -51,94 +39,58 @@ export const EpicSidebar: React.FC<EpicSidebarProps> = ({
 }) => {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
-  const [productsWithEpics, setProductsWithEpics] = useState<ProductWithEpics[]>([]);
-  const [totalPrompts, setTotalPrompts] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
 
-  // Fetch products with their epics and prompt counts
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!workspace?.id) return;
-      
-      try {
-        setLoading(true);
+  // Use real-time hooks
+  const { products, loading: productsLoading } = useProducts(workspace.id);
+  const { epics } = useEpics(workspace.id);
+  const { prompts } = usePrompts(workspace.id);
 
-        // Fetch products
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*')
-          .eq('workspace_id', workspace.id)
-          .order('created_at', { ascending: true });
+  // Group epics by product
+  const epicsByProduct = epics.reduce((acc, epic) => {
+    const productId = epic.product_id;
+    if (!acc[productId]) {
+      acc[productId] = [];
+    }
+    acc[productId].push(epic);
+    return acc;
+  }, {} as Record<string, typeof epics>);
 
-        if (productsError) throw productsError;
-
-        // Fetch epics  
-        const { data: epicsData, error: epicsError } = await supabase
-          .from('epics')
-          .select('*')
-          .eq('workspace_id', workspace.id);
-
-        if (epicsError) throw epicsError;
-
-        // Fetch prompt counts per epic
-        const epicPromptCounts: Record<string, number> = {};
-        for (const epic of epicsData || []) {
-          const { count, error: countError } = await supabase
-            .from('prompts')
-            .select('*', { count: 'exact', head: true })
-            .eq('epic_id', epic.id);
-          
-          if (!countError) {
-            epicPromptCounts[epic.id] = count || 0;
-          }
-        }
-
-        // Fetch total prompts count
-        const { count: totalPromptsCount, error: promptsError } = await supabase
-          .from('prompts')
-          .select('*', { count: 'exact', head: true })
-          .eq('workspace_id', workspace.id);
-
-        if (promptsError) throw promptsError;
-
-        // Group epics by product and calculate counts
-        const productsWithEpicsData = productsData?.map(product => {
-          const productEpics = epicsData?.filter(epic => epic.product_id === product.id) || [];
-          const promptCount = productEpics.reduce((sum, epic) => {
-            return sum + (epicPromptCounts[epic.id] || 0);
-          }, 0);
-
-          const epicsWithCounts = productEpics.map(epic => ({
-            ...epic,
-            promptCount: epicPromptCounts[epic.id] || 0
-          }));
-
-          return {
-            ...product,
-            epics: epicsWithCounts,
-            epicCount: productEpics.length,
-            promptCount,
-          };
-        }) || [];
-
-        setProductsWithEpics(productsWithEpicsData);
-        setTotalPrompts(totalPromptsCount || 0);
-
-        // Auto-expand selected product
-        if (selectedProductId && selectedProductId !== 'all') {
-          setExpandedProducts(prev => new Set(prev).add(selectedProductId));
-        }
-
-      } catch (error) {
-        console.error('Error fetching sidebar data:', error);
-      } finally {
-        setLoading(false);
+  // Count prompts by epic and by product
+  const promptCounts = {
+    byEpic: prompts.reduce((acc, prompt) => {
+      if (prompt.epic_id) {
+        acc[prompt.epic_id] = (acc[prompt.epic_id] || 0) + 1;
       }
-    };
+      return acc;
+    }, {} as Record<string, number>),
+    byProduct: prompts.reduce((acc, prompt) => {
+      if (prompt.product_id) {
+        acc[prompt.product_id] = (acc[prompt.product_id] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>),
+    total: prompts.length
+  };
 
-    fetchData();
-  }, [workspace?.id, selectedProductId]);
+  // Calculate data for products with epics
+  const productsWithEpics = products.map(product => {
+    const productEpics = epicsByProduct[product.id] || [];
+    const directPromptCount = promptCounts.byProduct[product.id] || 0;
+    const epicPromptCount = productEpics.reduce((sum, epic) => {
+      return sum + (promptCounts.byEpic[epic.id] || 0);
+    }, 0);
+    
+    return {
+      ...product,
+      epics: productEpics.map(epic => ({
+        ...epic,
+        promptCount: promptCounts.byEpic[epic.id] || 0
+      })),
+      epicCount: productEpics.length,
+      promptCount: directPromptCount + epicPromptCount
+    };
+  });
 
   const toggleProductExpansion = (productId: string) => {
     setExpandedProducts(prev => {
@@ -159,7 +111,7 @@ export const EpicSidebar: React.FC<EpicSidebarProps> = ({
     }
   };
 
-  if (loading) {
+  if (productsLoading) {
     return (
       <Sidebar className={collapsed ? "w-14" : "w-72"}>
         <SidebarTrigger className="m-2 self-end" />
@@ -202,7 +154,7 @@ export const EpicSidebar: React.FC<EpicSidebarProps> = ({
                       <>
                         <span className="flex-1 text-left">Tous les prompts</span>
                         <Badge variant="secondary" className="text-xs">
-                          {totalPrompts}
+                          {promptCounts.total}
                         </Badge>
                       </>
                     )}
@@ -332,7 +284,7 @@ export const EpicSidebar: React.FC<EpicSidebarProps> = ({
               </div>
               <div className="flex justify-between">
                 <span>Prompts:</span>
-                <span>{totalPrompts}</span>
+                <span>{promptCounts.total}</span>
               </div>
             </div>
           </div>

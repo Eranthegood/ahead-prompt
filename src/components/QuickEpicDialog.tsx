@@ -11,7 +11,7 @@ interface CreateEpicData {
   name: string;
   description?: string;
   color?: string;
-  product_id?: string;
+  product_id: string; // Required now
 }
 
 interface QuickEpicDialogProps {
@@ -45,7 +45,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<string>('#8B5CF6');
-  const [selectedProduct, setSelectedProduct] = useState<string>('none');
+  const [selectedProduct, setSelectedProduct] = useState<string>(selectedProductId || '');
   const [isLoading, setIsLoading] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +57,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
       setName('');
       setDescription('');
       setColor('#8B5CF6');
-      setSelectedProduct(selectedProductId || 'none');
+      setSelectedProduct(selectedProductId || '');
 
       // Focus with delay to avoid rendering issues
       setTimeout(() => {
@@ -79,23 +79,20 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
     }
   };
 
-  // 💾 Save epic
   const handleSave = async () => {
-    if (!name.trim()) return;
-
+    if (!name.trim() || !selectedProduct) return;
+    
     setIsLoading(true);
     try {
-      const epicData: CreateEpicData = {
+      await onSave({
         name: name.trim(),
         description: description.trim() || undefined,
         color,
-        product_id: selectedProduct === 'none' ? undefined : selectedProduct,
-      };
-
-      await onSave(epicData);
+        product_id: selectedProduct
+      });
       onClose();
     } catch (error) {
-      console.error('Error saving epic:', error);
+      console.error('Error creating epic:', error);
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +104,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
       name: name.trim(),
       description: description.trim() || undefined,
       color,
-      product_id: selectedProduct === 'none' ? undefined : selectedProduct,
+      product_id: selectedProduct
     };
 
     onOpenExtended?.(epicData);
@@ -161,14 +158,11 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
                   <SelectValue placeholder="Produit..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none" className="text-sm">
-                    <span className="text-muted-foreground">Aucun produit</span>
-                  </SelectItem>
                   {products.map((product) => (
-                    <SelectItem key={product.id} value={product.id} className="text-sm">
+                    <SelectItem key={product.id} value={product.id}>
                       <div className="flex items-center gap-2">
                         <div 
-                          className="w-2 h-2 rounded-full" 
+                          className="w-3 h-3 rounded-full flex-shrink-0" 
                           style={{ backgroundColor: product.color }}
                         />
                         {product.name}
@@ -238,7 +232,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={!name.trim() || isLoading}
+                disabled={!name.trim() || !selectedProduct || isLoading}
                 className="bg-primary hover:bg-primary/90"
               >
                 {isLoading ? (
