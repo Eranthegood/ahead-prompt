@@ -67,6 +67,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       order_index: 0,
       generated_prompt: promptData.generated_prompt || null,
       generated_at: promptData.generated_at || null,
+      is_debug_session: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -178,6 +179,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       order_index: 0,
       generated_prompt: prompt.generated_prompt,
       generated_at: prompt.generated_at,
+      is_debug_session: prompt.is_debug_session || false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

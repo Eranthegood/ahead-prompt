@@ -69,6 +69,7 @@ export interface Database {
           order_index: number;
           generated_prompt: string | null;
           generated_at: string | null;
+          is_debug_session: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -84,6 +85,7 @@ export interface Database {
           order_index?: number;
           generated_prompt?: string | null;
           generated_at?: string | null;
+          is_debug_session?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -99,6 +101,7 @@ export interface Database {
           order_index?: number;
           generated_prompt?: string | null;
           generated_at?: string | null;
+          is_debug_session?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };

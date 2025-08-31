@@ -152,6 +152,7 @@ export type Database = {
           generated_at: string | null
           generated_prompt: string | null
           id: string
+          is_debug_session: boolean | null
           order_index: number
           priority: number | null
           product_id: string | null
@@ -167,6 +168,7 @@ export type Database = {
           generated_at?: string | null
           generated_prompt?: string | null
           id?: string
+          is_debug_session?: boolean | null
           order_index?: number
           priority?: number | null
           product_id?: string | null
@@ -182,6 +184,7 @@ export type Database = {
           generated_at?: string | null
           generated_prompt?: string | null
           id?: string
+          is_debug_session?: boolean | null
           order_index?: number
           priority?: number | null
           product_id?: string | null

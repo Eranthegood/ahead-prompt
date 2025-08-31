@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   Trash2,
   Circle,
-  Sparkles
+  Sparkles,
+  Bug
 } from 'lucide-react';
 
 interface PromptCardProps {
@@ -167,7 +168,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   };
 
   return (
-    <Card className="bg-card border-border hover:shadow-md transition-shadow group">
+    <Card className={`${prompt.is_debug_session ? 'bg-orange-50/50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800' : 'bg-card border-border'} hover:shadow-md transition-shadow group`}>
       <CardHeader className="pb-3">
         {isEditing ? (
           <div className="space-y-2">
@@ -188,14 +189,24 @@ export const PromptCard: React.FC<PromptCardProps> = ({
           </div>
         ) : (
           <div className="flex items-start justify-between">
-            <TruncatedTitle 
-              title={prompt.title}
-              maxLength={50}
-              className="font-semibold text-sm flex-1 group"
-              showCopyButton={true}
-              variant="inline"
-            />
+            <div className="flex items-center gap-2 flex-1">
+              {prompt.is_debug_session && (
+                <Bug className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+              )}
+              <TruncatedTitle 
+                title={prompt.title}
+                maxLength={50}
+                className="font-semibold text-sm flex-1 group"
+                showCopyButton={true}
+                variant="inline"
+              />
+            </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {prompt.is_debug_session && (
+                <Badge variant="outline" className="text-xs bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700">
+                  DEBUG
+                </Badge>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
