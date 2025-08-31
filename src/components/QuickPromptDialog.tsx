@@ -71,6 +71,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [isTransforming, setIsTransforming] = useState(false);
   const [promptHistory, setPromptHistory] = useState<PromptHistory[]>([]);
   const [activeTab, setActiveTab] = useState('create');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const epicSelectRef = useRef<HTMLButtonElement>(null);
@@ -208,6 +209,49 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     });
   };
 
+  // Generate description from title using AI
+  const handleGenerateFromTitle = async () => {
+    if (!title.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez d'abord entrer un titre",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsTransforming(true);
+    try {
+      const result = await PromptTransformService.transformPrompt(title);
+      
+      if (result.error) {
+        toast({
+          title: "Erreur de génération",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setDescription(result.transformedPrompt);
+      setShowSuggestions(true);
+      
+      toast({
+        title: "Description générée !",
+        description: "Une description a été générée automatiquement",
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la description",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTransforming(false);
+    }
+  };
+
   // ⌨️ Enhanced keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Don't trigger shortcuts when typing in inputs
@@ -321,10 +365,35 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               />
             </div>
 
-            {/* 📝 Description - Optional */}
+            {/* 📝 Description - Optional with AI generation */}
             <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-muted-foreground">
+                  Description (optionnel)
+                </label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateFromTitle}
+                  disabled={!title.trim() || isTransforming}
+                  className="h-6 px-2 text-xs"
+                >
+                  {isTransforming ? (
+                    <>
+                      <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin mr-1" />
+                      Génération...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Générer avec IA
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
-                placeholder="Description (optionnel)..."
+                placeholder="Description (optionnel) ou utilisez l'IA pour générer..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
