@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const { workspace, loading } = useWorkspace();
-  const { createPrompt } = usePrompts(workspace?.id);
+  const { createPrompt, refetch: refetchPrompts } = usePrompts(workspace?.id);
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
@@ -40,6 +40,10 @@ const Dashboard = () => {
 
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
+  };
+
+  const handleTitlesUpdated = () => {
+    refetchPrompts?.();
   };
 
   if (loading) {
@@ -80,6 +84,7 @@ const Dashboard = () => {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onQuickAdd={handleQuickAdd}
+            onTitlesUpdated={handleTitlesUpdated}
           />
           
           <MinimalPromptList 
