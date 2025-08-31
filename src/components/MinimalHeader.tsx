@@ -2,17 +2,16 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Plus, LogOut } from 'lucide-react';
+import { Search, LogOut } from 'lucide-react';
 import { Workspace } from '@/types';
 
 interface MinimalHeaderProps {
   workspace: Workspace;
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onQuickAdd: () => void;
 }
 
-export function MinimalHeader({ workspace, searchQuery, onSearchChange, onQuickAdd }: MinimalHeaderProps) {
+export function MinimalHeader({ workspace, searchQuery, onSearchChange }: MinimalHeaderProps) {
   const { signOut } = useAuth();
 
   return (
@@ -30,11 +29,6 @@ export function MinimalHeader({ workspace, searchQuery, onSearchChange, onQuickA
       </div>
 
       <div className="flex items-center gap-3">
-        <Button onClick={onQuickAdd} className="bg-primary hover:bg-primary/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Prompt
-        </Button>
-        
         <Button 
           variant="ghost" 
           size="sm" 

@@ -84,7 +84,6 @@ const Dashboard = () => {
             workspace={workspace}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onQuickAdd={handleQuickAdd}
           />
           
           <MinimalPromptList 
