@@ -52,8 +52,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
       setDescription(prompt.description || '');
       setStatus(prompt.status);
       setPriority(prompt.priority);
-      setProductId(prompt.product_id || '');
-      setEpicId(prompt.epic_id || '');
+      setProductId(prompt.product_id || 'none');
+      setEpicId(prompt.epic_id || 'none');
     }
   }, [prompt]);
 
@@ -69,8 +69,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
           description: description.trim() || null,
           status,
           priority,
-          product_id: productId || null,
-          epic_id: epicId || null,
+          product_id: productId === 'none' ? null : productId,
+          epic_id: epicId === 'none' ? null : epicId,
           updated_at: new Date().toISOString()
         })
         .eq('id', prompt.id);
@@ -96,7 +96,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
     }
   };
 
-  const filteredEpics = epics.filter(epic => !productId || epic.product_id === productId);
+  const filteredEpics = epics.filter(epic => productId === 'none' || !productId || epic.product_id === productId);
   const selectedProduct = products.find(p => p.id === productId);
   const selectedEpic = epics.find(e => e.id === epicId);
   const priorityOption = priorityOptions.find(p => p.value === priority);
@@ -194,12 +194,17 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Product</Label>
-              <Select value={productId} onValueChange={setProductId}>
+              <Select value={productId} onValueChange={(value) => {
+                setProductId(value);
+                if (value === 'none') {
+                  setEpicId('none');
+                }
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select product..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No product</SelectItem>
+                  <SelectItem value="none">No product</SelectItem>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       <div className="flex items-center gap-2">
@@ -214,12 +219,12 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
 
             <div className="space-y-2">
               <Label>Epic</Label>
-              <Select value={epicId} onValueChange={setEpicId} disabled={!productId}>
+              <Select value={epicId} onValueChange={setEpicId} disabled={productId === 'none'}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select epic..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No epic</SelectItem>
+                  <SelectItem value="none">No epic</SelectItem>
                   {filteredEpics.map((epic) => (
                     <SelectItem key={epic.id} value={epic.id}>
                       <div className="flex items-center gap-2">
