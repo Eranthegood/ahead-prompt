@@ -5,6 +5,7 @@ import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
+import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useEpics } from '@/hooks/useEpics';
@@ -16,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
+  const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,6 +35,7 @@ const Dashboard = () => {
     'cmd+n': () => setQuickPromptOpen(true),
     'ctrl+n': () => setQuickPromptOpen(true),
     'q': () => setQuickPromptOpen(true),
+    't': () => setDebugConsoleOpen(true),
   });
 
   const handleToggleCompletedItems = (show: boolean) => {
@@ -110,6 +113,12 @@ const Dashboard = () => {
           epics={epics}
           products={products}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        />
+
+        <DebugConsole
+          isOpen={debugConsoleOpen}
+          onClose={() => setDebugConsoleOpen(false)}
+          workspace={workspace}
         />
       </div>
     </SidebarProvider>
