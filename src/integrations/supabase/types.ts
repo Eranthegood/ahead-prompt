@@ -149,6 +149,8 @@ export type Database = {
           created_at: string
           description: string | null
           epic_id: string | null
+          generated_at: string | null
+          generated_prompt: string | null
           id: string
           order_index: number
           priority: number | null
@@ -162,6 +164,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           epic_id?: string | null
+          generated_at?: string | null
+          generated_prompt?: string | null
           id?: string
           order_index?: number
           priority?: number | null
@@ -175,6 +179,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           epic_id?: string | null
+          generated_at?: string | null
+          generated_prompt?: string | null
           id?: string
           order_index?: number
           priority?: number | null

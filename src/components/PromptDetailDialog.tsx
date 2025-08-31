@@ -50,12 +50,13 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       editor.commands.setContent(content);
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
-      setGeneratedPrompt(content);
+      // Load persisted generated prompt or use description as fallback
+      setGeneratedPrompt(prompt.generated_prompt || content);
     }
   }, [prompt, editor]);
 
   const handleRegeneratePrompt = async () => {
-    if (!editor) return;
+    if (!editor || !prompt) return;
     
     setIsRegenerating(true);
     try {
@@ -68,11 +69,17 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
       if (response.transformedPrompt) {
         setGeneratedPrompt(response.transformedPrompt);
+        
+        // Persist to database immediately
+        await updatePrompt(prompt.id, {
+          generated_prompt: response.transformedPrompt,
+          generated_at: new Date().toISOString(),
+        });
       }
 
       toast({
         title: 'Prompt régénéré',
-        description: 'Le prompt a été régénéré avec succès'
+        description: 'Le prompt a été régénéré et sauvegardé avec succès'
       });
     } catch (error) {
       console.error('Error regenerating prompt:', error);
@@ -342,6 +349,12 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 dangerouslySetInnerHTML={{ __html: generatedPrompt }}
               />
             </div>
+            
+            {prompt.generated_at && (
+              <p className="text-xs text-muted-foreground">
+                Généré le {format(new Date(prompt.generated_at), 'dd/MM/yyyy à HH:mm')}
+              </p>
+            )}
           </div>
         </div>
       </DialogContent>

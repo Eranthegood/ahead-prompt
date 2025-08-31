@@ -67,6 +67,8 @@ export interface Database {
           status: 'todo' | 'in_progress' | 'done';
           priority: number;
           order_index: number;
+          generated_prompt: string | null;
+          generated_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -80,6 +82,8 @@ export interface Database {
           status?: 'todo' | 'in_progress' | 'done';
           priority?: number;
           order_index?: number;
+          generated_prompt?: string | null;
+          generated_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -93,6 +97,8 @@ export interface Database {
           status?: 'todo' | 'in_progress' | 'done';
           priority?: number;
           order_index?: number;
+          generated_prompt?: string | null;
+          generated_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -9,7 +9,9 @@ interface CreatePromptData {
   status?: PromptStatus;
   priority?: number;
   epic_id?: string;
-  product_id?: string; // Add product_id option
+  product_id?: string;
+  generated_prompt?: string;
+  generated_at?: string;
 }
 
 export const usePrompts = (workspaceId?: string, selectedProductId?: string) => {
@@ -63,6 +65,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       epic_id: promptData.epic_id || null,
       product_id: promptData.product_id || null,
       order_index: 0,
+      generated_prompt: promptData.generated_prompt || null,
+      generated_at: promptData.generated_at || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -80,6 +84,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         priority: promptData.priority || 3,
         epic_id: promptData.epic_id || undefined,
         product_id: promptData.product_id || undefined,
+        generated_prompt: promptData.generated_prompt || undefined,
+        generated_at: promptData.generated_at || undefined,
         order_index: 0,
       };
 
@@ -170,6 +176,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       epic_id: prompt.epic_id,
       product_id: prompt.product_id,
       order_index: 0,
+      generated_prompt: prompt.generated_prompt,
+      generated_at: prompt.generated_at,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -188,6 +196,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
           priority: prompt.priority,
           product_id: prompt.product_id,
           epic_id: prompt.epic_id,
+          generated_prompt: prompt.generated_prompt,
+          generated_at: prompt.generated_at,
           order_index: 0
         })
         .select()

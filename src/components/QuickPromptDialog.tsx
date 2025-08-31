@@ -14,6 +14,8 @@ interface CreatePromptData {
   description?: string;
   epic_id?: string;
   product_id?: string;
+  generated_prompt?: string;
+  generated_at?: string;
 }
 
 interface QuickPromptDialogProps {
@@ -126,9 +128,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
       const promptData: CreatePromptData = {
         title: 'Nouvelle idée', // Default title
-        description: response.transformedPrompt || content,
+        description: content, // Original user content
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
         product_id: resolvedProductId,
+        generated_prompt: response.transformedPrompt || null,
+        generated_at: response.transformedPrompt ? new Date().toISOString() : null,
       };
 
       await onSave(promptData);
@@ -151,9 +155,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
         const promptData: CreatePromptData = {
           title: 'Nouvelle idée',
-          description: content,
+          description: content, // Original user content
           epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
           product_id: resolvedProductId,
+          generated_prompt: null, // No AI generation in fallback
+          generated_at: null,
         };
 
         await onSave(promptData);
@@ -362,6 +368,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               <div className="border rounded-md bg-muted/20 p-4 text-sm">
                 <div dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }} />
               </div>
+              <p className="text-xs text-muted-foreground">
+                Ce prompt sera automatiquement sauvegardé et restera accessible après fermeture.
+              </p>
             </div>
           )}
         </div>
