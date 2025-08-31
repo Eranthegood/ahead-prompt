@@ -9,6 +9,7 @@ import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { QuickEpicDialog } from '@/components/QuickEpicDialog';
 import { ProductSelector } from '@/components/ProductSelector';
 import { ProductManagement } from '@/components/ProductManagement';
+import { ProductEpicViews } from '@/components/ProductEpicViews/ProductEpicViews';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
@@ -16,13 +17,13 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Hash, BookOpen, Package, Settings } from 'lucide-react';
+import { Loader2, Hash, BookOpen, Package, Settings, LayoutGrid } from 'lucide-react';
 
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [quickEpicOpen, setQuickEpicOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('board');
+  const [activeTab, setActiveTab] = useState('overview');
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [epics, setEpics] = useState([]);
   const { workspace, loading } = useWorkspace();
@@ -115,7 +116,11 @@ const Dashboard = () => {
               </div>
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full max-w-lg grid-cols-4">
+                <TabsList className="grid w-full max-w-2xl grid-cols-5">
+                  <TabsTrigger value="overview" className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4" />
+                    Overview
+                  </TabsTrigger>
                   <TabsTrigger value="board" className="flex items-center gap-2">
                     <Hash className="w-4 h-4" />
                     Prompts
@@ -133,6 +138,10 @@ const Dashboard = () => {
                     Config
                   </TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="overview">
+                  <ProductEpicViews />
+                </TabsContent>
 
                 <TabsContent value="board">
                   <KanbanBoard 
