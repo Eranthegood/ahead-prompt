@@ -51,16 +51,16 @@ export function TruncatedTitle({
 
   if (!needsTruncation) {
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className={cn("relative flex items-center gap-2", className)}>
         <span>{title}</span>
         {showCopyButton && (
           <Button
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
           >
-            <Copy className="h-3 w-3" />
+            <Copy className="h-4 w-4" />
           </Button>
         )}
       </div>
@@ -72,16 +72,16 @@ export function TruncatedTitle({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className={cn("flex items-center gap-2", className)}>
+            <div className={cn("relative flex items-center gap-2", className)}>
               <span className="cursor-help">{truncatedTitle}</span>
               {showCopyButton && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCopy}
-                  className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -110,7 +110,7 @@ export function TruncatedTitle({
 
   if (variant === 'inline') {
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className={cn("relative flex items-center gap-2", className)}>
         <span>{truncatedTitle}</span>
         <Button
           variant="ghost"
@@ -125,9 +125,9 @@ export function TruncatedTitle({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
           >
-            <Copy className="h-3 w-3" />
+            <Copy className="h-4 w-4" />
           </Button>
         )}
         
@@ -162,7 +162,7 @@ export function TruncatedTitle({
 
   // Default modal variant
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("relative flex items-center gap-2", className)}>
       <span>{truncatedTitle}</span>
       <Button
         variant="ghost"
@@ -177,9 +177,9 @@ export function TruncatedTitle({
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
         >
-          <Copy className="h-3 w-3" />
+          <Copy className="h-4 w-4" />
         </Button>
       )}
       
