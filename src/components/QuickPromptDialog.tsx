@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2 } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { useToast } from '@/hooks/use-toast';
-import type { Workspace, Epic } from '@/types';
+import type { Workspace, Epic, Product } from '@/types';
 
 interface CreatePromptData {
   title?: string;
@@ -22,6 +22,7 @@ interface QuickPromptDialogProps {
   onSave: (promptData: CreatePromptData) => Promise<any>;
   workspace: Workspace;
   epics?: Epic[];
+  products?: Product[];
   selectedProductId?: string;
 }
 
@@ -31,9 +32,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   onSave,
   workspace,
   epics = [],
+  products = [],
   selectedProductId,
 }) => {
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
+  const [selectedProduct, setSelectedProduct] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -49,19 +52,26 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     },
   });
 
-  // Filter epics by selected product
-  const filteredEpics = selectedProductId 
-    ? epics.filter(epic => epic.product_id === selectedProductId)
+  // Filter epics by selected product (either from props or local selection)
+  const activeProductId = selectedProductId || (selectedProduct !== 'none' ? selectedProduct : undefined);
+  const filteredEpics = activeProductId 
+    ? epics.filter(epic => epic.product_id === activeProductId)
     : epics;
+  
+  // Validation: Check if either epic or product is selected
+  const hasValidAssignment = selectedEpic !== 'none' || 
+    (selectedProductId || selectedProduct !== 'none');
 
   // Reset form when dialog opens
   useEffect(() => {
     if (isOpen && editor) {
       editor.commands.setContent('');
       setSelectedEpic('none');
+      // Set default product if no selectedProductId
+      setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
       setTimeout(() => editor?.commands.focus(), 100);
     }
-  }, [isOpen, editor]);
+  }, [isOpen, editor, selectedProductId, products]);
 
   // Handle save with automatic prompt generation
   const handleSave = async () => {
@@ -69,6 +79,16 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     
     const content = editor.getHTML();
     if (!content || content === '<p></p>') return;
+
+    // Validate assignment
+    if (!hasValidAssignment) {
+      toast({
+        title: 'Assignment requis',
+        description: 'Veuillez sélectionner un produit ou un epic.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsGenerating(true);
     try {
@@ -94,7 +114,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         title: 'Nouvelle idée', // Default title
         description: response.transformedPrompt || content,
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-        product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
+        product_id: selectedEpic === 'none' ? (selectedProductId || selectedProduct !== 'none' ? selectedProduct : undefined) : undefined,
       };
 
       await onSave(promptData);
@@ -115,7 +135,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           title: 'Nouvelle idée',
           description: content,
           epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-          product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
+          product_id: selectedEpic === 'none' ? (selectedProductId || selectedProduct !== 'none' ? selectedProduct : undefined) : undefined,
         };
 
         await onSave(promptData);
@@ -151,6 +171,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           <DialogTitle className="text-lg font-semibold">
             Your Idea
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a new prompt idea with rich text formatting and optional epic or product assignment.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 flex flex-col">
@@ -224,35 +247,76 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             />
           </div>
 
-          {/* Epic assignment */}
-          {filteredEpics.length > 0 && (
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Assigner à un epic (optionnel)
-              </label>
-              <Select value={selectedEpic} onValueChange={setSelectedEpic}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Sélectionner un epic..." />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                  <SelectItem value="none">
-                    <span className="text-muted-foreground">Aucun epic</span>
-                  </SelectItem>
-                  {filteredEpics.map((epic) => (
-                    <SelectItem key={epic.id} value={epic.id}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-2 h-2 rounded-full" 
-                          style={{ backgroundColor: epic.color }}
-                        />
-                        {epic.name}
-                      </div>
+          {/* Product and Epic assignment */}
+          <div className="space-y-4">
+            {!selectedProductId && products.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  Produit
+                </label>
+                <Select value={selectedProduct} onValueChange={(value) => {
+                  setSelectedProduct(value);
+                  if (value !== 'none') {
+                    setSelectedEpic('none');
+                  }
+                }}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Sélectionner un produit..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    <SelectItem value="none">
+                      <span className="text-muted-foreground">Aucun produit</span>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-2 h-2 rounded-full" 
+                            style={{ backgroundColor: product.color }}
+                          />
+                          {product.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {filteredEpics.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  Epic {!hasValidAssignment && <span className="text-destructive">(ou sélectionnez un produit)</span>}
+                </label>
+                <Select value={selectedEpic} onValueChange={(value) => {
+                  setSelectedEpic(value);
+                  if (value !== 'none') {
+                    setSelectedProduct('none');
+                  }
+                }}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Sélectionner un epic..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    <SelectItem value="none">
+                      <span className="text-muted-foreground">Aucun epic</span>
+                    </SelectItem>
+                    {filteredEpics.map((epic) => (
+                      <SelectItem key={epic.id} value={epic.id}>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-2 h-2 rounded-full" 
+                            style={{ backgroundColor: epic.color }}
+                          />
+                          {epic.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
@@ -261,7 +325,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             </Button>
             <Button 
               onClick={handleSave} 
-              disabled={isLoading || isGenerating || !editor.getHTML() || editor.getHTML() === '<p></p>'}
+              disabled={isLoading || isGenerating || !editor.getHTML() || editor.getHTML() === '<p></p>' || !hasValidAssignment}
             >
               {isGenerating ? (
                 <>

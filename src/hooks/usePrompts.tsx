@@ -24,15 +24,12 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     try {
       let query = supabase
         .from('prompts')
-        .select(`
-          *,
-          epic:epics(id, name, color, product_id)
-        `)
+        .select('*')
         .eq('workspace_id', workspaceId);
 
       // Filter by product if selectedProductId is specified
       if (selectedProductId) {
-        query = query.eq('epic.product_id', selectedProductId);
+        query = query.eq('product_id', selectedProductId);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
