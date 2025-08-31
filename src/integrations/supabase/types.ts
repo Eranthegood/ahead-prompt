@@ -21,7 +21,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
-          product_id: string | null
+          product_id: string
           updated_at: string
           workspace_id: string
         }
@@ -31,7 +31,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
-          product_id?: string | null
+          product_id: string
           updated_at?: string
           workspace_id: string
         }
@@ -41,7 +41,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
-          product_id?: string | null
+          product_id?: string
           updated_at?: string
           workspace_id?: string
         }
@@ -146,6 +146,7 @@ export type Database = {
           id: string
           order_index: number
           priority: number | null
+          product_id: string | null
           status: string
           title: string
           updated_at: string
@@ -158,6 +159,7 @@ export type Database = {
           id?: string
           order_index?: number
           priority?: number | null
+          product_id?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -170,6 +172,7 @@ export type Database = {
           id?: string
           order_index?: number
           priority?: number | null
+          product_id?: string | null
           status?: string
           title?: string
           updated_at?: string
