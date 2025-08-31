@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Package, Hash, User, Clock } from 'lucide-react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Prompt, PromptStatus, Product, Epic } from '@/types';
+import { Prompt, Product, Epic } from '@/types';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -22,53 +21,47 @@ interface PromptDetailDialogProps {
   epics: Epic[];
 }
 
-const statusOptions = [
-  { value: 'todo', label: 'Todo', variant: 'outline' as const },
-  { value: 'in_progress', label: 'In Progress', variant: 'secondary' as const },
-  { value: 'done', label: 'Done', variant: 'default' as const }
-];
-
-const priorityOptions = [
-  { value: 1, label: 'Critical', color: 'bg-red-500' },
-  { value: 2, label: 'High', color: 'bg-orange-500' },
-  { value: 3, label: 'Medium', color: 'bg-yellow-500' },
-  { value: 4, label: 'Low', color: 'bg-green-500' }
-];
-
 export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, products, epics }: PromptDetailDialogProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<PromptStatus>('todo');
-  const [priority, setPriority] = useState(3);
-  const [productId, setProductId] = useState<string>('');
-  const [epicId, setEpicId] = useState<string>('');
+  const [productId, setProductId] = useState<string>('none');
+  const [epicId, setEpicId] = useState<string>('none');
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
+  // Rich text editor
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[300px] p-4',
+      },
+    },
+  });
+
   // Reset form when prompt changes
   useEffect(() => {
-    if (prompt) {
-      setTitle(prompt.title);
-      setDescription(prompt.description || '');
-      setStatus(prompt.status);
-      setPriority(prompt.priority);
+    if (prompt && editor) {
+      // Combine title and description into rich content
+      const content = prompt.description || `<h1>${prompt.title}</h1>`;
+      editor.commands.setContent(content);
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
     }
-  }, [prompt]);
+  }, [prompt, editor]);
 
   const handleSave = async () => {
-    if (!prompt || !title.trim()) return;
+    if (!prompt || !editor) return;
+
+    const content = editor.getHTML();
+    if (!content || content === '<p></p>') return;
 
     setSaving(true);
     try {
       const { error } = await supabase
         .from('prompts')
         .update({
-          title: title.trim(),
-          description: description.trim() || null,
-          status,
-          priority,
+          title: 'Idée modifiée', // Default title
+          description: content,
           product_id: productId === 'none' ? null : productId,
           epic_id: epicId === 'none' ? null : epicId,
           updated_at: new Date().toISOString()
@@ -78,8 +71,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
       if (error) throw error;
 
       toast({
-        title: 'Prompt updated',
-        description: 'Changes have been saved successfully'
+        title: 'Prompt mis à jour',
+        description: 'Les modifications ont été sauvegardées'
       });
 
       onUpdate();
@@ -87,8 +80,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
     } catch (error) {
       console.error('Error updating prompt:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to update prompt',
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le prompt',
         variant: 'destructive'
       });
     } finally {
@@ -96,86 +89,121 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
     }
   };
 
-  const filteredEpics = epics.filter(epic => productId === 'none' || !productId || epic.product_id === productId);
-  const selectedProduct = products.find(p => p.id === productId);
-  const selectedEpic = epics.find(e => e.id === epicId);
-  const priorityOption = priorityOptions.find(p => p.value === priority);
+  // Handle keyboard shortcuts
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      onOpenChange(false);
+    }
+  };
 
-  if (!prompt) return null;
+  const filteredEpics = epics.filter(epic => productId === 'none' || !productId || epic.product_id === productId);
+
+  if (!prompt || !editor) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-[800px] max-h-[80vh] overflow-hidden"
+        onKeyDown={handleKeyDown}
+      >
         <DialogHeader>
-          <DialogTitle>Edit Prompt</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">
+            Modifier l&apos;idée
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 flex flex-col">
           {/* Metadata */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>Created {format(new Date(prompt.created_at), 'MMM d, yyyy')}</span>
+              <span>Créé le {format(new Date(prompt.created_at), 'dd/MM/yyyy')}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              <span>Updated {format(new Date(prompt.updated_at), 'MMM d, yyyy')}</span>
+              <span>Modifié le {format(new Date(prompt.updated_at), 'dd/MM/yyyy')}</span>
             </div>
           </div>
 
           <Separator />
 
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter prompt title..."
+          {/* Formatting toolbar */}
+          <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              className={editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}
+            >
+              <Heading1 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
+            >
+              <Heading2 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+              className={editor.isActive('heading', { level: 3 }) ? 'bg-muted' : ''}
+            >
+              <Heading3 className="h-4 w-4" />
+            </Button>
+            <div className="w-px h-6 bg-border mx-2" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={editor.isActive('bold') ? 'bg-muted' : ''}
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={editor.isActive('italic') ? 'bg-muted' : ''}
+            >
+              <Italic className="h-4 w-4" />
+            </Button>
+            <div className="w-px h-6 bg-border mx-2" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={editor.isActive('bulletList') ? 'bg-muted' : ''}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={editor.isActive('orderedList') ? 'bg-muted' : ''}
+            >
+              <ListOrdered className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Rich text editor */}
+          <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
+            <EditorContent 
+              editor={editor}
+              className="w-full h-full"
             />
           </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter prompt description..."
-              rows={4}
-            />
-          </div>
-
-          {/* Status and Priority */}
+          {/* Product and Epic assignment */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={status} onValueChange={(value) => setStatus(value as PromptStatus)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={option.variant} className="text-xs">
-                          {option.label}
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-          </div>
-
-          {/* Product and Epic */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Product</Label>
+              <Label>Produit</Label>
               <Select value={productId} onValueChange={(value) => {
                 setProductId(value);
                 if (value === 'none') {
@@ -183,10 +211,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
                 }
               }}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select product..." />
+                  <SelectValue placeholder="Sélectionner un produit..." />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No product</SelectItem>
+                <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                  <SelectItem value="none">Aucun produit</SelectItem>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       <div className="flex items-center gap-2">
@@ -203,14 +231,17 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
               <Label>Epic</Label>
               <Select value={epicId} onValueChange={setEpicId} disabled={productId === 'none'}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select epic..." />
+                  <SelectValue placeholder="Sélectionner un epic..." />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No epic</SelectItem>
+                <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                  <SelectItem value="none">Aucun epic</SelectItem>
                   {filteredEpics.map((epic) => (
                     <SelectItem key={epic.id} value={epic.id}>
                       <div className="flex items-center gap-2">
-                        <Hash className="h-4 w-4" />
+                        <div 
+                          className="w-2 h-2 rounded-full" 
+                          style={{ backgroundColor: epic.color }}
+                        />
                         {epic.name}
                       </div>
                     </SelectItem>
@@ -220,16 +251,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
             </div>
           </div>
 
-
           <Separator />
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 pt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Annuler
             </Button>
-            <Button onClick={handleSave} disabled={saving || !title.trim()}>
-              {saving ? 'Saving...' : 'Save Changes'}
+            <Button 
+              onClick={handleSave} 
+              disabled={saving || !editor.getHTML() || editor.getHTML() === '<p></p>'}
+            >
+              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
             </Button>
           </div>
         </div>
