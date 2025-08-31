@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 import { Workspace } from '@/types';
 
 interface MinimalSidebarProps {
@@ -28,6 +28,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
+  const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
 
   // Simple organization
   const productsWithCounts = products.map(product => {
@@ -40,6 +41,11 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
       promptCount: productPrompts.length
     };
   });
+
+  // Get completed prompts sorted by completion date (most recent first)
+  const completedPrompts = prompts
+    .filter(p => p.status === 'done')
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
 
   return (
     <Sidebar className="w-64 border-r border-border">
@@ -115,7 +121,29 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
         {showCompletedItems && (
           <SidebarGroup className="mt-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-muted-foreground">Achevé</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-medium text-muted-foreground">Achevé</h3>
+                {completedPrompts.length > 3 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-5 px-1 text-xs"
+                    onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}
+                  >
+                    {isCompletedExpanded ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 mr-1" />
+                        moins
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        plus
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -129,15 +157,15 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
-                {prompts.filter(p => p.status === 'done').length === 0 ? (
+                {completedPrompts.length === 0 ? (
                   <div className="py-2 px-3 text-center">
                     <p className="text-xs text-muted-foreground">Aucun prompt terminé</p>
                   </div>
                 ) : (
-                  prompts
-                    .filter(p => p.status === 'done')
-                    .slice(0, 8)
-                    .map((prompt) => (
+                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isCompletedExpanded ? 'max-h-96' : 'max-h-32'
+                  }`}>
+                    {(isCompletedExpanded ? completedPrompts : completedPrompts.slice(0, 3)).map((prompt) => (
                       <SidebarMenuItem key={prompt.id}>
                         <SidebarMenuButton className="w-full justify-start text-xs">
                           <div className="flex items-center gap-2 w-full">
@@ -146,7 +174,8 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
                           </div>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
-                    ))
+                    ))}
+                  </div>
                 )}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -164,7 +193,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
               <Eye className="mr-3 h-4 w-4" />
               Afficher les éléments achevés
               <Badge variant="secondary" className="ml-auto">
-                {prompts.filter(p => p.status === 'done').length}
+                {completedPrompts.length}
               </Badge>
             </Button>
           </div>
