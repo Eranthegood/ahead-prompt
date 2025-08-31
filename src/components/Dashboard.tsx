@@ -9,6 +9,7 @@ import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
 
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const { createPrompt } = usePrompts(workspace?.id);
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
+  const { preferences, saveCompletedItemsPreference } = useUserPreferences();
 
   // Set up global shortcuts
   useGlobalShortcuts({
@@ -31,6 +33,10 @@ const Dashboard = () => {
     'ctrl+n': () => setQuickPromptOpen(true),
     'q': () => setQuickPromptOpen(true),
   });
+
+  const handleToggleCompletedItems = (show: boolean) => {
+    saveCompletedItemsPreference(show);
+  };
 
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
@@ -64,6 +70,8 @@ const Dashboard = () => {
           workspace={workspace}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
           onProductSelect={setSelectedProductId}
+          showCompletedItems={preferences.showCompletedItems}
+          onToggleCompletedItems={handleToggleCompletedItems}
         />
         
         <div className="flex-1 flex flex-col">

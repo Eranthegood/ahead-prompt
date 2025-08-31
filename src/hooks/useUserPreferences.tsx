@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 interface UserPreferences {
   lastPromptStatus: string;
   lastPromptPriority: string;
+  showCompletedItems: boolean;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -10,6 +11,7 @@ const PREFERENCES_KEY = 'user_prompt_preferences';
 const defaultPreferences: UserPreferences = {
   lastPromptStatus: 'todo',
   lastPromptPriority: 'medium',
+  showCompletedItems: true,
 };
 
 export const useUserPreferences = () => {
@@ -51,10 +53,18 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save completed items visibility preference
+  const saveCompletedItemsPreference = (show: boolean) => {
+    updatePreferences({
+      showCompletedItems: show,
+    });
+  };
+
   return {
     preferences,
     loading,
     updatePreferences,
     savePromptSettings,
+    saveCompletedItemsPreference,
   };
 };
