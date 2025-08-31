@@ -22,6 +22,7 @@ import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2 } from 'lucide-react';
 import { Workspace } from '@/types';
+import { SidePanelMenu } from './SidePanelMenu';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -200,7 +201,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   return (
     <>
       <Sidebar className="w-64 border-r border-border" collapsible="icon">
-        <SidebarContent className="p-4">
+        <SidebarContent className="p-4 flex flex-col min-h-full">
           {/* Workspace Name */}
           <div className="mb-6">
             <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
@@ -459,6 +460,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           )}
 
           {/* Remove Recent Epics since they're now integrated above */}
+
+          {/* Side Panel Menu - Fixed at bottom */}
+          <SidePanelMenu />
         </SidebarContent>
       </Sidebar>
 

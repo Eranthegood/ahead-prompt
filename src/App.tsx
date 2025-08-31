@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProductPage from "./pages/ProductPage";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +32,21 @@ const App = () => (
             <Route path="/product/:productId" element={
               <ProtectedRoute>
                 <ProductPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/shortcuts" element={
+              <ProtectedRoute>
+                <KeyboardShortcuts />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
