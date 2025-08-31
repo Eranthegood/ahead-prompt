@@ -88,7 +88,11 @@ const Dashboard = () => {
         <DashboardHeader workspace={workspace} />
         
         <div className="flex w-full">
-          <EpicSidebar workspace={workspace} />
+          <EpicSidebar 
+            workspace={workspace} 
+            selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+            onProductSelect={setSelectedProductId}
+          />
           
           <main className="flex-1 p-6">
             <div className="space-y-6">
