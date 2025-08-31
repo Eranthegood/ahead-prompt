@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
@@ -70,7 +70,12 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full bg-background flex">
-        <MinimalSidebar 
+        {/* Global Sidebar Trigger - Always Visible */}
+        <div className="fixed top-4 left-4 z-50 lg:hidden">
+          <SidebarTrigger className="bg-background shadow-md border" />
+        </div>
+        
+        <MinimalSidebar
           workspace={workspace}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
           selectedEpicId={selectedEpicId}

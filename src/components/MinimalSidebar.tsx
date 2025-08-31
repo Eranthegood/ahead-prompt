@@ -199,12 +199,11 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
   return (
     <>
-      <Sidebar className="w-64 border-r border-border">
+      <Sidebar className="w-64 border-r border-border" collapsible="icon">
         <SidebarContent className="p-4">
           {/* Workspace Name */}
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6">
             <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
-            <SidebarTrigger />
           </div>
 
           {/* Add Prompt Action */}
