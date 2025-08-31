@@ -170,24 +170,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Priority</Label>
-              <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {priorityOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value.toString()}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${option.color}`} />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
           {/* Product and Epic */}
