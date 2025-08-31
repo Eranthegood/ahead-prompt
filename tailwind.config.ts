@@ -26,7 +26,9 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					muted: 'hsl(var(--primary-muted))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -61,6 +63,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				status: {
+					todo: 'hsl(var(--status-todo))',
+					'todo-foreground': 'hsl(var(--status-todo-foreground))',
+					progress: 'hsl(var(--status-progress))',
+					'progress-foreground': 'hsl(var(--status-progress-foreground))',
+					done: 'hsl(var(--status-done))',
+					'done-foreground': 'hsl(var(--status-done-foreground))'
+				},
+				epic: {
+					purple: 'hsl(var(--epic-purple))',
+					blue: 'hsl(var(--epic-blue))',
+					green: 'hsl(var(--epic-green))',
+					orange: 'hsl(var(--epic-orange))',
+					pink: 'hsl(var(--epic-pink))'
 				}
 			},
 			borderRadius: {
