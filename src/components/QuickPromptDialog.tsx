@@ -56,7 +56,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<number>(3);
   const [status, setStatus] = useState<PromptStatus>('todo');
-  const [selectedEpic, setSelectedEpic] = useState<string>('');
+  const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +69,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       setDescription('');
       setPriority(3);
       setStatus('todo');
-      setSelectedEpic('');
+      setSelectedEpic('none');
 
       // Focus with delay to avoid rendering issues
       setTimeout(() => {
@@ -102,7 +102,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         description: description.trim() || undefined,
         priority,
         status,
-        epic_id: selectedEpic || undefined,
+        epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
       };
 
       await onSave(promptData);
@@ -121,7 +121,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       description: description.trim() || undefined,
       priority,
       status,
-      epic_id: selectedEpic || undefined,
+      epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
     };
 
     onOpenExtended?.(promptData);
@@ -212,7 +212,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   <SelectValue placeholder="Epic..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="" className="text-sm">
+                  <SelectItem value="none" className="text-sm">
                     <span className="text-muted-foreground">Aucun epic</span>
                   </SelectItem>
                   {epics.map((epic) => (
