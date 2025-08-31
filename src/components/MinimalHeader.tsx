@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { Search, Plus, LogOut } from 'lucide-react';
 import { Workspace } from '@/types';
@@ -18,10 +17,6 @@ export function MinimalHeader({ workspace, searchQuery, onSearchChange, onQuickA
 
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
-      <div className="flex items-center gap-4">
-        <SidebarTrigger />
-      </div>
-
       <div className="flex-1 max-w-md mx-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

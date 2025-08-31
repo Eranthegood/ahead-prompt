@@ -7,6 +7,7 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -75,8 +76,9 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
     <Sidebar className="w-64 border-r border-border">
       <SidebarContent className="p-4">
         {/* Workspace Name */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
+          <SidebarTrigger />
         </div>
 
         {/* Add Prompt Action */}
