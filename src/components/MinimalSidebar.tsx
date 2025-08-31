@@ -54,7 +54,6 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
         {/* Workspace Name */}
         <div className="mb-6">
           <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
-          <p className="text-sm text-muted-foreground">Workspace</p>
         </div>
 
         {/* Add Prompt Action */}
