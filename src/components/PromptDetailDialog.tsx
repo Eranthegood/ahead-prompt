@@ -220,32 +220,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, onUpdate, produ
             </div>
           </div>
 
-          {/* Current Associations */}
-          {(selectedProduct || selectedEpic) && (
-            <div className="space-y-2">
-              <Label>Current Associations</Label>
-              <div className="flex gap-2">
-                {selectedProduct && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Package className="h-3 w-3" />
-                    {selectedProduct.name}
-                  </Badge>
-                )}
-                {selectedEpic && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Hash className="h-3 w-3" />
-                    {selectedEpic.name}
-                  </Badge>
-                )}
-                {priorityOption && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${priorityOption.color}`} />
-                    {priorityOption.label}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
 
           <Separator />
 
