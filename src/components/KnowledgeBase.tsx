@@ -305,3 +305,5 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
     </div>
   );
 }
+
+export default KnowledgeBase;

@@ -3,7 +3,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EpicSidebar } from '@/components/EpicSidebar';
 import { KanbanBoard } from '@/components/KanbanBoard';
-import { KnowledgeBase } from '@/components/KnowledgeBase';
+import KnowledgeBase from '@/components/KnowledgeBase';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { QuickEpicDialog } from '@/components/QuickEpicDialog';
