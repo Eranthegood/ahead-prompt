@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3 } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2 } from 'lucide-react';
+import { PromptTransformService } from '@/services/promptTransformService';
+import { useToast } from '@/hooks/use-toast';
 import type { Workspace, Epic } from '@/types';
 
 interface CreatePromptData {
@@ -33,6 +35,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 }) => {
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
   // Rich text editor
   const editor = useEditor({
@@ -59,18 +63,36 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     }
   }, [isOpen, editor]);
 
-  // Handle save
+  // Handle save with automatic prompt generation
   const handleSave = async () => {
     if (!editor) return;
     
     const content = editor.getHTML();
     if (!content || content === '<p></p>') return;
 
-    setIsLoading(true);
+    setIsGenerating(true);
     try {
+      // Extract raw text from editor (without HTML tags)
+      const rawText = editor.getText();
+      
+      // Generate prompt using AI
+      const response = await PromptTransformService.transformPrompt(rawText);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      // Replace editor content with generated prompt
+      if (response.transformedPrompt) {
+        editor.commands.setContent(response.transformedPrompt);
+      }
+
+      setIsGenerating(false);
+      setIsLoading(true);
+
       const promptData: CreatePromptData = {
         title: 'Nouvelle idée', // Default title
-        description: content,
+        description: response.transformedPrompt || content,
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
         product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
       };
@@ -78,9 +100,32 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       await onSave(promptData);
       onClose();
     } catch (error) {
-      console.error('Error saving prompt:', error);
+      console.error('Error generating or saving prompt:', error);
+      toast({
+        title: 'Erreur de génération',
+        description: 'Impossible de générer le prompt. Sauvegarde du contenu original.',
+        variant: 'destructive'
+      });
+      
+      // Save original content if generation fails
+      setIsGenerating(false);
+      setIsLoading(true);
+      try {
+        const promptData: CreatePromptData = {
+          title: 'Nouvelle idée',
+          description: content,
+          epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
+          product_id: selectedEpic === 'none' && selectedProductId ? selectedProductId : undefined,
+        };
+
+        await onSave(promptData);
+        onClose();
+      } catch (saveError) {
+        console.error('Error saving original prompt:', saveError);
+      }
     } finally {
       setIsLoading(false);
+      setIsGenerating(false);
     }
   };
 
@@ -216,9 +261,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             </Button>
             <Button 
               onClick={handleSave} 
-              disabled={isLoading || !editor.getHTML() || editor.getHTML() === '<p></p>'}
+              disabled={isLoading || isGenerating || !editor.getHTML() || editor.getHTML() === '<p></p>'}
             >
-              {isLoading ? 'Création...' : 'Créer'}
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Génération...
+                </>
+              ) : isLoading ? 'Création...' : 'Créer'}
             </Button>
           </div>
         </div>
