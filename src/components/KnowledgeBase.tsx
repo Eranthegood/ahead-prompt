@@ -24,7 +24,7 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<KnowledgeItem | null>(null);
 
@@ -63,7 +63,7 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
       selectedTags.some((tag) => item.tags?.includes(tag));
 
     const matchesCategory =
-      !selectedCategory || 
+      !selectedCategory || selectedCategory === "all" ||
       (item as any).category === selectedCategory;
 
     return matchesSearch && matchesTags && matchesCategory;
@@ -146,7 +146,7 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {Object.entries(KNOWLEDGE_CATEGORIES).map(([key, category]) => (
                 <SelectItem key={key} value={key}>
                   <div className="flex items-center">
@@ -270,7 +270,7 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
         <div className="text-center py-12">
           <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">
-            {searchQuery || selectedTags.length > 0 || selectedCategory 
+            {searchQuery || selectedTags.length > 0 || (selectedCategory && selectedCategory !== "all")
               ? "No results found" 
               : product
               ? `No knowledge items for ${product.name}`
@@ -278,14 +278,14 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
             }
           </h3>
           <p className="text-muted-foreground mb-4">
-            {searchQuery || selectedTags.length > 0 || selectedCategory
+            {searchQuery || selectedTags.length > 0 || (selectedCategory && selectedCategory !== "all")
               ? "Try adjusting your search or filters"
               : product
               ? `Start building ${product.name}'s knowledge base with technical context, guidelines, and best practices.`
               : "Start building your knowledge base with reusable content for better prompts"
             }
           </p>
-          {(!searchQuery && selectedTags.length === 0 && !selectedCategory) && (
+          {(!searchQuery && selectedTags.length === 0 && (selectedCategory === "all" || !selectedCategory)) && (
             <Button onClick={handleCreate}>
               <Plus className="h-4 w-4 mr-2" />
               Add Knowledge
