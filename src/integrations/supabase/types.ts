@@ -21,6 +21,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          product_id: string | null
           updated_at: string
           workspace_id: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          product_id?: string | null
           updated_at?: string
           workspace_id: string
         }
@@ -39,10 +41,18 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          product_id?: string | null
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "epics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "epics_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -83,6 +93,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "knowledge_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

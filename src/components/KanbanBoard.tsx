@@ -9,6 +9,7 @@ import { Plus, MoreHorizontal } from 'lucide-react';
 
 interface KanbanBoardProps {
   workspace: Workspace;
+  selectedProductId?: string;
 }
 
 const COLUMNS: { status: PromptStatus; title: string; color: string }[] = [
@@ -17,8 +18,8 @@ const COLUMNS: { status: PromptStatus; title: string; color: string }[] = [
   { status: 'done', title: 'Done', color: 'status-done' },
 ];
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace }) => {
-  const { prompts, loading, createPrompt, updatePromptStatus } = usePrompts(workspace.id);
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace, selectedProductId }) => {
+  const { prompts, loading, createPrompt, updatePromptStatus } = usePrompts(workspace.id, selectedProductId);
 
   const getPromptsByStatus = (status: PromptStatus) => {
     return prompts.filter(prompt => prompt.status === status);

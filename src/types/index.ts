@@ -128,9 +128,22 @@ export interface Database {
 }
 
 export type Workspace = Database['public']['Tables']['workspaces']['Row'];
-export type Epic = Database['public']['Tables']['epics']['Row'];
+export type Epic = Database['public']['Tables']['epics']['Row'] & {
+  product_id?: string; // Add product_id to Epic interface
+};
 export type Prompt = Database['public']['Tables']['prompts']['Row'];
 export type KnowledgeItem = Database['public']['Tables']['knowledge_items']['Row'];
+
+// Add Product type (will be available after migration)
+export interface Product {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export type PromptStatus = 'todo' | 'in_progress' | 'done';
 export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';

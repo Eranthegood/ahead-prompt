@@ -6,13 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Zap, MoreHorizontal, Target, CheckCircle2 } from 'lucide-react';
-import type { Workspace, PromptStatus } from '@/types';
-
-interface Epic {
-  id: string;
-  name: string;
-  color: string;
-}
+import type { Workspace, PromptStatus, Epic } from '@/types';
 
 interface CreatePromptData {
   title: string;
@@ -29,6 +23,7 @@ interface QuickPromptDialogProps {
   onOpenExtended?: (promptData: CreatePromptData) => void;
   workspace: Workspace;
   epics?: Epic[];
+  selectedProductId?: string;
 }
 
 const priorities = [
@@ -51,6 +46,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   onOpenExtended,
   workspace,
   epics = [],
+  selectedProductId,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -60,6 +56,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
+
+  // Filter epics by selected product
+  const filteredEpics = selectedProductId 
+    ? epics.filter(epic => epic.product_id === selectedProductId)
+    : epics;
 
   // 🎯 Auto-focus and reset on open
   useEffect(() => {
@@ -206,7 +207,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             </Select>
 
             {/* Epic selector */}
-            {epics.length > 0 && (
+            {filteredEpics.length > 0 && (
               <Select value={selectedEpic} onValueChange={setSelectedEpic}>
                 <SelectTrigger className="flex-1 h-9 text-sm">
                   <SelectValue placeholder="Epic..." />
@@ -215,7 +216,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   <SelectItem value="none" className="text-sm">
                     <span className="text-muted-foreground">Aucun epic</span>
                   </SelectItem>
-                  {epics.map((epic) => (
+                  {filteredEpics.map((epic) => (
                     <SelectItem key={epic.id} value={epic.id} className="text-sm">
                       <div className="flex items-center gap-2">
                         <div 
