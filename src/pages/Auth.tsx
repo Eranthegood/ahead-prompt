@@ -73,7 +73,7 @@ const Auth = () => {
             </h1>
           </div>
           <CardDescription className="text-muted-foreground">
-            Product management built for Vibe Coders
+            AI-powered product management for modern teams
           </CardDescription>
         </CardHeader>
 
@@ -208,7 +208,7 @@ const Auth = () => {
 
         <CardFooter className="text-center text-sm text-muted-foreground">
           <p>
-            Streamline your Lovable development with intelligent prompt planning
+            Streamline your AI development with intelligent prompt management
           </p>
         </CardFooter>
       </Card>

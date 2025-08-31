@@ -36,12 +36,12 @@ interface MinimalSidebarProps {
 }
 
 const PRODUCT_COLORS = [
-  { value: '#3B82F6', label: 'Bleu' },
-  { value: '#10B981', label: 'Vert' },
-  { value: '#8B5CF6', label: 'Violet' },
+  { value: '#3B82F6', label: 'Blue' },
+  { value: '#10B981', label: 'Green' },
+  { value: '#8B5CF6', label: 'Purple' },
   { value: '#F59E0B', label: 'Orange' },
-  { value: '#EF4444', label: 'Rouge' },
-  { value: '#6B7280', label: 'Gris' },
+  { value: '#EF4444', label: 'Red' },
+  { value: '#6B7280', label: 'Gray' },
 ];
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
@@ -187,7 +187,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.')) {
+    if (confirm('Are you sure you want to delete this product? This action is irreversible.')) {
       await deleteProduct(productId);
       // If the deleted product was selected, reset selection
       if (selectedProductId === productId) {
@@ -215,10 +215,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               size="sm"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Ajouter un prompt
+              Add Prompt
             </Button>
             <p className="text-xs text-muted-foreground mt-2 px-1">
-              Astuce : Appuyez sur <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> pour créer rapidement
+              Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> to create quickly
             </p>
           </div>
 
@@ -322,7 +322,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 className="flex items-center gap-2"
                               >
                                 <Hash className="h-4 w-4" />
-                                Créer un epic
+                                Create Epic
                               </ContextMenuItem>
                               <ContextMenuSeparator />
                               <ContextMenuItem 
@@ -330,7 +330,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 className="flex items-center gap-2 text-destructive focus:text-destructive"
                               >
                                 <Trash2 className="h-4 w-4" />
-                                Supprimer le produit
+                                Delete Product
                               </ContextMenuItem>
                             </ContextMenuContent>
                           </ContextMenu>
@@ -401,7 +401,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           {showCompletedItems && (
             <SidebarGroup className="mt-6">
               <div className="mb-3 flex items-center justify-between cursor-pointer" onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
-                <h3 className="text-sm font-medium text-muted-foreground">Achevé ({completedPrompts.length})</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Completed ({completedPrompts.length})</h3>
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isCompletedExpanded ? 'rotate-180' : ''}`} />
               </div>
               
@@ -410,7 +410,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   <SidebarMenu className="space-y-1">
                     {completedPrompts.length === 0 ? (
                       <div className="py-2 px-3 text-center">
-                        <p className="text-xs text-muted-foreground">Aucun prompt terminé</p>
+                        <p className="text-xs text-muted-foreground">No completed prompts</p>
                       </div>
                     ) : (
                       <>
@@ -430,7 +430,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                               className="w-full justify-center text-xs text-muted-foreground hover:text-foreground"
                               onClick={() => onProductSelect('completed')}
                             >
-                              Voir tous les {completedPrompts.length} prompts
+                              View all {completedPrompts.length} prompts
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         )}
@@ -451,7 +451,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 onClick={() => onToggleCompletedItems(true)}
               >
                 <Eye className="mr-3 h-4 w-4" />
-                Afficher les éléments achevés
+                Show completed items
                 <Badge variant="secondary" className="ml-auto">
                   {completedPrompts.length}
                 </Badge>
@@ -469,36 +469,36 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Package className="w-5 h-5" />
-              Nouveau Produit
+              New Product
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="product-name">Nom du produit</Label>
+              <Label htmlFor="product-name">Product name</Label>
               <Input
                 id="product-name"
                 value={newProductData.name}
                 onChange={(e) => setNewProductData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ex: Application Mobile, Site Web..."
+                placeholder="e.g. Mobile App, Website..."
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="product-description">Description (optionnel)</Label>
+              <Label htmlFor="product-description">Description (optional)</Label>
               <Textarea
                 id="product-description"
                 value={newProductData.description}
                 onChange={(e) => setNewProductData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Décrivez brièvement ce produit..."
+                placeholder="Briefly describe this product..."
                 rows={3}
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label>Couleur</Label>
+              <Label>Color</Label>
               <div className="flex items-center gap-2 mt-2">
                 {PRODUCT_COLORS.map((color) => (
                   <button
@@ -527,19 +527,19 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsCreateProductOpen(false)}
-                disabled={isCreating}
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={handleCreateProduct}
-                disabled={!newProductData.name.trim() || isCreating}
-              >
-                {isCreating ? 'Création...' : 'Créer'}
-              </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreateProductOpen(false)}
+                  disabled={isCreating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateProduct}
+                  disabled={!newProductData.name.trim() || isCreating}
+                >
+                  {isCreating ? 'Creating...' : 'Create'}
+                </Button>
             </div>
           </div>
         </DialogContent>
@@ -551,44 +551,44 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Hash className="w-5 h-5" />
-              Nouvel Epic
+              New Epic
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="epic-name">Nom de l'epic</Label>
+              <Label htmlFor="epic-name">Epic name</Label>
               <Input
                 id="epic-name"
                 value={newEpicData.name}
                 onChange={(e) => setNewEpicData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ex: Authentification, Dashboard..."
+                placeholder="e.g. Authentication, Dashboard..."
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="epic-description">Description (optionnel)</Label>
+              <Label htmlFor="epic-description">Description (optional)</Label>
               <Textarea
                 id="epic-description"
                 value={newEpicData.description}
                 onChange={(e) => setNewEpicData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Décrivez brièvement cet epic..."
+                placeholder="Briefly describe this epic..."
                 rows={3}
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label>Couleur</Label>
+              <Label>Color</Label>
               <div className="flex items-center gap-2 mt-2">
                 {[
-                  { value: '#8B5CF6', label: 'Violet' },
-                  { value: '#10B981', label: 'Vert' },
-                  { value: '#3B82F6', label: 'Bleu' },
+                  { value: '#8B5CF6', label: 'Purple' },
+                  { value: '#10B981', label: 'Green' },
+                  { value: '#3B82F6', label: 'Blue' },
                   { value: '#F59E0B', label: 'Orange' },
-                  { value: '#EF4444', label: 'Rouge' },
-                  { value: '#6B7280', label: 'Gris' },
+                  { value: '#EF4444', label: 'Red' },
+                  { value: '#6B7280', label: 'Gray' },
                 ].map((color) => (
                   <button
                     key={color.value}
@@ -616,23 +616,23 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsCreateEpicOpen(false);
-                  setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
-                  setSelectedProductForEpic('');
-                }}
-                disabled={isCreatingEpic}
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={handleCreateEpic}
-                disabled={!newEpicData.name.trim() || isCreatingEpic}
-              >
-                {isCreatingEpic ? 'Création...' : 'Créer'}
-              </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsCreateEpicOpen(false);
+                    setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
+                    setSelectedProductForEpic('');
+                  }}
+                  disabled={isCreatingEpic}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateEpic}
+                  disabled={!newEpicData.name.trim() || isCreatingEpic}
+                >
+                  {isCreatingEpic ? 'Creating...' : 'Create'}
+                </Button>
             </div>
           </div>
         </DialogContent>

@@ -96,8 +96,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     // Validate assignment
     if (!hasValidAssignment) {
       toast({
-        title: 'Assignment requis',
-        description: 'Veuillez sélectionner un produit ou un epic.',
+        title: 'Assignment required',
+        description: 'Please select a product or epic.',
         variant: 'destructive'
       });
       return;
@@ -144,8 +144,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     } catch (error) {
       console.error('Error generating or saving prompt:', error);
       toast({
-        title: 'Erreur de génération',
-        description: 'Impossible de générer le prompt. Sauvegarde du contenu original.',
+        title: 'Generation error',
+        description: 'Unable to generate prompt. Saving original content.',
         variant: 'destructive'
       });
       
@@ -284,22 +284,22 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             <div className="space-y-4">
               {!selectedProductId && products.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Produit
-                  </label>
+                   <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                     Product
+                   </label>
                   <Select value={selectedProduct} onValueChange={(value) => {
                     setSelectedProduct(value);
                     if (value !== 'none') {
                       setSelectedEpic('none');
                     }
                   }}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Sélectionner un produit..." />
-                    </SelectTrigger>
+                     <SelectTrigger className="h-10">
+                       <SelectValue placeholder="Select a product..." />
+                     </SelectTrigger>
                     <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                      <SelectItem value="none">
-                        <span className="text-muted-foreground">Aucun produit</span>
-                      </SelectItem>
+                       <SelectItem value="none">
+                         <span className="text-muted-foreground">No product</span>
+                       </SelectItem>
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
                           <div className="flex items-center gap-2">
@@ -318,22 +318,22 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               
               {filteredEpics.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Epic {!hasValidAssignment && <span className="text-destructive">(ou sélectionnez un produit)</span>}
-                  </label>
+                   <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                     Epic {!hasValidAssignment && <span className="text-destructive">(or select a product)</span>}
+                   </label>
                   <Select value={selectedEpic} onValueChange={(value) => {
                     setSelectedEpic(value);
                     if (value !== 'none') {
                       setSelectedProduct('none');
                     }
                   }}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Sélectionner un epic..." />
-                    </SelectTrigger>
+                     <SelectTrigger className="h-10">
+                       <SelectValue placeholder="Select an epic..." />
+                     </SelectTrigger>
                     <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                      <SelectItem value="none">
-                        <span className="text-muted-foreground">Aucun epic</span>
-                      </SelectItem>
+                       <SelectItem value="none">
+                         <span className="text-muted-foreground">No epic</span>
+                       </SelectItem>
                       {filteredEpics.map((epic) => (
                         <SelectItem key={epic.id} value={epic.id}>
                           <div className="flex items-center gap-2">
@@ -356,14 +356,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           {generatedPrompt && (
             <div className="lg:w-80 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-muted-foreground">Prompt généré</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Generated Prompt</h3>
                 <div className="flex gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
                       navigator.clipboard.writeText(generatedPrompt);
-                      toast({ title: 'Copié !', description: 'Le prompt a été copié dans le presse-papier.' });
+                      toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
                     }}
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -375,9 +375,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               <div className="border rounded-md bg-muted/20 p-4 text-sm">
                 <div dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }} />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Ce prompt sera automatiquement sauvegardé et restera accessible après fermeture.
-              </p>
+               <p className="text-xs text-muted-foreground">
+                 This prompt will be automatically saved and remain accessible after closing.
+               </p>
             </div>
           )}
         </div>
@@ -385,7 +385,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button variant="outline" onClick={onClose}>
-            Annuler
+            Cancel
           </Button>
           <Button 
             onClick={handleSave} 
@@ -394,9 +394,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Génération...
+                Generating...
               </>
-            ) : isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
+            ) : isLoading ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </DialogContent>

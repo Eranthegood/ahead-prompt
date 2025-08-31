@@ -41,14 +41,14 @@ serve(async (req) => {
 
     console.log('Analyzing console errors with OpenAI...');
 
-    const systemPrompt = `Tu es un expert debugging web. Analyse ces erreurs console et pour chaque erreur donne :
+    const systemPrompt = `You are a web debugging expert. Analyze these console errors and for each error provide:
 - Type (React/API/Supabase/CORS/Build/Network/etc)
-- Criticité (Critical/Warning/Info)
-- Cause exacte
-- Solution avec code précis
-- Fichier où appliquer le fix
+- Severity (Critical/Warning/Info)
+- Exact cause
+- Solution with precise code
+- File where to apply the fix
 
-Format ta réponse en JSON avec cette structure:
+Format your response as JSON with this structure:
 {
   "summary": {
     "totalErrors": number,
@@ -61,17 +61,17 @@ Format ta réponse en JSON avec cette structure:
       "id": "unique-id",
       "type": "React|API|Supabase|CORS|Build|Network|Other",
       "severity": "Critical|Warning|Info",
-      "title": "Titre court de l'erreur",
-      "description": "Description de la cause exacte",
-      "solution": "Solution détaillée avec code",
-      "codeExample": "Code d'exemple si applicable",
-      "file": "Fichier où appliquer le fix",
-      "originalError": "Erreur console originale"
+      "title": "Short error title",
+      "description": "Description of the exact cause",
+      "solution": "Detailed solution with code",
+      "codeExample": "Code example if applicable",
+      "file": "File where to apply the fix",
+      "originalError": "Original console error"
     }
   ]
 }
 
-Priorise les erreurs critiques en premier. Sois précis et actionnable.`;
+Prioritize critical errors first. Be precise and actionable.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -83,7 +83,7 @@ Priorise les erreurs critiques en premier. Sois précis et actionnable.`;
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Analyse ces erreurs console:\n\n${consoleErrors}` }
+          { role: 'user', content: `Analyze these console errors:\n\n${consoleErrors}` }
         ],
         temperature: 0.3,
         max_tokens: 2000,

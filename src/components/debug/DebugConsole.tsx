@@ -48,8 +48,8 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
   const handleAnalyze = async () => {
     if (!consoleInput.trim()) {
       toast({
-        title: "Erreur",
-        description: "Veuillez coller des erreurs console à analyser",
+        title: "Error",
+        description: "Please paste console errors to analyze",
         variant: "destructive"
       });
       return;
@@ -68,14 +68,14 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
 
       setAnalysis(data);
       toast({
-        title: "Analyse terminée",
-        description: `${data.summary.totalErrors} erreur(s) analysée(s)`,
+        title: "Analysis complete",
+        description: `${data.summary.totalErrors} error(s) analyzed`,
       });
     } catch (error) {
       console.error('Debug analysis error:', error);
       toast({
-        title: "Erreur d'analyse",
-        description: "Impossible d'analyser les erreurs console",
+        title: "Analysis error",
+        description: "Unable to analyze console errors",
         variant: "destructive"
       });
     } finally {
@@ -87,13 +87,13 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        title: "Copié !",
-        description: `${label} copié dans le presse-papiers`,
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
       });
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de copier dans le presse-papiers",
+        title: "Error",
+        description: "Unable to copy to clipboard",
         variant: "destructive"
       });
     }
@@ -136,7 +136,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bug className="h-5 w-5 text-primary" />
-            Débogage Intelligent
+            Smart Debugging
           </DialogTitle>
         </DialogHeader>
 
@@ -144,7 +144,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
           {/* Input Section */}
           <div className="flex-1 flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium">Erreurs Console</h3>
+              <h3 className="text-sm font-medium">Console Errors</h3>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -152,7 +152,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                   onClick={handleReset}
                   disabled={isAnalyzing}
                 >
-                  Réinitialiser
+                  Reset
                 </Button>
                 <Button
                   onClick={handleAnalyze}
@@ -162,24 +162,24 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                   {isAnalyzing ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Analyse...
+                      Analyzing...
                     </>
                   ) : (
-                    'Analyser'
+                    'Analyze'
                   )}
                 </Button>
               </div>
             </div>
             
             <Textarea
-              placeholder="Collez ici les erreurs de la console (Ctrl+Shift+I → Console → copier les erreurs)..."
+              placeholder="Paste console errors here (Ctrl+Shift+I → Console → copy errors)..."
               value={consoleInput}
               onChange={(e) => setConsoleInput(e.target.value)}
               className="flex-1 min-h-[200px] font-mono text-sm"
             />
 
             <div className="mt-3 text-xs text-muted-foreground">
-              💡 Ouvrez la console (F12), copiez les erreurs et collez-les ici pour une analyse automatique
+              💡 Open console (F12), copy errors and paste them here for automatic analysis
             </div>
           </div>
 
@@ -191,7 +191,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <h3 className="text-sm font-medium">Résultats de l'analyse</h3>
+                    <h3 className="text-sm font-medium">Analysis Results</h3>
                   </div>
                   <div className="flex gap-2">
                     <Badge variant="outline">
@@ -199,7 +199,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                     </Badge>
                     {analysis.summary.criticalCount > 0 && (
                       <Badge variant="destructive">
-                        Critique: {analysis.summary.criticalCount}
+                        Critical: {analysis.summary.criticalCount}
                       </Badge>
                     )}
                     {analysis.summary.warningCount > 0 && (
@@ -242,16 +242,16 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                           </p>
                           
                           <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs font-medium">Solution:</span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => copyToClipboard(error.solution, 'Solution')}
-                              >
-                                <Copy className="h-3 w-3" />
-                              </Button>
-                            </div>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-medium">Solution:</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(error.solution, 'Solution')}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
                             <div className="bg-muted p-3 rounded text-xs">
                               <pre className="whitespace-pre-wrap">{error.solution}</pre>
                             </div>
@@ -276,7 +276,7 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
                           )}
 
                           <div className="text-xs text-muted-foreground">
-                            📁 Fichier: {error.file}
+                            📁 File: {error.file}
                           </div>
                         </CardContent>
                       </Card>
@@ -288,8 +288,8 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
               <div className="flex-1 flex items-center justify-center text-center">
                 <div className="text-muted-foreground">
                   <Bug className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Collez des erreurs console et cliquez sur "Analyser"</p>
-                  <p className="text-xs mt-1">L'IA analysera les erreurs et proposera des solutions</p>
+                  <p className="text-sm">Paste console errors and click "Analyze"</p>
+                  <p className="text-xs mt-1">AI will analyze errors and suggest solutions</p>
                 </div>
               </div>
             )}
