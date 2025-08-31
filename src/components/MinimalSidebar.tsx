@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
-import { Hash, Package, Plus, FileText } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle } from 'lucide-react';
 import { Workspace } from '@/types';
 
 interface MinimalSidebarProps {
@@ -104,6 +104,37 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect }
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Completed Prompts */}
+        <SidebarGroup className="mt-6">
+          <div className="mb-3">
+            <h3 className="text-sm font-medium text-muted-foreground">Achevé</h3>
+          </div>
+          
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1">
+              {prompts.filter(p => p.status === 'done').length === 0 ? (
+                <div className="py-2 px-3 text-center">
+                  <p className="text-xs text-muted-foreground">Aucun prompt terminé</p>
+                </div>
+              ) : (
+                prompts
+                  .filter(p => p.status === 'done')
+                  .slice(0, 8)
+                  .map((prompt) => (
+                    <SidebarMenuItem key={prompt.id}>
+                      <SidebarMenuButton className="w-full justify-start text-xs">
+                        <div className="flex items-center gap-2 w-full">
+                          <CheckCircle className="h-3 w-3 text-success" />
+                          <span className="truncate flex-1">{prompt.title}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))
               )}
             </SidebarMenu>
           </SidebarGroupContent>
