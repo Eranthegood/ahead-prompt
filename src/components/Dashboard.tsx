@@ -76,6 +76,7 @@ const Dashboard = () => {
           onProductSelect={setSelectedProductId}
           showCompletedItems={preferences.showCompletedItems}
           onToggleCompletedItems={handleToggleCompletedItems}
+          onQuickAdd={handleQuickAdd}
         />
         
         <div className="flex-1 flex flex-col">

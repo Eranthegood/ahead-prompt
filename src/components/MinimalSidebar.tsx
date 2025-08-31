@@ -22,9 +22,10 @@ interface MinimalSidebarProps {
   onProductSelect: (productId: string) => void;
   showCompletedItems: boolean;
   onToggleCompletedItems: (show: boolean) => void;
+  onQuickAdd: () => void;
 }
 
-export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, showCompletedItems, onToggleCompletedItems }: MinimalSidebarProps) {
+export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd }: MinimalSidebarProps) {
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
@@ -51,9 +52,24 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
     <Sidebar className="w-64 border-r border-border">
       <SidebarContent className="p-4">
         {/* Workspace Name */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
           <p className="text-sm text-muted-foreground">Workspace</p>
+        </div>
+
+        {/* Add Prompt Action */}
+        <div className="mb-6">
+          <Button 
+            onClick={onQuickAdd}
+            className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground"
+            size="sm"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Ajouter un prompt
+          </Button>
+          <p className="text-xs text-muted-foreground mt-2 px-1">
+            Astuce : Appuyez sur <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> pour créer rapidement
+          </p>
         </div>
 
         {/* Quick Actions */}
