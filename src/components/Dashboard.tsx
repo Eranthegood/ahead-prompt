@@ -19,6 +19,7 @@ const Dashboard = () => {
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
+    'q': () => setCommandPaletteOpen(true),
   });
 
   if (loading) {
