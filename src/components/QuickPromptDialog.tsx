@@ -7,6 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2 } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { useToast } from '@/hooks/use-toast';
+import { generateTitleFromContent } from '@/lib/titleUtils';
 import type { Workspace, Epic, Product } from '@/types';
 
 interface CreatePromptData {
@@ -126,8 +127,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
         : undefined;
 
+      // Generate descriptive title from content
+      const generatedTitle = generateTitleFromContent(content);
+
       const promptData: CreatePromptData = {
-        title: 'Nouvelle idée', // Default title
+        title: generatedTitle, // Auto-generated descriptive title
         description: content, // Original user content
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
         product_id: resolvedProductId,
@@ -153,8 +157,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
           : undefined;
 
+        // Generate descriptive title from content
+        const fallbackTitle = generateTitleFromContent(content);
+
         const promptData: CreatePromptData = {
-          title: 'Nouvelle idée',
+          title: fallbackTitle, // Auto-generated descriptive title
           description: content, // Original user content
           epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
           product_id: resolvedProductId,

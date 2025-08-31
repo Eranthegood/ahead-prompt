@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
 import { PromptTransformService } from '@/services/promptTransformService';
+import { generateTitleFromContent } from '@/lib/titleUtils';
 import { Prompt, Product, Epic } from '@/types';
 
 interface PromptDetailDialogProps {
@@ -118,8 +119,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
     setSaving(true);
     try {
+      // Generate descriptive title from content  
+      const updatedTitle = generateTitleFromContent(content);
+      
       await updatePrompt(prompt.id, {
-        title: 'Idée modifiée',
+        title: updatedTitle, // Auto-generated descriptive title
         description: content,
         product_id: productId === 'none' ? null : productId,
         epic_id: epicId === 'none' ? null : epicId,

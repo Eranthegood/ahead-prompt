@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
+import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { Workspace, Prompt, PromptStatus } from '@/types';
 
@@ -241,9 +242,13 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
                   onClick={() => handlePromptClick(prompt)}
                 >
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-foreground mb-2 truncate">
-                      {prompt.title}
-                    </h3>
+                    <TruncatedTitle 
+                      title={prompt.title}
+                      maxLength={60}
+                      className="font-medium text-foreground mb-2 group"
+                      showCopyButton={true}
+                      variant="inline"
+                    />
                     
                     {prompt.description && (
                       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
@@ -414,9 +419,13 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
                   onClick={() => handlePromptClick(prompt)}
                 >
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-foreground mb-2 truncate">
-                      {prompt.title}
-                    </h3>
+                    <TruncatedTitle 
+                      title={prompt.title}
+                      maxLength={60}
+                      className="font-medium text-foreground mb-2 group"
+                      showCopyButton={true}
+                      variant="inline"
+                    />
                     
                     {prompt.description && (
                       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">

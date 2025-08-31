@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { TruncatedTitle } from '@/components/ui/truncated-title';
+import { generateTitleFromContent } from '@/lib/titleUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PromptTransformService } from '@/services/promptTransformService';
@@ -186,9 +188,13 @@ export const PromptCard: React.FC<PromptCardProps> = ({
           </div>
         ) : (
           <div className="flex items-start justify-between">
-            <h4 className="font-semibold text-sm line-clamp-2 flex-1">
-              {prompt.title}
-            </h4>
+            <TruncatedTitle 
+              title={prompt.title}
+              maxLength={50}
+              className="font-semibold text-sm flex-1 group"
+              showCopyButton={true}
+              variant="inline"
+            />
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
                 size="sm"
