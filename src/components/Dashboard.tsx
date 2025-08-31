@@ -6,12 +6,14 @@ import { KanbanBoard } from '@/components/KanbanBoard';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
+import { QuickEpicDialog } from '@/components/QuickEpicDialog';
 import { ProductSelector } from '@/components/ProductSelector';
 import { ProductManagement } from '@/components/ProductManagement';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useProducts } from '@/hooks/useProducts';
+import { useEpics } from '@/hooks/useEpics';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Hash, BookOpen, Package, Settings } from 'lucide-react';
@@ -19,12 +21,14 @@ import { Loader2, Hash, BookOpen, Package, Settings } from 'lucide-react';
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
+  const [quickEpicOpen, setQuickEpicOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('board');
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [epics, setEpics] = useState([]);
   const { workspace, loading } = useWorkspace();
   const { createPrompt } = usePrompts(workspace?.id);
   const { products } = useProducts(workspace?.id);
+  const { createEpic } = useEpics(workspace?.id);
 
   // Fetch epics based on selected product
   useEffect(() => {
@@ -59,6 +63,7 @@ const Dashboard = () => {
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
     'q': () => setQuickPromptOpen(true), // Quick prompt creation
+    'e': () => setQuickEpicOpen(true), // Quick epic creation
   });
 
   if (loading) {
@@ -171,6 +176,15 @@ const Dashboard = () => {
           onSave={createPrompt}
           workspace={workspace}
           epics={epics}
+          selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        />
+
+        <QuickEpicDialog
+          isOpen={quickEpicOpen}
+          onClose={() => setQuickEpicOpen(false)}
+          onSave={createEpic}
+          workspace={workspace}
+          products={products}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
         />
       </div>
