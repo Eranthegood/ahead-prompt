@@ -68,7 +68,7 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
   const statusOptions = [
     { value: 'todo', label: 'Todo', variant: 'outline' as const },
     { value: 'in_progress', label: 'In Progress', variant: 'secondary' as const },
-    { value: 'done', label: 'Done', variant: 'default' as const }
+    { value: 'done', label: 'Done', variant: 'success' as const }
   ];
 
   const handleStatusChange = async (prompt: Prompt, newStatus: PromptStatus) => {
@@ -291,7 +291,7 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
                     {/* Status Badge - Click to cycle through statuses */}
                     <Badge 
                       variant={
-                        prompt.status === 'done' ? 'default' : 
+                        prompt.status === 'done' ? 'success' : 
                         prompt.status === 'in_progress' ? 'secondary' : 'outline'
                       }
                       className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
