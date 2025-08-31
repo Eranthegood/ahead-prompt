@@ -110,11 +110,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         throw new Error(response.error);
       }
 
-      // Replace editor content with generated prompt
-      if (response.transformedPrompt) {
-        editor.commands.setContent(response.transformedPrompt);
-      }
-
       setIsGenerating(false);
       setIsLoading(true);
 
