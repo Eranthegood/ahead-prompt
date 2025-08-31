@@ -20,10 +20,9 @@ interface MinimalPromptListProps {
   selectedProductId?: string;
   searchQuery: string;
   onQuickAdd: () => void;
-  onPromptSelect?: (prompt: Prompt) => void;
 }
 
-export function MinimalPromptList({ workspace, selectedProductId, searchQuery, onQuickAdd, onPromptSelect }: MinimalPromptListProps) {
+export function MinimalPromptList({ workspace, selectedProductId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
   const { prompts, loading, refetch } = usePrompts(workspace.id);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
@@ -253,7 +252,7 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
               <CardContent className="p-4">
                 <div 
                   className="flex items-start justify-between"
-                  onClick={() => onPromptSelect?.(prompt)}
+                  onClick={() => handlePromptClick(prompt)}
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-foreground mb-2 truncate">

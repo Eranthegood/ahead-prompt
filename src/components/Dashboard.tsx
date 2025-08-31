@@ -5,32 +5,21 @@ import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
-import { PromptSidePanel } from '@/components/PromptSidePanel';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useEpics } from '@/hooks/useEpics';
-import { useProducts } from '@/hooks/useProducts';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
-import type { Prompt } from '@/types';
-
-type EnrichedPrompt = Prompt & {
-  epic?: { id: string; name: string; color: string };
-  product?: { id: string; name: string };
-};
 
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPrompt, setSelectedPrompt] = useState<EnrichedPrompt | null>(null);
-  const [isPromptPanelOpen, setIsPromptPanelOpen] = useState(false);
   
   const { workspace, loading } = useWorkspace();
   const { createPrompt } = usePrompts(workspace?.id);
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
-  const { products } = useProducts(workspace?.id);
 
   // Set up global shortcuts
   useGlobalShortcuts({
@@ -43,38 +32,6 @@ const Dashboard = () => {
 
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
-  };
-
-  const handleCreatePrompt = async (promptData: any) => {
-    const newPrompt = await createPrompt(promptData);
-    // Enrich with epic and product info before opening side panel
-    const epic = epics?.find(e => e.id === newPrompt.epic_id);
-    const product = products?.find(p => p.id === newPrompt.product_id);
-    
-    const enrichedPrompt = {
-      ...newPrompt,
-      epic: epic ? { id: epic.id, name: epic.name, color: epic.color } : undefined,
-      product: product ? { id: product.id, name: product.name } : undefined,
-    };
-    
-    setSelectedPrompt(enrichedPrompt);
-    setIsPromptPanelOpen(true);
-    return newPrompt;
-  };
-
-  const handlePromptSelect = (prompt: Prompt) => {
-    // Enrich prompt with epic and product info
-    const epic = epics?.find(e => e.id === prompt.epic_id);
-    const product = products?.find(p => p.id === prompt.product_id);
-    
-    const enrichedPrompt = {
-      ...prompt,
-      epic: epic ? { id: epic.id, name: epic.name, color: epic.color } : undefined,
-      product: product ? { id: product.id, name: product.name } : undefined,
-    };
-    
-    setSelectedPrompt(enrichedPrompt);
-    setIsPromptPanelOpen(true);
   };
 
   if (loading) {
@@ -120,7 +77,6 @@ const Dashboard = () => {
             selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
             searchQuery={searchQuery}
             onQuickAdd={handleQuickAdd}
-            onPromptSelect={handlePromptSelect}
           />
         </div>
 
@@ -134,16 +90,10 @@ const Dashboard = () => {
         <QuickPromptDialog
           isOpen={quickPromptOpen}
           onClose={() => setQuickPromptOpen(false)}
-          onSave={handleCreatePrompt}
+          onSave={createPrompt}
           workspace={workspace}
           epics={epics}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-        />
-
-        <PromptSidePanel
-          isOpen={isPromptPanelOpen}
-          onClose={() => setIsPromptPanelOpen(false)}
-          prompt={selectedPrompt}
         />
       </div>
     </SidebarProvider>
