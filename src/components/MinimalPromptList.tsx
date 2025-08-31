@@ -20,11 +20,12 @@ import { Workspace, Prompt, PromptStatus } from '@/types';
 interface MinimalPromptListProps {
   workspace: Workspace;
   selectedProductId?: string;
+  selectedEpicId?: string;
   searchQuery: string;
   onQuickAdd: () => void;
 }
 
-export function MinimalPromptList({ workspace, selectedProductId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
+export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
   const { prompts, loading, updatePromptStatus, duplicatePrompt, deletePrompt } = usePrompts(workspace.id);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
@@ -33,7 +34,7 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  // Filter prompts (exclude done prompts)
+  // Filter prompts (exclude done prompts and apply epic filter)
   const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch = !searchQuery || 
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,9 +43,11 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
     const matchesProduct = !selectedProductId || selectedProductId === 'all' || 
       prompt.product_id === selectedProductId;
 
+    const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
+
     const isNotDone = prompt.status !== 'done';
 
-    return matchesSearch && matchesProduct && isNotDone;
+    return matchesSearch && matchesProduct && matchesEpic && isNotDone;
   });
 
   // Get product and epic info for each prompt and group by status
@@ -207,8 +210,10 @@ export function MinimalPromptList({ workspace, selectedProductId, searchQuery, o
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-semibold mb-2">
-          {selectedProductId === 'all' || !selectedProductId ? 'All Prompts' : 
-           products.find(p => p.id === selectedProductId)?.name || 'Prompts'}
+          {selectedEpicId ? 
+            `Epic: ${epics.find(e => e.id === selectedEpicId)?.name || 'Unknown'}` :
+            selectedProductId === 'all' || !selectedProductId ? 'All Prompts' : 
+            products.find(p => p.id === selectedProductId)?.name || 'Prompts'}
         </h2>
         <p className="text-muted-foreground">
           {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}

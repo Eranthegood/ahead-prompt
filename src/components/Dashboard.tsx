@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
+  const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   
   const { workspace, loading } = useWorkspace();
@@ -69,7 +70,9 @@ const Dashboard = () => {
         <MinimalSidebar 
           workspace={workspace}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+          selectedEpicId={selectedEpicId}
           onProductSelect={setSelectedProductId}
+          onEpicSelect={setSelectedEpicId}
           showCompletedItems={preferences.showCompletedItems}
           onToggleCompletedItems={handleToggleCompletedItems}
           onQuickAdd={handleQuickAdd}
@@ -87,6 +90,7 @@ const Dashboard = () => {
           <MinimalPromptList 
             workspace={workspace}
             selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+            selectedEpicId={selectedEpicId}
             searchQuery={searchQuery}
             onQuickAdd={handleQuickAdd}
           />

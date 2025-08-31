@@ -15,16 +15,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronUp, Palette } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette } from 'lucide-react';
 import { Workspace } from '@/types';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
   selectedProductId?: string;
+  selectedEpicId?: string;
   onProductSelect: (productId: string) => void;
+  onEpicSelect: (epicId: string | undefined) => void;
   showCompletedItems: boolean;
   onToggleCompletedItems: (show: boolean) => void;
   onQuickAdd: () => void;
@@ -40,12 +43,13 @@ const PRODUCT_COLORS = [
   { value: '#6B7280', label: 'Gris' },
 ];
 
-export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
+export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const { products, createProduct } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [newProductData, setNewProductData] = useState({
     name: '',
     description: '',
@@ -54,7 +58,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
   const [isCreating, setIsCreating] = useState(false);
 
   // Filter function to match search and exclude completed
-  const getActivePrompts = (productFilter?: string) => {
+  const getActivePrompts = (productFilter?: string, epicFilter?: string) => {
     return prompts.filter(prompt => {
       const matchesSearch = !searchQuery || 
         prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -63,24 +67,60 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
       const matchesProduct = !productFilter || productFilter === 'all' || 
         prompt.product_id === productFilter;
 
+      const matchesEpic = !epicFilter || prompt.epic_id === epicFilter;
+
       const isActive = prompt.status !== 'done';
 
-      return matchesSearch && matchesProduct && isActive;
+      return matchesSearch && matchesProduct && matchesEpic && isActive;
+    });
+  };
+
+  // Filter epics by search
+  const getFilteredEpics = (productId?: string) => {
+    return epics.filter(epic => {
+      const matchesProduct = !productId || epic.product_id === productId;
+      const matchesSearch = !searchQuery || 
+        epic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        epic.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return matchesProduct && matchesSearch;
     });
   };
 
   // Get active prompts count for "All Prompts"
   const allActivePromptsCount = getActivePrompts('all').length;
 
-  // Simple organization with filtered counts
-  const productsWithCounts = products.map(product => {
-    const activePromptsCount = getActivePrompts(product.id).length;
+  // Organization with epic hierarchy and filtered counts
+  const productsWithData = products.map(product => {
+    const productEpics = getFilteredEpics(product.id);
+    const directPrompts = getActivePrompts(product.id).filter(p => !p.epic_id);
+    
+    const epicsWithCounts = productEpics.map(epic => ({
+      ...epic,
+      promptCount: getActivePrompts(product.id, epic.id).length
+    }));
+
+    const totalActivePrompts = getActivePrompts(product.id).length;
     
     return {
       ...product,
-      promptCount: activePromptsCount
+      epics: epicsWithCounts,
+      directPrompts,
+      promptCount: totalActivePrompts
     };
   });
+
+  const toggleProductExpanded = (productId: string) => {
+    setExpandedProducts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
 
   // Get completed prompts with search filter
   const completedPrompts = prompts
@@ -143,7 +183,10 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             <Button 
               variant="ghost" 
               className="w-full justify-start text-left font-normal"
-              onClick={() => onProductSelect('all')}
+              onClick={() => {
+                onProductSelect('all');
+                onEpicSelect(undefined); // Clear epic selection
+              }}
             >
               <FileText className="mr-3 h-4 w-4" />
               All Prompts
@@ -153,7 +196,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             </Button>
           </div>
 
-          {/* Products */}
+          {/* Products with Epic Hierarchy */}
           <SidebarGroup>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-medium text-muted-foreground">Products</h3>
@@ -168,39 +211,109 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             </div>
             
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                {productsWithCounts.length === 0 ? (
+              <div className="space-y-1">
+                {productsWithData.length === 0 ? (
                   <div className="py-4 text-center">
                     <p className="text-sm text-muted-foreground mb-2">No products yet</p>
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setIsCreateProductOpen(true)}
+                    >
                       <Plus className="h-3 w-3 mr-1" />
                       Add Product
                     </Button>
                   </div>
                 ) : (
-                  productsWithCounts.map((product) => (
-                    <SidebarMenuItem key={product.id}>
-                      <SidebarMenuButton 
-                        className="w-full justify-between"
-                        onClick={() => onProductSelect(product.id)}
-                        isActive={selectedProductId === product.id}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-2 h-2 rounded-full" 
-                            style={{ backgroundColor: product.color || '#6B7280' }}
-                          />
-                          <Package className="h-4 w-4" />
-                          <span className="truncate">{product.name}</span>
+                  productsWithData.map((product) => (
+                    <Collapsible 
+                      key={product.id}
+                      open={expandedProducts.has(product.id)}
+                      onOpenChange={() => toggleProductExpanded(product.id)}
+                    >
+                      <div className="space-y-1">
+                        {/* Product Header */}
+                        <div className="flex items-center">
+                          <CollapsibleTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 mr-1"
+                            >
+                              <ChevronRight className={`h-3 w-3 transition-transform duration-200 ${
+                                expandedProducts.has(product.id) ? 'rotate-90' : ''
+                              }`} />
+                            </Button>
+                          </CollapsibleTrigger>
+                          
+                          <SidebarMenuButton 
+                            className="flex-1 justify-between"
+                            onClick={() => {
+                              onProductSelect(product.id);
+                              onEpicSelect(undefined); // Clear epic selection when product is selected
+                            }}
+                            isActive={selectedProductId === product.id && !selectedEpicId}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-2 h-2 rounded-full" 
+                                style={{ backgroundColor: product.color || '#6B7280' }}
+                              />
+                              <Package className="h-3 w-3" />
+                              <span className="truncate text-sm">{product.name}</span>
+                            </div>
+                            <Badge variant="secondary" className="text-xs">
+                              {product.promptCount}
+                            </Badge>
+                          </SidebarMenuButton>
                         </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {product.promptCount}
-                        </Badge>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
+
+                        {/* Epic List */}
+                        <CollapsibleContent className="ml-4">
+                          <div className="space-y-1">
+                            {product.epics.length > 0 && (
+                              <>
+                                {product.epics.map((epic) => (
+                                  <SidebarMenuButton
+                                    key={epic.id}
+                                    className="w-full justify-between text-xs"
+                                    onClick={() => {
+                                      onProductSelect(product.id);
+                                      onEpicSelect(epic.id);
+                                    }}
+                                    isActive={selectedEpicId === epic.id}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <div 
+                                        className="w-1.5 h-1.5 rounded-full" 
+                                        style={{ backgroundColor: epic.color || '#8B5CF6' }}
+                                      />
+                                      <Hash className="h-3 w-3" />
+                                      <span className="truncate">{epic.name}</span>
+                                    </div>
+                                    {epic.promptCount > 0 && (
+                                      <Badge variant="outline" className="text-xs h-4">
+                                        {epic.promptCount}
+                                      </Badge>
+                                    )}
+                                  </SidebarMenuButton>
+                                ))}
+                              </>
+                            )}
+                            
+                            {/* Show "No epics" when expanded but empty */}
+                            {expandedProducts.has(product.id) && product.epics.length === 0 && (
+                              <div className="text-xs text-muted-foreground py-2 px-2">
+                                No epics yet
+                              </div>
+                            )}
+                          </div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
                   ))
                 )}
-              </SidebarMenu>
+              </div>
             </SidebarGroupContent>
           </SidebarGroup>
 
@@ -266,33 +379,7 @@ export function MinimalSidebar({ workspace, selectedProductId, onProductSelect, 
             </div>
           )}
 
-          {/* Recent Epics */}
-          {epics.length > 0 && (
-            <SidebarGroup className="mt-6">
-              <div className="mb-3">
-                <h3 className="text-sm font-medium text-muted-foreground">Recent Epics</h3>
-              </div>
-              
-              <SidebarGroupContent>
-                <SidebarMenu className="space-y-1">
-                  {epics.slice(0, 5).map((epic) => (
-                    <SidebarMenuItem key={epic.id}>
-                      <SidebarMenuButton className="w-full justify-start">
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-2 h-2 rounded-full" 
-                            style={{ backgroundColor: epic.color || '#8B5CF6' }}
-                          />
-                          <Hash className="h-3 w-3" />
-                          <span className="truncate text-sm">{epic.name}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          )}
+          {/* Remove Recent Epics since they're now integrated above */}
         </SidebarContent>
       </Sidebar>
 
