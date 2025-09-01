@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
+import { BentoGrid1 } from "@/components/ui/bento-grid";
 export default function LandingPage() {
   const {
     signInWithGoogle
@@ -83,6 +84,11 @@ export default function LandingPage() {
             <TestimonialSlider testimonials={testimonials} />
           </div>
         </BlurFade>
+      </section>
+
+      {/* Bento Grid Section */}
+      <section className="bg-background">
+        <BentoGrid1 />
       </section>
 
       {/* Footer */}
