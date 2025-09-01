@@ -4,6 +4,8 @@ interface UserPreferences {
   lastPromptStatus: string;
   lastPromptPriority: string;
   showCompletedItems: boolean;
+  theme: 'light' | 'dark' | 'system';
+  compactMode: boolean;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -12,6 +14,8 @@ const defaultPreferences: UserPreferences = {
   lastPromptStatus: 'todo',
   lastPromptPriority: 'medium',
   showCompletedItems: true,
+  theme: 'system',
+  compactMode: false,
 };
 
 export const useUserPreferences = () => {
@@ -60,11 +64,27 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save theme preference
+  const saveThemePreference = (theme: 'light' | 'dark' | 'system') => {
+    updatePreferences({
+      theme,
+    });
+  };
+
+  // Save compact mode preference
+  const saveCompactModePreference = (compact: boolean) => {
+    updatePreferences({
+      compactMode: compact,
+    });
+  };
+
   return {
     preferences,
     loading,
     updatePreferences,
     savePromptSettings,
     saveCompletedItemsPreference,
+    saveThemePreference,
+    saveCompactModePreference,
   };
 };

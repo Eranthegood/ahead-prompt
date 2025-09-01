@@ -4,11 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Moon, Sun, Monitor } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ArrowLeft, Moon, Sun, Monitor, Crown, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/hooks/useTheme';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
+import { PremiumFeatureCard } from '@/components/PremiumFeatureCard';
 
 export default function Settings() {
   const navigate = useNavigate();
+  const { 
+    theme, 
+    setTheme, 
+    isDarkModeUnlocked, 
+    xpNeededForDarkMode, 
+    currentLevel, 
+    requiredLevel 
+  } = useTheme();
+  const { preferences, saveCompletedItemsPreference } = useUserPreferences();
+  const { hasUnlockedFeature } = useGamification();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,6 +43,18 @@ export default function Settings() {
         </div>
 
         <div className="grid gap-6">
+          {/* Premium Features Unlock Card */}
+          {(!isDarkModeUnlocked || !hasUnlockedFeature('COMPACT_MODE')) && (
+            <PremiumFeatureCard
+              featureName="Mode Sombre Premium"
+              requiredLevel={PREMIUM_FEATURES.DARK_MODE}
+              isUnlocked={isDarkModeUnlocked}
+              xpNeeded={xpNeededForDarkMode}
+              currentLevel={currentLevel}
+              icon={<Moon className="h-5 w-5 text-primary" />}
+              description="Débloquez une interface élégante et moderne avec le mode sombre exclusif"
+            />
+          )}
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
@@ -37,12 +65,28 @@ export default function Settings() {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Theme</Label>
+                  <div className="flex items-center gap-2">
+                    <Label>Theme</Label>
+                    {!isDarkModeUnlocked && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Crown className="mr-1 h-3 w-3" />
+                        Niveau {requiredLevel} requis
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">
-                    Choose your preferred theme
+                    {isDarkModeUnlocked 
+                      ? "Choose your preferred theme" 
+                      : `Atteignez le niveau ${requiredLevel} pour débloquer le mode sombre`
+                    }
                   </p>
+                  {!isDarkModeUnlocked && xpNeededForDarkMode > 0 && (
+                    <p className="text-xs text-primary">
+                      {xpNeededForDarkMode} XP restants (Niveau {currentLevel}/{requiredLevel})
+                    </p>
+                  )}
                 </div>
-                <Select defaultValue="system">
+                <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => setTheme(value)}>
                   <SelectTrigger className="w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -53,12 +97,31 @@ export default function Settings() {
                         Light
                       </div>
                     </SelectItem>
-                    <SelectItem value="dark">
-                      <div className="flex items-center">
-                        <Moon className="mr-2 h-4 w-4" />
-                        Dark
-                      </div>
-                    </SelectItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <SelectItem 
+                            value="dark" 
+                            disabled={!isDarkModeUnlocked}
+                            className={!isDarkModeUnlocked ? "opacity-50" : ""}
+                          >
+                            <div className="flex items-center">
+                              {!isDarkModeUnlocked ? (
+                                <Lock className="mr-2 h-4 w-4" />
+                              ) : (
+                                <Moon className="mr-2 h-4 w-4" />
+                              )}
+                              Dark
+                            </div>
+                          </SelectItem>
+                        </div>
+                      </TooltipTrigger>
+                      {!isDarkModeUnlocked && (
+                        <TooltipContent>
+                          <p>Atteignez le niveau {requiredLevel} pour débloquer</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                     <SelectItem value="system">
                       <div className="flex items-center">
                         <Monitor className="mr-2 h-4 w-4" />
@@ -71,12 +134,23 @@ export default function Settings() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Compact Mode</Label>
+                  <div className="flex items-center gap-2">
+                    <Label>Compact Mode</Label>
+                    {!hasUnlockedFeature('COMPACT_MODE') && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Crown className="mr-1 h-3 w-3" />
+                        Niveau {PREMIUM_FEATURES.COMPACT_MODE} requis
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Use a more compact interface
                   </p>
                 </div>
-                <Switch />
+                <Switch 
+                  disabled={!hasUnlockedFeature('COMPACT_MODE')}
+                  checked={preferences.compactMode && hasUnlockedFeature('COMPACT_MODE')}
+                />
               </div>
             </CardContent>
           </Card>
@@ -106,7 +180,10 @@ export default function Settings() {
                     Display completed prompts in the sidebar
                   </p>
                 </div>
-                <Switch />
+                <Switch 
+                  checked={preferences.showCompletedItems}
+                  onCheckedChange={saveCompletedItemsPreference}
+                />
               </div>
 
               <div className="flex items-center justify-between">

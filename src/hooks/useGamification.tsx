@@ -25,12 +25,25 @@ export const subscribeToXPAnimations = (listener: (event: XPAnimationEvent) => v
   };
 };
 
+// Premium features unlocked by level
+export const PREMIUM_FEATURES = {
+  DARK_MODE: 2,
+  COMPACT_MODE: 3,
+  ADVANCED_SHORTCUTS: 4,
+} as const;
+
 export const useGamification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Check if user has unlocked a premium feature
+  const hasUnlockedFeature = (feature: keyof typeof PREMIUM_FEATURES): boolean => {
+    if (!stats) return false;
+    return stats.current_level >= PREMIUM_FEATURES[feature];
+  };
 
   // Initialize user stats if they don't exist
   const initializeUserStats = async () => {
@@ -349,6 +362,7 @@ export const useGamification = () => {
     achievements,
     loading,
     awardXP,
+    hasUnlockedFeature,
     refetch: () => {
       fetchUserStats();
       fetchAchievements();
