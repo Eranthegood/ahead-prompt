@@ -58,7 +58,7 @@ export function TruncatedTitle({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
+            className="h-6 w-6 p-0 ml-auto shrink-0"
           >
             <Copy className="h-4 w-4" />
           </Button>
@@ -79,7 +79,7 @@ export function TruncatedTitle({
                   variant="ghost"
                   size="sm"
                   onClick={handleCopy}
-                  className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
+                  className="h-6 w-6 p-0 ml-auto shrink-0"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -125,7 +125,7 @@ export function TruncatedTitle({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
+            className="h-6 w-6 p-0 ml-auto shrink-0"
           >
             <Copy className="h-4 w-4" />
           </Button>
@@ -177,7 +177,7 @@ export function TruncatedTitle({
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          className="absolute bottom-1 right-1 h-8 w-8 p-0 opacity-100 transition-opacity"
+          className="h-6 w-6 p-0 ml-auto shrink-0"
         >
           <Copy className="h-4 w-4" />
         </Button>
