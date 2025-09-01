@@ -1,5 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 
+// Utility function to strip HTML and normalize text
+export const stripHtmlAndNormalize = (html: string): string => {
+  return html
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
+    .replace(/&[a-zA-Z0-9#]+;/g, ' ') // Replace other HTML entities
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim()
+}
+
 export interface TransformPromptRequest {
   rawIdea: string;
 }
@@ -7,6 +17,7 @@ export interface TransformPromptRequest {
 export interface TransformPromptResponse {
   transformedPrompt: string;
   error?: string;
+  success?: boolean;
 }
 
 export interface PromptHistory {
@@ -22,12 +33,19 @@ const MAX_HISTORY_ITEMS = 10;
 export class PromptTransformService {
   static async transformPrompt(rawIdea: string): Promise<TransformPromptResponse> {
     try {
-      if (!rawIdea.trim()) {
-        throw new Error('L\'idée ne peut pas être vide');
+      // Clean and validate the input
+      const cleanIdea = stripHtmlAndNormalize(rawIdea);
+      
+      if (!cleanIdea || cleanIdea.length < 3) {
+        return {
+          success: false,
+          transformedPrompt: '',
+          error: 'Veuillez ajouter plus de contexte à votre idée pour une meilleure génération.'
+        };
       }
 
       const { data, error } = await supabase.functions.invoke('transform-prompt', {
-        body: { rawIdea: rawIdea.trim() }
+        body: { rawIdea: cleanIdea }
       });
 
       if (error) {
@@ -44,15 +62,16 @@ export class PromptTransformService {
       }
 
       // Save to history
-      this.saveToHistory(rawIdea, data.transformedPrompt);
+      this.saveToHistory(cleanIdea, data.transformedPrompt);
 
       // Award XP for AI generation
       // Note: This is called from a static method, so XP will be awarded in the component that uses this service
       
-      return { transformedPrompt: data.transformedPrompt };
+      return { success: true, transformedPrompt: data.transformedPrompt };
     } catch (error) {
       console.error('Transform prompt error:', error);
       return { 
+        success: false,
         transformedPrompt: '',
         error: error instanceof Error ? error.message : 'Erreur inconnue'
       };

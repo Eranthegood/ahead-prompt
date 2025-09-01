@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2 } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
-import { PromptTransformService } from '@/services/promptTransformService';
+import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { Prompt, Product, Epic } from '@/types';
 
@@ -30,6 +31,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
+  const [textLength, setTextLength] = useState(0);
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
 
@@ -41,6 +43,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       attributes: {
         class: 'prose prose-sm max-w-none focus:outline-none min-h-[300px] p-4',
       },
+    },
+    onUpdate: ({ editor }) => {
+      const htmlContent = editor.getHTML();
+      const cleanText = stripHtmlAndNormalize(htmlContent);
+      setTextLength(cleanText.length);
     },
   });
 
@@ -54,6 +61,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       setEpicId(prompt.epic_id || 'none');
       // Load persisted generated prompt or use description as fallback
       setGeneratedPrompt(prompt.generated_prompt || content);
+      
+      // Calculate initial text length
+      const cleanText = stripHtmlAndNormalize(content);
+      setTextLength(cleanText.length);
     }
   }, [prompt, editor]);
 
@@ -62,8 +73,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     
     setIsRegenerating(true);
     try {
-      const rawText = editor.getText();
-      const response = await PromptTransformService.transformPrompt(rawText);
+      const htmlContent = editor.getHTML();
+      const response = await PromptTransformService.transformPrompt(htmlContent);
       
       if (response.error) {
         throw new Error(response.error);
@@ -208,6 +219,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
                 <Separator />
 
+                {/* Context Warning */}
+                {textLength < 20 && textLength > 0 && (
+                  <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                    <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                      Ajoutez un peu plus de contexte pour une meilleure génération IA.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {/* Compact toolbar */}
                 <div className="flex items-center gap-1 p-2 border rounded-md bg-muted/30 overflow-x-auto">
                   <Button
@@ -302,7 +323,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                       variant="ghost"
                       size="sm"
                       onClick={handleRegeneratePrompt}
-                      disabled={isRegenerating}
+                      disabled={isRegenerating || textLength === 0}
                     >
                       {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                     </Button>
@@ -357,6 +378,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             </div>
 
             <Separator />
+
+            {/* Context Warning */}
+            {textLength < 20 && textLength > 0 && (
+              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                <AlertDescription className="text-orange-800 dark:text-orange-200">
+                  Ajoutez un peu plus de contexte pour une meilleure génération IA.
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Formatting toolbar */}
             <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
@@ -504,7 +535,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   variant="outline"
                   size="sm"
                   onClick={handleRegeneratePrompt}
-                  disabled={isRegenerating}
+                  disabled={isRegenerating || textLength === 0}
+                  title={textLength === 0 ? "Ajoutez du contenu pour régénérer" : "Régénérer le prompt"}
                 >
                   {isRegenerating ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

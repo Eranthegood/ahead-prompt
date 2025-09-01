@@ -95,7 +95,7 @@ export function PromptCard({
                 )}
               </div>
               
-              {prompt.description && (
+              {prompt.description ? (
                 <div 
                   className="text-sm text-muted-foreground mb-3 overflow-hidden"
                   style={{
@@ -106,6 +106,10 @@ export function PromptCard({
                   }}
                   dangerouslySetInnerHTML={{ __html: prompt.description }}
                 />
+              ) : (
+                <div className="text-sm text-muted-foreground mb-3 italic opacity-60">
+                  Aucun contexte
+                </div>
               )}
               
               <div className="flex items-center gap-3 text-xs text-muted-foreground">

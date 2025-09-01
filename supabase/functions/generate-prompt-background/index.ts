@@ -7,7 +7,7 @@ const corsHeaders = {
 
 interface RequestBody {
   promptId: string;
-  rawText: string;
+  rawText?: string;
 }
 
 Deno.serve(async (req) => {
@@ -37,9 +37,59 @@ Deno.serve(async (req) => {
 
     const { promptId, rawText }: RequestBody = await req.json()
 
-    if (!promptId || !rawText) {
+    if (!promptId) {
       return new Response(
-        JSON.stringify({ error: 'Missing promptId or rawText' }),
+        JSON.stringify({ error: 'Missing promptId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Strip HTML and normalize text
+    const stripHtmlAndNormalize = (html: string): string => {
+      return html
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
+        .replace(/&[a-zA-Z0-9#]+;/g, ' ') // Replace other HTML entities
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim()
+    }
+
+    let finalRawText = rawText
+
+    // If rawText is empty or missing, fetch from database
+    if (!finalRawText || stripHtmlAndNormalize(finalRawText).length === 0) {
+      console.log(`No rawText provided for prompt ${promptId}, fetching from database`)
+      
+      const { data: promptData, error: fetchError } = await supabase
+        .from('prompts')
+        .select('title, description')
+        .eq('id', promptId)
+        .single()
+        
+      if (fetchError || !promptData) {
+        console.error('Failed to fetch prompt data:', fetchError)
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch prompt data' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      
+      // Build rawText from description or title
+      const cleanDescription = promptData.description ? stripHtmlAndNormalize(promptData.description) : ''
+      finalRawText = cleanDescription || promptData.title || ''
+      
+      console.log(`Fallback rawText for prompt ${promptId}: "${finalRawText}" (length: ${finalRawText.length})`)
+    } else {
+      // Clean the provided rawText
+      finalRawText = stripHtmlAndNormalize(finalRawText)
+      console.log(`Using provided rawText for prompt ${promptId}: length ${finalRawText.length}`)
+    }
+
+    // Final validation
+    if (!finalRawText || finalRawText.length < 3) {
+      console.log(`Insufficient content for prompt ${promptId}: "${finalRawText}"`)
+      return new Response(
+        JSON.stringify({ error: 'Insufficient content for AI generation. Please add more context to your prompt.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -77,7 +127,7 @@ Format markdown prêt à copier-coller. Réponds UNIQUEMENT avec le prompt trans
           },
           {
             role: 'user',
-            content: rawText
+            content: finalRawText
           }
         ],
         max_tokens: 800,

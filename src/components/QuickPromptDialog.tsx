@@ -144,8 +144,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
       // 🔥 Generate AI prompt in background (non-blocking)
       if (createdPrompt?.id) {
-        // Start background AI generation
-        generatePromptInBackground(createdPrompt.id, editor.getText());
+        // Start background AI generation with HTML content
+        generatePromptInBackground(createdPrompt.id, content);
       }
 
     } catch (error) {
