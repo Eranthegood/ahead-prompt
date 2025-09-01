@@ -13,6 +13,7 @@ import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
+import Achievements from "./pages/Achievements";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,11 @@ function App() {
                 <Route path="/shortcuts" element={
                   <ProtectedRoute>
                     <KeyboardShortcuts />
+                  </ProtectedRoute>
+                } />
+                <Route path="/achievements" element={
+                  <ProtectedRoute>
+                    <Achievements />
                   </ProtectedRoute>
                 } />
                 <Route path="*" element={<NotFound />} />
