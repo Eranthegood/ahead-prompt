@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.debug-console]
 verify_jwt = true
+
+[functions.generate-prompt-background]
+verify_jwt = true

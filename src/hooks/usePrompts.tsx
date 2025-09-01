@@ -15,7 +15,7 @@ interface CreatePromptData {
   generated_at?: string;
 }
 
-export const usePrompts = (workspaceId?: string, selectedProductId?: string) => {
+export const usePrompts = (workspaceId?: string, selectedProductId?: string, selectedEpicId?: string) => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -31,9 +31,13 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         .select('*')
         .eq('workspace_id', workspaceId);
 
-      // Filter by product if selectedProductId is specified
-      if (selectedProductId) {
+      // Apply server-side filtering for better performance
+      if (selectedProductId && selectedProductId !== 'all') {
         query = query.eq('product_id', selectedProductId);
+      }
+
+      if (selectedEpicId) {
+        query = query.eq('epic_id', selectedEpicId);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -394,7 +398,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [workspaceId, selectedProductId]);
+  }, [workspaceId, selectedProductId, selectedEpicId]);
 
   return {
     prompts,

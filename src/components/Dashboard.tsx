@@ -24,7 +24,11 @@ const Dashboard = () => {
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   
   const { workspace, loading } = useWorkspace();
-  const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(workspace?.id);
+  const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(
+    workspace?.id, 
+    selectedProductId === 'all' ? undefined : selectedProductId,
+    selectedEpicId
+  );
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();

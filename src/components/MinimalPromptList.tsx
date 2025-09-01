@@ -32,7 +32,11 @@ export function MinimalPromptList({
   hoveredPromptId,
   onPromptHover
 }: MinimalPromptListProps) {
-  const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(workspace.id);
+  const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(
+    workspace.id,
+    selectedProductId === 'all' ? undefined : selectedProductId,
+    selectedEpicId
+  );
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
@@ -40,20 +44,15 @@ export function MinimalPromptList({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  // Filter prompts (exclude done prompts and apply epic filter)
+  // Apply minimal client-side filtering (most filtering now done server-side)
   const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch = !searchQuery || 
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesProduct = !selectedProductId || selectedProductId === 'all' || 
-      prompt.product_id === selectedProductId;
-
-    const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
-
     const isNotDone = prompt.status !== 'done';
 
-    return matchesSearch && matchesProduct && matchesEpic && isNotDone;
+    return matchesSearch && isNotDone;
   });
 
   // Get product and epic info for each prompt and sort by priority first, then by status

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -92,7 +93,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     }
   }, [isOpen, editor, selectedProductId, products]);
 
-  // Handle save with automatic prompt generation
+  // Handle save with immediate creation and background AI generation
   const handleSave = async () => {
     if (!editor) return;
     
@@ -109,28 +110,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       return;
     }
 
-    setIsGenerating(true);
+    setIsLoading(true);
+    
     try {
-      // Extract raw text from editor (without HTML tags)
-      const rawText = editor.getText();
-      
-      // Generate prompt using AI
-      const response = await PromptTransformService.transformPrompt(rawText);
-      
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      // Store the generated prompt
-      if (response.transformedPrompt) {
-        setGeneratedPrompt(response.transformedPrompt);
-        // Award XP for AI generation
-        awardXP('AI_GENERATION');
-      }
-
-      setIsGenerating(false);
-      setIsLoading(true);
-
       const resolvedProductId = selectedEpic === 'none'
         ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
         : undefined;
@@ -138,55 +120,67 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       // Generate descriptive title from content
       const generatedTitle = generateTitleFromContent(content);
 
+      // 🚀 Create prompt immediately without waiting for AI generation
       const promptData: CreatePromptData = {
-        title: generatedTitle, // Auto-generated descriptive title
-        description: content, // Original user content
+        title: generatedTitle,
+        description: content,
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
         product_id: resolvedProductId,
         priority: selectedPriority,
-        generated_prompt: response.transformedPrompt || undefined,
-        generated_at: response.transformedPrompt ? new Date().toISOString() : undefined,
+        // No generated_prompt yet - will be added later
       };
 
-      await onSave(promptData);
-      onClose();
-    } catch (error) {
-      console.error('Error generating or saving prompt:', error);
+      // Save immediately for instant UI feedback
+      const createdPrompt = await onSave(promptData);
+      
+      // Show success feedback immediately
       toast({
-        title: 'Generation error',
-        description: 'Unable to generate prompt. Saving original content.',
-        variant: 'destructive'
+        title: 'Prompt created!',
+        description: 'AI generation starting in background...',
+        variant: 'default'
       });
       
-      // Save original content if generation fails
-      setIsGenerating(false);
-      setIsLoading(true);
-      try {
-        const resolvedProductId = selectedEpic === 'none'
-          ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
-          : undefined;
+      onClose();
 
-        // Generate descriptive title from content
-        const fallbackTitle = generateTitleFromContent(content);
-
-        const promptData: CreatePromptData = {
-          title: fallbackTitle, // Auto-generated descriptive title
-          description: content, // Original user content
-          epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-          product_id: resolvedProductId,
-          priority: selectedPriority,
-          generated_prompt: undefined, // No AI generation in fallback
-          generated_at: undefined,
-        };
-
-        await onSave(promptData);
-        onClose();
-      } catch (saveError) {
-        console.error('Error saving original prompt:', saveError);
+      // 🔥 Generate AI prompt in background (non-blocking)
+      if (createdPrompt?.id) {
+        // Start background AI generation
+        generatePromptInBackground(createdPrompt.id, editor.getText());
       }
+
+    } catch (error) {
+      console.error('Error saving prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create prompt. Please try again.',
+        variant: 'destructive'
+      });
     } finally {
       setIsLoading(false);
-      setIsGenerating(false);
+    }
+  };
+
+  // Background AI generation function
+  const generatePromptInBackground = async (promptId: string, rawText: string) => {
+    try {
+      // Use the new edge function for background generation
+      const { data, error } = await supabase.functions.invoke('generate-prompt-background', {
+        body: { promptId, rawText }
+      });
+      
+      if (data?.success) {
+        awardXP('AI_GENERATION');
+        
+        // Optional: Show completion notification
+        toast({
+          title: 'AI generation complete!',
+          description: 'Your prompt has been enhanced.',
+          variant: 'default'
+        });
+      }
+    } catch (error) {
+      console.error('Background AI generation failed:', error);
+      // Don't show error to user since prompt was already created successfully
     }
   };
 
