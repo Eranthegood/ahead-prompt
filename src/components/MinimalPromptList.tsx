@@ -285,6 +285,20 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   </div>
                   
                   <div className="flex items-center gap-2 ml-4">
+                    {/* Quick Copy Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(prompt);
+                      }}
+                      className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
+                      title="Copy prompt"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    
                     {/* Status Badge - Click to cycle through statuses */}
                     <Badge 
                       variant={
@@ -461,6 +475,20 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   </div>
                   
                   <div className="flex items-center gap-2 ml-4">
+                    {/* Quick Copy Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(prompt);
+                      }}
+                      className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
+                      title="Copy prompt"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    
                     {/* Status Badge - Click to cycle through statuses */}
                     <Badge 
                       variant={
