@@ -600,9 +600,19 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           {/* Completed Prompts */}
           {showCompletedItems && !isCollapsed && (
             <SidebarGroup className="mt-6">
-              <div className="mb-3 flex items-center justify-between cursor-pointer" onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}>
+              <div className="mb-3 flex items-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 mr-1"
+                  onClick={() => setIsCompletedExpanded(!isCompletedExpanded)}
+                  aria-label={`${isCompletedExpanded ? 'Collapse' : 'Expand'} completed prompts`}
+                >
+                  <ChevronRight className={`h-3 w-3 transition-transform duration-200 ${
+                    isCompletedExpanded ? 'rotate-90' : ''
+                  }`} />
+                </Button>
                 <h3 className="text-sm font-medium text-muted-foreground">Completed ({completedPrompts.length})</h3>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isCompletedExpanded ? 'rotate-180' : ''}`} />
               </div>
               
               {isCompletedExpanded && (
