@@ -257,7 +257,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           </div>
 
           {/* Quick Actions */}
-          <div className="mb-6 space-y-2">
+          <div className="mb-4 space-y-2">
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -308,7 +308,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           </div>
 
           {/* Products with Epic Hierarchy */}
-          <SidebarGroup>
+          <SidebarGroup className="mt-2">
             {!isCollapsed && (
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-medium text-muted-foreground">Products</h3>
