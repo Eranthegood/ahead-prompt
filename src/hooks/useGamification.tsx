@@ -1,8 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { UserStats, UserAchievement, XP_REWARDS, ACHIEVEMENTS } from '@/types/gamification';
+
+// Create a global event emitter for XP animations
+type XPAnimationEvent = {
+  xp: number;
+  element?: HTMLElement | null;
+  type?: 'xp' | 'level' | 'achievement';
+};
+
+const xpAnimationEvents: ((event: XPAnimationEvent) => void)[] = [];
+
+export const emitXPAnimation = (event: XPAnimationEvent) => {
+  xpAnimationEvents.forEach(listener => listener(event));
+};
+
+export const subscribeToXPAnimations = (listener: (event: XPAnimationEvent) => void) => {
+  xpAnimationEvents.push(listener);
+  return () => {
+    const index = xpAnimationEvents.indexOf(listener);
+    if (index > -1) xpAnimationEvents.splice(index, 1);
+  };
+};
 
 export const useGamification = () => {
   const { user } = useAuth();
@@ -68,57 +89,94 @@ export const useGamification = () => {
     }
   };
 
-  // Award XP for various actions
-  const awardXP = async (action: keyof typeof XP_REWARDS, additionalData?: any) => {
-    if (!user?.id || !stats) return;
-
-    const xpAmount = XP_REWARDS[action];
-    const newXP = stats.total_xp + xpAmount;
-    const newLevel = Math.floor(newXP / 100) + 1;
-    const leveledUp = newLevel > stats.current_level;
+  // Unlock an achievement
+  const unlockAchievement = async (achievement: any) => {
+    if (!user?.id) return;
 
     try {
-      // Update user stats
-      const updates: Partial<UserStats> = {
-        total_xp: newXP,
-        current_level: newLevel,
-        last_activity_date: new Date().toISOString().split('T')[0],
-        ...getActionSpecificUpdates(action, additionalData)
-      };
-
       const { error } = await supabase
-        .from('user_stats')
-        .update(updates)
-        .eq('user_id', user.id);
+        .from('user_achievements')
+        .insert({
+          user_id: user.id,
+          achievement_type: achievement.type,
+          achievement_name: achievement.name
+        });
 
       if (error) throw error;
 
-      // Update local state
-      setStats(prev => prev ? { ...prev, ...updates } : prev);
+      // Add to local state
+      setAchievements(prev => [...prev, {
+        id: Date.now().toString(),
+        user_id: user.id!,
+        achievement_type: achievement.type,
+        achievement_name: achievement.name,
+        unlocked_at: new Date().toISOString()
+      }]);
 
-      // Update daily activity
-      await updateDailyActivity(action, xpAmount);
+      // Award bonus XP
+      if (achievement.xp_reward > 0 && stats) {
+        const newXP = stats.total_xp + achievement.xp_reward;
+        const { error: xpError } = await supabase
+          .from('user_stats')
+          .update({ total_xp: newXP })
+          .eq('user_id', user.id);
 
-      // Check for achievements
-      await checkAchievements();
-
-      // Show notifications
-      if (leveledUp) {
-        toast({
-          title: "🎉 Niveau supérieur !",
-          description: `Vous êtes maintenant niveau ${newLevel}`,
-        });
-      } else {
-        toast({
-          title: "✨ XP gagnée !",
-          description: `+${xpAmount} XP`,
-        });
+        if (!xpError) {
+          setStats(prev => prev ? { ...prev, total_xp: newXP } : prev);
+        }
       }
 
+      // Trigger achievement animation
+      emitXPAnimation({ 
+        xp: achievement.xp_reward, 
+        type: 'achievement'
+      });
+
+      // Show achievement notification
+      toast({
+        title: `🏆 Succès débloqué !`,
+        description: `${achievement.icon} ${achievement.title}`,
+      });
+
     } catch (error) {
-      console.error('Error awarding XP:', error);
+      console.error('Error unlocking achievement:', error);
     }
   };
+
+  // Check and unlock achievements
+  const checkAchievements = useCallback(async () => {
+    if (!user?.id || !stats) return;
+
+    for (const achievement of ACHIEVEMENTS) {
+      // Check if already unlocked
+      const alreadyUnlocked = achievements.some(
+        a => a.achievement_type === achievement.type && a.achievement_name === achievement.name
+      );
+
+      if (alreadyUnlocked) continue;
+
+      // Check if requirement is met
+      let currentProgress = 0;
+      switch (achievement.type) {
+        case 'prompt_creation':
+          currentProgress = stats.total_prompts_created;
+          break;
+        case 'prompt_completion':
+          currentProgress = stats.total_prompts_completed;
+          break;
+        case 'ai_generation':
+          currentProgress = stats.total_ai_generations;
+          break;
+        case 'streak':
+          currentProgress = stats.current_streak;
+          break;
+      }
+
+      if (currentProgress >= achievement.requirement) {
+        await unlockAchievement(achievement);
+      }
+    }
+  }, [user?.id, stats, achievements]);
 
   // Get action-specific stat updates
   const getActionSpecificUpdates = (action: keyof typeof XP_REWARDS, additionalData?: any) => {
@@ -208,88 +266,73 @@ export const useGamification = () => {
     return updates;
   };
 
-  // Check and unlock achievements
-  const checkAchievements = async () => {
+  // Award XP for various actions
+  const awardXP = useCallback(async (action: keyof typeof XP_REWARDS, additionalData?: any) => {
     if (!user?.id || !stats) return;
 
-    for (const achievement of ACHIEVEMENTS) {
-      // Check if already unlocked
-      const alreadyUnlocked = achievements.some(
-        a => a.achievement_type === achievement.type && a.achievement_name === achievement.name
-      );
-
-      if (alreadyUnlocked) continue;
-
-      // Check if requirement is met
-      let currentProgress = 0;
-      switch (achievement.type) {
-        case 'prompt_creation':
-          currentProgress = stats.total_prompts_created;
-          break;
-        case 'prompt_completion':
-          currentProgress = stats.total_prompts_completed;
-          break;
-        case 'ai_generation':
-          currentProgress = stats.total_ai_generations;
-          break;
-        case 'streak':
-          currentProgress = stats.current_streak;
-          break;
-      }
-
-      if (currentProgress >= achievement.requirement) {
-        await unlockAchievement(achievement);
-      }
-    }
-  };
-
-  // Unlock an achievement
-  const unlockAchievement = async (achievement: any) => {
-    if (!user?.id) return;
+    const xpAmount = XP_REWARDS[action];
+    const newXP = stats.total_xp + xpAmount;
+    const newLevel = Math.floor(newXP / 100) + 1;
+    const leveledUp = newLevel > stats.current_level;
 
     try {
+      // Update user stats
+      const updates: Partial<UserStats> = {
+        total_xp: newXP,
+        current_level: newLevel,
+        last_activity_date: new Date().toISOString().split('T')[0],
+        ...getActionSpecificUpdates(action, additionalData)
+      };
+
       const { error } = await supabase
-        .from('user_achievements')
-        .insert({
-          user_id: user.id,
-          achievement_type: achievement.type,
-          achievement_name: achievement.name
-        });
+        .from('user_stats')
+        .update(updates)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      // Add to local state
-      setAchievements(prev => [...prev, {
-        id: Date.now().toString(),
-        user_id: user.id!,
-        achievement_type: achievement.type,
-        achievement_name: achievement.name,
-        unlocked_at: new Date().toISOString()
-      }]);
+      // Update local state
+      setStats(prev => prev ? { ...prev, ...updates } : prev);
 
-      // Award bonus XP
-      if (achievement.xp_reward > 0 && stats) {
-        const newXP = stats.total_xp + achievement.xp_reward;
-        const { error: xpError } = await supabase
-          .from('user_stats')
-          .update({ total_xp: newXP })
-          .eq('user_id', user.id);
+      // Update daily activity
+      await updateDailyActivity(action, xpAmount);
 
-        if (!xpError) {
-          setStats(prev => prev ? { ...prev, total_xp: newXP } : prev);
-        }
-      }
+      // Check for achievements
+      await checkAchievements();
 
-      // Show achievement notification
-      toast({
-        title: `🏆 Succès débloqué !`,
-        description: `${achievement.icon} ${achievement.title}`,
+      // Trigger XP animation
+      emitXPAnimation({ 
+        xp: xpAmount, 
+        element: additionalData?.element || null,
+        type: 'xp'
       });
 
+      // Show notifications
+      if (leveledUp) {
+        // Trigger level up animation
+        setTimeout(() => {
+          emitXPAnimation({ 
+            xp: 0, 
+            element: additionalData?.element || null,
+            type: 'level'
+          });
+        }, 500);
+
+        toast({
+          title: "🎉 Niveau supérieur !",
+          description: `Vous êtes maintenant niveau ${newLevel}`,
+        });
+      } else {
+        toast({
+          title: "✨ XP gagnée !",
+          description: `+${xpAmount} XP`,
+        });
+      }
+
     } catch (error) {
-      console.error('Error unlocking achievement:', error);
+      console.error('Error awarding XP:', error);
     }
-  };
+  }, [user?.id, stats, checkAchievements, toast]);
 
   useEffect(() => {
     if (user?.id) {

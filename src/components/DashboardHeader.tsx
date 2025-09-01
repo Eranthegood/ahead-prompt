@@ -34,7 +34,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ workspace }) =
       <div className="flex items-center gap-3">
         {stats && (
           <div className="hidden lg:block">
-            <XPProgressBar stats={stats} />
+            <XPProgressBar stats={stats} animate={true} />
           </div>
         )}
         

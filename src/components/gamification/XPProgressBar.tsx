@@ -2,12 +2,15 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Star } from 'lucide-react';
 import { UserStats, LEVEL_TITLES } from '@/types/gamification';
+import { useEffect, useState } from 'react';
 
 interface XPProgressBarProps {
   stats: UserStats;
+  animate?: boolean;
 }
 
-export const XPProgressBar: React.FC<XPProgressBarProps> = ({ stats }) => {
+export const XPProgressBar: React.FC<XPProgressBarProps> = ({ stats, animate = false }) => {
+  const [animatedProgress, setAnimatedProgress] = useState(0);
   const currentLevelXP = (stats.current_level - 1) * 100;
   const nextLevelXP = stats.current_level * 100;
   const progressXP = stats.total_xp - currentLevelXP;
@@ -15,14 +18,30 @@ export const XPProgressBar: React.FC<XPProgressBarProps> = ({ stats }) => {
 
   const levelTitle = LEVEL_TITLES[stats.current_level as keyof typeof LEVEL_TITLES] || 'Master';
 
+  useEffect(() => {
+    if (animate) {
+      setAnimatedProgress(0);
+      const timer = setTimeout(() => {
+        setAnimatedProgress(progressPercentage);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimatedProgress(progressPercentage);
+    }
+  }, [progressPercentage, animate]);
+
   return (
     <div className="flex items-center gap-3 bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border/50">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center">
+        <div className={`w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center transition-all duration-300 ${
+          animate ? 'animate-level-glow' : ''
+        }`}>
           <Star className="w-4 h-4 text-primary-foreground" />
         </div>
         <div className="flex flex-col">
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className={`text-xs transition-all duration-300 ${
+            animate ? 'scale-105' : ''
+          }`}>
             Niveau {stats.current_level}
           </Badge>
           <span className="text-xs text-muted-foreground">{levelTitle}</span>
@@ -39,7 +58,10 @@ export const XPProgressBar: React.FC<XPProgressBarProps> = ({ stats }) => {
             {stats.total_xp}
           </div>
         </div>
-        <Progress value={progressPercentage} className="h-2" />
+        <Progress 
+          value={animatedProgress} 
+          className={`h-2 transition-all duration-800 ${animate ? 'animate-progress-fill' : ''}`} 
+        />
       </div>
     </div>
   );
