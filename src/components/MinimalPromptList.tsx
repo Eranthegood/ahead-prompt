@@ -286,15 +286,15 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   
                   <div className="flex items-center gap-2 ml-4">
                     {/* Quick Copy Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopy(prompt);
-                      }}
-                      className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
-                      title="Copy prompt"
+                     <Button
+                       variant="ghost"
+                       size="sm"
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         handleCopyGenerated(prompt);
+                       }}
+                       className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
+                       title="Copy auto-generated prompt"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -476,15 +476,15 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   
                   <div className="flex items-center gap-2 ml-4">
                     {/* Quick Copy Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopy(prompt);
-                      }}
-                      className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
-                      title="Copy prompt"
+                     <Button
+                       variant="ghost"
+                       size="sm"
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         handleCopyGenerated(prompt);
+                       }}
+                       className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
+                       title="Copy auto-generated prompt"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
