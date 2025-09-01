@@ -68,11 +68,6 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-center px-6 pb-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <BlurFade delay={0.25} inView>
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-              AHEAD
-            </h1>
-          </BlurFade>
           
           <BlurFade delay={0.5} inView>
             <h2 className="text-2xl md:text-3xl font-semibold mb-4">
