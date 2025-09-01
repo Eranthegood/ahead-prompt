@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      binary_tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_completed: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_completed?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_completed?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_activity: {
+        Row: {
+          activity_date: string
+          ai_generations: number
+          created_at: string
+          epics_completed: number
+          epics_created: number
+          id: string
+          prompts_completed: number
+          prompts_created: number
+          updated_at: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          activity_date?: string
+          ai_generations?: number
+          created_at?: string
+          epics_completed?: number
+          epics_created?: number
+          id?: string
+          prompts_completed?: number
+          prompts_created?: number
+          updated_at?: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          activity_date?: string
+          ai_generations?: number
+          created_at?: string
+          epics_completed?: number
+          epics_created?: number
+          id?: string
+          prompts_completed?: number
+          prompts_created?: number
+          updated_at?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
       epics: {
         Row: {
           color: string | null
@@ -210,6 +282,81 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          best_streak: number
+          created_at: string
+          current_level: number
+          current_streak: number
+          id: string
+          last_activity_date: string | null
+          total_ai_generations: number
+          total_epics_completed: number
+          total_epics_created: number
+          total_prompts_completed: number
+          total_prompts_created: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_streak?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          total_ai_generations?: number
+          total_epics_completed?: number
+          total_epics_created?: number
+          total_prompts_completed?: number
+          total_prompts_created?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_streak?: number
+          created_at?: string
+          current_level?: number
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          total_ai_generations?: number
+          total_epics_completed?: number
+          total_epics_created?: number
+          total_prompts_completed?: number
+          total_prompts_created?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -242,7 +389,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_level: {
+        Args: { xp: number }
+        Returns: number
+      }
+      ensure_user_stats: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
