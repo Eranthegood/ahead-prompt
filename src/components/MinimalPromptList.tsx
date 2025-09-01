@@ -129,6 +129,18 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
 
   const handleCopyGenerated = async (prompt: Prompt) => {
     try {
+      // If a generated prompt already exists, use it directly
+      if (prompt.generated_prompt) {
+        await navigator.clipboard.writeText(prompt.generated_prompt);
+        
+        toast({
+          title: 'Generated prompt copied',
+          description: 'AI-generated prompt has been copied to clipboard'
+        });
+        return;
+      }
+
+      // If no generated prompt exists, generate a new one
       const rawText = `${prompt.title}\n\n${prompt.description || ''}`.trim();
       
       toast({
