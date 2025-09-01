@@ -76,6 +76,26 @@ export default function LandingPage() {
         </div>
       </main>
 
+      {/* Problem Statement Section */}
+      <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-4xl mx-auto text-center">
+          <BlurFade delay={0.8} inView>
+            <blockquote className="text-xl md:text-2xl font-medium text-foreground mb-2 italic">
+              "I'm swimming in prompts these days and I don't have a good way of recalling which one to use"
+            </blockquote>
+            <cite className="text-sm text-muted-foreground block mb-8">
+              - Developer on Twitter
+            </cite>
+          </BlurFade>
+          
+          <BlurFade delay={1} inView>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+              Sound familiar? You use AI to code faster, but lose 5 hours/week managing chaotic prompt docs.
+            </p>
+          </BlurFade>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section aria-labelledby="testimonials-heading" className="py-16 bg-background/50">
         <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
