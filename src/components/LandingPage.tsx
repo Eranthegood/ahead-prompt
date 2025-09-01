@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers } from "lucide-react";
+import { BlurFade } from "@/components/ui/blur-fade";
 export default function LandingPage() {
   const {
     signInWithGoogle
@@ -26,27 +27,32 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Hero Content */}
           <div className="space-y-6">
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-              Ship AI Features
-              <br />
-              <span className="text-primary">Faster</span>
-            </h1>
+            <BlurFade delay={0.25} inView>
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+                Ship AI Features
+                <br />
+                <span className="text-primary">Faster</span>
+              </h1>
+            </BlurFade>
             
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              The prompt management platform for developers who build with AI.
-              <br />
-              Organize, version, and deploy like code.
-            </p>
+            <BlurFade delay={0.5} inView>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                The prompt management platform for developers who build with AI.
+                <br />
+                Organize, version, and deploy like code.
+              </p>
+            </BlurFade>
           </div>
 
           {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
-              Start Building
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-            
-          </div>
+          <BlurFade delay={0.75} inView>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
+                Start Building
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+          </BlurFade>
 
           {/* Features */}
           <div className="grid md:grid-cols-3 gap-8 mt-16 pt-16 border-t border-border/10">
