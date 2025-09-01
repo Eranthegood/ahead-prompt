@@ -29,6 +29,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [saving, setSaving] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
 
@@ -154,10 +155,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto flex flex-col"
+        className="w-[95vw] max-w-4xl h-[90vh] max-h-[600px] lg:max-h-[85vh] p-0 flex flex-col"
         onKeyDown={handleKeyDown}
       >
-        <DialogHeader>
+        <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <DialogTitle className="text-lg font-semibold">
             Modifier l&apos;idée
           </DialogTitle>
@@ -166,9 +167,183 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-6 h-full flex-1 overflow-y-auto">
-          {/* Left Panel - Editor */}
-          <div className="flex-1 space-y-4 min-h-0">
+        {/* Mobile: Tab Navigation */}
+        <div className="lg:hidden border-b flex-shrink-0">
+          <div className="flex">
+            <Button
+              variant={activeTab === 'edit' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('edit')}
+              className="flex-1 rounded-none h-12"
+              size="sm"
+            >
+              Édition
+            </Button>
+            <Button
+              variant={activeTab === 'preview' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('preview')}
+              className="flex-1 rounded-none h-12"
+              size="sm"
+            >
+              Aperçu
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Content - Tab based */}
+        <div className="lg:hidden flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-y-auto p-6">
+            {activeTab === 'edit' ? (
+              <div className="space-y-4">
+                {/* Metadata */}
+                <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>Créé le {format(new Date(prompt.created_at), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>Modifié le {format(new Date(prompt.updated_at), 'dd/MM/yyyy')}</span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Compact toolbar */}
+                <div className="flex items-center gap-1 p-2 border rounded-md bg-muted/30 overflow-x-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleBold().run()}
+                    className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-muted' : ''}`}
+                  >
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleItalic().run()}
+                    className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-muted' : ''}`}
+                  >
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                    className={`h-8 w-8 p-0 ${editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}`}
+                  >
+                    <Heading1 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-muted' : ''}`}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Editor */}
+                <div className="border rounded-md min-h-[200px]">
+                  <EditorContent 
+                    editor={editor}
+                    className="w-full h-full"
+                  />
+                </div>
+
+                {/* Assignment - Stacked */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Produit</Label>
+                    <Select value={productId} onValueChange={(value) => {
+                      setProductId(value);
+                      if (value === 'none') setEpicId('none');
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucun produit</SelectItem>
+                        {products.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Epic</Label>
+                    <Select value={epicId} onValueChange={setEpicId} disabled={productId === 'none'}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucun epic</SelectItem>
+                        {filteredEpics.map((epic) => (
+                          <SelectItem key={epic.id} value={epic.id}>
+                            {epic.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Preview Tab */
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Prompt généré</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRegeneratePrompt}
+                      disabled={isRegenerating}
+                    >
+                      {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyPrompt}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="border rounded-md bg-muted/20 p-4 max-h-[300px] overflow-y-auto">
+                  <div 
+                    className="prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="border-t p-4 flex gap-3 flex-shrink-0">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={saving || !editor?.getHTML() || editor?.getHTML() === '<p></p>'}
+              className="flex-1"
+            >
+              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:flex gap-6 h-full flex-1 overflow-y-auto p-6">
+          {/* Desktop Left Panel - Editor */}
+          <div className="flex-1 space-y-4 min-h-0 p-6">
             {/* Metadata */}
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
@@ -320,8 +495,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             </div>
           </div>
 
-          {/* Right Panel - Generated Prompt Preview */}
-          <div className="w-96 border-l pl-6 space-y-4">
+          {/* Desktop Right Panel - Generated Prompt Preview */}
+          <div className="w-80 border-l pl-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Prompt généré</h3>
               <div className="flex gap-2">
