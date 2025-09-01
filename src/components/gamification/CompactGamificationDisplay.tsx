@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { XPProgressBar } from './XPProgressBar';
-import { Trophy, ExternalLink } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { UserStats, UserAchievement } from '@/types/gamification';
 
 interface CompactGamificationDisplayProps {
@@ -14,29 +13,27 @@ export const CompactGamificationDisplay: React.FC<CompactGamificationDisplayProp
   achievements 
 }) => {
   return (
-    <div className="space-y-3">
-      {/* XP Progress Bar */}
-      <XPProgressBar stats={stats} />
+    <div className="space-y-2">
+      {/* Simple level and XP display */}
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">Niveau {stats.current_level}</span>
+        <span className="text-xs text-muted-foreground">{stats.total_xp} XP</span>
+      </div>
       
-      {/* Link to full achievements page */}
-      <Button 
-        variant="ghost" 
-        className="w-full justify-between text-left font-normal text-sm h-8"
-        asChild
-      >
-        <Link to="/achievements">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-primary" />
-            <span>Voir tous les succès</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-              {achievements.length}
-            </span>
-            <ExternalLink className="w-3 h-3 text-muted-foreground" />
-          </div>
-        </Link>
-      </Button>
+      {/* Minimal progress bar */}
+      <div className="space-y-1">
+        <Progress value={(stats.total_xp % 100)} className="h-1" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="w-full h-6 text-xs text-muted-foreground hover:text-foreground"
+          asChild
+        >
+          <Link to="/achievements">
+            {achievements.length} succès →
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 };
