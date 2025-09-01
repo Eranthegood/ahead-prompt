@@ -54,16 +54,17 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   // Reset form when prompt changes
   useEffect(() => {
     if (prompt && editor) {
-      // Combine title and description into rich content
-      const content = prompt.description || `<h1>${prompt.title}</h1>`;
-      editor.commands.setContent(content);
+      // Load the original user content (description) into the editor
+      const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
+      editor.commands.setContent(originalContent);
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
-      // Load persisted generated prompt or use description as fallback
-      setGeneratedPrompt(prompt.generated_prompt || content);
       
-      // Calculate initial text length
-      const cleanText = stripHtmlAndNormalize(content);
+      // Load the AI-generated prompt separately for the preview panel
+      setGeneratedPrompt(prompt.generated_prompt || '');
+      
+      // Calculate initial text length from original content
+      const cleanText = stripHtmlAndNormalize(originalContent);
       setTextLength(cleanText.length);
     }
   }, [prompt, editor]);
@@ -339,7 +340,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="border rounded-md bg-muted/20 p-4 max-h-[300px] overflow-y-auto">
                   <div 
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }}
+                    dangerouslySetInnerHTML={{ __html: generatedPrompt || 'Aucun prompt généré. Utilisez le bouton ci-dessus pour générer un prompt basé sur votre contenu.' }}
                   />
                 </div>
               </div>
@@ -557,7 +558,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             <div className="border rounded-md bg-muted/20 p-4 max-h-[500px] overflow-y-auto">
               <div 
                 className="prose-content prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: generatedPrompt }}
+                dangerouslySetInnerHTML={{ __html: generatedPrompt || 'Aucun prompt généré. Cliquez sur le bouton pour générer un prompt basé sur votre contenu.' }}
               />
             </div>
             
