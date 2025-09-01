@@ -94,6 +94,45 @@ export default function LandingPage() {
         </div>
       </main>
 
+      {/* Results Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <BlurFade delay={1.4} inView>
+            <blockquote className="text-xl md:text-2xl font-medium text-center mb-4 italic">
+              "I was always 2-3 moves ahead. Completely crazy building speed."
+            </blockquote>
+            <cite className="text-center block mb-12 text-muted-foreground">
+              - Jeremy, Indie Hacker
+            </cite>
+          </BlurFade>
+          
+          <BlurFade delay={1.5} inView>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Never lose creative momentum</h3>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <ArrowRight className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Transform AI wait time into strategic advantage</h3>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Layers className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Stay 3 moves ahead, always</h3>
+              </div>
+            </div>
+          </BlurFade>
+        </div>
+      </section>
+
       {/* Solution Section */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
@@ -153,45 +192,6 @@ export default function LandingPage() {
             <div className="bg-muted/50 rounded-2xl p-8 text-center">
               <div className="text-muted-foreground mb-2">GIF Demo Placeholder</div>
               <div className="text-sm text-muted-foreground">30 second demo coming soon</div>
-            </div>
-          </BlurFade>
-        </div>
-      </section>
-
-      {/* Results Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-4xl mx-auto">
-          <BlurFade delay={1.4} inView>
-            <blockquote className="text-xl md:text-2xl font-medium text-center mb-4 italic">
-              "I was always 2-3 moves ahead. Completely crazy building speed."
-            </blockquote>
-            <cite className="text-center block mb-12 text-muted-foreground">
-              - Jeremy, Indie Hacker
-            </cite>
-          </BlurFade>
-          
-          <BlurFade delay={1.5} inView>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center space-y-2">
-                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold">Never lose creative momentum</h3>
-              </div>
-              
-              <div className="text-center space-y-2">
-                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <ArrowRight className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold">Transform AI wait time into strategic advantage</h3>
-              </div>
-              
-              <div className="text-center space-y-2">
-                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Layers className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold">Stay 3 moves ahead, always</h3>
-              </div>
             </div>
           </BlurFade>
         </div>
