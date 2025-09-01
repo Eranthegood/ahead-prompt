@@ -14,7 +14,7 @@ const defaultPreferences: UserPreferences = {
   lastPromptStatus: 'todo',
   lastPromptPriority: 'medium',
   showCompletedItems: true,
-  theme: 'system',
+  theme: 'light', // Default to light theme to avoid dark mode issues before unlock
   compactMode: false,
 };
 

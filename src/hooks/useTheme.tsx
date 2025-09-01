@@ -17,9 +17,11 @@ export const useTheme = () => {
       return 'light';
     }
     
-    if (preferences.theme === 'dark' && !isDarkModeUnlocked) {
-      return 'light'; // Force light mode if dark mode not unlocked
+    // If dark mode is not unlocked, force light theme regardless of preference
+    if (!isDarkModeUnlocked && (preferences.theme === 'dark' || preferences.theme === 'system')) {
+      return 'light';
     }
+    
     return preferences.theme;
   };
 
@@ -62,8 +64,9 @@ export const useTheme = () => {
   }, [effectiveTheme, isDarkModeUnlocked, isLoading]);
 
   const setTheme = (theme: 'light' | 'dark' | 'system') => {
-    // Prevent setting dark mode if not unlocked
-    if (theme === 'dark' && !isDarkModeUnlocked) {
+    // Prevent setting dark mode or system theme if not unlocked
+    if ((theme === 'dark' || theme === 'system') && !isDarkModeUnlocked) {
+      console.log(`Theme ${theme} blocked - dark mode not unlocked`);
       return;
     }
     saveThemePreference(theme);

@@ -122,12 +122,31 @@ export default function Settings() {
                         </TooltipContent>
                       )}
                     </Tooltip>
-                    <SelectItem value="system">
-                      <div className="flex items-center">
-                        <Monitor className="mr-2 h-4 w-4" />
-                        System
-                      </div>
-                    </SelectItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <SelectItem 
+                            value="system" 
+                            disabled={!isDarkModeUnlocked}
+                            className={!isDarkModeUnlocked ? "opacity-50" : ""}
+                          >
+                            <div className="flex items-center">
+                              {!isDarkModeUnlocked ? (
+                                <Lock className="mr-2 h-4 w-4" />
+                              ) : (
+                                <Monitor className="mr-2 h-4 w-4" />
+                              )}
+                              System
+                            </div>
+                          </SelectItem>
+                        </div>
+                      </TooltipTrigger>
+                      {!isDarkModeUnlocked && (
+                        <TooltipContent>
+                          <p>Atteignez le niveau {requiredLevel} pour débloquer</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </SelectContent>
                 </Select>
               </div>
