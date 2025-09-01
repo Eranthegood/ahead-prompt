@@ -145,7 +145,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <BlurFade delay={1.4} inView>
             <blockquote className="text-xl md:text-2xl font-medium text-center mb-4 italic">
-              "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle."
+              "I was always 2-3 moves ahead. Completely crazy building speed."
             </blockquote>
             <cite className="text-center block mb-12 text-muted-foreground">
               - Jeremy, Indie Hacker
