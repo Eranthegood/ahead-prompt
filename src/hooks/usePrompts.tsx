@@ -435,10 +435,37 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
               break;
 
             case 'UPDATE':
-              // Update existing prompt, prioritize real data over optimistic updates
+              // Update existing prompt, preserving important fields if not explicitly updated
               return prevPrompts.map(prompt => {
                 if (prompt.id === newRecord.id && !prompt.id.startsWith('temp-')) {
-                  return { ...prompt, ...newRecord, status: newRecord.status as PromptStatus };
+                  // Preserve generated_prompt and generated_at if they exist but are not in the update
+                  const preservedFields: Partial<Prompt> = {};
+                  
+                  // Preserve generated_prompt if it exists in current prompt but not in update
+                  if (prompt.generated_prompt && !newRecord.generated_prompt) {
+                    preservedFields.generated_prompt = prompt.generated_prompt;
+                  }
+                  
+                  // Preserve generated_at if it exists in current prompt but not in update
+                  if (prompt.generated_at && !newRecord.generated_at) {
+                    preservedFields.generated_at = prompt.generated_at;
+                  }
+                  
+                  const updatedPrompt = { 
+                    ...prompt, 
+                    ...newRecord, 
+                    ...preservedFields,
+                    status: newRecord.status as PromptStatus 
+                  };
+                  
+                  console.log('Real-time UPDATE:', {
+                    promptId: newRecord.id,
+                    hadGeneratedPrompt: !!prompt.generated_prompt,
+                    updateHasGeneratedPrompt: !!newRecord.generated_prompt,
+                    preserved: Object.keys(preservedFields)
+                  });
+                  
+                  return updatedPrompt;
                 }
                 return prompt;
               });
