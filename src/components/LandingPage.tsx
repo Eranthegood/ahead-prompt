@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, Zap, Code, Layers } from "lucide-react";
+import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { BentoGrid1 } from "@/components/ui/bento-grid";
@@ -76,22 +76,105 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Problem Statement Section */}
+      {/* Solution Section */}
       <section className="py-16 px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto">
           <BlurFade delay={0.8} inView>
-            <blockquote className="text-xl md:text-2xl font-medium text-foreground mb-2 italic">
-              "I'm swimming in prompts these days and I don't have a good way of recalling which one to use"
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Turn Wait Time Into Win Time
+            </h2>
+          </BlurFade>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <BlurFade delay={0.9} inView>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <Code className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-sm text-primary font-medium">STEP 1</div>
+                <h3 className="font-semibold">Launch prompt in Cursor/Claude</h3>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={1} inView>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <ToggleLeft className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-sm text-primary font-medium">STEP 2</div>
+                <h3 className="font-semibold">Switch to Ahead</h3>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={1.1} inView>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <div className="flex space-x-1">
+                    <Circle className="w-2 h-2 text-primary fill-current" />
+                    <Circle className="w-2 h-2 text-primary fill-current" />
+                    <Circle className="w-2 h-2 text-primary fill-current" />
+                  </div>
+                </div>
+                <div className="text-sm text-primary font-medium">STEP 3</div>
+                <h3 className="font-semibold">Prepare your next 3 moves</h3>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={1.2} inView>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <Clipboard className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-sm text-primary font-medium">STEP 4</div>
+                <h3 className="font-semibold">Copy-paste instantly</h3>
+              </div>
+            </BlurFade>
+          </div>
+          
+          <BlurFade delay={1.3} inView>
+            <div className="bg-muted/50 rounded-2xl p-8 text-center">
+              <div className="text-muted-foreground mb-2">GIF Demo Placeholder</div>
+              <div className="text-sm text-muted-foreground">30 second demo coming soon</div>
+            </div>
+          </BlurFade>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <BlurFade delay={1.4} inView>
+            <blockquote className="text-xl md:text-2xl font-medium text-center mb-4 italic">
+              "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle."
             </blockquote>
-            <cite className="text-sm text-muted-foreground block mb-8">
-              - Developer on Twitter
+            <cite className="text-center block mb-12 text-muted-foreground">
+              - Jeremy, Indie Hacker
             </cite>
           </BlurFade>
           
-          <BlurFade delay={1} inView>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              Sound familiar? You use AI to code faster, but lose 5 hours/week managing chaotic prompt docs.
-            </p>
+          <BlurFade delay={1.5} inView>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Never lose creative momentum</h3>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <ArrowRight className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Transform AI wait time into strategic advantage</h3>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Layers className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">Stay 3 moves ahead, always</h3>
+              </div>
+            </div>
           </BlurFade>
         </div>
       </section>
