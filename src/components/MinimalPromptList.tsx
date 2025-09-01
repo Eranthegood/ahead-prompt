@@ -9,8 +9,8 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useToast } from '@/hooks/use-toast';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
-import { PromptCard } from '@/components/PromptCard';
 import { PromptTransformService } from '@/services/promptTransformService';
+import { PromptCard } from '@/components/PromptCard';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 
 interface MinimalPromptListProps {
