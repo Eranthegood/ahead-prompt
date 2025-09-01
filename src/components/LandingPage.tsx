@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers } from "lucide-react";
 
@@ -29,9 +28,8 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 relative">
-        <BackgroundBeamsWithCollision className="min-h-screen">
-          <div className="max-w-4xl mx-auto text-center space-y-8 px-6 relative z-10">
+      <main className="flex-1 flex items-center justify-center px-6">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Hero Content */}
           <div className="space-y-6">
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
@@ -93,9 +91,8 @@ export default function LandingPage() {
                 Built for speed with shortcuts and efficient workflows
               </p>
             </div>
-            </div>
           </div>
-        </BackgroundBeamsWithCollision>
+        </div>
       </main>
 
       {/* Footer */}
