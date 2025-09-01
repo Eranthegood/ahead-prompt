@@ -68,16 +68,19 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-center px-6 pb-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          
-          <BlurFade delay={0.5} inView>
-            <h2 className="text-2xl md:text-3xl font-semibold mb-4">
-              Stay 3 moves ahead while AI generates your code
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              The workspace developers love for capturing ideas during AI wait time.
-            </p>
+          <BlurFade delay={0.25} inView>
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+                Stay <span className="text-primary">3 moves ahead</span>
+                <br />
+                while AI generates your code
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                The workspace developers love for capturing ideas during AI wait time.
+              </p>
+            </div>
           </BlurFade>
-
+          
           <BlurFade delay={0.75} inView>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
