@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
+import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface CreatePromptData {
@@ -56,7 +58,50 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
-  // Create prompt with optimistic update
+  // Helper function to auto-generate prompt if content is sufficient
+  const autoGeneratePrompt = async (promptId: string, content: string) => {
+    try {
+      const cleanContent = stripHtmlAndNormalize(content);
+      
+      // Only auto-generate if we have sufficient content (more than just a title)
+      if (cleanContent.length > 20) {
+        console.log('Auto-generating prompt for sufficient content:', cleanContent.length, 'characters');
+        
+        const response = await PromptTransformService.transformPrompt(content);
+        
+        if (response.success && response.transformedPrompt) {
+          // Update the prompt with the generated content
+          const { error } = await supabase
+            .from('prompts')
+            .update({
+              generated_prompt: response.transformedPrompt,
+              generated_at: new Date().toISOString(),
+            })
+            .eq('id', promptId);
+
+          if (!error) {
+            // Update local state
+            setPrompts(prev => prev.map(p => 
+              p.id === promptId 
+                ? { 
+                    ...p, 
+                    generated_prompt: response.transformedPrompt,
+                    generated_at: new Date().toISOString()
+                  }
+                : p
+            ));
+            
+            console.log('Auto-generated prompt successfully for prompt:', promptId);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Auto-generation failed, but continuing silently:', error);
+      // Fail silently - auto-generation is a nice-to-have, not critical
+    }
+  };
+
+  // Create prompt with optimistic update and auto-generation
   const createPrompt = async (promptData: CreatePromptData): Promise<Prompt | null> => {
     if (!workspaceId) return null;
 
@@ -126,6 +171,12 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       // ✅ 3. Replace with real data
       const realPrompt = { ...data, status: data.status as PromptStatus };
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
+
+      // 🤖 4. Auto-generate prompt if we have description content
+      if (realPrompt.description) {
+        // Don't await this - let it run in background
+        autoGeneratePrompt(realPrompt.id, realPrompt.description);
+      }
 
       // Award XP for creating a prompt
       awardXP('PROMPT_CREATE');
@@ -314,7 +365,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
-  // Update prompt with optimistic update
+  // Update prompt with optimistic update and auto-generation
   const updatePrompt = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
     // Optimistic update
     setPrompts(prev => prev.map(p => 
@@ -336,6 +387,12 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
         // Rollback on error
         await fetchPrompts();
         throw error;
+      }
+
+      // 🤖 Auto-generate prompt if description was updated and has sufficient content
+      if (updates.description) {
+        // Don't await this - let it run in background
+        autoGeneratePrompt(promptId, updates.description);
       }
 
       toast({
