@@ -1,27 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers } from "lucide-react";
-
 export default function LandingPage() {
-  const { signInWithGoogle } = useAuth();
-
+  const {
+    signInWithGoogle
+  } = useAuth();
   const handleGetStarted = async () => {
     await signInWithGoogle();
   };
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
+  return <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation */}
       <nav className="border-b border-border/5 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="font-mono text-xl font-bold text-primary">
             Vibe Plan Forge
           </div>
-          <Button 
-            variant="ghost" 
-            onClick={handleGetStarted}
-            className="text-sm hover:text-primary"
-          >
+          <Button variant="ghost" onClick={handleGetStarted} className="text-sm hover:text-primary">
             Sign In
           </Button>
         </div>
@@ -47,17 +41,11 @@ export default function LandingPage() {
 
           {/* CTA */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              onClick={handleGetStarted}
-              className="px-8 py-6 text-lg font-medium group"
-            >
+            <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
               Start Building
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
-            <p className="text-sm text-muted-foreground">
-              Join 500+ builders • Free to start
-            </p>
+            
           </div>
 
           {/* Features */}
@@ -103,6 +91,5 @@ export default function LandingPage() {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
