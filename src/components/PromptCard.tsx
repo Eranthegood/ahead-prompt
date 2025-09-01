@@ -97,7 +97,13 @@ export function PromptCard({
               
               {prompt.description && (
                 <div 
-                  className="text-sm text-muted-foreground mb-3 line-clamp-2"
+                  className="text-sm text-muted-foreground mb-3 overflow-hidden"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    maxHeight: '2.5rem'
+                  }}
                   dangerouslySetInnerHTML={{ __html: prompt.description }}
                 />
               )}
