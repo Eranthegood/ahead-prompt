@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
+import chessKnightLogo from "@/assets/chess-knight-logo.png";
 export default function LandingPage() {
   const {
     signInWithGoogle
@@ -48,8 +49,15 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="border-b border-border/5 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="font-mono text-xl font-bold text-primary">
-            Vibe Plan Forge
+          <div className="flex items-center gap-3">
+            <img 
+              src={chessKnightLogo} 
+              alt="Ahead Logo" 
+              className="w-10 h-10"
+            />
+            <div className="font-mono text-xl font-bold text-primary">
+              Ahead
+            </div>
           </div>
           <Button variant="ghost" onClick={handleGetStarted} className="text-sm hover:text-primary">
             Sign In
