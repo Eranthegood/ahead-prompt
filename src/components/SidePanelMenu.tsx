@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
-import { User, Settings, Keyboard, LogOut } from 'lucide-react';
+import { User, Settings, Keyboard, LogOut, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 
@@ -23,6 +23,11 @@ export function SidePanelMenu() {
   };
 
   const menuItems = [
+    {
+      label: 'Gestionnaire de Tâches',
+      icon: CheckSquare,
+      onClick: () => navigate('/tasks'),
+    },
     {
       label: 'Profile',
       icon: User,
