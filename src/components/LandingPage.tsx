@@ -14,25 +14,6 @@ export default function LandingPage() {
 
   const testimonials = [
     {
-      img: "https://randomuser.me/api/portraits/men/91.jpg",
-      quote: "EldoraUI's components make building UIs effortless great work!",
-      name: "Jessie J",
-      role: "Acme LTD",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/women/12.jpg",
-      quote:
-        "EldoraUI simplifies complex designs with ready-to-use components.",
-      name: "Nick V",
-      role: "Malika Inc.",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/men/45.jpg",
-      quote: "With EldoraUI, creating responsive UIs is a breeze.",
-      name: "Amelia W",
-      role: "Panda AI",
-    },
-    {
       img: "https://randomuser.me/api/portraits/women/65.jpg",
       quote: "After struggling with prompt chaos for months (copy-pasting from random docs, losing track of versions), I needed something that actually fits my workflow.",
       name: "Sarah",
@@ -55,6 +36,12 @@ export default function LandingPage() {
       quote: "Now I capture every brilliant idea the moment it hits. No more 'wait, what was that fix I thought of?' moments. My development flow is finally uninterrupted.",
       name: "Alex",
       role: "Late night SaaS builder",
+    },
+    {
+      img: "https://randomuser.me/api/portraits/women/88.jpg",
+      quote: "I went from frantically switching between 12 tabs to having my next 3 moves ready before Cursor even finishes. Game changer for shipping fast.",
+      name: "Sarah",
+      role: "Full-Stack Developer",
     },
   ];
 
