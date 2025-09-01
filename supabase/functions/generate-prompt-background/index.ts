@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
       throw new Error('OpenAI API key not configured')
     }
 
-    // Transform the prompt using OpenAI
+    // Transform the prompt using OpenAI (CLEAR framework)
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -58,27 +58,29 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
-            content: `You are a prompt engineering expert. Transform user ideas into clear, actionable prompts for AI assistants.
+            content: `Tu es un expert en création de prompts pour Lovable. Transforme l'idée brute en prompt structuré suivant le framework CLEAR :
 
-Guidelines:
-- Make prompts specific and actionable
-- Include context and desired output format
-- Use clear, direct language
-- Keep prompts concise but comprehensive
-- Focus on the core intent of the user's idea
+Concise (150 mots max), Logique (ordre d'implémentation), Explicite (technologies spécifiques), Adaptive (MVP suggéré), Reflective (critères mesurables).
 
-Transform the user's raw idea into a well-structured prompt.`
+Structure obligatoire :
+# Titre
+→ Fonctionnalités principales
+→ Structure technique  
+→ Détails spécifiques
+→ Point de départ MVP
+
+Format markdown prêt à copier-coller. Réponds UNIQUEMENT avec le prompt transformé, sans commentaires additionnels.`
           },
           {
             role: 'user',
             content: rawText
           }
         ],
-        max_tokens: 500,
+        max_tokens: 800,
         temperature: 0.7,
       }),
     })
