@@ -27,20 +27,23 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <BlurFade delay={0.25} inView>
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-              Hello World
+              AHEAD
             </h1>
           </BlurFade>
           
           <BlurFade delay={0.5} inView>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4">
+              Stay 3 moves ahead while AI generates your code
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Nice to meet you
+              The workspace developers love for capturing ideas during AI wait time.
             </p>
           </BlurFade>
 
           <BlurFade delay={0.75} inView>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
-                Start Building
+                Get Ahead - Free
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
