@@ -251,7 +251,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                       title={prompt.title}
                       maxLength={60}
                       className="font-medium text-foreground mb-2 group"
-                      showCopyButton={true}
+                      showCopyButton={false}
                       variant="inline"
                     />
                     
@@ -427,7 +427,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                       title={prompt.title}
                       maxLength={60}
                       className="font-medium text-foreground mb-2 group"
-                      showCopyButton={true}
+                      showCopyButton={false}
                       variant="inline"
                     />
                     
