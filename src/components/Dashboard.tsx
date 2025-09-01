@@ -21,12 +21,31 @@ const Dashboard = () => {
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   
   const { workspace, loading } = useWorkspace();
-  const { createPrompt, refetch: refetchPrompts } = usePrompts(workspace?.id);
+  const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(workspace?.id);
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
+
+  // Function to copy generated prompt
+  const handleCopyPrompt = async (prompt: any) => {
+    try {
+      // If prompt exists, use its generated prompt
+      if (prompt.generated_prompt) {
+        await navigator.clipboard.writeText(prompt.generated_prompt);
+        
+        // Using a simple console log instead of toast to avoid dependency issues
+        console.log('Prompt copied via keyboard shortcut');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error copying prompt:', error);
+      return false;
+    }
+  };
 
   // Set up global shortcuts
   useGlobalShortcuts({
@@ -36,6 +55,25 @@ const Dashboard = () => {
     'ctrl+n': () => setQuickPromptOpen(true),
     'q': () => setQuickPromptOpen(true),
     't': () => setDebugConsoleOpen(true),
+    'c': async () => {
+      // If hovering over a prompt, copy its generated prompt
+      if (hoveredPromptId) {
+        const hoveredPrompt = prompts?.find(p => p.id === hoveredPromptId);
+        if (hoveredPrompt && await handleCopyPrompt(hoveredPrompt)) {
+          // Success feedback handled by MinimalPromptList
+          return;
+        }
+      }
+      
+      // Otherwise copy the first prompt's generated prompt
+      if (prompts && prompts.length > 0) {
+        const firstPrompt = prompts[0];
+        if (await handleCopyPrompt(firstPrompt)) {
+          // Success feedback handled by MinimalPromptList
+          return;
+        }
+      }
+    },
   });
 
   const handleToggleCompletedItems = (show: boolean) => {
@@ -100,6 +138,8 @@ const Dashboard = () => {
             selectedEpicId={selectedEpicId}
             searchQuery={searchQuery}
             onQuickAdd={handleQuickAdd}
+            hoveredPromptId={hoveredPromptId}
+            onPromptHover={setHoveredPromptId}
           />
         </div>
 

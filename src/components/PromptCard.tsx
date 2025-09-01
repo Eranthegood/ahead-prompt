@@ -22,6 +22,8 @@ interface PromptCardProps {
   onDelete: (prompt: Prompt) => void;
   onCopy: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
+  isHovered?: boolean;
+  onHover?: (promptId: string | null) => void;
 }
 
 const statusOptions = [
@@ -39,7 +41,9 @@ export function PromptCard({
   onDuplicate,
   onDelete,
   onCopy,
-  onCopyGenerated
+  onCopyGenerated,
+  isHovered,
+  onHover
 }: PromptCardProps) {
   const priority = prompt.priority || 3;
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
@@ -50,7 +54,13 @@ export function PromptCard({
       onEdit={() => onEdit(prompt)}
       onUpdate={() => {}}
     >
-      <Card className="hover:shadow-sm transition-shadow cursor-pointer">
+      <Card 
+        className={`hover:shadow-sm transition-all cursor-pointer ${
+          isHovered ? 'ring-2 ring-primary/50 shadow-lg' : ''
+        }`}
+        onMouseEnter={() => onHover?.(prompt.id)}
+        onMouseLeave={() => onHover?.(null)}
+      >
         <CardContent className="p-4">
           <div 
             className="flex items-start justify-between"

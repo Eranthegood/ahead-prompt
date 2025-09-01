@@ -19,9 +19,19 @@ interface MinimalPromptListProps {
   selectedEpicId?: string;
   searchQuery: string;
   onQuickAdd: () => void;
+  hoveredPromptId?: string | null;
+  onPromptHover?: (promptId: string | null) => void;
 }
 
-export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId, searchQuery, onQuickAdd }: MinimalPromptListProps) {
+export function MinimalPromptList({ 
+  workspace, 
+  selectedProductId, 
+  selectedEpicId, 
+  searchQuery, 
+  onQuickAdd,
+  hoveredPromptId,
+  onPromptHover
+}: MinimalPromptListProps) {
   const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(workspace.id);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
@@ -270,6 +280,8 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   onDelete={handleDelete}
                   onCopy={handleCopy}
                   onCopyGenerated={handleCopyGenerated}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
                 />
               ))}
             </div>
@@ -299,6 +311,8 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   onDelete={handleDelete}
                   onCopy={handleCopy}
                   onCopyGenerated={handleCopyGenerated}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
                 />
               ))}
             </div>
@@ -328,6 +342,8 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                   onDelete={handleDelete}
                   onCopy={handleCopy}
                   onCopyGenerated={handleCopyGenerated}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
                 />
               ))}
             </div>
