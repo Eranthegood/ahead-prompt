@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2 } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2, Flame } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
-import type { Workspace, Epic, Product } from '@/types';
+import type { Workspace, Epic, Product, PromptPriority } from '@/types';
+import { PRIORITY_OPTIONS } from '@/types';
 
 interface CreatePromptData {
-  title?: string;
+  title: string;
   description?: string;
   epic_id?: string;
   product_id?: string;
+  priority?: PromptPriority;
   generated_prompt?: string;
   generated_at?: string;
 }
@@ -40,6 +42,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 }) => {
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [selectedProduct, setSelectedProduct] = useState<string>('none');
+  const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2); // Default to Normal priority
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasContent, setHasContent] = useState(false);
@@ -74,6 +77,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     if (isOpen && editor) {
       editor.commands.setContent('');
       setSelectedEpic('none');
+      setSelectedPriority(2); // Reset to normal priority
       setHasContent(false);
       setGeneratedPrompt('');
       // Set default product if no selectedProductId
@@ -135,8 +139,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         description: content, // Original user content
         epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
         product_id: resolvedProductId,
-        generated_prompt: response.transformedPrompt || null,
-        generated_at: response.transformedPrompt ? new Date().toISOString() : null,
+        priority: selectedPriority,
+        generated_prompt: response.transformedPrompt || undefined,
+        generated_at: response.transformedPrompt ? new Date().toISOString() : undefined,
       };
 
       await onSave(promptData);
@@ -165,8 +170,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           description: content, // Original user content
           epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
           product_id: resolvedProductId,
-          generated_prompt: null, // No AI generation in fallback
-          generated_at: null,
+          priority: selectedPriority,
+          generated_prompt: undefined, // No AI generation in fallback
+          generated_at: undefined,
         };
 
         await onSave(promptData);
@@ -280,8 +286,30 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               />
             </div>
 
-            {/* Product and Epic assignment */}
+            {/* Priority, Product and Epic assignment */}
             <div className="space-y-4">
+              {/* Priority Selector */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  Priorité
+                </label>
+                <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Sélectionner une priorité..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    {PRIORITY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        <div className="flex items-center gap-2">
+                          {option.value === 1 && <Flame className="h-3 w-3 text-red-500" />}
+                          <span>{option.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {!selectedProductId && products.length > 0 && (
                 <div>
                    <label className="text-sm font-medium text-muted-foreground mb-2 block">

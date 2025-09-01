@@ -132,16 +132,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     if (!query.trim()) return;
 
     try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .insert({
-          workspace_id: workspace.id,
-          title: query.trim(),
-          status: 'todo',
-          order_index: 0,
-        })
-        .select()
-        .single();
+        const { data, error } = await supabase
+          .from('prompts')
+          .insert({
+            workspace_id: workspace.id,
+            title: query.trim(),
+            status: 'todo',
+            priority: 2, // Default to normal priority
+            order_index: 0,
+          })
+          .select()
+          .single();
 
       if (error) throw error;
 

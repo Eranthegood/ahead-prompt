@@ -61,10 +61,10 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       title: promptData.title.trim(),
       description: promptData.description?.trim() || null,
       status: promptData.status || 'todo',
-      priority: promptData.priority || 3,
+      priority: promptData.priority || 2, // Default to normal priority
+      order_index: 0,
       epic_id: promptData.epic_id || null,
       product_id: promptData.product_id || null,
-      order_index: 0,
       generated_prompt: promptData.generated_prompt || null,
       generated_at: promptData.generated_at || null,
       is_debug_session: false,
@@ -82,7 +82,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         title: promptData.title.trim(),
         description: promptData.description?.trim() || undefined,
         status: promptData.status || 'todo',
-        priority: promptData.priority || 3,
+        priority: promptData.priority || 2, // Default to normal priority
         epic_id: promptData.epic_id || undefined,
         product_id: promptData.product_id || undefined,
         generated_prompt: promptData.generated_prompt || undefined,
