@@ -50,6 +50,12 @@ export default function LandingPage() {
       name: "Jeremy",
       role: "Indie Hacker",
     },
+    {
+      img: "https://randomuser.me/api/portraits/men/54.jpg",
+      quote: "Now I capture every brilliant idea the moment it hits. No more 'wait, what was that fix I thought of?' moments. My development flow is finally uninterrupted.",
+      name: "Alex",
+      role: "Late night SaaS builder",
+    },
   ];
 
   return <div className="min-h-screen bg-background flex flex-col">
