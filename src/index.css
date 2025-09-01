@@ -2,127 +2,137 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Minimalist Design System - Todoist Inspired */
+/* Mini Motorways Style Design System */
 
 @layer base {
   :root {
-    /* Palette personnalisée basée sur l'image fournie */
-    --background: 0 0% 100%;        /* Blanc #FFFFFF */
-    --foreground: 0 0% 15%;
+    /* Palette inspirée de Mini Motorways */
+    --background: 200 40% 95%;          /* Bleu très clair #F0F7FA */
+    --foreground: 220 15% 20%;          /* Gris foncé pour le texte */
 
-    --card: 0 0% 100%;              /* Blanc #FFFFFF */
-    --card-foreground: 0 0% 15%;
+    --card: 210 30% 98%;                /* Blanc légèrement bleuté */
+    --card-foreground: 220 15% 20%;
 
-    --popover: 0 0% 100%;           /* Blanc #FFFFFF */
-    --popover-foreground: 0 0% 15%;
+    --popover: 210 30% 98%;
+    --popover-foreground: 220 15% 20%;
 
-    /* Couleur primaire - Rose vif #FF4970 */
-    --primary: 344 100% 64%;
+    /* Couleur primaire - Corail doux */
+    --primary: 15 85% 65%;              /* Corail/Rose saumon */
     --primary-foreground: 0 0% 98%;
-    --primary-muted: 344 100% 85%;
-    --primary-glow: 344 100% 75%;
+    --primary-muted: 15 60% 85%;
+    --primary-glow: 15 75% 75%;
 
-    /* Couleur secondaire - Gris clair #E5E5E5 */
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 15%;
+    /* Couleur secondaire - Bleu pastel */
+    --secondary: 200 60% 85%;           /* Bleu pastel */
+    --secondary-foreground: 220 15% 20%;
 
-    /* Couleur accent - Orange/Jaune #FAB83E */
-    --accent: 41 94% 61%;
-    --accent-foreground: 0 0% 15%;
+    /* Couleur accent - Jaune doux */
+    --accent: 50 90% 75%;               /* Jaune doux */
+    --accent-foreground: 220 15% 20%;
 
-    /* États muted */
-    --muted: 0 0% 90%;              /* Gris clair #E5E5E5 */
-    --muted-foreground: 0 0% 45%;
+    /* États muted - Vert menthe */
+    --muted: 160 40% 90%;               /* Vert menthe clair */
+    --muted-foreground: 220 15% 45%;
 
-    /* Destructive reste sur la couleur primaire */
-    --destructive: 344 100% 64%;
+    /* Destructive */
+    --destructive: 15 85% 65%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 85%;
-    --input: 0 0% 95%;
-    --ring: 344 100% 64%;
+    --border: 200 30% 85%;
+    --input: 200 40% 92%;
+    --ring: 15 85% 65%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    /* Couleurs de statut personnalisées */
-    --status-todo: 0 0% 90%;        /* Gris clair */
-    --status-todo-foreground: 0 0% 30%;
-    --status-progress: 41 94% 61%;  /* Orange #FAB83E */
-    --status-progress-foreground: 0 0% 15%;
-    --status-done: 120 52% 73%;     /* Vert clair #99DD93 */
-    --status-done-foreground: 0 0% 15%;
+    /* Couleurs Mini Motorways */
+    --mini-coral: 15 85% 65%;           /* Corail */
+    --mini-blue: 200 70% 70%;           /* Bleu pastel */
+    --mini-mint: 160 50% 75%;           /* Vert menthe */
+    --mini-yellow: 50 90% 75%;          /* Jaune doux */
+    --mini-purple: 270 60% 80%;         /* Violet pastel */
 
-    /* Couleurs d'epic personnalisées */
-    --epic-purple: 344 100% 64%;    /* Rose vif */
-    --epic-blue: 41 94% 61%;        /* Orange */
-    --epic-green: 120 52% 73%;      /* Vert clair */
-    --epic-orange: 41 94% 61%;      /* Orange */
-    --epic-pink: 344 100% 64%;      /* Rose vif */
+    /* Couleurs de statut avec la nouvelle palette */
+    --status-todo: 200 30% 88%;
+    --status-todo-foreground: 220 15% 30%;
+    --status-progress: 50 90% 75%;
+    --status-progress-foreground: 220 15% 20%;
+    --status-done: 160 50% 75%;
+    --status-done-foreground: 220 15% 20%;
 
-    /* Sidebar avec la nouvelle palette */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 344 100% 64%;
+    /* Couleurs d'epic avec la nouvelle palette */
+    --epic-purple: 270 60% 80%;
+    --epic-blue: 200 70% 70%;
+    --epic-green: 160 50% 75%;
+    --epic-orange: 50 90% 75%;
+    --epic-pink: 15 85% 65%;
+
+    /* Sidebar */
+    --sidebar-background: 200 35% 97%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 15 85% 65%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 90%;
-    --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 344 100% 64%;
+    --sidebar-accent: 200 30% 88%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 200 30% 85%;
+    --sidebar-ring: 15 85% 65%;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 95%;
+    --background: 220 25% 8%;
+    --foreground: 200 20% 95%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
+    --card: 220 25% 10%;
+    --card-foreground: 200 20% 95%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 220 25% 10%;
+    --popover-foreground: 200 20% 95%;
 
-    /* Couleurs adaptées pour le mode sombre */
-    --primary: 344 85% 58%;         /* Rose plus sombre */
+    --primary: 15 75% 60%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 200 50% 25%;
+    --secondary-foreground: 200 20% 95%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 220 25% 15%;
+    --muted-foreground: 200 20% 65%;
 
-    --accent: 41 90% 55%;           /* Orange plus sombre */
-    --accent-foreground: 0 0% 95%;
+    --accent: 50 80% 60%;
+    --accent-foreground: 220 25% 95%;
 
-    --destructive: 344 85% 58%;
+    --destructive: 15 75% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 15%;
-    --ring: 344 85% 58%;
+    --border: 220 25% 18%;
+    --input: 220 25% 15%;
+    --ring: 15 75% 60%;
 
-    /* États en mode sombre */
-    --status-todo: 0 0% 20%;
-    --status-todo-foreground: 0 0% 80%;
-    --status-progress: 41 90% 55%;
-    --status-progress-foreground: 0 0% 95%;
-    --status-done: 120 45% 65%;
-    --status-done-foreground: 0 0% 95%;
+    --mini-coral: 15 75% 60%;
+    --mini-blue: 200 60% 60%;
+    --mini-mint: 160 40% 65%;
+    --mini-yellow: 50 80% 65%;
+    --mini-purple: 270 50% 70%;
 
-    /* Epic colors pour le mode sombre */
-    --epic-purple: 344 85% 58%;
-    --epic-blue: 41 90% 55%;
-    --epic-green: 120 45% 65%;
-    --epic-orange: 41 90% 55%;
-    --epic-pink: 344 85% 58%;
+    --status-todo: 220 25% 20%;
+    --status-todo-foreground: 200 20% 80%;
+    --status-progress: 50 80% 65%;
+    --status-progress-foreground: 220 25% 95%;
+    --status-done: 160 40% 65%;
+    --status-done-foreground: 220 25% 95%;
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 344 85% 58%;
+    --epic-purple: 270 50% 70%;
+    --epic-blue: 200 60% 60%;
+    --epic-green: 160 40% 65%;
+    --epic-orange: 50 80% 65%;
+    --epic-pink: 15 75% 60%;
+
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 200 20% 95%;
+    --sidebar-primary: 15 75% 60%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 344 85% 58%;
+    --sidebar-accent: 220 25% 15%;
+    --sidebar-accent-foreground: 200 20% 95%;
+    --sidebar-border: 220 25% 18%;
+    --sidebar-ring: 15 75% 60%;
   }
 }
 
