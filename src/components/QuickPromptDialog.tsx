@@ -195,7 +195,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-[800px] max-h-[80vh] overflow-hidden"
+        className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col"
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
@@ -207,9 +207,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 flex flex-col lg:flex-row lg:gap-6">
+        <div className="space-y-4 flex flex-col lg:flex-row lg:gap-6 flex-1 overflow-y-auto">
           {/* Left side - Editor */}
-          <div className="space-y-4 flex-1">
+          <div className="space-y-4 flex-1 min-h-0">
             {/* Formatting toolbar */}
             <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
             <Button
@@ -383,7 +383,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex justify-end gap-3 pt-4 border-t mt-auto flex-shrink-0">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>

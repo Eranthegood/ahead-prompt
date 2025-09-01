@@ -154,7 +154,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="sm:max-w-[1200px] max-h-[80vh] overflow-hidden"
+        className="sm:max-w-[1000px] max-h-[85vh] overflow-y-auto flex flex-col"
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
@@ -166,9 +166,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-6 h-full">
+        <div className="flex gap-6 h-full flex-1 overflow-y-auto">
           {/* Left Panel - Editor */}
-          <div className="flex-1 space-y-4 flex flex-col">
+          <div className="flex-1 space-y-4 min-h-0">
             {/* Metadata */}
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
