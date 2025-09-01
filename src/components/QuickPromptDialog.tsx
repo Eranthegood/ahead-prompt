@@ -373,7 +373,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 </div>
               </div>
               <div className="border rounded-md bg-muted/20 p-4 text-sm">
-                <div dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }} />
+                <div className="prose-content" dangerouslySetInnerHTML={{ __html: generatedPrompt.replace(/\n/g, '<br>') }} />
               </div>
                <p className="text-xs text-muted-foreground">
                  This prompt will be automatically saved and remain accessible after closing.

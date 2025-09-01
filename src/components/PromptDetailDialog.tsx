@@ -349,7 +349,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
             <div className="border rounded-md bg-muted/20 p-4 max-h-[500px] overflow-y-auto">
               <div 
-                className="prose prose-sm max-w-none"
+                className="prose-content prose prose-sm max-w-none dark:prose-invert"
                 dangerouslySetInnerHTML={{ __html: generatedPrompt }}
               />
             </div>
