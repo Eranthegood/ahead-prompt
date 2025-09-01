@@ -1,4 +1,3 @@
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,7 +12,6 @@ import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
-import BinaryTasks from "./pages/BinaryTasks";
 
 const queryClient = new QueryClient();
 
@@ -49,11 +47,6 @@ const App = () => (
             <Route path="/shortcuts" element={
               <ProtectedRoute>
                 <KeyboardShortcuts />
-              </ProtectedRoute>
-            } />
-            <Route path="/tasks" element={
-              <ProtectedRoute>
-                <BinaryTasks />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

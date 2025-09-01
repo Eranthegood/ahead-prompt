@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      binary_tasks: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_completed: boolean
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_completed?: boolean
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_completed?: boolean
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       epics: {
         Row: {
           color: string | null
