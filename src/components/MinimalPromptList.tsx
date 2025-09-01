@@ -327,6 +327,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                         
                         <DropdownMenuItem onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleCopy(prompt);
                         }} className="flex items-center gap-2">
                           <Copy className="h-4 w-4" />
@@ -335,6 +336,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                         
                         <DropdownMenuItem onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleCopyGenerated(prompt);
                         }} className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4" />
@@ -505,6 +507,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                         
                         <DropdownMenuItem onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleCopy(prompt);
                         }} className="flex items-center gap-2">
                           <Copy className="h-4 w-4" />
@@ -513,6 +516,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                         
                         <DropdownMenuItem onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleCopyGenerated(prompt);
                         }} className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4" />
