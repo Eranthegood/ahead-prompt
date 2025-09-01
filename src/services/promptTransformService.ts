@@ -46,6 +46,9 @@ export class PromptTransformService {
       // Save to history
       this.saveToHistory(rawIdea, data.transformedPrompt);
 
+      // Award XP for AI generation
+      // Note: This is called from a static method, so XP will be awarded in the component that uses this service
+      
       return { transformedPrompt: data.transformedPrompt };
     } catch (error) {
       console.error('Transform prompt error:', error);

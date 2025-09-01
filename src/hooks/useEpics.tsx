@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useGamification } from '@/hooks/useGamification';
 import type { Epic } from '@/types';
 
 interface CreateEpicData {
@@ -14,6 +15,7 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   const [epics, setEpics] = useState<Epic[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { awardXP } = useGamification();
 
   // Fetch epics
   const fetchEpics = async () => {
@@ -105,6 +107,9 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
       // ✅ 3. Replace with real data
       const realEpic = { ...data, product_id: data.product_id || null };
       setEpics(prev => prev.map(e => e.id === optimisticEpic.id ? realEpic : e));
+
+      // Award XP for creating an epic
+      awardXP('EPIC_CREATE');
 
       // 🎉 Success notification
       toast({

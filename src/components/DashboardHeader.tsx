@@ -2,8 +2,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
+import { useGamification } from '@/hooks/useGamification';
 import { Workspace } from '@/types';
 import { Zap, LogOut, Command } from 'lucide-react';
+import { XPProgressBar } from '@/components/gamification/XPProgressBar';
+import { StreakDisplay } from '@/components/gamification/StreakDisplay';
 
 interface DashboardHeaderProps {
   workspace: Workspace;
@@ -11,6 +14,7 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ workspace }) => {
   const { signOut, user } = useAuth();
+  const { stats } = useGamification();
 
   return (
     <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4">
@@ -28,6 +32,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ workspace }) =
       </div>
 
       <div className="flex items-center gap-3">
+        {stats && (
+          <div className="hidden lg:block">
+            <XPProgressBar stats={stats} />
+          </div>
+        )}
+        
+        {stats && (
+          <div className="hidden md:block">
+            <StreakDisplay stats={stats} />
+          </div>
+        )}
+        
         <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
           <Command className="w-3 h-3" />
           <span>K</span>

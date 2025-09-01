@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useGamification } from '@/hooks/useGamification';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface CreatePromptData {
@@ -18,6 +19,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { awardXP } = useGamification();
 
   // Fetch prompts
   const fetchPrompts = async () => {
@@ -121,6 +123,9 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
       const realPrompt = { ...data, status: data.status as PromptStatus };
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
 
+      // Award XP for creating a prompt
+      awardXP('PROMPT_CREATE');
+
       // 🎉 Success notification
       toast({
         title: 'Prompt créé',
@@ -153,6 +158,11 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
         // Rollback on error
         await fetchPrompts();
         throw error;
+      }
+
+      // Award XP for completing a prompt
+      if (status === 'done') {
+        awardXP('PROMPT_COMPLETE');
       }
     } catch (error) {
       console.error('Error updating prompt status:', error);

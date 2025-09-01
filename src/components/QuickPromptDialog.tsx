@@ -7,6 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2, Flame } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { useToast } from '@/hooks/use-toast';
+import { useGamification } from '@/hooks/useGamification';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import type { Workspace, Epic, Product, PromptPriority } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
@@ -48,6 +49,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [hasContent, setHasContent] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const { toast } = useToast();
+  const { awardXP } = useGamification();
 
   // Rich text editor
   const editor = useEditor({
@@ -122,6 +124,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       // Store the generated prompt
       if (response.transformedPrompt) {
         setGeneratedPrompt(response.transformedPrompt);
+        // Award XP for AI generation
+        awardXP('AI_GENERATION');
       }
 
       setIsGenerating(false);

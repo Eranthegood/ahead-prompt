@@ -22,10 +22,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2 } from 'lucide-react';
+import { useGamification } from '@/hooks/useGamification';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2, Trophy } from 'lucide-react';
 import { Workspace } from '@/types';
 import { SidePanelMenu } from './SidePanelMenu';
 import { AdaptiveTitle } from './ui/adaptive-title';
+import { AchievementsList } from './gamification/AchievementsList';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -52,6 +54,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const { products, createProduct, deleteProduct } = useProducts(workspace.id);
   const { epics, createEpic } = useEpics(workspace.id);
   const { prompts } = usePrompts(workspace.id);
+  const { achievements } = useGamification();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
   
@@ -60,6 +63,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [isCreateEpicOpen, setIsCreateEpicOpen] = useState(false);
   const [selectedProductForEpic, setSelectedProductForEpic] = useState<string>('');
+  const [showGamification, setShowGamification] = useState(false);
   const [newProductData, setNewProductData] = useState({
     name: '',
     description: '',
@@ -716,7 +720,71 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           )}
 
           {/* Side Panel Menu - Fixed at bottom */}
-          {!isCollapsed && <SidePanelMenu />}
+          {!isCollapsed && (
+            <>
+              <SidebarGroup className="mt-6">
+                <SidebarGroupContent>
+                  <SidebarMenu className="space-y-1">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton 
+                        className="text-muted-foreground cursor-pointer"
+                        onClick={() => setShowGamification(!showGamification)}
+                      >
+                        <Trophy className="w-4 h-4" />
+                        <span>Succès</span>
+                        {achievements.length > 0 && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {achievements.length}
+                          </Badge>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+
+                {/* Achievements Section */}
+                {showGamification && (
+                  <SidebarGroupContent className="mt-4">
+                    <AchievementsList achievements={achievements} className="border-0 shadow-none bg-transparent" />
+                  </SidebarGroupContent>
+                )}
+              </SidebarGroup>
+
+              <SidePanelMenu />
+            </>
+          )}
+          
+          {/* Collapsed achievements button */}
+          {isCollapsed && (
+            <div className="mt-auto">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full aspect-square p-0"
+                    onClick={() => setShowGamification(!showGamification)}
+                    aria-label="Achievements"
+                  >
+                    <div className="relative">
+                      <Trophy className="h-4 w-4" />
+                      {achievements.length > 0 && (
+                        <Badge 
+                          variant="secondary" 
+                          className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center"
+                        >
+                          {achievements.length > 99 ? '99+' : achievements.length}
+                        </Badge>
+                      )}
+                    </div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Succès</p>
+                  <p className="text-xs text-muted-foreground">{achievements.length} débloqués</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          )}
         </SidebarContent>
       </Sidebar>
 
