@@ -44,6 +44,12 @@ export default function LandingPage() {
       name: "Mike",
       role: "Indie Hacker",
     },
+    {
+      img: "https://randomuser.me/api/portraits/men/78.jpg",
+      quote: "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle.",
+      name: "Jeremy",
+      role: "Indie Hacker",
+    },
   ];
 
   return <div className="min-h-screen bg-background flex flex-col">
