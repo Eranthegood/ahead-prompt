@@ -25,7 +25,7 @@ import { usePrompts } from '@/hooks/usePrompts';
 import { useGamification } from '@/hooks/useGamification';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2, Trophy } from 'lucide-react';
 import { Workspace } from '@/types';
-import { SidePanelMenu } from './SidePanelMenu';
+
 import { AdaptiveTitle } from './ui/adaptive-title';
 import { AchievementsList } from './gamification/AchievementsList';
 
@@ -750,7 +750,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 )}
               </SidebarGroup>
 
-              <SidePanelMenu />
+              
             </>
           )}
           
