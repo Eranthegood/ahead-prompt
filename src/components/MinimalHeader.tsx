@@ -1,10 +1,9 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useAuth } from '@/hooks/useAuth';
-import { Search, LogOut } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Workspace } from '@/types';
+import { UserDropdownMenu } from './UserDropdownMenu';
 
 interface MinimalHeaderProps {
   workspace: Workspace;
@@ -13,7 +12,6 @@ interface MinimalHeaderProps {
 }
 
 export function MinimalHeader({ workspace, searchQuery, onSearchChange }: MinimalHeaderProps) {
-  const { signOut } = useAuth();
 
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
@@ -33,14 +31,7 @@ export function MinimalHeader({ workspace, searchQuery, onSearchChange }: Minima
       </div>
 
       <div className="flex items-center gap-3">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={signOut}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
+        <UserDropdownMenu />
       </div>
     </header>
   );
