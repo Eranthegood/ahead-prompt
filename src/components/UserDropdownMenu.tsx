@@ -7,11 +7,13 @@ import {
   LogOut, 
   Crown,
   Bell,
-  Palette,
+  Moon,
+  Sun,
   Users,
   UserPlus,
   HelpCircle,
-  Mail
+  Mail,
+  Lock
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -20,13 +22,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
@@ -36,7 +36,15 @@ export function UserDropdownMenu() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
-  const { theme, setTheme } = useTheme();
+  const { 
+    theme, 
+    setTheme, 
+    resolvedTheme, 
+    isDarkModeUnlocked,
+    xpNeededForDarkMode,
+    currentLevel,
+    requiredLevel 
+  } = useTheme();
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleLogout = async () => {
@@ -183,45 +191,45 @@ export function UserDropdownMenu() {
             </DropdownMenuItem>
           ))}
 
-          {/* Theme Submenu */}
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="flex items-center gap-3 py-2 px-2 cursor-pointer hover:bg-muted/50 rounded-md">
-              <Palette className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">Apparence</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="w-48 bg-popover/95 backdrop-blur-sm">
-              <DropdownMenuItem 
-                onClick={() => setTheme('light')}
-                className="cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-background border border-border" />
-                  <span>Clair</span>
-                  {theme === 'light' && <Badge variant="outline" className="ml-auto text-xs">Actuel</Badge>}
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setTheme('dark')}
-                className="cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-foreground" />
-                  <span>Sombre</span>
-                  {theme === 'dark' && <Badge variant="outline" className="ml-auto text-xs">Actuel</Badge>}
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setTheme('system')}
-                className="cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-gradient-to-r from-background to-foreground" />
-                  <span>Système</span>
-                  {theme === 'system' && <Badge variant="outline" className="ml-auto text-xs">Actuel</Badge>}
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
+          {/* Theme Switch */}
+          <div className="flex items-center justify-between py-2 px-2">
+            <div className="flex items-center gap-3">
+              {resolvedTheme === 'dark' ? (
+                <Moon className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <Sun className="h-4 w-4 text-muted-foreground" />
+              )}
+              <div className="flex flex-col">
+                <span className="text-sm">Mode sombre</span>
+                {!isDarkModeUnlocked && (
+                  <div className="flex items-center gap-1">
+                    <Lock className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      Niveau {requiredLevel} requis ({xpNeededForDarkMode} XP)
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {!isDarkModeUnlocked && (
+                <Badge variant="secondary" className="text-xs">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Niv. {requiredLevel}
+                </Badge>
+              )}
+              <Switch 
+                checked={resolvedTheme === 'dark'}
+                disabled={!isDarkModeUnlocked}
+                onCheckedChange={(checked) => {
+                  if (isDarkModeUnlocked) {
+                    setTheme(checked ? 'dark' : 'light');
+                  }
+                }}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+          </div>
 
           <DropdownMenuSeparator />
 
