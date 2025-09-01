@@ -54,9 +54,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border/5 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Built for developers, by developers. Start shipping AI features today.
-          </p>
+          
         </div>
       </footer>
     </div>;
