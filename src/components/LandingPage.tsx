@@ -32,6 +32,12 @@ export default function LandingPage() {
       name: "Amelia W",
       role: "Panda AI",
     },
+    {
+      img: "https://randomuser.me/api/portraits/women/65.jpg",
+      quote: "After struggling with prompt chaos for months (copy-pasting from random docs, losing track of versions), I needed something that actually fits my workflow.",
+      name: "Sarah",
+      role: "Full-Stack Developer",
+    },
   ];
 
   return <div className="min-h-screen bg-background flex flex-col">
