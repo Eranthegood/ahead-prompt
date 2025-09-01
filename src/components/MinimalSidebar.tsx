@@ -23,6 +23,7 @@ import { usePrompts } from '@/hooks/usePrompts';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2 } from 'lucide-react';
 import { Workspace } from '@/types';
 import { SidePanelMenu } from './SidePanelMenu';
+import { AdaptiveTitle } from './ui/adaptive-title';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -300,15 +301,22 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 }}
                                 isActive={selectedProductId === product.id && !selectedEpicId}
                               >
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
                                   <div 
-                                    className="w-2 h-2 rounded-full" 
+                                    className="w-2 h-2 rounded-full flex-shrink-0" 
                                     style={{ backgroundColor: product.color || '#6B7280' }}
                                   />
-                                  <Package className="h-3 w-3" />
-                                  <span className="truncate text-sm">{product.name}</span>
+                                  <Package className="h-3 w-3 flex-shrink-0" />
+                                  <AdaptiveTitle 
+                                    className="text-sm"
+                                    reservedSpace={40}
+                                    minSize={11}
+                                    maxSize={14}
+                                  >
+                                    {product.name}
+                                  </AdaptiveTitle>
                                 </div>
-                                <Badge variant="secondary" className="text-xs">
+                                <Badge variant="secondary" className="text-xs flex-shrink-0">
                                   {product.promptCount}
                                 </Badge>
                               </SidebarMenuButton>
@@ -351,13 +359,20 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                     }}
                                     isActive={selectedEpicId === epic.id}
                                   >
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
                                       <div 
-                                        className="w-1.5 h-1.5 rounded-full" 
+                                        className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
                                         style={{ backgroundColor: epic.color || '#8B5CF6' }}
                                       />
-                                      <Hash className="h-3 w-3" />
-                                      <span className="truncate">{epic.name}</span>
+                                      <Hash className="h-3 w-3 flex-shrink-0" />
+                                      <AdaptiveTitle 
+                                        className="text-xs"
+                                        reservedSpace={30}
+                                        minSize={10}
+                                        maxSize={12}
+                                      >
+                                        {epic.name}
+                                      </AdaptiveTitle>
                                     </div>
                                     {epic.promptCount > 0 && (
                                       <Badge variant="outline" className="text-xs h-4">

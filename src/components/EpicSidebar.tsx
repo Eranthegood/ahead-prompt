@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { Workspace, Product, Epic } from '@/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { AdaptiveTitle } from './ui/adaptive-title';
 
 interface EpicSidebarProps {
   workspace: Workspace;
@@ -208,7 +209,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                       >
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton className="w-full justify-between">
-                            <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
                               <div 
                                 className="w-3 h-3 rounded-full flex-shrink-0" 
                                 style={{ backgroundColor: product.color || '#3B82F6' }}
@@ -216,7 +217,13 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                               {!collapsed && (
                                 <>
                                   <Package className="h-4 w-4 flex-shrink-0" />
-                                  <span className="truncate">{product.name}</span>
+                                  <AdaptiveTitle 
+                                    reservedSpace={50}
+                                    minSize={12}
+                                    maxSize={14}
+                                  >
+                                    {product.name}
+                                  </AdaptiveTitle>
                                 </>
                               )}
                             </div>
@@ -254,13 +261,19 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                   >
                                     <CollapsibleTrigger asChild>
                                       <SidebarMenuButton className="w-full justify-between">
-                                        <div className="flex items-center gap-2 min-w-0">
+                                        <div className="flex items-center gap-2 min-w-0 flex-1">
                                           <div 
                                             className="w-2 h-2 rounded-full flex-shrink-0" 
                                             style={{ backgroundColor: epic.color || '#8B5CF6' }}
                                           />
                                           <Hash className="h-4 w-4 flex-shrink-0" />
-                                          <span className="truncate">{epic.name}</span>
+                                          <AdaptiveTitle 
+                                            reservedSpace={40}
+                                            minSize={11}
+                                            maxSize={13}
+                                          >
+                                            {epic.name}
+                                          </AdaptiveTitle>
                                         </div>
                                         <div className="flex items-center gap-1 flex-shrink-0">
                                           <Badge variant="outline" className="text-xs">
@@ -283,9 +296,16 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                       {epic.prompts.map((prompt) => (
                                         <SidebarMenuItem key={prompt.id}>
                                           <SidebarMenuButton className="w-full justify-between">
-                                            <div className="flex items-center gap-2 min-w-0">
+                                            <div className="flex items-center gap-2 min-w-0 flex-1">
                                               <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
-                                              <span className="truncate text-sm">{prompt.title}</span>
+                                              <AdaptiveTitle 
+                                                className="text-sm"
+                                                reservedSpace={35}
+                                                minSize={10}
+                                                maxSize={12}
+                                              >
+                                                {prompt.title}
+                                              </AdaptiveTitle>
                                             </div>
                                             <Badge 
                                               variant={
@@ -322,9 +342,16 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                             {product.directPrompts.slice(-3).map((prompt) => (
                               <SidebarMenuItem key={prompt.id}>
                                 <SidebarMenuButton className="w-full justify-between">
-                                  <div className="flex items-center gap-2 min-w-0">
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
-                                    <span className="truncate text-sm">{prompt.title}</span>
+                                    <AdaptiveTitle 
+                                      className="text-sm"
+                                      reservedSpace={35}
+                                      minSize={10}
+                                      maxSize={12}
+                                    >
+                                      {prompt.title}
+                                    </AdaptiveTitle>
                                   </div>
                                   <Badge 
                                     variant={
