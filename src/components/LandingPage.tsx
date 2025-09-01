@@ -38,6 +38,12 @@ export default function LandingPage() {
       name: "Sarah",
       role: "Full-Stack Developer",
     },
+    {
+      img: "https://randomuser.me/api/portraits/men/32.jpg",
+      quote: "My prompt collection has gone from fun experiments to... a monster living in Google Docs, stickies, chat logs. I spend more time hunting prompts than coding.",
+      name: "Mike",
+      role: "Indie Hacker",
+    },
   ];
 
   return <div className="min-h-screen bg-background flex flex-col">
