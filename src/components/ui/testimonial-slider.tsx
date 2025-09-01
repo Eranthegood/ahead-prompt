@@ -38,16 +38,16 @@ export const TestimonialSlider = ({
   }, []);
 
   return (
-    <div className="mx-auto w-full max-w-3xl text-center">
-      <div className="relative h-32">
+    <div className="mx-auto w-full max-w-4xl text-center">
+      <div className="relative mb-6">
         <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-gradient-to-b before:from-primary/25 before:via-primary/5 before:via-25% before:to-primary/0 before:to-75%">
-          <div className="h-32 [mask-image:_linear-gradient(0deg,transparent,hsl(var(--background))_20%,hsl(var(--background)))]">
+          <div className="flex h-24 items-center justify-center [mask-image:_linear-gradient(0deg,transparent,hsl(var(--background))_20%,hsl(var(--background)))]">
             {testimonials.map((testimonial, index) => (
               <Transition
                 as="div"
                 key={index}
                 show={active === index}
-                className="absolute inset-0 -z-10 h-full"
+                className="absolute inset-0 -z-10 flex h-full items-center justify-center"
                 enter="transition ease-[cubic-bezier(0.68,-0.3,0.32,1)] duration-700 order-first"
                 enterFrom="opacity-0 -rotate-[60deg]"
                 enterTo="opacity-100 rotate-0"
@@ -57,7 +57,7 @@ export const TestimonialSlider = ({
                 beforeEnter={() => heightFix()}
               >
                 <img
-                  className="relative left-1/2 top-11 -translate-x-1/2 rounded-full"
+                  className="rounded-full"
                   src={testimonial.img}
                   width={56}
                   height={56}
@@ -68,7 +68,7 @@ export const TestimonialSlider = ({
           </div>
         </div>
       </div>
-      <div className="mb-9 transition-all delay-300 duration-150 ease-in-out">
+      <div className="mb-8 min-h-[120px] sm:min-h-[100px] transition-all delay-300 duration-150 ease-in-out">
         <div className="relative flex flex-col" ref={testimonialsRef}>
           {testimonials.map((testimonial, index) => (
             <Transition
@@ -82,18 +82,18 @@ export const TestimonialSlider = ({
               leaveTo="opacity-0 translate-x-4"
               beforeEnter={() => heightFix()}
             >
-              <div className="text-2xl font-bold text-foreground before:content-['\201C'] after:content-['\201D']">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground leading-relaxed px-4 before:content-['\201C'] after:content-['\201D']">
                 {testimonial.quote}
               </div>
             </Transition>
           ))}
         </div>
       </div>
-      <div className="-m-1.5 flex flex-wrap justify-center">
+      <div className="flex flex-wrap justify-center gap-2">
         {testimonials.map((testimonial, index) => (
           <button
             key={index}
-            className={`m-1.5 inline-flex justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary/30 ${
+            className={`flex flex-col items-center rounded-lg px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary/30 ${
               active === index
                 ? "bg-primary text-primary-foreground shadow-primary/10"
                 : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
@@ -103,11 +103,10 @@ export const TestimonialSlider = ({
               setAutorotate(false);
             }}
           >
-            <span>{testimonial.name}</span>{" "}
-            <span className="text-muted-foreground">
-              -
-            </span>{" "}
-            <span>{testimonial.role}</span>
+            <span className="font-medium">{testimonial.name}</span>
+            <span className="text-muted-foreground text-xs mt-0.5">
+              {testimonial.role}
+            </span>
           </button>
         ))}
       </div>
