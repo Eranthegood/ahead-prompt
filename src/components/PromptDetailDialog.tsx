@@ -56,6 +56,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     if (prompt && editor) {
       // Load the original user content (description) into the editor
       const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
+      
+      console.log('PromptDetailDialog: Loading prompt content', {
+        promptId: prompt.id,
+        title: prompt.title,
+        hasDescription: !!prompt.description,
+        descriptionLength: prompt.description?.length || 0,
+        descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
+        originalContentLength: originalContent.length
+      });
+      
       editor.commands.setContent(originalContent);
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
