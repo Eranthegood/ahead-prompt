@@ -3,15 +3,20 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
 
 export const useTheme = () => {
-  const { preferences, saveThemePreference } = useUserPreferences();
-  const { hasUnlockedFeature, stats } = useGamification();
+  const { preferences, saveThemePreference, loading: prefsLoading } = useUserPreferences();
+  const { hasUnlockedFeature, stats, loading: gamificationLoading } = useGamification();
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   // Check if dark mode is unlocked
   const isDarkModeUnlocked = hasUnlockedFeature('DARK_MODE');
 
-  // Get effective theme considering level restrictions
+  // Get effective theme considering level restrictions and loading states
   const getEffectiveTheme = (): 'light' | 'dark' | 'system' => {
+    // Force light mode during loading to prevent black interface
+    if (prefsLoading || gamificationLoading) {
+      return 'light';
+    }
+    
     if (preferences.theme === 'dark' && !isDarkModeUnlocked) {
       return 'light'; // Force light mode if dark mode not unlocked
     }
@@ -19,6 +24,7 @@ export const useTheme = () => {
   };
 
   const effectiveTheme = getEffectiveTheme();
+  const isLoading = prefsLoading || gamificationLoading;
 
   // Update theme class on document
   useEffect(() => {
@@ -28,14 +34,21 @@ export const useTheme = () => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
+      console.log(`Theme applied: ${theme}, loading: ${isLoading}, unlocked: ${isDarkModeUnlocked}`);
     };
+
+    // Always start with light theme during loading
+    if (isLoading) {
+      applyTheme('light');
+      return;
+    }
 
     if (effectiveTheme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       
       const handleChange = () => {
         const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-        const finalTheme = systemTheme === 'dark' && !isDarkModeUnlocked ? 'light' : systemTheme;
+        const finalTheme = (systemTheme === 'dark' && !isDarkModeUnlocked) ? 'light' : systemTheme;
         applyTheme(finalTheme);
       };
 
@@ -46,7 +59,7 @@ export const useTheme = () => {
     } else {
       applyTheme(effectiveTheme);
     }
-  }, [effectiveTheme, isDarkModeUnlocked]);
+  }, [effectiveTheme, isDarkModeUnlocked, isLoading]);
 
   const setTheme = (theme: 'light' | 'dark' | 'system') => {
     // Prevent setting dark mode if not unlocked
@@ -73,5 +86,6 @@ export const useTheme = () => {
     xpNeededForDarkMode: getXPNeededForDarkMode(),
     currentLevel: stats?.current_level || 1,
     requiredLevel: PREMIUM_FEATURES.DARK_MODE,
+    isLoading,
   };
 };
