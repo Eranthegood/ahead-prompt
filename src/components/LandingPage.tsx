@@ -73,16 +73,17 @@ export default function LandingPage() {
             </div>
           </BlurFade>
         </div>
-
-        <section aria-labelledby="testimonials-heading" className="py-16">
-          <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
-          <BlurFade delay={1} inView>
-            <div className="max-w-5xl mx-auto px-6">
-              <TestimonialSlider testimonials={testimonials} />
-            </div>
-          </BlurFade>
-        </section>
       </main>
+
+      {/* Testimonials Section */}
+      <section aria-labelledby="testimonials-heading" className="py-16 bg-background/50">
+        <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
+        <BlurFade delay={1} inView>
+          <div className="max-w-5xl mx-auto px-6">
+            <TestimonialSlider testimonials={testimonials} />
+          </div>
+        </BlurFade>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-border/5 py-8">
