@@ -140,7 +140,7 @@ export function PromptContextMenu({ prompt, children, onEdit, onUpdate }: Prompt
           Edit prompt
         </ContextMenuItem>
         
-        <ContextMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopy(); }} className="flex items-center gap-2">
+        <ContextMenuItem onClick={handleCopy} className="flex items-center gap-2">
           <Copy className="h-4 w-4" />
           Copy content
         </ContextMenuItem>

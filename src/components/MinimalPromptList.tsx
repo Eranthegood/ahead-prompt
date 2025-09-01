@@ -325,11 +325,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                           Edit prompt
                         </DropdownMenuItem>
                         
-                        <DropdownMenuItem onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleCopy(prompt);
-                        }} className="flex items-center gap-2">
+                        <DropdownMenuItem onClick={() => handleCopy(prompt)} className="flex items-center gap-2">
                           <Copy className="h-4 w-4" />
                           Copy content
                         </DropdownMenuItem>
@@ -505,11 +501,7 @@ export function MinimalPromptList({ workspace, selectedProductId, selectedEpicId
                           Edit prompt
                         </DropdownMenuItem>
                         
-                        <DropdownMenuItem onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleCopy(prompt);
-                        }} className="flex items-center gap-2">
+                        <DropdownMenuItem onClick={() => handleCopy(prompt)} className="flex items-center gap-2">
                           <Copy className="h-4 w-4" />
                           Copy content
                         </DropdownMenuItem>
