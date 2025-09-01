@@ -76,22 +76,34 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Problem Statement Section */}
+      {/* How It Works Section */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
           <BlurFade delay={0.8} inView>
-            <blockquote className="text-xl md:text-2xl font-medium text-foreground mb-2 italic">
-              "I'm swimming in prompts these days and I don't have a good way of recalling which one to use"
-            </blockquote>
-            <cite className="text-sm text-muted-foreground block mb-8">
-              - Developer on Twitter
-            </cite>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
+              How Ahead works:
+            </h2>
           </BlurFade>
           
           <BlurFade delay={1} inView>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              Sound familiar? You use AI to code faster, but lose 5 hours/week managing chaotic prompt docs.
-            </p>
+            <div className="text-left max-w-2xl mx-auto space-y-4">
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">1</span>
+                <p className="text-lg text-muted-foreground">Launch prompt in Cursor/Claude →</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">2</span>
+                <p className="text-lg text-muted-foreground">Switch to Ahead →</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">3</span>
+                <p className="text-lg text-muted-foreground">Prepare your next 3 moves →</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">4</span>
+                <p className="text-lg text-muted-foreground">Copy-paste instantly when AI finishes</p>
+              </div>
+            </div>
           </BlurFade>
         </div>
       </section>
