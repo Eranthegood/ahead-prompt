@@ -86,8 +86,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace, selectedPro
                   <PromptCard
                     key={prompt.id}
                     prompt={prompt}
-                    onStatusChange={updatePromptStatus}
-                    onUpdate={() => {}} // No longer needed with real-time updates
+                    onPromptClick={() => {}}
+                    onEdit={() => {}}
+                    onStatusChange={(prompt, status) => updatePromptStatus(prompt.id, status)}
+                    onPriorityChange={() => {}}
+                    onDuplicate={() => {}}
+                    onDelete={() => {}}
+                    onCopy={() => {}}
+                    onCopyGenerated={() => {}}
                   />
                 ))}
                 

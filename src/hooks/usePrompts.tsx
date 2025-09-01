@@ -164,6 +164,41 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     }
   };
 
+  // Update prompt priority with optimistic update
+  const updatePromptPriority = async (promptId: string, priority: number): Promise<void> => {
+    // Optimistic update
+    setPrompts(prev => prev.map(p => 
+      p.id === promptId 
+        ? { ...p, priority, updated_at: new Date().toISOString() }
+        : p
+    ));
+
+    try {
+      const { error } = await supabase
+        .from('prompts')
+        .update({ priority })
+        .eq('id', promptId);
+
+      if (error) {
+        // Rollback on error
+        await fetchPrompts();
+        throw error;
+      }
+
+      toast({
+        title: 'Succès',
+        description: 'Priorité mise à jour',
+      });
+    } catch (error) {
+      console.error('Error updating prompt priority:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour la priorité',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Duplicate prompt with optimistic update
   const duplicatePrompt = async (prompt: Prompt): Promise<void> => {
     // Create optimistic duplicate
@@ -356,6 +391,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string) => 
     loading,
     createPrompt,
     updatePromptStatus,
+    updatePromptPriority,
     duplicatePrompt,
     deletePrompt,
     updatePrompt,

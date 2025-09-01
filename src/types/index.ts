@@ -165,3 +165,18 @@ export interface Product {
 
 export type PromptStatus = 'todo' | 'in_progress' | 'done';
 export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';
+
+// Priority levels: 1 = High, 2 = Normal, 3 = Low
+export type PromptPriority = 1 | 2 | 3;
+
+export const PRIORITY_LABELS = {
+  1: 'Haute',
+  2: 'Normale', 
+  3: 'Basse'
+} as const;
+
+export const PRIORITY_OPTIONS = [
+  { value: 1, label: 'Haute', variant: 'destructive' as const },
+  { value: 2, label: 'Normale', variant: 'secondary' as const },
+  { value: 3, label: 'Basse', variant: 'outline' as const }
+] as const;
