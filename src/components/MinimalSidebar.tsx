@@ -219,7 +219,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               Add Prompt
             </Button>
             <p className="text-xs text-muted-foreground mt-2 px-1">
-              Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> to create quickly
+              Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">T</kbd> for bugs
             </p>
           </div>
 
