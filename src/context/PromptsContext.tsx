@@ -31,15 +31,15 @@ export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId
   );
 
   const value = useMemo<PromptsContextValue>(() => ({
-    prompts: promptsApi.prompts,
-    loading: promptsApi.loading,
-    createPrompt: promptsApi.createPrompt,
-    updatePromptStatus: promptsApi.updatePromptStatus,
-    updatePromptPriority: promptsApi.updatePromptPriority,
-    duplicatePrompt: promptsApi.duplicatePrompt,
-    deletePrompt: promptsApi.deletePrompt,
-    updatePrompt: promptsApi.updatePrompt,
-    refetch: promptsApi.refetch,
+    prompts: promptsApi.prompts || [],
+    loading: promptsApi.loading || false,
+    createPrompt: promptsApi.createPrompt || (async () => null),
+    updatePromptStatus: promptsApi.updatePromptStatus || (async () => {}),
+    updatePromptPriority: promptsApi.updatePromptPriority || (async () => {}),
+    duplicatePrompt: promptsApi.duplicatePrompt || (async () => {}),
+    deletePrompt: promptsApi.deletePrompt || (async () => {}),
+    updatePrompt: promptsApi.updatePrompt || (async () => {}),
+    refetch: promptsApi.refetch || (async () => {}),
   }), [promptsApi]);
 
   return (
