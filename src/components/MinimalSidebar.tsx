@@ -28,7 +28,7 @@ import { Workspace, Product } from '@/types';
 
 import { AdaptiveTitle } from './ui/adaptive-title';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
-import { KnowledgeModal } from './KnowledgeModal';
+import { KnowledgeBase } from './KnowledgeBase';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -1085,14 +1085,17 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         </DialogContent>
       </Dialog>
 
-      {/* Knowledge Modal */}
-      <KnowledgeModal
-        open={isKnowledgeModalOpen}
-        onOpenChange={setIsKnowledgeModalOpen}
-        onClose={handleCloseKnowledge}
-        workspace={workspace}
-        product={selectedKnowledgeProduct}
-      />
+      {/* Knowledge Manager */}
+      <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
+        <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Knowledge for {selectedKnowledgeProduct?.name ?? 'Workspace'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <KnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 }
