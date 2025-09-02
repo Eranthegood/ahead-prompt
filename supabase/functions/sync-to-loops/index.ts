@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log('Sending contact data to Loops:', contactData);
 
     // Send to Loops API
-    const loopsResponse = await fetch('https://app.loops.so/api/v1/contacts', {
+    const loopsResponse = await fetch('https://app.loops.so/api/v1/contacts/create', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${loopsApiKey}`,
@@ -64,7 +64,16 @@ serve(async (req) => {
       body: JSON.stringify(contactData),
     });
 
-    const loopsResult = await loopsResponse.json();
+    let loopsResult;
+    try {
+      loopsResult = await loopsResponse.json();
+    } catch (parseError) {
+      // If we can't parse JSON, log the raw response text
+      const responseText = await loopsResponse.text();
+      console.error('Failed to parse Loops API response as JSON. Status:', loopsResponse.status);
+      console.error('Raw response:', responseText);
+      throw new Error(`Loops API returned non-JSON response (${loopsResponse.status}): ${responseText.substring(0, 200)}`);
+    }
     
     if (!loopsResponse.ok) {
       console.error('Loops API error:', loopsResult);
