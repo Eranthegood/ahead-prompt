@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -23,7 +22,42 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const { toast } = useToast();
   const { awardXP } = useGamification();
 
-  // Fetch prompts
+  // Helper function to handle optimistic updates with rollback capability
+  const withOptimisticUpdate = async <T,>(
+    optimisticUpdate: (prev: Prompt[]) => Prompt[],
+    operation: () => Promise<T>,
+    rollback: (prev: Prompt[]) => Prompt[]
+  ): Promise<T | null> => {
+    // Apply optimistic update
+    setPrompts(optimisticUpdate);
+    setLoading(false);
+
+    try {
+      const result = await operation();
+      return result;
+    } catch (error) {
+      // Rollback on error
+      setPrompts(rollback);
+      throw error;
+    }
+  };
+
+  // Helper function to show contextual error messages
+  const showErrorToast = (error: any, context: string) => {
+    let description = `Impossible de ${context}. Veuillez réessayer.`;
+    
+    if (error.message?.includes('epic_id')) {
+      description = 'L\'epic sélectionné n\'existe pas.';
+    }
+
+    toast({
+      title: 'Erreur',
+      description,
+      variant: 'destructive',
+    });
+  };
+
+  // Fetch prompts with filtering
   const fetchPrompts = async () => {
     if (!workspaceId) return;
     
@@ -48,17 +82,45 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       setPrompts((data || []).map(p => ({ ...p, status: p.status as PromptStatus })));
     } catch (error: any) {
       console.error('Error fetching prompts:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les prompts',
-        variant: 'destructive',
-      });
+      showErrorToast(error, 'charger les prompts');
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to auto-generate prompt if content is sufficient
+  // Create optimistic prompt for immediate UI feedback
+  const createOptimisticPrompt = (promptData: CreatePromptData): Prompt => ({
+    id: `temp-${Date.now()}`,
+    workspace_id: workspaceId!,
+    title: promptData.title.trim(),
+    description: promptData.description?.trim() || null,
+    status: promptData.status || 'todo',
+    priority: promptData.priority || 2,
+    order_index: 0,
+    epic_id: promptData.epic_id || null,
+    product_id: promptData.product_id || null,
+    generated_prompt: promptData.generated_prompt || null,
+    generated_at: promptData.generated_at || null,
+    is_debug_session: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  });
+
+  // Prepare database payload from prompt data
+  const createDatabasePayload = (promptData: CreatePromptData) => ({
+    workspace_id: workspaceId!,
+    title: promptData.title.trim(),
+    description: promptData.description?.trim() || undefined,
+    status: promptData.status || 'todo',
+    priority: promptData.priority || 2,
+    epic_id: promptData.epic_id || undefined,
+    product_id: promptData.product_id || undefined,
+    generated_prompt: promptData.generated_prompt || undefined,
+    generated_at: promptData.generated_at || undefined,
+    order_index: 0,
+  });
+
+  // Auto-generate prompt if content is sufficient
   const autoGeneratePrompt = async (promptId: string, content: string) => {
     try {
       const cleanContent = stripHtmlAndNormalize(content);
@@ -101,120 +163,89 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
+  // Insert prompt into database
+  const insertPromptToDatabase = async (promptData: CreatePromptData) => {
+    const payload = createDatabasePayload(promptData);
+    
+    const { data, error } = await supabase
+      .from('prompts')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { ...data, status: data.status as PromptStatus };
+  };
+
+  // Handle post-creation tasks (XP, auto-generation, toast)
+  const handlePostCreationTasks = async (prompt: Prompt, title: string) => {
+    // Auto-generate prompt if we have description content
+    if (prompt.description) {
+      // Don't await this - let it run in background
+      autoGeneratePrompt(prompt.id, prompt.description);
+    }
+
+    // Award XP for creating a prompt
+    awardXP('PROMPT_CREATE');
+
+    // Success notification
+    toast({
+      title: 'Prompt créé',
+      description: `"${title}" a été créé avec succès`,
+    });
+  };
+
   // Create prompt with optimistic update and auto-generation
   const createPrompt = async (promptData: CreatePromptData): Promise<Prompt | null> => {
     if (!workspaceId) return null;
 
-    // 🚀 1. Optimistic update - immediate UI response
-    const optimisticPrompt: Prompt = {
-      id: `temp-${Date.now()}`,
-      workspace_id: workspaceId,
-      title: promptData.title.trim(),
-      description: promptData.description?.trim() || null,
-      status: promptData.status || 'todo',
-      priority: promptData.priority || 2, // Default to normal priority
-      order_index: 0,
-      epic_id: promptData.epic_id || null,
-      product_id: promptData.product_id || null,
-      generated_prompt: promptData.generated_prompt || null,
-      generated_at: promptData.generated_at || null,
-      is_debug_session: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    // Add immediately to UI and stop loading
-    setPrompts(prev => [optimisticPrompt, ...prev]);
-    setLoading(false); // Stop loading immediately for instant feedback
+    const optimisticPrompt = createOptimisticPrompt(promptData);
 
     try {
-      // 📡 2. Send to database
-      const payload = {
-        workspace_id: workspaceId,
-        title: promptData.title.trim(),
-        description: promptData.description?.trim() || undefined,
-        status: promptData.status || 'todo',
-        priority: promptData.priority || 2, // Default to normal priority
-        epic_id: promptData.epic_id || undefined,
-        product_id: promptData.product_id || undefined,
-        generated_prompt: promptData.generated_prompt || undefined,
-        generated_at: promptData.generated_at || undefined,
-        order_index: 0,
-      };
+      const realPrompt = await withOptimisticUpdate(
+        // Optimistic update - add immediately to UI
+        prev => [optimisticPrompt, ...prev],
+        // Database operation
+        () => insertPromptToDatabase(promptData),
+        // Rollback - remove optimistic prompt
+        prev => prev.filter(p => p.id !== optimisticPrompt.id)
+      );
 
-      const { data, error } = await supabase
-        .from('prompts')
-        .insert(payload)
-        .select()
-        .single();
+      if (!realPrompt) throw new Error('Failed to create prompt');
 
-      if (error) {
-        // 🔴 Rollback on error
-        setPrompts(prev => prev.filter(p => p.id !== optimisticPrompt.id));
-        
-        // Contextual error messages
-        if (error.message?.includes('epic_id')) {
-          toast({
-            title: 'Erreur',
-            description: 'L\'epic sélectionné n\'existe pas.',
-            variant: 'destructive',
-          });
-        } else {
-          toast({
-            title: 'Erreur',
-            description: 'Impossible de créer le prompt. Veuillez réessayer.',
-            variant: 'destructive',
-          });
-        }
-        throw error;
-      }
-
-      // ✅ 3. Replace with real data
-      const realPrompt = { ...data, status: data.status as PromptStatus };
+      // Replace optimistic prompt with real data
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
 
-      // 🤖 4. Auto-generate prompt if we have description content
-      if (realPrompt.description) {
-        // Don't await this - let it run in background
-        autoGeneratePrompt(realPrompt.id, realPrompt.description);
-      }
-
-      // Award XP for creating a prompt
-      awardXP('PROMPT_CREATE');
-
-      // 🎉 Success notification
-      toast({
-        title: 'Prompt créé',
-        description: `"${promptData.title}" a été créé avec succès`,
-      });
+      // Handle post-creation tasks
+      await handlePostCreationTasks(realPrompt, promptData.title);
 
       return realPrompt;
     } catch (error) {
       console.error('Error creating prompt:', error);
+      showErrorToast(error, 'créer le prompt');
       return null;
     }
   };
 
   // Update prompt status with optimistic update
   const updatePromptStatus = async (promptId: string, status: PromptStatus): Promise<void> => {
-    // Optimistic update
-    setPrompts(prev => prev.map(p => 
-      p.id === promptId 
-        ? { ...p, status, updated_at: new Date().toISOString() }
-        : p
-    ));
+    const updateData = { status, updated_at: new Date().toISOString() };
 
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({ status })
-        .eq('id', promptId);
-
-      if (error) {
-        // Rollback on error
-        await fetchPrompts();
-        throw error;
-      }
+      await withOptimisticUpdate(
+        // Optimistic update
+        prev => prev.map(p => p.id === promptId ? { ...p, ...updateData } : p),
+        // Database operation
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .update({ status })
+            .eq('id', promptId);
+          if (error) throw error;
+        },
+        // Rollback - refetch all data
+        () => { fetchPrompts(); return []; }
+      );
 
       // Award XP for completing a prompt
       if (status === 'done') {
@@ -222,34 +253,29 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       }
     } catch (error) {
       console.error('Error updating prompt status:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour le statut',
-        variant: 'destructive',
-      });
+      showErrorToast(error, 'mettre à jour le statut');
     }
   };
 
   // Update prompt priority with optimistic update
   const updatePromptPriority = async (promptId: string, priority: number): Promise<void> => {
-    // Optimistic update
-    setPrompts(prev => prev.map(p => 
-      p.id === promptId 
-        ? { ...p, priority, updated_at: new Date().toISOString() }
-        : p
-    ));
+    const updateData = { priority, updated_at: new Date().toISOString() };
 
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({ priority })
-        .eq('id', promptId);
-
-      if (error) {
-        // Rollback on error
-        await fetchPrompts();
-        throw error;
-      }
+      await withOptimisticUpdate(
+        // Optimistic update
+        prev => prev.map(p => p.id === promptId ? { ...p, ...updateData } : p),
+        // Database operation
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .update({ priority })
+            .eq('id', promptId);
+          if (error) throw error;
+        },
+        // Rollback - refetch all data
+        () => { fetchPrompts(); return []; }
+      );
 
       toast({
         title: 'Succès',
@@ -257,65 +283,54 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       });
     } catch (error) {
       console.error('Error updating prompt priority:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour la priorité',
-        variant: 'destructive',
-      });
+      showErrorToast(error, 'mettre à jour la priorité');
     }
   };
 
+  // Create duplicate prompt data
+  const createDuplicatePromptData = (original: Prompt): Omit<Prompt, 'id'> => ({
+    workspace_id: original.workspace_id,
+    title: `${original.title} (Copy)`,
+    description: original.description,
+    status: 'todo',
+    priority: original.priority,
+    epic_id: original.epic_id,
+    product_id: original.product_id,
+    order_index: 0,
+    generated_prompt: original.generated_prompt,
+    generated_at: original.generated_at,
+    is_debug_session: original.is_debug_session || false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  });
+
   // Duplicate prompt with optimistic update
   const duplicatePrompt = async (prompt: Prompt): Promise<void> => {
-    // Create optimistic duplicate
-    const duplicatePrompt: Prompt = {
-      id: `temp-${Date.now()}`,
-      workspace_id: prompt.workspace_id,
-      title: `${prompt.title} (Copy)`,
-      description: prompt.description,
-      status: 'todo',
-      priority: prompt.priority,
-      epic_id: prompt.epic_id,
-      product_id: prompt.product_id,
-      order_index: 0,
-      generated_prompt: prompt.generated_prompt,
-      generated_at: prompt.generated_at,
-      is_debug_session: prompt.is_debug_session || false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    // Add immediately to UI and stop loading
-    setPrompts(prev => [duplicatePrompt, ...prev]);
-    setLoading(false); // Stop loading for instant feedback
+    const duplicateData = createDuplicatePromptData(prompt);
+    const optimisticDuplicate: Prompt = { ...duplicateData, id: `temp-${Date.now()}` };
 
     try {
-      const { data, error } = await supabase
-        .from('prompts')
-        .insert({
-          workspace_id: prompt.workspace_id,
-          title: `${prompt.title} (Copy)`,
-          description: prompt.description,
-          status: 'todo',
-          priority: prompt.priority,
-          product_id: prompt.product_id,
-          epic_id: prompt.epic_id,
-          generated_prompt: prompt.generated_prompt,
-          generated_at: prompt.generated_at,
-          order_index: 0
-        })
-        .select()
-        .single();
+      const realPrompt = await withOptimisticUpdate(
+        // Optimistic update - add duplicate immediately
+        prev => [optimisticDuplicate, ...prev],
+        // Database operation
+        async () => {
+          const { data, error } = await supabase
+            .from('prompts')
+            .insert(duplicateData)
+            .select()
+            .single();
+          if (error) throw error;
+          return { ...data, status: data.status as PromptStatus };
+        },
+        // Rollback - remove optimistic duplicate
+        prev => prev.filter(p => p.id !== optimisticDuplicate.id)
+      );
 
-      if (error) {
-        // Rollback on error
-        setPrompts(prev => prev.filter(p => p.id !== duplicatePrompt.id));
-        throw error;
-      }
+      if (!realPrompt) throw new Error('Failed to duplicate prompt');
 
-      // Replace with real data
-      const realPrompt = { ...data, status: data.status as PromptStatus };
-      setPrompts(prev => prev.map(p => p.id === duplicatePrompt.id ? realPrompt : p));
+      // Replace optimistic duplicate with real data
+      setPrompts(prev => prev.map(p => p.id === optimisticDuplicate.id ? realPrompt : p));
 
       toast({
         title: 'Prompt dupliqué',
@@ -323,35 +338,29 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       });
     } catch (error) {
       console.error('Error duplicating prompt:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de dupliquer le prompt',
-        variant: 'destructive'
-      });
+      showErrorToast(error, 'dupliquer le prompt');
     }
   };
 
   // Delete prompt with optimistic update
   const deletePrompt = async (promptId: string): Promise<void> => {
-    // Store for potential rollback
     const promptToDelete = prompts.find(p => p.id === promptId);
-    
-    // Optimistic delete
-    setPrompts(prev => prev.filter(p => p.id !== promptId));
 
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .delete()
-        .eq('id', promptId);
-
-      if (error) {
-        // Rollback on error
-        if (promptToDelete) {
-          setPrompts(prev => [promptToDelete, ...prev]);
-        }
-        throw error;
-      }
+      await withOptimisticUpdate(
+        // Optimistic update - remove immediately
+        prev => prev.filter(p => p.id !== promptId),
+        // Database operation
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .delete()
+            .eq('id', promptId);
+          if (error) throw error;
+        },
+        // Rollback - restore deleted prompt
+        prev => promptToDelete ? [promptToDelete, ...prev] : prev
+      );
 
       toast({
         title: 'Prompt supprimé',
@@ -359,39 +368,31 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       });
     } catch (error) {
       console.error('Error deleting prompt:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer le prompt',
-        variant: 'destructive'
-      });
+      showErrorToast(error, 'supprimer le prompt');
     }
   };
 
   // Update prompt with optimistic update and auto-generation
   const updatePrompt = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
-    // Optimistic update
-    setPrompts(prev => prev.map(p => 
-      p.id === promptId 
-        ? { ...p, ...updates, updated_at: new Date().toISOString() }
-        : p
-    ));
+    const updateData = { ...updates, updated_at: new Date().toISOString() };
 
     try {
-      const { error } = await supabase
-        .from('prompts')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', promptId);
+      await withOptimisticUpdate(
+        // Optimistic update
+        prev => prev.map(p => p.id === promptId ? { ...p, ...updateData } : p),
+        // Database operation
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .update(updateData)
+            .eq('id', promptId);
+          if (error) throw error;
+        },
+        // Rollback - refetch all data
+        () => { fetchPrompts(); return []; }
+      );
 
-      if (error) {
-        // Rollback on error
-        await fetchPrompts();
-        throw error;
-      }
-
-      // 🤖 Auto-generate prompt if description was updated and has sufficient content
+      // Auto-generate prompt if description was updated and has sufficient content
       if (updates.description) {
         // Don't await this - let it run in background
         autoGeneratePrompt(promptId, updates.description);
@@ -403,15 +404,66 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       });
     } catch (error) {
       console.error('Error updating prompt:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour le prompt',
-        variant: 'destructive'
-      });
+      showErrorToast(error, 'mettre à jour le prompt');
     }
   };
 
-  // Real-time subscription
+  // Handle real-time subscription events
+  const handleRealtimeEvent = (payload: any) => {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+
+    setPrompts(prevPrompts => {
+      switch (eventType) {
+        case 'INSERT':
+          // Only add if it's not a temporary optimistic update
+          if (newRecord && !newRecord.id.startsWith('temp-') && !prevPrompts.find(p => p.id === newRecord.id)) {
+            return [newRecord as Prompt, ...prevPrompts];
+          }
+          break;
+
+        case 'UPDATE':
+          // Update existing prompt, preserving important fields if not explicitly updated
+          return prevPrompts.map(prompt => {
+            if (prompt.id === newRecord.id && !prompt.id.startsWith('temp-')) {
+              // Preserve generated_prompt and generated_at if they exist but are not in the update
+              const preservedFields: Partial<Prompt> = {};
+              
+              if (prompt.generated_prompt && !newRecord.generated_prompt) {
+                preservedFields.generated_prompt = prompt.generated_prompt;
+              }
+              
+              if (prompt.generated_at && !newRecord.generated_at) {
+                preservedFields.generated_at = prompt.generated_at;
+              }
+              
+              const updatedPrompt = { 
+                ...prompt, 
+                ...newRecord, 
+                ...preservedFields,
+                status: newRecord.status as PromptStatus 
+              };
+              
+              console.log('Real-time UPDATE:', {
+                promptId: newRecord.id,
+                hadGeneratedPrompt: !!prompt.generated_prompt,
+                updateHasGeneratedPrompt: !!newRecord.generated_prompt,
+                preserved: Object.keys(preservedFields)
+              });
+              
+              return updatedPrompt;
+            }
+            return prompt;
+          });
+
+        case 'DELETE':
+          // Remove deleted prompt
+          return prevPrompts.filter(p => p.id !== oldRecord.id);
+      }
+      return prevPrompts;
+    });
+  };
+
+  // Set up real-time subscription and initial fetch
   useEffect(() => {
     fetchPrompts();
 
@@ -424,61 +476,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
         schema: 'public',
         table: 'prompts',
         filter: `workspace_id=eq.${workspaceId}`,
-      }, (payload) => {
-        const { eventType, new: newRecord, old: oldRecord } = payload;
-
-        setPrompts(prevPrompts => {
-          switch (eventType) {
-            case 'INSERT':
-              // Only add if it's not a temporary optimistic update
-              if (newRecord && !newRecord.id.startsWith('temp-') && !prevPrompts.find(p => p.id === newRecord.id)) {
-                return [newRecord as Prompt, ...prevPrompts];
-              }
-              break;
-
-            case 'UPDATE':
-              // Update existing prompt, preserving important fields if not explicitly updated
-              return prevPrompts.map(prompt => {
-                if (prompt.id === newRecord.id && !prompt.id.startsWith('temp-')) {
-                  // Preserve generated_prompt and generated_at if they exist but are not in the update
-                  const preservedFields: Partial<Prompt> = {};
-                  
-                  // Preserve generated_prompt if it exists in current prompt but not in update
-                  if (prompt.generated_prompt && !newRecord.generated_prompt) {
-                    preservedFields.generated_prompt = prompt.generated_prompt;
-                  }
-                  
-                  // Preserve generated_at if it exists in current prompt but not in update
-                  if (prompt.generated_at && !newRecord.generated_at) {
-                    preservedFields.generated_at = prompt.generated_at;
-                  }
-                  
-                  const updatedPrompt = { 
-                    ...prompt, 
-                    ...newRecord, 
-                    ...preservedFields,
-                    status: newRecord.status as PromptStatus 
-                  };
-                  
-                  console.log('Real-time UPDATE:', {
-                    promptId: newRecord.id,
-                    hadGeneratedPrompt: !!prompt.generated_prompt,
-                    updateHasGeneratedPrompt: !!newRecord.generated_prompt,
-                    preserved: Object.keys(preservedFields)
-                  });
-                  
-                  return updatedPrompt;
-                }
-                return prompt;
-              });
-
-            case 'DELETE':
-              // Remove deleted prompt
-              return prevPrompts.filter(p => p.id !== oldRecord.id);
-          }
-          return prevPrompts;
-        });
-      })
+      }, handleRealtimeEvent)
       .subscribe();
 
     return () => {
