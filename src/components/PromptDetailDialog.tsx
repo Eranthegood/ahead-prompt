@@ -484,6 +484,24 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </Button>
             </div>
 
+            {/* Original Text Display */}
+            {prompt && (prompt.title || prompt.description) && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">Texte original</Label>
+                <div className="p-3 bg-muted/50 border rounded-md">
+                  {prompt.title && (
+                    <div className="font-medium text-sm mb-2">{prompt.title}</div>
+                  )}
+                  {prompt.description && (
+                    <div 
+                      className="text-sm text-muted-foreground prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: prompt.description }}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Rich text editor */}
             <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
               <EditorContent 
