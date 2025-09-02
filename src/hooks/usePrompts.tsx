@@ -57,7 +57,49 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     });
   };
 
-  // Fetch prompts with filtering
+  // Clean up stuck prompts in 'generating' status that already have generated content
+  const cleanupStuckGeneratingPrompts = async (prompts: Prompt[]) => {
+    const stuckPrompts = prompts.filter(p => 
+      p.status === 'generating' && 
+      p.generated_prompt && 
+      p.generated_prompt.trim().length > 0
+    );
+
+    if (stuckPrompts.length > 0) {
+      console.log(`Found ${stuckPrompts.length} stuck prompts in generating status, fixing...`, stuckPrompts.map(p => p.id));
+      
+      // Fix each stuck prompt individually to avoid batch failures
+      for (const prompt of stuckPrompts) {
+        try {
+          const { error } = await supabase
+            .from('prompts')
+            .update({ 
+              status: 'todo',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', prompt.id);
+          
+          if (error) {
+            console.error(`Failed to fix stuck prompt ${prompt.id}:`, error);
+          } else {
+            console.log(`Fixed stuck prompt: ${prompt.id}`);
+          }
+        } catch (error) {
+          console.error(`Error fixing stuck prompt ${prompt.id}:`, error);
+        }
+      }
+      
+      // Show notification if any prompts were fixed
+      if (stuckPrompts.length > 0) {
+        toast({
+          title: "Prompts corrigés",
+          description: `${stuckPrompts.length} prompt(s) bloqué(s) en génération ont été réparés.`,
+        });
+      }
+    }
+  };
+
+  // Fetch prompts with filtering and cleanup
   const fetchPrompts = async () => {
     if (!workspaceId) return;
     
@@ -79,7 +121,13 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPrompts((data || []).map(p => ({ ...p, status: p.status as PromptStatus })));
+      
+      const processedPrompts = (data || []).map(p => ({ ...p, status: p.status as PromptStatus }));
+      setPrompts(processedPrompts);
+
+      // Clean up any stuck prompts after loading
+      await cleanupStuckGeneratingPrompts(processedPrompts);
+      
     } catch (error: any) {
       console.error('Error fetching prompts:', error);
       showErrorToast(error, 'charger les prompts');
@@ -122,14 +170,17 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
   // Auto-generate prompt if content is sufficient
   const autoGeneratePrompt = async (promptId: string, content: string) => {
+    console.log(`Starting auto-generation for prompt ${promptId} with ${content.length} characters`);
+    
     try {
       const cleanContent = stripHtmlAndNormalize(content);
       
       // Only auto-generate if we have sufficient content (more than just a title)
       if (cleanContent.length > 20) {
-        console.log('Auto-generating prompt for sufficient content:', cleanContent.length, 'characters');
+        console.log(`Auto-generating prompt for sufficient content: ${cleanContent.length} characters`);
         
-        // Step 1: Update status to 'generating'
+        // Step 1: Update status to 'generating' with enhanced error handling
+        console.log(`Step 1: Setting status to 'generating' for prompt ${promptId}`);
         await withOptimisticUpdate(
           (prev) => prev.map(p => 
             p.id === promptId 
@@ -145,7 +196,11 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
               })
               .eq('id', promptId);
 
-            if (error) throw error;
+            if (error) {
+              console.error(`Failed to set generating status for prompt ${promptId}:`, error);
+              throw error;
+            }
+            console.log(`Successfully set generating status for prompt ${promptId}`);
           },
           (prev) => prev.map(p => 
             p.id === promptId 
@@ -154,11 +209,18 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
           )
         );
         
-        // Step 2: Call the transform service
-        const response = await PromptTransformService.transformPrompt(content);
+        // Step 2: Call the transform service with timeout
+        console.log(`Step 2: Calling transform service for prompt ${promptId}`);
+        const response = await Promise.race([
+          PromptTransformService.transformPrompt(content),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Transform timeout')), 30000)
+          )
+        ]) as any;
         
         if (response.success && response.transformedPrompt) {
           // Step 3: Update with generated content and change status back to 'todo'
+          console.log(`Step 3: Updating with generated content and setting todo status for prompt ${promptId}`);
           await withOptimisticUpdate(
             (prev) => prev.map(p => 
               p.id === promptId 
@@ -172,17 +234,36 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
                 : p
             ),
             async () => {
-              const { error } = await supabase
+              // Update in two separate calls to ensure robustness
+              const { error: contentError } = await supabase
                 .from('prompts')
                 .update({
                   generated_prompt: response.transformedPrompt,
                   generated_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', promptId);
+
+              if (contentError) {
+                console.error(`Failed to update content for prompt ${promptId}:`, contentError);
+                throw contentError;
+              }
+
+              // Separate status update to ensure it happens
+              const { error: statusError } = await supabase
+                .from('prompts')
+                .update({
                   status: 'todo',
                   updated_at: new Date().toISOString(),
                 })
                 .eq('id', promptId);
 
-              if (error) throw error;
+              if (statusError) {
+                console.error(`Failed to update status to todo for prompt ${promptId}:`, statusError);
+                throw statusError;
+              }
+              
+              console.log(`Successfully completed auto-generation for prompt ${promptId}`);
             },
             (prev) => prev.map(p => 
               p.id === promptId 
@@ -191,69 +272,22 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             )
           );
           
-          console.log('Auto-generated prompt successfully for prompt:', promptId);
+          console.log(`Auto-generated prompt successfully for prompt: ${promptId}`);
           toast({
             title: "Prompt généré !",
             description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
           });
         } else {
           // Failed to generate - revert status to 'todo'
-          await withOptimisticUpdate(
-            (prev) => prev.map(p => 
-              p.id === promptId 
-                ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
-                : p
-            ),
-            async () => {
-              const { error } = await supabase
-                .from('prompts')
-                .update({
-                  status: 'todo',
-                  updated_at: new Date().toISOString(),
-                })
-                .eq('id', promptId);
-
-              if (error) throw error;
-            },
-            (prev) => prev.map(p => 
-              p.id === promptId 
-                ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
-                : p
-            )
-          );
+          console.log(`Transform failed for prompt ${promptId}, reverting to todo`);
+          await revertStatusToTodo(promptId, "Transform service failed");
         }
+      } else {
+        console.log(`Content too short for auto-generation: ${cleanContent.length} characters`);
       }
     } catch (error) {
-      console.log('Auto-generation failed:', error);
-      
-      // On error, revert status to 'todo'
-      try {
-        await withOptimisticUpdate(
-          (prev) => prev.map(p => 
-            p.id === promptId 
-              ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
-              : p
-          ),
-          async () => {
-            const { error } = await supabase
-              .from('prompts')
-              .update({
-                status: 'todo',
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', promptId);
-
-            if (error) throw error;
-          },
-          (prev) => prev.map(p => 
-            p.id === promptId 
-              ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
-              : p
-          )
-        );
-      } catch (revertError) {
-        console.error('Failed to revert status after generation error:', revertError);
-      }
+      console.error(`Auto-generation failed for prompt ${promptId}:`, error);
+      await revertStatusToTodo(promptId, `Auto-generation error: ${error.message}`);
       
       // Show error toast
       toast({
@@ -261,6 +295,57 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
         title: "Erreur de génération",
         description: "Impossible de générer le prompt. Veuillez réessayer.",
       });
+    }
+  };
+
+  // Helper function to revert status to 'todo' with enhanced error handling
+  const revertStatusToTodo = async (promptId: string, reason: string) => {
+    console.log(`Reverting status to 'todo' for prompt ${promptId}. Reason: ${reason}`);
+    try {
+      await withOptimisticUpdate(
+        (prev) => prev.map(p => 
+          p.id === promptId 
+            ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+            : p
+        ),
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .update({
+              status: 'todo',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', promptId);
+
+          if (error) {
+            console.error(`Failed to revert status for prompt ${promptId}:`, error);
+            throw error;
+          }
+          console.log(`Successfully reverted status to 'todo' for prompt ${promptId}`);
+        },
+        (prev) => prev.map(p => 
+          p.id === promptId 
+            ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
+            : p
+        )
+      );
+    } catch (revertError) {
+      console.error(`Failed to revert status after generation error for prompt ${promptId}:`, revertError);
+      // As a last resort, try a direct update without optimistic handling
+      try {
+        const { error } = await supabase
+          .from('prompts')
+          .update({ status: 'todo', updated_at: new Date().toISOString() })
+          .eq('id', promptId);
+        
+        if (error) {
+          console.error(`Last resort revert failed for prompt ${promptId}:`, error);
+        } else {
+          console.log(`Last resort revert succeeded for prompt ${promptId}`);
+        }
+      } catch (lastResortError) {
+        console.error(`Last resort revert also failed for prompt ${promptId}:`, lastResortError);
+      }
     }
   };
 
@@ -595,5 +680,6 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     deletePrompt,
     updatePrompt,
     refetch: fetchPrompts,
+    cleanupStuckGeneratingPrompts: () => cleanupStuckGeneratingPrompts(prompts),
   };
 };

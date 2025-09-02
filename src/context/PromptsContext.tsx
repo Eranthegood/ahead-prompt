@@ -12,6 +12,7 @@ interface PromptsContextValue {
   deletePrompt: (promptId: string) => Promise<void>;
   updatePrompt: (promptId: string, updates: Partial<Prompt>) => Promise<void>;
   refetch: () => Promise<void>;
+  cleanupStuckGeneratingPrompts: () => void;
 }
 
 export const PromptsContext = createContext<PromptsContextValue | undefined>(undefined);
@@ -40,6 +41,7 @@ export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId
     deletePrompt: promptsApi.deletePrompt || (async () => {}),
     updatePrompt: promptsApi.updatePrompt || (async () => {}),
     refetch: promptsApi.refetch || (async () => {}),
+    cleanupStuckGeneratingPrompts: promptsApi.cleanupStuckGeneratingPrompts || (() => {}),
   }), [promptsApi]);
 
   return (
