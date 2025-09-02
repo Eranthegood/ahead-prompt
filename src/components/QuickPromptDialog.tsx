@@ -86,25 +86,27 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     ? epics.filter(epic => epic.product_id === activeProductId)
     : epics;
 
-  // Reset form when dialog opens (only if no draft is restored)
+  // Reset form when dialog opens - ALWAYS start fresh
   useEffect(() => {
     if (isOpen && editor) {
-      // Only reset if no draft was restored
+      // Always clear draft and reset form for a fresh start
+      clearDraft();
+      
       setTimeout(() => {
-        if (!draftRestored && editor.isEmpty) {
-          editor.commands.setContent('');
-          setSelectedEpic('none');
-          setSelectedPriority(2);
-          setHasContent(false);
-          setGeneratedPrompt('');
-          setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
-        }
+        editor.commands.setContent('');
+        setSelectedEpic('none');
+        setSelectedPriority(2);
+        setHasContent(false);
+        setGeneratedPrompt('');
+        setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
+        setDraftRestored(false);
+        
         if (editor.view) {
           editor.commands.focus();
         }
       }, 100);
     }
-  }, [isOpen, editor, selectedProductId, products, draftRestored]);
+  }, [isOpen, editor, selectedProductId, products, clearDraft]);
 
   // Handle save with immediate creation and background AI generation
   const handleSave = async () => {
