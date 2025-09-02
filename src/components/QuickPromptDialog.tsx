@@ -141,6 +141,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       // Save immediately for instant UI feedback
       const createdPrompt = await onSave(promptData);
       
+      // Verify creation was successful
+      if (!createdPrompt?.id) {
+        throw new Error('Failed to create prompt - no ID returned');
+      }
+      
       // Clear draft after successful save
       clearDraft();
       
