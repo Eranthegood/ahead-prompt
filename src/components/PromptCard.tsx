@@ -8,7 +8,9 @@ import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { GeneratingLoader } from '@/components/ui/generating-loader';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
+import { isPromptUsable } from '@/lib/utils';
 
 interface PromptCardProps {
   prompt: Prompt & {
@@ -50,6 +52,7 @@ export function PromptCard({
   const [justCopied, setJustCopied] = useState(false);
   const priority = prompt.priority || 3;
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
+  const isUsable = isPromptUsable(prompt);
 
   return (
     <PromptContextMenu
@@ -60,7 +63,7 @@ export function PromptCard({
       <Card 
         className={`hover:shadow-sm transition-all cursor-pointer ${
           isHovered ? 'ring-2 ring-primary/50 shadow-lg' : ''
-        }`}
+        } ${!isUsable ? 'opacity-60' : ''}`}
         onMouseEnter={() => onHover?.(prompt.id)}
         onMouseLeave={() => onHover?.(null)}
       >
@@ -148,24 +151,43 @@ export function PromptCard({
                 
                 <div className="flex items-center gap-2 ml-4">
                   {/* Quick Copy Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setJustCopied(true);
-                      setTimeout(() => setJustCopied(false), 1200);
-                      onCopyGenerated(prompt);
-                    }}
-                    className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
-                    title="Copy auto-generated prompt"
-                  >
-                    {justCopied ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isUsable) return;
+                            setJustCopied(true);
+                            setTimeout(() => setJustCopied(false), 1200);
+                            onCopyGenerated(prompt);
+                          }}
+                          disabled={!isUsable}
+                          className={`h-8 w-8 p-0 transition-opacity ${
+                            !isUsable 
+                              ? 'opacity-30 cursor-not-allowed' 
+                              : 'opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          {justCopied ? (
+                            <Check className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      {!isUsable && (
+                        <TooltipContent>
+                          {prompt.status === 'generating' 
+                            ? 'Prompt en cours de génération' 
+                            : 'Description trop courte pour être exploitable'
+                          }
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                   
                   {/* Status Badge - Click to cycle through statuses */}
                   <Badge 

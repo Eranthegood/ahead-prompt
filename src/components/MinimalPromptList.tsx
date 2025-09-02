@@ -12,6 +12,7 @@ import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { PromptCard } from '@/components/PromptCard';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
+import { isPromptUsable } from '@/lib/utils';
 
 interface MinimalPromptListProps {
   workspace: Workspace;
@@ -148,6 +149,18 @@ export function MinimalPromptList({
 
   const handleCopyGenerated = async (prompt: Prompt) => {
     try {
+      // Check if prompt is usable before proceeding
+      if (!isPromptUsable(prompt)) {
+        toast({
+          title: 'Prompt non exploitable',
+          description: prompt.status === 'generating' 
+            ? 'Attendez la fin de la génération' 
+            : 'Description trop courte pour générer un prompt',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       // If a generated prompt already exists, use it directly
       if (prompt.generated_prompt) {
         await navigator.clipboard.writeText(prompt.generated_prompt);
