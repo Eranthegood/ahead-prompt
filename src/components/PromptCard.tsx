@@ -48,6 +48,7 @@ export function PromptCard({
   onHover
 }: PromptCardProps) {
   const [justCopied, setJustCopied] = useState(false);
+  const [isSliding, setIsSliding] = useState(false);
   const priority = prompt.priority || 3;
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
   const isUsable = isPromptUsable(prompt);
@@ -61,7 +62,7 @@ export function PromptCard({
       <Card 
         className={`hover:shadow-sm transition-all cursor-pointer ${
           isHovered ? 'ring-2 ring-primary/50 shadow-lg' : ''
-        } ${!isUsable ? 'opacity-60' : ''}`}
+        } ${!isUsable ? 'opacity-60' : ''} ${isSliding ? 'animate-slide-out-right' : ''}`}
         onMouseEnter={() => onHover?.(prompt.id)}
         onMouseLeave={() => onHover?.(null)}
       >
@@ -187,7 +188,15 @@ export function PromptCard({
                       const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
                       const nextIndex = (currentIndex + 1) % statusOptions.length;
                       const nextStatus = statusOptions[nextIndex].value as PromptStatus;
-                      onStatusChange(prompt, nextStatus);
+                      
+                      if (nextStatus === 'done') {
+                        setIsSliding(true);
+                        setTimeout(() => {
+                          onStatusChange(prompt, nextStatus);
+                        }, 300);
+                      } else {
+                        onStatusChange(prompt, nextStatus);
+                      }
                     }}
                   >
                     {prompt.status === 'in_progress' ? 'In Progress' : 
@@ -250,7 +259,16 @@ export function PromptCard({
                               key={option.value}
                               onClick={(e) => {
                                 e.preventDefault();
-                                onStatusChange(prompt, option.value as PromptStatus);
+                                const status = option.value as PromptStatus;
+                                
+                                if (status === 'done') {
+                                  setIsSliding(true);
+                                  setTimeout(() => {
+                                    onStatusChange(prompt, status);
+                                  }, 300);
+                                } else {
+                                  onStatusChange(prompt, status);
+                                }
                               }}
                               disabled={option.value === prompt.status}
                               className="flex items-center justify-between"

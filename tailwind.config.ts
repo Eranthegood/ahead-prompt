@@ -149,6 +149,16 @@ export default {
 						transform: 'scale(1) rotate(0deg)',
 						opacity: '0'
 					}
+				},
+				'slide-out-right': {
+					'0%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateX(100%)',
+						opacity: '0'
+					}
 				}
 			},
 			animation: {
@@ -157,7 +167,8 @@ export default {
 				'xp-float': 'xp-float 2s ease-out forwards',
 				'progress-fill': 'progress-fill 0.8s ease-out',
 				'level-glow': 'level-glow 1.5s ease-in-out',
-				'celebration': 'celebration 2s ease-in-out'
+				'celebration': 'celebration 2s ease-in-out',
+				'slide-out-right': 'slide-out-right 0.3s ease-in-out forwards'
 			}
 		}
 	},
