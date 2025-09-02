@@ -32,8 +32,7 @@ export function MinimalPromptList({
   searchQuery, 
   hoveredPromptId, 
   onPromptHover,
-  onCopy,
-  showCompletedItems = false
+  onCopy
 }: MinimalPromptListProps) {
   const promptsContext = usePromptsContext();
   const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
@@ -56,7 +55,8 @@ export function MinimalPromptList({
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const isNotDone = showCompletedItems || prompt.status !== 'done';
+    // Always hide completed prompts
+    const isNotDone = prompt.status !== 'done';
 
     return matchesProduct && matchesEpic && matchesSearch && isNotDone;
   });

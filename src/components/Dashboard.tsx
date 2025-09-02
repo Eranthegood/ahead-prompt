@@ -139,7 +139,7 @@ const Dashboard = () => {
             onSearchChange={setSearchQuery}
           />
           
-          <MinimalPromptList 
+          <MinimalPromptList
             workspace={workspace}
             selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
             selectedEpicId={selectedEpicId}
@@ -147,7 +147,6 @@ const Dashboard = () => {
             hoveredPromptId={hoveredPromptId}
             onPromptHover={setHoveredPromptId}
             onCopy={handleCopyPrompt}
-            showCompletedItems={preferences.showCompletedItems}
           />
         </div>
 
