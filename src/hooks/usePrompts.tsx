@@ -123,8 +123,9 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       updated_at: new Date().toISOString(),
     };
 
-    // Add immediately to UI
+    // Add immediately to UI and stop loading
     setPrompts(prev => [optimisticPrompt, ...prev]);
+    setLoading(false); // Stop loading immediately for instant feedback
 
     try {
       // 📡 2. Send to database
@@ -284,8 +285,9 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       updated_at: new Date().toISOString(),
     };
 
-    // Add immediately to UI
+    // Add immediately to UI and stop loading
     setPrompts(prev => [duplicatePrompt, ...prev]);
+    setLoading(false); // Stop loading for instant feedback
 
     try {
       const { data, error } = await supabase
