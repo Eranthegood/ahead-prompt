@@ -44,11 +44,19 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
   // Helper function to show contextual error messages
   const showErrorToast = (error: any, context: string) => {
-    let description = `Impossible de ${context}. Veuillez réessayer.`;
+    let description = `Erreur impossible de sauvegarder la modification. ${context}. Veuillez réessayer.`;
     
     if (error.message?.includes('epic_id')) {
       description = 'L\'epic sélectionné n\'existe pas.';
+    } else if (error.message?.includes('product_id')) {
+      description = 'Le produit sélectionné n\'existe pas.';
+    } else if (error.message?.includes('workspace_id')) {
+      description = 'Workspace invalide.';
+    } else if (error.message?.includes('title')) {
+      description = 'Le titre est requis.';
     }
+
+    console.error(`Error in ${context}:`, error);
 
     toast({
       title: 'Erreur',
@@ -155,18 +163,23 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   });
 
   // Prepare database payload from prompt data
-  const createDatabasePayload = (promptData: CreatePromptData) => ({
-    workspace_id: workspaceId!,
-    title: promptData.title.trim(),
-    description: promptData.description?.trim() || undefined,
-    status: promptData.status || 'todo',
-    priority: promptData.priority || 2,
-    epic_id: promptData.epic_id || undefined,
-    product_id: promptData.product_id || undefined,
-    generated_prompt: promptData.generated_prompt || undefined,
-    generated_at: promptData.generated_at || undefined,
-    order_index: 0,
-  });
+  const createDatabasePayload = (promptData: CreatePromptData) => {
+    const payload = {
+      workspace_id: workspaceId!,
+      title: promptData.title.trim(),
+      description: promptData.description?.trim() || null,
+      status: promptData.status || 'todo',
+      priority: promptData.priority || 2,
+      epic_id: promptData.epic_id || null,
+      product_id: promptData.product_id || null,
+      generated_prompt: promptData.generated_prompt || null,
+      generated_at: promptData.generated_at || null,
+      order_index: 0,
+    };
+    
+    console.log('CreateDatabasePayload: Generated payload:', payload);
+    return payload;
+  };
 
   // Auto-generate prompt if content is sufficient
   const autoGeneratePrompt = async (promptId: string, content: string) => {
@@ -352,6 +365,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   // Insert prompt into database
   const insertPromptToDatabase = async (promptData: CreatePromptData) => {
     const payload = createDatabasePayload(promptData);
+    console.log('InsertPrompt: Database payload:', payload);
     
     const { data, error } = await supabase
       .from('prompts')
@@ -359,7 +373,12 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('InsertPrompt: Database error:', error);
+      throw error;
+    }
+    
+    console.log('InsertPrompt: Database response:', data);
     return { ...data, status: data.status as PromptStatus };
   };
 
@@ -383,21 +402,48 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
   // Create prompt with optimistic update and auto-generation
   const createPrompt = async (promptData: CreatePromptData): Promise<Prompt | null> => {
-    if (!workspaceId) return null;
+    if (!workspaceId) {
+      console.error('CreatePrompt: No workspace ID provided');
+      return null;
+    }
+
+    console.log('CreatePrompt: Starting with data:', promptData);
+
+    // Validate required fields
+    if (!promptData.title || promptData.title.trim().length === 0) {
+      console.error('CreatePrompt: Title is required');
+      showErrorToast(new Error('Title is required'), 'créer le prompt');
+      return null;
+    }
 
     const optimisticPrompt = createOptimisticPrompt(promptData);
+    console.log('CreatePrompt: Created optimistic prompt:', optimisticPrompt);
 
     try {
       const realPrompt = await withOptimisticUpdate(
         // Optimistic update - add immediately to UI
-        prev => [optimisticPrompt, ...prev],
+        prev => {
+          console.log('CreatePrompt: Adding optimistic prompt to UI');
+          return [optimisticPrompt, ...prev];
+        },
         // Database operation
-        () => insertPromptToDatabase(promptData),
+        async () => {
+          console.log('CreatePrompt: Inserting to database');
+          return await insertPromptToDatabase(promptData);
+        },
         // Rollback - remove optimistic prompt
-        prev => prev.filter(p => p.id !== optimisticPrompt.id)
+        prev => {
+          console.log('CreatePrompt: Rolling back optimistic update');
+          return prev.filter(p => p.id !== optimisticPrompt.id);
+        }
       );
 
-      if (!realPrompt) throw new Error('Failed to create prompt');
+      if (!realPrompt) {
+        console.error('CreatePrompt: Database operation returned null');
+        throw new Error('Failed to create prompt');
+      }
+
+      console.log('CreatePrompt: Successfully created prompt:', realPrompt);
 
       // Replace optimistic prompt with real data
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
@@ -407,7 +453,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
       return realPrompt;
     } catch (error) {
-      console.error('Error creating prompt:', error);
+      console.error('CreatePrompt: Error creating prompt:', error);
       showErrorToast(error, 'créer le prompt');
       return null;
     }
