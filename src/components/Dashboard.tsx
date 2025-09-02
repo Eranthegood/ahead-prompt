@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
+import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { DebugConsole } from '@/components/debug/DebugConsole';
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
+  const [showMetrics, setShowMetrics] = useState(false);
   
   const { workspace, loading } = useWorkspace();
   const promptsContext = usePromptsContext();
@@ -137,7 +139,16 @@ const Dashboard = () => {
             workspace={workspace}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            showMetrics={showMetrics}
+            onToggleMetrics={() => setShowMetrics(!showMetrics)}
           />
+          
+          {/* Metrics Dashboard - conditionally shown */}
+          {showMetrics && (
+            <div className="p-4 border-b bg-muted/20">
+              <MetricsDashboard />
+            </div>
+          )}
           
           <MinimalPromptList
             workspace={workspace}
@@ -166,6 +177,14 @@ const Dashboard = () => {
           products={products}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
           selectedEpicId={selectedEpicId}
+          onCreateProduct={() => {
+            // Simple callback pour ouvrir une création de produit
+            console.log('Create product requested - implement product creation dialog');
+          }}
+          onCreateEpic={() => {
+            // Simple callback pour ouvrir une création d'épique
+            console.log('Create epic requested - implement epic creation dialog');
+          }}
         />
 
         <DebugConsole

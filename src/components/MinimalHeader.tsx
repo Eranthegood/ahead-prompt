@@ -1,7 +1,8 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Search } from 'lucide-react';
+import { Search, TrendingUp } from 'lucide-react';
 import { Workspace } from '@/types';
 import { UserDropdownMenu } from './UserDropdownMenu';
 
@@ -9,9 +10,17 @@ interface MinimalHeaderProps {
   workspace: Workspace;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  showMetrics?: boolean;
+  onToggleMetrics?: () => void;
 }
 
-export function MinimalHeader({ workspace, searchQuery, onSearchChange }: MinimalHeaderProps) {
+export function MinimalHeader({ 
+  workspace, 
+  searchQuery, 
+  onSearchChange, 
+  showMetrics = false, 
+  onToggleMetrics 
+}: MinimalHeaderProps) {
 
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
@@ -31,6 +40,17 @@ export function MinimalHeader({ workspace, searchQuery, onSearchChange }: Minima
       </div>
 
       <div className="flex items-center gap-3">
+        {onToggleMetrics && (
+          <Button
+            variant={showMetrics ? 'default' : 'outline'}
+            size="sm"
+            onClick={onToggleMetrics}
+            className="text-xs"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Métriques
+          </Button>
+        )}
         <UserDropdownMenu />
       </div>
     </header>

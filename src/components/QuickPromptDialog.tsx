@@ -8,6 +8,8 @@ import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, R
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { ProductEpicSelector } from '@/components/ProductEpicSelector';
+import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import type { Workspace, Epic, Product, PromptPriority } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -30,6 +32,8 @@ interface QuickPromptDialogProps {
   products?: Product[];
   selectedProductId?: string;
   selectedEpicId?: string;
+  onCreateProduct?: () => void;
+  onCreateEpic?: () => void;
 }
 
 // Formatting toolbar component for rich text editor
@@ -81,11 +85,17 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   products = [],
   selectedProductId,
   selectedEpicId,
+  onCreateProduct,
+  onCreateEpic,
 }) => {
   // Form state
-  const [selectedEpic, setSelectedEpic] = useState<string>('none');
-  const [selectedProduct, setSelectedProduct] = useState<string>('none');
+  const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
   const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
+  
+  // Performance tracking
+  const [startTime] = useState(Date.now());
+  const { trackPromptCreation, trackError } = usePromptMetrics();
   
   // UI state
   const [isLoading, setIsLoading] = useState(false);
@@ -135,10 +145,10 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     
     clearDraft();
     editor.commands.setContent('');
-    setSelectedEpic(selectedEpicId || 'none');
+    setSelectedEpic(selectedEpicId || null);
     setSelectedPriority(2);
     setHasContent(false);
-    setSelectedProduct(selectedProductId || 'none');
+    setSelectedProduct(selectedProductId || null);
     setDraftRestored(false);
     
     // Focus editor after a brief delay to ensure DOM is ready
@@ -149,15 +159,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
   // Create prompt data object from form state
   const createPromptData = (content: string): CreatePromptData => {
-    const resolvedProductId = selectedEpic === 'none'
-      ? (selectedProductId ?? (selectedProduct !== 'none' ? selectedProduct : undefined))
-      : undefined;
-
     return {
       title: generateTitleFromContent(content),
       description: content,
-      epic_id: selectedEpic === 'none' ? undefined : selectedEpic,
-      product_id: resolvedProductId,
+      epic_id: selectedEpic || undefined,
+      product_id: selectedProduct || undefined,
       priority: selectedPriority,
     };
   };
@@ -177,11 +183,22 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       const promptData = createPromptData(content);
       await onSave(promptData);
       
+      // Track performance metrics
+      const responseTime = Date.now() - startTime;
+      trackPromptCreation(responseTime, {
+        hasProduct: !!selectedProduct,
+        hasEpic: !!selectedEpic,
+        priority: selectedPriority,
+        contentLength: content.length,
+      });
+      
+      console.log(`Prompt creation completed in ${responseTime}ms`);
+      
       // Clear draft and show success
       clearDraft();
       toast({
-        title: 'Prompt created!',
-        description: 'Your prompt will be generated automatically.',
+        title: 'Prompt créé!',
+        description: 'Votre prompt va être généré automatiquement.',
         variant: 'default'
       });
       
@@ -189,9 +206,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       
     } catch (error) {
       console.error('Error saving prompt:', error);
+      trackError(error as Error, {
+        hasProduct: !!selectedProduct,
+        hasEpic: !!selectedEpic,
+        contentLength: content.length,
+      });
       toast({
-        title: 'Error',
-        description: 'Failed to create prompt. Please try again.',
+        title: 'Erreur',
+        description: 'Impossible de créer le prompt. Veuillez réessayer.',
         variant: 'destructive'
       });
     } finally {
@@ -209,20 +231,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     }
   };
 
-  // Handle product selection and clear epic if product changes
-  const handleProductChange = (value: string) => {
-    setSelectedProduct(value);
-    if (value !== 'none') {
-      setSelectedEpic('none');
-    }
+  // Handle product and epic selection
+  const handleProductChange = (productId: string | null) => {
+    setSelectedProduct(productId);
+    console.log('Product selected:', productId ? products.find(p => p.id === productId)?.name : 'none');
   };
 
-  // Handle epic selection and clear product if epic changes
-  const handleEpicChange = (value: string) => {
-    setSelectedEpic(value);
-    if (value !== 'none') {
-      setSelectedProduct('none');
-    }
+  const handleEpicChange = (epicId: string | null) => {
+    setSelectedEpic(epicId);
+    console.log('Epic selected:', epicId ? epics.find(e => e.id === epicId)?.name : 'none');
   };
 
   // Reset form when dialog opens
@@ -280,7 +297,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   Priorité
                 </label>
                 <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
-                  <SelectTrigger className="h-10">
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="Sélectionner une priorité..." />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border shadow-lg z-50">
@@ -296,65 +313,18 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 </Select>
               </div>
 
-              {/* Product selector */}
-              {products.length > 0 && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Product (optional)
-                  </label>
-                  <Select value={selectedProduct} onValueChange={handleProductChange}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select a product..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                      <SelectItem value="none">
-                        <span className="text-muted-foreground">No product</span>
-                      </SelectItem>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-2 h-2 rounded-full" 
-                              style={{ backgroundColor: product.color }}
-                            />
-                            {product.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              {/* Epic selector */}
-              {filteredEpics.length > 0 && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Epic (optional)
-                  </label>
-                  <Select value={selectedEpic} onValueChange={handleEpicChange}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select an epic..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                      <SelectItem value="none">
-                        <span className="text-muted-foreground">No epic</span>
-                      </SelectItem>
-                      {filteredEpics.map((epic) => (
-                        <SelectItem key={epic.id} value={epic.id}>
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-2 h-2 rounded-full" 
-                              style={{ backgroundColor: epic.color }}
-                            />
-                            {epic.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              {/* Enhanced Product/Epic Selector */}
+              <ProductEpicSelector
+                products={products}
+                epics={epics}
+                selectedProductId={selectedProduct}
+                selectedEpicId={selectedEpic}
+                onProductChange={handleProductChange}
+                onEpicChange={handleEpicChange}
+                showCreateButtons={true}
+                onCreateProduct={onCreateProduct}
+                onCreateEpic={onCreateEpic}
+              />
             </div>
           </div>
         </div>
@@ -368,7 +338,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             onClick={handleSave} 
             disabled={!hasContent || isLoading}
           >
-            {isLoading ? 'Saving...' : 'Save'}
+            {isLoading ? 'Enregistrement...' : 'Enregistrer'}
           </Button>
         </div>
       </DialogContent>
