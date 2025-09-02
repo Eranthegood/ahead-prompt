@@ -68,8 +68,8 @@ export function PromptCard({
         onMouseLeave={() => onHover?.(null)}
       >
         <CardContent className="p-4">
-          {/* Show generating loader when status is generating */}
-          {(prompt.status as string) === 'generating' ? (
+          {/* Show generating loader when status is generating AND no generated content exists yet */}
+          {(prompt.status as string) === 'generating' && !prompt.generated_prompt ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <GeneratingLoader className="mb-3" />
               <div className="text-sm font-medium text-foreground mb-1">{prompt.title}</div>
