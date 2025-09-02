@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -24,7 +24,6 @@ interface PromptCardProps {
   onCopyGenerated: (prompt: Prompt) => void;
   isHovered?: boolean;
   onHover?: (promptId: string | null) => void;
-  copyTrigger?: number; // Used to trigger copy animation from parent
 }
 
 const statusOptions = [
@@ -44,24 +43,11 @@ export function PromptCard({
   onCopy,
   onCopyGenerated,
   isHovered,
-  onHover,
-  copyTrigger
+  onHover
 }: PromptCardProps) {
-  const [isCopyAnimating, setIsCopyAnimating] = useState(false);
+  const [justCopied, setJustCopied] = useState(false);
   const priority = prompt.priority || 3;
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
-
-  // Trigger copy animation when copyTrigger changes
-  useEffect(() => {
-    if (copyTrigger) {
-      setIsCopyAnimating(true);
-      const timer = setTimeout(() => {
-        setIsCopyAnimating(false);
-      }, 3000); // 3 seconds animation
-      
-      return () => clearTimeout(timer);
-    }
-  }, [copyTrigger]);
 
   return (
     <PromptContextMenu
@@ -156,18 +142,18 @@ export function PromptCard({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsCopyAnimating(true);
-                  setTimeout(() => setIsCopyAnimating(false), 3000);
+                  setJustCopied(true);
+                  setTimeout(() => setJustCopied(false), 1200);
                   onCopyGenerated(prompt);
                 }}
-                className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-all duration-300"
+                className="h-8 w-8 p-0 opacity-60 hover:opacity-100 transition-opacity"
                 title="Copy auto-generated prompt"
               >
-                <Copy className={`h-4 w-4 transition-all duration-300 ${
-                  isCopyAnimating 
-                    ? 'text-green-500 scale-110 animate-pulse' 
-                    : ''
-                }`} />
+                {justCopied ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
               
               {/* Status Badge - Click to cycle through statuses */}
