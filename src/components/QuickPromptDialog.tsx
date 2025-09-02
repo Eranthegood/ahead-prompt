@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,7 +6,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useGamification } from '@/hooks/useGamification';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import type { Workspace, Epic, Product, PromptPriority } from '@/types';
@@ -95,7 +93,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [draftRestored, setDraftRestored] = useState(false);
   
   const { toast } = useToast();
-  const { awardXP } = useGamification();
 
   // Initialize rich text editor
   const editor = useEditor({
@@ -165,28 +162,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     };
   };
 
-  // Handle AI generation in background after prompt creation
-  const startBackgroundGeneration = async (promptId: string, content: string) => {
-    try {
-      const { data } = await supabase.functions.invoke('generate-prompt-background', {
-        body: { promptId, rawText: content }
-      });
-      
-      if (data?.success) {
-        awardXP('AI_GENERATION');
-        toast({
-          title: 'AI generation complete!',
-          description: 'Your prompt has been enhanced.',
-          variant: 'default'
-        });
-      }
-    } catch (error) {
-      console.error('Background AI generation failed:', error);
-      // Silent failure - prompt was already created successfully
-    }
-  };
 
-  // Main save handler - creates prompt immediately, then starts AI generation
+  // Main save handler - creates prompt and lets usePrompts handle generation
   const handleSave = async () => {
     if (!editor) return;
     
@@ -196,27 +173,19 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     setIsLoading(true);
     
     try {
-      // Create prompt data and save immediately
+      // Create prompt data and save
       const promptData = createPromptData(content);
-      const createdPrompt = await onSave(promptData);
-      
-      // Verify prompt creation was successful
-      if (!createdPrompt?.id) {
-        throw new Error('Failed to create prompt - no ID returned');
-      }
+      await onSave(promptData);
       
       // Clear draft and show success
       clearDraft();
       toast({
         title: 'Prompt created!',
-        description: 'AI generation starting in background...',
+        description: 'Your prompt will be generated automatically.',
         variant: 'default'
       });
       
       onClose();
-      
-      // Start background AI generation (non-blocking)
-      startBackgroundGeneration(createdPrompt.id, content);
       
     } catch (error) {
       console.error('Error saving prompt:', error);
