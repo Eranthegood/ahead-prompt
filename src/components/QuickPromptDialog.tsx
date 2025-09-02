@@ -321,9 +321,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 selectedEpicId={selectedEpic}
                 onProductChange={handleProductChange}
                 onEpicChange={handleEpicChange}
-                showCreateButtons={true}
-                onCreateProduct={onCreateProduct}
-                onCreateEpic={onCreateEpic}
               />
             </div>
           </div>
