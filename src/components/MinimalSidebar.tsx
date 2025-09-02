@@ -23,7 +23,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2, Trophy } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy } from 'lucide-react';
 import { Workspace } from '@/types';
 
 import { AdaptiveTitle } from './ui/adaptive-title';
@@ -51,8 +51,8 @@ const PRODUCT_COLORS = [
 ];
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
-  const { products, createProduct, deleteProduct } = useProducts(workspace.id);
-  const { epics, createEpic } = useEpics(workspace.id);
+  const { products, createProduct, updateProduct, deleteProduct } = useProducts(workspace.id);
+  const { epics, createEpic, updateEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats } = useGamification();
@@ -77,6 +77,22 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   });
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingEpic, setIsCreatingEpic] = useState(false);
+  
+  // Edit states
+  const [isEditProductOpen, setIsEditProductOpen] = useState(false);
+  const [isEditEpicOpen, setIsEditEpicOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingEpic, setEditingEpic] = useState<any>(null);
+  const [editProductData, setEditProductData] = useState({
+    name: '',
+    description: '',
+    color: '#3B82F6'
+  });
+  const [editEpicData, setEditEpicData] = useState({
+    name: '',
+    description: '',
+    color: '#8B5CF6'
+  });
 
   // Filter function to match search and exclude completed
   const getActivePrompts = (productFilter?: string, epicFilter?: string) => {
@@ -206,6 +222,68 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         onProductSelect('all');
         onEpicSelect(undefined);
       }
+    }
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setEditProductData({
+      name: product.name,
+      description: product.description || '',
+      color: product.color || '#3B82F6'
+    });
+    setIsEditProductOpen(true);
+  };
+
+  const handleEditEpic = (epic: any) => {
+    setEditingEpic(epic);
+    setEditEpicData({
+      name: epic.name,
+      description: epic.description || '',
+      color: epic.color || '#8B5CF6'
+    });
+    setIsEditEpicOpen(true);
+  };
+
+  const handleUpdateProduct = async () => {
+    if (!editingProduct || !editProductData.name.trim()) return;
+
+    setIsCreating(true);
+    try {
+      await updateProduct(editingProduct.id, {
+        name: editProductData.name.trim(),
+        description: editProductData.description.trim() || undefined,
+        color: editProductData.color
+      });
+
+      setIsEditProductOpen(false);
+      setEditProductData({ name: '', description: '', color: '#3B82F6' });
+      setEditingProduct(null);
+    } catch (error) {
+      console.error('Error updating product:', error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleUpdateEpic = async () => {
+    if (!editingEpic || !editEpicData.name.trim()) return;
+
+    setIsCreating(true);
+    try {
+      await updateEpic(editingEpic.id, {
+        name: editEpicData.name.trim(),
+        description: editEpicData.description.trim() || undefined,
+        color: editEpicData.color
+      });
+
+      setIsEditEpicOpen(false);
+      setEditEpicData({ name: '', description: '', color: '#8B5CF6' });
+      setEditingEpic(null);
+    } catch (error) {
+      console.error('Error updating epic:', error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -515,6 +593,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                     <Hash className="h-4 w-4" />
                                     Create Epic
                                   </ContextMenuItem>
+                                  <ContextMenuItem 
+                                    onClick={() => handleEditProduct(product)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Edit3 className="h-4 w-4" />
+                                    Edit Product
+                                  </ContextMenuItem>
                                   <ContextMenuSeparator />
                                   <ContextMenuItem 
                                     onClick={() => handleDeleteProduct(product.id)}
@@ -532,39 +617,51 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                               <div className="space-y-1">
                                 {product.epics.length > 0 && (
                                   <>
-                                    {product.epics.map((epic) => (
-                                      <SidebarMenuButton
-                                        key={epic.id}
-                                        className="w-full justify-between text-xs"
-                                        onClick={() => {
-                                          onProductSelect(product.id);
-                                          onEpicSelect(epic.id);
-                                        }}
-                                        isActive={selectedEpicId === epic.id}
-                                        aria-label={`Epic: ${epic.name} (${epic.promptCount} prompts)`}
-                                      >
-                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                          <div 
-                                            className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
-                                            style={{ backgroundColor: epic.color || '#8B5CF6' }}
-                                          />
-                                          <Hash className="h-3 w-3 flex-shrink-0" />
-                                          <AdaptiveTitle 
-                                            className="text-xs"
-                                            reservedSpace={30}
-                                            minSize={10}
-                                            maxSize={12}
-                                          >
-                                            {epic.name}
-                                          </AdaptiveTitle>
-                                        </div>
-                                        {epic.promptCount > 0 && (
-                                          <Badge variant="outline" className="text-xs h-4">
-                                            {epic.promptCount}
-                                          </Badge>
-                                        )}
-                                      </SidebarMenuButton>
-                                    ))}
+                                     {product.epics.map((epic) => (
+                                       <ContextMenu key={epic.id}>
+                                         <ContextMenuTrigger asChild>
+                                           <SidebarMenuButton
+                                             className="w-full justify-between text-xs"
+                                             onClick={() => {
+                                               onProductSelect(product.id);
+                                               onEpicSelect(epic.id);
+                                             }}
+                                             isActive={selectedEpicId === epic.id}
+                                             aria-label={`Epic: ${epic.name} (${epic.promptCount} prompts)`}
+                                           >
+                                             <div className="flex items-center gap-2 min-w-0 flex-1">
+                                               <div 
+                                                 className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
+                                                 style={{ backgroundColor: epic.color || '#8B5CF6' }}
+                                               />
+                                               <Hash className="h-3 w-3 flex-shrink-0" />
+                                               <AdaptiveTitle 
+                                                 className="text-xs"
+                                                 reservedSpace={30}
+                                                 minSize={10}
+                                                 maxSize={12}
+                                               >
+                                                 {epic.name}
+                                               </AdaptiveTitle>
+                                             </div>
+                                             {epic.promptCount > 0 && (
+                                               <Badge variant="outline" className="text-xs h-4">
+                                                 {epic.promptCount}
+                                               </Badge>
+                                             )}
+                                           </SidebarMenuButton>
+                                         </ContextMenuTrigger>
+                                         <ContextMenuContent className="w-48">
+                                           <ContextMenuItem 
+                                             onClick={() => handleEditEpic(epic)}
+                                             className="flex items-center gap-2"
+                                           >
+                                             <Edit3 className="h-4 w-4" />
+                                             Edit Epic
+                                           </ContextMenuItem>
+                                         </ContextMenuContent>
+                                       </ContextMenu>
+                                     ))}
                                   </>
                                 )}
                                 
@@ -780,6 +877,169 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 >
                   {isCreatingEpic ? 'Creating...' : 'Create'}
                 </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Product Dialog */}
+      <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              Edit Product
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-product-name">Product name</Label>
+              <Input
+                id="edit-product-name"
+                value={editProductData.name}
+                onChange={(e) => setEditProductData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g. Mobile App, Website..."
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-product-description">Description (optional)</Label>
+              <Textarea
+                id="edit-product-description"
+                value={editProductData.description}
+                onChange={(e) => setEditProductData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Briefly describe this product..."
+                rows={3}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Color</Label>
+              <div className="flex items-center gap-2 mt-2">
+                {PRODUCT_COLORS.map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    onClick={() => setEditProductData(prev => ({ ...prev, color: color.value }))}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      editProductData.color === color.value 
+                        ? 'border-primary scale-110' 
+                        : 'border-muted hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    title={color.label}
+                  />
+                ))}
+                <div className="flex items-center gap-2 ml-2">
+                  <Palette className="w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="color"
+                    value={editProductData.color}
+                    onChange={(e) => setEditProductData(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-8 h-8 rounded border cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditProductOpen(false)}
+                disabled={isCreating}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdateProduct}
+                disabled={!editProductData.name.trim() || isCreating}
+              >
+                {isCreating ? 'Updating...' : 'Update'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Epic Dialog */}
+      <Dialog open={isEditEpicOpen} onOpenChange={setIsEditEpicOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Hash className="w-5 h-5" />
+              Edit Epic
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-epic-name">Epic name</Label>
+              <Input
+                id="edit-epic-name"
+                value={editEpicData.name}
+                onChange={(e) => setEditEpicData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g. Authentication, Dashboard..."
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-epic-description">Description (optional)</Label>
+              <Textarea
+                id="edit-epic-description"
+                value={editEpicData.description}
+                onChange={(e) => setEditEpicData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Briefly describe this epic..."
+                rows={3}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Color</Label>
+              <div className="flex items-center gap-2 mt-2">
+                {[
+                  { value: '#8B5CF6', label: 'Purple' },
+                  { value: '#10B981', label: 'Green' },
+                  { value: '#3B82F6', label: 'Blue' },
+                  { value: '#F59E0B', label: 'Orange' },
+                  { value: '#EF4444', label: 'Red' },
+                  { value: '#6B7280', label: 'Gray' },
+                ].map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    onClick={() => setEditEpicData(prev => ({ ...prev, color: color.value }))}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      editEpicData.color === color.value 
+                        ? 'border-primary scale-110' 
+                        : 'border-muted hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    title={color.label}
+                  />
+                ))}
+                <div className="flex items-center gap-2 ml-2">
+                  <Palette className="w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="color"
+                    value={editEpicData.color}
+                    onChange={(e) => setEditEpicData(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-8 h-8 rounded border cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditEpicOpen(false)}
+                disabled={isCreating}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdateEpic}
+                disabled={!editEpicData.name.trim() || isCreating}
+              >
+                {isCreating ? 'Updating...' : 'Update'}
+              </Button>
             </div>
           </div>
         </DialogContent>
