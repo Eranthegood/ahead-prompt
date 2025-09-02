@@ -85,46 +85,39 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
       
       <CardContent className="space-y-4">
         {/* Mode Selection */}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={mode === 'none' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => handleModeChange('none')}
-            className="text-xs"
-          >
-            Aucune allocation
-          </Button>
-          <Button
-            variant={mode === 'product' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => handleModeChange('product')}
-            className="text-xs"
-            disabled={products.length === 0}
-          >
-            <Package className="h-3 w-3 mr-1" />
-            Produit uniquement
-          </Button>
-          <Button
-            variant={mode === 'epic' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => handleModeChange('epic')}
-            className="text-xs"
-            disabled={epics.length === 0}
-          >
-            <Hash className="h-3 w-3 mr-1" />
-            Épique uniquement
-          </Button>
-          <Button
-            variant={mode === 'both' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => handleModeChange('both')}
-            className="text-xs"
-            disabled={products.length === 0}
-          >
-            <Package className="h-3 w-3 mr-1" />
-            <Hash className="h-3 w-3 mr-1" />
-            Produit + Épique
-          </Button>
+        <div>
+          <label className="text-sm font-medium text-muted-foreground mb-2 block">
+            Type d'allocation
+          </label>
+          <Select value={mode} onValueChange={(value: typeof mode) => handleModeChange(value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Choisir le type d'allocation..." />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border border-border shadow-lg z-50">
+              <SelectItem value="none">
+                <span>Aucune allocation</span>
+              </SelectItem>
+              <SelectItem value="product" disabled={products.length === 0}>
+                <div className="flex items-center gap-2">
+                  <Package className="h-3 w-3" />
+                  <span>Produit uniquement</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="epic" disabled={epics.length === 0}>
+                <div className="flex items-center gap-2">
+                  <Hash className="h-3 w-3" />
+                  <span>Épique uniquement</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="both" disabled={products.length === 0}>
+                <div className="flex items-center gap-2">
+                  <Package className="h-3 w-3 mr-1" />
+                  <Hash className="h-3 w-3" />
+                  <span>Produit + Épique</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Product Selection */}
