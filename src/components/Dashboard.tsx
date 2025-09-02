@@ -162,6 +162,7 @@ const Dashboard = () => {
           epics={epics}
           products={products}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+          selectedEpicId={selectedEpicId}
         />
 
         <DebugConsole

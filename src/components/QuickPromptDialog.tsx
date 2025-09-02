@@ -32,6 +32,7 @@ interface QuickPromptDialogProps {
   epics?: Epic[];
   products?: Product[];
   selectedProductId?: string;
+  selectedEpicId?: string;
 }
 
 export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
@@ -42,6 +43,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   epics = [],
   products = [],
   selectedProductId,
+  selectedEpicId,
 }) => {
   const [selectedEpic, setSelectedEpic] = useState<string>('none');
   const [selectedProduct, setSelectedProduct] = useState<string>('none');
@@ -94,7 +96,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       
       setTimeout(() => {
         editor.commands.setContent('');
-        setSelectedEpic('none');
+        setSelectedEpic(selectedEpicId || 'none');
         setSelectedPriority(2);
         setHasContent(false);
         setGeneratedPrompt('');
@@ -106,7 +108,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         }
       }, 100);
     }
-  }, [isOpen, editor, selectedProductId, products, clearDraft]);
+  }, [isOpen, editor, selectedProductId, selectedEpicId, products, clearDraft]);
 
   // Handle save with immediate creation and background AI generation
   const handleSave = async () => {
