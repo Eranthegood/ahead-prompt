@@ -50,6 +50,18 @@ export function PromptCard({
   const [justCopied, setJustCopied] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
   const priority = prompt.priority || 3;
+  
+  const playSlideSound = () => {
+    try {
+      const audio = new Audio('/sounds/swoosh.wav');
+      audio.volume = 0.3;
+      audio.play().catch(() => {
+        // Silently fail if audio can't be played (user hasn't interacted yet, etc.)
+      });
+    } catch (error) {
+      // Silently fail if audio creation fails
+    }
+  };
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
   const isUsable = isPromptUsable(prompt);
 
@@ -190,6 +202,7 @@ export function PromptCard({
                       const nextStatus = statusOptions[nextIndex].value as PromptStatus;
                       
                       if (nextStatus === 'done') {
+                        playSlideSound();
                         setIsSliding(true);
                         setTimeout(() => {
                           onStatusChange(prompt, nextStatus);
@@ -262,6 +275,7 @@ export function PromptCard({
                                 const status = option.value as PromptStatus;
                                 
                                 if (status === 'done') {
+                                  playSlideSound();
                                   setIsSliding(true);
                                   setTimeout(() => {
                                     onStatusChange(prompt, status);
