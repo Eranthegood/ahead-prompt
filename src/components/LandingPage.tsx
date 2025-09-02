@@ -193,9 +193,15 @@ export default function LandingPage() {
           </div>
           
           <BlurFade delay={1.3} inView>
-            <div className="bg-muted/50 rounded-2xl p-8 text-center">
-              <div className="text-muted-foreground mb-2">GIF Demo Placeholder</div>
-              <div className="text-sm text-muted-foreground">30 second demo coming soon</div>
+            <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.0136' }}>
+              <iframe 
+                src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" 
+                loading="lazy" 
+                title="Ahead Demo" 
+                allow="clipboard-write" 
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0 rounded-lg"
+              />
             </div>
           </BlurFade>
         </div>
