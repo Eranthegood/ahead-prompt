@@ -496,10 +496,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     value={prompt.title || ''}
                     onChange={(e) => {
                       if (prompt) {
-                        // Update the local prompt object
-                        const updatedPrompt = { ...prompt, title: e.target.value };
-                        // This would need to be handled by the parent component
-                        // For now, we'll just update locally
+                        updatePrompt(prompt.id, { title: e.target.value });
                       }
                     }}
                     className="text-sm"
