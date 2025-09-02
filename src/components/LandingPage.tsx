@@ -95,6 +95,22 @@ export default function LandingPage() {
               </Button>
             </div>
           </BlurFade>
+
+          <BlurFade delay={1.0} inView>
+            <div className="flex justify-center mt-8">
+              <a href="https://peerpush.net/p/ahead"
+                target="_blank"
+                rel="noopener"
+                style={{height: '60px'}}
+              >
+                <img
+                  src="https://peerpush.net/p/ahead/badge"
+                  alt="Ahead badge"
+                  style={{height: '60px'}}
+                />
+              </a>
+            </div>
+          </BlurFade>
         </div>
       </main>
 
