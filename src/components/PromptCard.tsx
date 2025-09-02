@@ -53,13 +53,27 @@ export function PromptCard({
   
   const playSlideSound = () => {
     try {
-      const audio = new Audio('/sounds/swoosh.wav');
-      audio.volume = 0.3;
-      audio.play().catch(() => {
-        // Silently fail if audio can't be played (user hasn't interacted yet, etc.)
-      });
+      // Create synthetic swoosh sound using Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Configure swoosh sound: frequency sweep from 800Hz to 200Hz
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.2);
+      
+      // Configure volume envelope: fade out over 200ms
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+      
+      // Play sound
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.2);
     } catch (error) {
-      // Silently fail if audio creation fails
+      // Silently fail if Web Audio API is not supported
     }
   };
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
