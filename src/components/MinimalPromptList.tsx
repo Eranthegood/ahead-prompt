@@ -122,9 +122,14 @@ export function MinimalPromptList({
       const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
       await navigator.clipboard.writeText(content);
       
+      // Auto-change status from todo to in_progress when copied
+      if (prompt.status === 'todo') {
+        await updatePromptStatus(prompt.id, 'in_progress');
+      }
+      
       toast({
         title: 'Copied to clipboard',
-        description: 'Prompt content has been copied'
+        description: prompt.status === 'todo' ? 'Prompt copied and moved to In Progress' : 'Prompt content has been copied'
       });
     } catch (error) {
       console.error('Error copying to clipboard:', error);
@@ -142,9 +147,14 @@ export function MinimalPromptList({
       if (prompt.generated_prompt) {
         await navigator.clipboard.writeText(prompt.generated_prompt);
         
+        // Auto-change status from todo to in_progress when copied
+        if (prompt.status === 'todo') {
+          await updatePromptStatus(prompt.id, 'in_progress');
+        }
+        
         toast({
           title: 'Generated prompt copied',
-          description: 'AI-generated prompt has been copied to clipboard'
+          description: prompt.status === 'todo' ? 'AI prompt copied and moved to In Progress' : 'AI-generated prompt has been copied to clipboard'
         });
         return;
       }
@@ -166,9 +176,14 @@ export function MinimalPromptList({
       if (response.transformedPrompt) {
         await navigator.clipboard.writeText(response.transformedPrompt);
         
+        // Auto-change status from todo to in_progress when copied
+        if (prompt.status === 'todo') {
+          await updatePromptStatus(prompt.id, 'in_progress');
+        }
+        
         toast({
           title: 'Generated prompt copied',
-          description: 'AI-generated prompt has been copied to clipboard'
+          description: prompt.status === 'todo' ? 'AI prompt copied and moved to In Progress' : 'AI-generated prompt has been copied to clipboard'
         });
       } else {
         throw new Error('No generated prompt received');
@@ -185,6 +200,11 @@ export function MinimalPromptList({
       try {
         const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
         await navigator.clipboard.writeText(content);
+        
+        // Auto-change status from todo to in_progress when copied (even in fallback)
+        if (prompt.status === 'todo') {
+          await updatePromptStatus(prompt.id, 'in_progress');
+        }
       } catch (fallbackError) {
         console.error('Fallback copy also failed:', fallbackError);
       }

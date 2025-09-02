@@ -115,9 +115,14 @@ export function PromptContextMenu({ prompt, children, onEdit, onUpdate }: Prompt
       const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
       await navigator.clipboard.writeText(content);
       
+      // Auto-change status from todo to in_progress when copied
+      if (prompt.status === 'todo') {
+        await handleStatusChange('in_progress');
+      }
+      
       toast({
         title: 'Copied to clipboard',
-        description: 'Prompt content has been copied'
+        description: prompt.status === 'todo' ? 'Prompt copied and moved to In Progress' : 'Prompt content has been copied'
       });
     } catch (error) {
       console.error('Error copying to clipboard:', error);
