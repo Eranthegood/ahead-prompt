@@ -32,7 +32,8 @@ export function MinimalPromptList({
   searchQuery, 
   hoveredPromptId, 
   onPromptHover,
-  onCopy
+  onCopy,
+  showCompletedItems
 }: MinimalPromptListProps) {
   const promptsContext = usePromptsContext();
   const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
@@ -55,10 +56,10 @@ export function MinimalPromptList({
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Always hide completed prompts
-    const isNotDone = prompt.status !== 'done';
+    // Hide completed based on user preference
+    const includeByCompletion = showCompletedItems ? true : prompt.status !== 'done';
 
-    return matchesProduct && matchesEpic && matchesSearch && isNotDone;
+    return matchesProduct && matchesEpic && matchesSearch && includeByCompletion;
   });
 
   // Get product and epic info for each prompt and sort by priority first, then by status
@@ -87,6 +88,7 @@ export function MinimalPromptList({
   const highPriorityPrompts = promptsWithInfo.filter(p => (p.priority || 3) === 1);
   const normalLowPriorityInProgress = promptsWithInfo.filter(p => p.status === 'in_progress' && (p.priority || 3) > 1);
   const normalLowPriorityTodo = promptsWithInfo.filter(p => p.status === 'todo' && (p.priority || 3) > 1);
+  const generatingPrompts = promptsWithInfo.filter(p => p.status === 'generating');
 
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
@@ -300,6 +302,37 @@ export function MinimalPromptList({
             </div>
             <div className="space-y-3">
               {highPriorityPrompts.map((prompt) => (
+                <PromptCard 
+                  key={prompt.id} 
+                  prompt={prompt} 
+                  onPromptClick={handlePromptClick}
+                  onEdit={handleEdit}
+                  onStatusChange={handleStatusChangeWrapper}
+                  onPriorityChange={handlePriorityChangeWrapper}
+                  onDuplicate={handleDuplicate}
+                  onDelete={handleDelete}
+                  onCopy={handleCopy}
+                  onCopyGenerated={handleCopyGenerated}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Generating Section */}
+        {generatingPrompts.length > 0 && (
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <div className="h-px bg-primary flex-1" />
+              <Badge variant="secondary" className="bg-primary/20 text-primary">
+                Generating... ({generatingPrompts.length})
+              </Badge>
+              <div className="h-px bg-primary flex-1" />
+            </div>
+            <div className="space-y-3">
+              {generatingPrompts.map((prompt) => (
                 <PromptCard 
                   key={prompt.id} 
                   prompt={prompt} 

@@ -161,11 +161,12 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
   // Create prompt data object from form state
   const createPromptData = (content: string): CreatePromptData => {
+    const inferredProductId = selectedProduct || (selectedEpic ? epics.find(e => e.id === selectedEpic)?.product_id || null : null);
     return {
       title: generateTitleFromContent(content),
       description: content,
       epic_id: selectedEpic || undefined,
-      product_id: selectedProduct || undefined,
+      product_id: inferredProductId || undefined,
       priority: selectedPriority,
     };
   };
