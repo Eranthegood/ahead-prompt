@@ -152,8 +152,10 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     setDraftRestored(false);
     
     // Focus editor after a brief delay to ensure DOM is ready
-    if (editor.view) {
-      editor.commands.focus();
+    if (editor && editor.view && editor.view.dom) {
+      setTimeout(() => {
+        editor.commands.focus();
+      }, 150);
     }
   };
 

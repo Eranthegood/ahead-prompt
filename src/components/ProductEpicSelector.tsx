@@ -38,9 +38,9 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
       {products.length > 0 && (
         <div>
           <Select 
-            value={selectedProductId || ''} 
+            value={selectedProductId || 'none'} 
             onValueChange={(value) => {
-              const productId = value || null;
+              const productId = value === 'none' ? null : value;
               onProductChange(productId);
               if (productId) {
                 trackAllocation('product', { productId, productName: products.find(p => p.id === productId)?.name });
@@ -54,7 +54,7 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-lg z-50">
-              <SelectItem value="">
+              <SelectItem value="none">
                 <span className="text-muted-foreground">Aucun produit</span>
               </SelectItem>
               {products.map((product) => (
@@ -77,9 +77,9 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
       {filteredEpics.length > 0 && (
         <div>
           <Select 
-            value={selectedEpicId || ''} 
+            value={selectedEpicId || 'none'} 
             onValueChange={(value) => {
-              const epicId = value || null;
+              const epicId = value === 'none' ? null : value;
               onEpicChange(epicId);
               if (epicId) {
                 trackAllocation('epic', { epicId, epicName: epics.find(e => e.id === epicId)?.name });
@@ -93,7 +93,7 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-lg z-50">
-              <SelectItem value="">
+              <SelectItem value="none">
                 <span className="text-muted-foreground">Aucune épique</span>
               </SelectItem>
               {filteredEpics.map((epic) => (
