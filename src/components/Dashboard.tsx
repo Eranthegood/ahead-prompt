@@ -14,7 +14,6 @@ import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
-
 const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
@@ -24,19 +23,32 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
-  
-  const { workspace, loading } = useWorkspace();
+  const {
+    workspace,
+    loading
+  } = useWorkspace();
   const promptsContext = usePromptsContext();
-  const { prompts = [], createPrompt, refetch: refetchPrompts } = promptsContext || {};
-  
+  const {
+    prompts = [],
+    createPrompt,
+    refetch: refetchPrompts
+  } = promptsContext || {};
+
   // Provide safe fallback if createPrompt is not available yet
   const handleCreatePrompt = createPrompt || (async () => {
     console.warn('createPrompt not available yet');
     return null;
   });
-  const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
-  const { products } = useProducts(workspace?.id);
-  const { preferences, saveCompletedItemsPreference } = useUserPreferences();
+  const {
+    epics
+  } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
+  const {
+    products
+  } = useProducts(workspace?.id);
+  const {
+    preferences,
+    saveCompletedItemsPreference
+  } = useUserPreferences();
 
   // Function to copy generated prompt
   const handleCopyPrompt = async (prompt: any) => {
@@ -44,7 +56,7 @@ const Dashboard = () => {
       // If prompt exists, use its generated prompt
       if (prompt.generated_prompt) {
         await navigator.clipboard.writeText(prompt.generated_prompt);
-        
+
         // Using a simple console log instead of toast to avoid dependency issues
         console.log('Prompt copied via keyboard shortcut');
         return true;
@@ -68,12 +80,12 @@ const Dashboard = () => {
       // If hovering over a prompt, copy its generated prompt
       if (hoveredPromptId) {
         const hoveredPrompt = prompts?.find(p => p.id === hoveredPromptId);
-        if (hoveredPrompt && await handleCopyPrompt(hoveredPrompt)) {
+        if (hoveredPrompt && (await handleCopyPrompt(hoveredPrompt))) {
           // Success feedback handled by MinimalPromptList
           return;
         }
       }
-      
+
       // Otherwise copy the first prompt's generated prompt
       if (prompts && prompts.length > 0) {
         const firstPrompt = prompts[0];
@@ -82,119 +94,60 @@ const Dashboard = () => {
           return;
         }
       }
-    },
+    }
   });
-
   const handleToggleCompletedItems = (show: boolean) => {
     saveCompletedItemsPreference(show);
   };
-
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">Loading workspace...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!workspace) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">Failed to load workspace</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <div className="min-h-screen w-full bg-background flex">
         {/* Global Sidebar Trigger - Always Visible */}
         <div className="fixed top-4 left-4 z-50 lg:hidden">
           <SidebarTrigger className="bg-background shadow-md border" />
         </div>
         
-        <MinimalSidebar
-          workspace={workspace}
-          selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-          selectedEpicId={selectedEpicId}
-          onProductSelect={setSelectedProductId}
-          onEpicSelect={setSelectedEpicId}
-          showCompletedItems={preferences.showCompletedItems}
-          onToggleCompletedItems={handleToggleCompletedItems}
-          onQuickAdd={handleQuickAdd}
-          searchQuery={searchQuery}
-        />
+        <MinimalSidebar workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onProductSelect={setSelectedProductId} onEpicSelect={setSelectedEpicId} showCompletedItems={preferences.showCompletedItems} onToggleCompletedItems={handleToggleCompletedItems} onQuickAdd={handleQuickAdd} searchQuery={searchQuery} />
         
         <div className="flex-1 flex flex-col">
-          <MinimalHeader 
-            workspace={workspace}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            showMetrics={showMetrics}
-            onToggleMetrics={() => setShowMetrics(!showMetrics)}
-          />
+          <MinimalHeader workspace={workspace} searchQuery={searchQuery} onSearchChange={setSearchQuery} showMetrics={showMetrics} onToggleMetrics={() => setShowMetrics(!showMetrics)} />
           
           {/* Metrics Dashboard - conditionally shown */}
-          {showMetrics && (
-            <div className="p-4 border-b bg-muted/20">
-              <MetricsDashboard />
-            </div>
-          )}
+          {showMetrics}
           
-          <MinimalPromptList
-            workspace={workspace}
-            selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-            selectedEpicId={selectedEpicId}
-            searchQuery={searchQuery}
-            hoveredPromptId={hoveredPromptId}
-            onPromptHover={setHoveredPromptId}
-            onCopy={handleCopyPrompt}
-          />
+          <MinimalPromptList workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
         </div>
 
-        <CommandPalette 
-          open={commandPaletteOpen}
-          onOpenChange={setCommandPaletteOpen}
-          workspace={workspace}
-          onNavigate={() => {}} // No longer needed with simplified interface
-        />
+        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} onNavigate={() => {}} // No longer needed with simplified interface
+      />
 
-        <QuickPromptDialog
-          isOpen={quickPromptOpen}
-          onClose={() => setQuickPromptOpen(false)}
-          onSave={handleCreatePrompt}
-          workspace={workspace}
-          epics={epics}
-          products={products}
-          selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-          selectedEpicId={selectedEpicId}
-          onCreateProduct={() => {
-            // Simple callback pour ouvrir une création de produit
-            console.log('Create product requested - implement product creation dialog');
-          }}
-          onCreateEpic={() => {
-            // Simple callback pour ouvrir une création d'épique
-            console.log('Create epic requested - implement epic creation dialog');
-          }}
-        />
+        <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onCreateProduct={() => {
+        // Simple callback pour ouvrir une création de produit
+        console.log('Create product requested - implement product creation dialog');
+      }} onCreateEpic={() => {
+        // Simple callback pour ouvrir une création d'épique
+        console.log('Create epic requested - implement epic creation dialog');
+      }} />
 
-        <DebugConsole
-          isOpen={debugConsoleOpen}
-          onClose={() => setDebugConsoleOpen(false)}
-          workspace={workspace}
-        />
+        <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;
