@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.generate-prompt-background]
 verify_jwt = true
+
+[functions.sync-to-loops]
+verify_jwt = false
