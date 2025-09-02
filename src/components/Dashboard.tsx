@@ -175,7 +175,7 @@ const Dashboard = () => {
           workspace={workspace}
         />
       </div>
-      </SidebarProvider>
+    </SidebarProvider>
   );
 };
 
