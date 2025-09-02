@@ -98,7 +98,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         setSelectedPriority(2);
         setHasContent(false);
         setGeneratedPrompt('');
-        setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
+        setSelectedProduct(selectedProductId || 'none');
         setDraftRestored(false);
         
         if (editor.view) {
