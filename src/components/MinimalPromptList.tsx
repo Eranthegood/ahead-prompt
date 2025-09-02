@@ -36,8 +36,9 @@ export function MinimalPromptList({
 }: MinimalPromptListProps) {
   const promptsContext = usePromptsContext();
   const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
-  const { epics } = useEpics(workspace.id);
+  console.debug('[MinimalPromptList] using PromptsContext', { count: prompts?.length, loading });
   const { products } = useProducts(workspace.id);
+  const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
   
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
