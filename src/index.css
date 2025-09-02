@@ -47,6 +47,8 @@
     /* Couleurs de statut personnalisées */
     --status-todo: 0 0% 90%;        /* Gris clair */
     --status-todo-foreground: 0 0% 30%;
+    --status-generating: 244 85% 70%; /* Violet clair pour génération */
+    --status-generating-foreground: 0 0% 15%;
     --status-progress: 41 94% 61%;  /* Orange #FAB83E */
     --status-progress-foreground: 0 0% 15%;
     --status-done: 120 52% 73%;     /* Vert clair #99DD93 */

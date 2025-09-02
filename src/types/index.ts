@@ -64,7 +64,7 @@ export interface Database {
           product_id: string | null;
           title: string;
           description: string | null;
-          status: 'todo' | 'in_progress' | 'done';
+          status: 'todo' | 'generating' | 'in_progress' | 'done';
           priority: number;
           order_index: number;
           generated_prompt: string | null;
@@ -80,7 +80,7 @@ export interface Database {
           product_id?: string | null;
           title: string;
           description?: string | null;
-          status?: 'todo' | 'in_progress' | 'done';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
@@ -96,7 +96,7 @@ export interface Database {
           product_id?: string | null;
           title?: string;
           description?: string | null;
-          status?: 'todo' | 'in_progress' | 'done';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
@@ -163,7 +163,7 @@ export interface Product {
   updated_at: string;
 }
 
-export type PromptStatus = 'todo' | 'in_progress' | 'done';
+export type PromptStatus = 'todo' | 'generating' | 'in_progress' | 'done';
 export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';
 
 // Priority levels: 1 = High, 2 = Normal, 3 = Low

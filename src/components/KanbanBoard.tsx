@@ -14,6 +14,7 @@ interface KanbanBoardProps {
 
 const COLUMNS: { status: PromptStatus; title: string; color: string }[] = [
   { status: 'todo', title: 'To Do', color: 'status-todo' },
+  { status: 'generating', title: 'Generating Code', color: 'status-generating' },
   { status: 'in_progress', title: 'In Progress', color: 'status-progress' },
   { status: 'done', title: 'Done', color: 'status-done' },
 ];

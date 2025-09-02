@@ -129,37 +129,138 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       if (cleanContent.length > 20) {
         console.log('Auto-generating prompt for sufficient content:', cleanContent.length, 'characters');
         
+        // Step 1: Update status to 'generating'
+        await withOptimisticUpdate(
+          (prev) => prev.map(p => 
+            p.id === promptId 
+              ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
+              : p
+          ),
+          async () => {
+            const { error } = await supabase
+              .from('prompts')
+              .update({
+                status: 'generating',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', promptId);
+
+            if (error) throw error;
+          },
+          (prev) => prev.map(p => 
+            p.id === promptId 
+              ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+              : p
+          )
+        );
+        
+        // Step 2: Call the transform service
         const response = await PromptTransformService.transformPrompt(content);
         
         if (response.success && response.transformedPrompt) {
-          // Update the prompt with the generated content
-          const { error } = await supabase
-            .from('prompts')
-            .update({
-              generated_prompt: response.transformedPrompt,
-              generated_at: new Date().toISOString(),
-            })
-            .eq('id', promptId);
-
-          if (!error) {
-            // Update local state
-            setPrompts(prev => prev.map(p => 
+          // Step 3: Update with generated content and change status back to 'todo'
+          await withOptimisticUpdate(
+            (prev) => prev.map(p => 
               p.id === promptId 
                 ? { 
                     ...p, 
                     generated_prompt: response.transformedPrompt,
-                    generated_at: new Date().toISOString()
+                    generated_at: new Date().toISOString(),
+                    status: 'todo' as PromptStatus,
+                    updated_at: new Date().toISOString()
                   }
                 : p
-            ));
-            
-            console.log('Auto-generated prompt successfully for prompt:', promptId);
-          }
+            ),
+            async () => {
+              const { error } = await supabase
+                .from('prompts')
+                .update({
+                  generated_prompt: response.transformedPrompt,
+                  generated_at: new Date().toISOString(),
+                  status: 'todo',
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', promptId);
+
+              if (error) throw error;
+            },
+            (prev) => prev.map(p => 
+              p.id === promptId 
+                ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+                : p
+            )
+          );
+          
+          console.log('Auto-generated prompt successfully for prompt:', promptId);
+          toast({
+            title: "Prompt généré !",
+            description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
+          });
+        } else {
+          // Failed to generate - revert status to 'todo'
+          await withOptimisticUpdate(
+            (prev) => prev.map(p => 
+              p.id === promptId 
+                ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+                : p
+            ),
+            async () => {
+              const { error } = await supabase
+                .from('prompts')
+                .update({
+                  status: 'todo',
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', promptId);
+
+              if (error) throw error;
+            },
+            (prev) => prev.map(p => 
+              p.id === promptId 
+                ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+                : p
+            )
+          );
         }
       }
     } catch (error) {
-      console.log('Auto-generation failed, but continuing silently:', error);
-      // Fail silently - auto-generation is a nice-to-have, not critical
+      console.log('Auto-generation failed:', error);
+      
+      // On error, revert status to 'todo'
+      try {
+        await withOptimisticUpdate(
+          (prev) => prev.map(p => 
+            p.id === promptId 
+              ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+              : p
+          ),
+          async () => {
+            const { error } = await supabase
+              .from('prompts')
+              .update({
+                status: 'todo',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', promptId);
+
+            if (error) throw error;
+          },
+          (prev) => prev.map(p => 
+            p.id === promptId 
+              ? { ...p, status: 'todo' as PromptStatus, updated_at: new Date().toISOString() }
+              : p
+          )
+        );
+      } catch (revertError) {
+        console.error('Failed to revert status after generation error:', revertError);
+      }
+      
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: "Erreur de génération",
+        description: "Impossible de générer le prompt. Veuillez réessayer.",
+      });
     }
   };
 
