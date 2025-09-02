@@ -23,11 +23,12 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy } from 'lucide-react';
-import { Workspace } from '@/types';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen } from 'lucide-react';
+import { Workspace, Product } from '@/types';
 
 import { AdaptiveTitle } from './ui/adaptive-title';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
+import { KnowledgeModal } from './KnowledgeModal';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -93,6 +94,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     description: '',
     color: '#8B5CF6'
   });
+
+  // Knowledge Modal states
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  const [selectedKnowledgeProduct, setSelectedKnowledgeProduct] = useState<Product | undefined>();
 
   // Filter function to match search and exclude completed
   const getActivePrompts = (productFilter?: string, epicFilter?: string) => {
@@ -285,6 +290,17 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     } finally {
       setIsCreating(false);
     }
+  };
+
+  // Knowledge Modal handlers
+  const handleOpenKnowledge = (product?: Product) => {
+    setSelectedKnowledgeProduct(product);
+    setIsKnowledgeModalOpen(true);
+  };
+
+  const handleCloseKnowledge = () => {
+    setIsKnowledgeModalOpen(false);
+    setSelectedKnowledgeProduct(undefined);
   };
 
   return (
@@ -484,6 +500,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                               </ContextMenuTrigger>
                               <ContextMenuContent className="w-48">
                                 <ContextMenuItem 
+                                  onClick={() => handleOpenKnowledge(product)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <BookOpen className="h-4 w-4" />
+                                  Manage Knowledge
+                                </ContextMenuItem>
+                                <ContextMenuSeparator />
+                                <ContextMenuItem 
                                   onClick={() => {
                                     setSelectedProductForEpic(product.id);
                                     setIsCreateEpicOpen(true);
@@ -584,6 +608,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 </ContextMenuTrigger>
                                 <ContextMenuContent className="w-48">
                                   <ContextMenuItem 
+                                    onClick={() => handleOpenKnowledge(product)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <BookOpen className="h-4 w-4" />
+                                    Manage Knowledge
+                                  </ContextMenuItem>
+                                  <ContextMenuSeparator />
+                                  <ContextMenuItem 
                                     onClick={() => {
                                       setSelectedProductForEpic(product.id);
                                       setIsCreateEpicOpen(true);
@@ -651,15 +683,23 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                              )}
                                            </SidebarMenuButton>
                                          </ContextMenuTrigger>
-                                         <ContextMenuContent className="w-48">
-                                           <ContextMenuItem 
-                                             onClick={() => handleEditEpic(epic)}
-                                             className="flex items-center gap-2"
-                                           >
-                                             <Edit3 className="h-4 w-4" />
-                                             Edit Epic
-                                           </ContextMenuItem>
-                                         </ContextMenuContent>
+                                          <ContextMenuContent className="w-48">
+                                            <ContextMenuItem 
+                                              onClick={() => handleOpenKnowledge(product)}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <BookOpen className="h-4 w-4" />
+                                              Manage Knowledge
+                                            </ContextMenuItem>
+                                            <ContextMenuSeparator />
+                                            <ContextMenuItem 
+                                              onClick={() => handleEditEpic(epic)}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <Edit3 className="h-4 w-4" />
+                                              Edit Epic
+                                            </ContextMenuItem>
+                                          </ContextMenuContent>
                                        </ContextMenu>
                                      ))}
                                   </>
@@ -1044,6 +1084,15 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Knowledge Modal */}
+      <KnowledgeModal
+        open={isKnowledgeModalOpen}
+        onOpenChange={setIsKnowledgeModalOpen}
+        onClose={handleCloseKnowledge}
+        workspace={workspace}
+        product={selectedKnowledgeProduct}
+      />
     </TooltipProvider>
   );
 }
