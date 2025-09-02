@@ -25,13 +25,7 @@ const Dashboard = () => {
   
   const { workspace, loading } = useWorkspace();
   const promptsContext = usePromptsContext();
-  const { prompts = [], createPrompt, refetch: refetchPrompts } = promptsContext || {};
-  
-  // Provide safe fallback if createPrompt is not available yet
-  const handleCreatePrompt = createPrompt || (async () => {
-    console.warn('createPrompt not available yet');
-    return null;
-  });
+  const { prompts, createPrompt, refetch: refetchPrompts } = promptsContext || {};
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
@@ -161,7 +155,7 @@ const Dashboard = () => {
         <QuickPromptDialog
           isOpen={quickPromptOpen}
           onClose={() => setQuickPromptOpen(false)}
-          onSave={handleCreatePrompt}
+          onSave={createPrompt}
           workspace={workspace}
           epics={epics}
           products={products}
