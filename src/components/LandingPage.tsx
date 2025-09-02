@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 export default function LandingPage() {
-  const {
-    signInWithGoogle
-  } = useAuth();
-  const handleGetStarted = async () => {
-    await signInWithGoogle();
+  const navigate = useNavigate();
+  
+  const handleSignIn = () => {
+    navigate('/auth');
   };
 
   const testimonials = [
@@ -59,7 +58,7 @@ export default function LandingPage() {
               Ahead
             </div>
           </div>
-          <Button variant="ghost" onClick={handleGetStarted} className="text-sm hover:text-primary">
+          <Button variant="ghost" onClick={handleSignIn} className="text-sm hover:text-primary">
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -89,7 +88,7 @@ export default function LandingPage() {
           
           <BlurFade delay={0.75} inView>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
                 Get Ahead - Free
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -280,7 +279,7 @@ export default function LandingPage() {
                     </ul>
                   </div>
                   
-                  <Button size="lg" onClick={handleGetStarted} className="mt-6 px-8 py-6 text-lg font-medium group">
+                  <Button size="lg" onClick={handleSignIn} className="mt-6 px-8 py-6 text-lg font-medium group">
                     Start Building Faster Today - Free Demo Available
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
@@ -373,7 +372,7 @@ export default function LandingPage() {
                     </p>
                   </div>
                   
-                  <Button size="lg" onClick={handleGetStarted} className="mt-6 px-8 py-6 text-lg font-medium group">
+                  <Button size="lg" onClick={handleSignIn} className="mt-6 px-8 py-6 text-lg font-medium group">
                     Try Smart Prompts - Free
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
