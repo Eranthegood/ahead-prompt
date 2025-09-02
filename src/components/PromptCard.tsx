@@ -7,7 +7,6 @@ import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
-import { GeneratingLoader } from '@/components/ui/generating-loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
@@ -31,7 +30,6 @@ interface PromptCardProps {
 
 const statusOptions = [
   { value: 'todo', label: 'Todo', variant: 'outline' as const },
-  { value: 'generating', label: 'Generating', variant: 'secondary' as const },
   { value: 'in_progress', label: 'In Progress', variant: 'secondary' as const },
   { value: 'done', label: 'Done', variant: 'success' as const }
 ];
@@ -68,86 +66,77 @@ export function PromptCard({
         onMouseLeave={() => onHover?.(null)}
       >
         <CardContent className="p-4">
-          {/* Show generating loader when status is generating AND no generated content exists yet */}
-          {(prompt.status as string) === 'generating' && !prompt.generated_prompt ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <GeneratingLoader className="mb-3" />
-              <div className="text-sm font-medium text-foreground mb-1">{prompt.title}</div>
-              <div className="text-xs text-muted-foreground">Transformation du prompt en cours...</div>
-            </div>
-          ) : (
-            <>
-              <div 
-                className="flex items-start justify-between"
-                onClick={() => onPromptClick(prompt)}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TruncatedTitle 
-                      title={prompt.title}
-                      maxLength={60}
-                      className="font-medium text-foreground group"
-                      showCopyButton={false}
-                      variant="inline"
-                    />
-                    
-                    {/* Priority Badge */}
-                    {priority === 1 && (
-                      <Badge variant="destructive" className="text-xs flex items-center gap-1">
-                        <Flame className="h-3 w-3" />
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                    {priority === 2 && (
-                      <Badge variant="secondary" className="text-xs">
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                    {priority === 3 && (
-                      <Badge variant="outline" className="text-xs opacity-60">
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  {prompt.description ? (
-                    <div 
-                      className="text-sm text-muted-foreground mb-3 overflow-hidden"
-                      style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        maxHeight: '2.5rem'
-                      }}
-                      dangerouslySetInnerHTML={{ __html: prompt.description }}
-                    />
-                  ) : (
-                    <div className="text-sm text-muted-foreground mb-3 italic opacity-60">
-                      Aucun contexte
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {prompt.product && (
-                      <div className="flex items-center gap-1">
-                        <Package className="h-3 w-3" />
-                        <span>{prompt.product.name}</span>
-                      </div>
-                    )}
-                    
-                    {prompt.epic && (
-                      <div className="flex items-center gap-1">
-                        <Hash className="h-3 w-3" />
-                        <span>{prompt.epic.name}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
-                    </div>
-                  </div>
+          <div 
+            className="flex items-start justify-between"
+            onClick={() => onPromptClick(prompt)}
+          >
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <TruncatedTitle 
+                  title={prompt.title}
+                  maxLength={60}
+                  className="font-medium text-foreground group"
+                  showCopyButton={false}
+                  variant="inline"
+                />
+                
+                {/* Priority Badge */}
+                {priority === 1 && (
+                  <Badge variant="destructive" className="text-xs flex items-center gap-1">
+                    <Flame className="h-3 w-3" />
+                    {PRIORITY_LABELS[priority]}
+                  </Badge>
+                )}
+                {priority === 2 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {PRIORITY_LABELS[priority]}
+                  </Badge>
+                )}
+                {priority === 3 && (
+                  <Badge variant="outline" className="text-xs opacity-60">
+                    {PRIORITY_LABELS[priority]}
+                  </Badge>
+                )}
+              </div>
+              
+              {prompt.description ? (
+                <div 
+                  className="text-sm text-muted-foreground mb-3 overflow-hidden"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    maxHeight: '2.5rem'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: prompt.description }}
+                />
+              ) : (
+                <div className="text-sm text-muted-foreground mb-3 italic opacity-60">
+                  Aucun contexte
                 </div>
+              )}
+              
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                {prompt.product && (
+                  <div className="flex items-center gap-1">
+                    <Package className="h-3 w-3" />
+                    <span>{prompt.product.name}</span>
+                  </div>
+                )}
+                
+                {prompt.epic && (
+                  <div className="flex items-center gap-1">
+                    <Hash className="h-3 w-3" />
+                    <span>{prompt.epic.name}</span>
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
+                </div>
+              </div>
+            </div>
                 
                 <div className="flex items-center gap-2 ml-4">
                   {/* Quick Copy Button */}
@@ -180,10 +169,7 @@ export function PromptCard({
                       </TooltipTrigger>
                       {!isUsable && (
                         <TooltipContent>
-                          {prompt.status === 'generating' 
-                            ? 'Prompt en cours de génération' 
-                            : 'Description trop courte pour être exploitable'
-                          }
+                          Description trop courte pour être exploitable
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -193,7 +179,7 @@ export function PromptCard({
                   <Badge 
                     variant={
                       prompt.status === 'done' ? 'success' : 
-                      (prompt.status === 'in_progress' || (prompt.status as string) === 'generating') ? 'secondary' : 'outline'
+                      prompt.status === 'in_progress' ? 'secondary' : 'outline'
                     }
                     className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={(e) => {
@@ -205,7 +191,6 @@ export function PromptCard({
                     }}
                   >
                     {prompt.status === 'in_progress' ? 'In Progress' : 
-                     (prompt.status as string) === 'generating' ? 'Generating' :
                      prompt.status === 'done' ? 'Done' : 'Todo'}
                   </Badge>
                   
@@ -320,8 +305,6 @@ export function PromptCard({
                   </DropdownMenu>
                 </div>
               </div>
-            </>
-          )}
         </CardContent>
       </Card>
     </PromptContextMenu>
