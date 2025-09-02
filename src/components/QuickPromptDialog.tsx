@@ -85,9 +85,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const filteredEpics = activeProductId 
     ? epics.filter(epic => epic.product_id === activeProductId)
     : epics;
-  
-  // Validation: Check if either epic or product is selected
-  const hasValidAssignment = (selectedEpic !== 'none') || !!selectedProductId || (selectedProduct !== 'none');
 
   // Reset form when dialog opens (only if no draft is restored)
   useEffect(() => {
@@ -116,15 +113,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     const content = editor.getHTML();
     if (!content || content === '<p></p>') return;
 
-    // Validate assignment
-    if (!hasValidAssignment) {
-      toast({
-        title: 'Assignment required',
-        description: 'Please select a product or epic.',
-        variant: 'destructive'
-      });
-      return;
-    }
 
     setIsLoading(true);
     
@@ -336,7 +324,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               {!selectedProductId && products.length > 0 && (
                 <div>
                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                     Product
+                     Product (optional)
                    </label>
                   <Select value={selectedProduct} onValueChange={(value) => {
                     setSelectedProduct(value);
@@ -370,7 +358,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               {filteredEpics.length > 0 && (
                 <div>
                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                     Epic {!hasValidAssignment && <span className="text-destructive">(or select a product)</span>}
+                     Epic (optional)
                    </label>
                   <Select value={selectedEpic} onValueChange={(value) => {
                     setSelectedEpic(value);
@@ -440,7 +428,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           </Button>
           <Button 
             onClick={handleSave} 
-            disabled={!hasContent || !hasValidAssignment || isLoading || isGenerating}
+            disabled={!hasContent || isLoading || isGenerating}
           >
             {isGenerating ? (
               <>
