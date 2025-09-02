@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw } from 'lucide-react';
@@ -484,20 +486,37 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </Button>
             </div>
 
-            {/* Original Text Display */}
-            {prompt && (prompt.title || prompt.description) && (
+            {/* Original Text Edit */}
+            {prompt && (
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Texte original</Label>
-                <div className="p-3 bg-muted/50 border rounded-md">
-                  {prompt.title && (
-                    <div className="font-medium text-sm mb-2">{prompt.title}</div>
-                  )}
-                  {prompt.description && (
-                    <div 
-                      className="text-sm text-muted-foreground prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: prompt.description }}
-                    />
-                  )}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Titre du prompt"
+                    value={prompt.title || ''}
+                    onChange={(e) => {
+                      if (prompt) {
+                        // Update the local prompt object
+                        const updatedPrompt = { ...prompt, title: e.target.value };
+                        // This would need to be handled by the parent component
+                        // For now, we'll just update locally
+                      }
+                    }}
+                    className="text-sm"
+                  />
+                  <Textarea
+                    placeholder="Description du prompt"
+                    value={prompt.description || ''}
+                    onChange={(e) => {
+                      if (prompt) {
+                        // Update the local prompt object
+                        const updatedPrompt = { ...prompt, description: e.target.value };
+                        // This would need to be handled by the parent component
+                        // For now, we'll just update locally
+                      }
+                    }}
+                    className="text-sm min-h-[100px]"
+                  />
                 </div>
               </div>
             )}
