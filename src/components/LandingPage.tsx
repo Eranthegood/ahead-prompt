@@ -137,8 +137,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Solution Section */}
+      {/* General Demo Section */}
       <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <BlurFade delay={0.8} inView>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              See Ahead in Action
+            </h2>
+          </BlurFade>
+          
+          <BlurFade delay={1.0} inView>
+            <div className="relative box-content max-h-[80vh] w-full py-10 mx-auto" style={{ aspectRatio: '2.0136' }}>
+              <iframe 
+                src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" 
+                loading="lazy" 
+                title="Ahead Demo" 
+                allow="clipboard-write" 
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0 rounded-lg"
+              />
+            </div>
+          </BlurFade>
+        </div>
+      </section>
+
+      {/* Feature Demo Section */}
+      <section className="py-16 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
           <BlurFade delay={0.8} inView>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -198,7 +222,7 @@ export default function LandingPage() {
               </BlurFade>
             </div>
             
-            {/* Demo */}
+            {/* Feature Demo */}
             <BlurFade delay={1.0} inView>
               <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.1068032187271397' }}>
                 <iframe 
