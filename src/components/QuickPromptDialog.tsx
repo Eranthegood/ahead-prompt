@@ -323,7 +323,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 </Select>
               </div>
 
-              {!selectedProductId && products.length > 0 && (
+              {products.length > 0 && (
                 <div>
                    <label className="text-sm font-medium text-muted-foreground mb-2 block">
                      Product (optional)
