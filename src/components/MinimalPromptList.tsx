@@ -34,8 +34,8 @@ export function MinimalPromptList({
 }: MinimalPromptListProps) {
   const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(
     workspace.id,
-    selectedProductId === 'all' ? undefined : selectedProductId,
-    selectedEpicId
+    undefined, // Ne pas filtrer côté serveur - optimistic updates
+    undefined
   );
   const { epics } = useEpics(workspace.id);
   const { products } = useProducts(workspace.id);
@@ -44,15 +44,20 @@ export function MinimalPromptList({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  // Apply minimal client-side filtering (most filtering now done server-side)
+  // Apply client-side filtering for instant optimistic updates
   const filteredPrompts = prompts.filter(prompt => {
+    // Filter by selected product/epic
+    const matchesProduct = !selectedProductId || selectedProductId === 'all' || prompt.product_id === selectedProductId;
+    const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
+    
+    // Filter by search
     const matchesSearch = !searchQuery || 
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const isNotDone = prompt.status !== 'done';
 
-    return matchesSearch && isNotDone;
+    return matchesProduct && matchesEpic && matchesSearch && isNotDone;
   });
 
   // Get product and epic info for each prompt and sort by priority first, then by status

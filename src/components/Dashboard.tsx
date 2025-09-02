@@ -26,8 +26,8 @@ const Dashboard = () => {
   const { workspace, loading } = useWorkspace();
   const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(
     workspace?.id, 
-    selectedProductId === 'all' ? undefined : selectedProductId,
-    selectedEpicId
+    undefined, // Ne pas filtrer côté serveur pour les optimistic updates
+    undefined
   );
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
