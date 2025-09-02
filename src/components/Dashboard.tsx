@@ -7,7 +7,7 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { usePrompts } from '@/hooks/usePrompts';
+import { usePromptsContext } from '@/context/PromptsContext';
 import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -24,11 +24,8 @@ const Dashboard = () => {
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   
   const { workspace, loading } = useWorkspace();
-  const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(
-    workspace?.id, 
-    undefined, // Ne pas filtrer côté serveur pour les optimistic updates
-    undefined
-  );
+  const promptsContext = usePromptsContext();
+  const { prompts, createPrompt, refetch: refetchPrompts } = promptsContext || {};
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
@@ -141,9 +138,10 @@ const Dashboard = () => {
             selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
             selectedEpicId={selectedEpicId}
             searchQuery={searchQuery}
-            onQuickAdd={handleQuickAdd}
             hoveredPromptId={hoveredPromptId}
             onPromptHover={setHoveredPromptId}
+            onCopy={handleCopyPrompt}
+            showCompletedItems={preferences.showCompletedItems}
           />
         </div>
 

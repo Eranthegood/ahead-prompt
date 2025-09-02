@@ -21,7 +21,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
-import { usePrompts } from '@/hooks/usePrompts';
+import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Trash2, Trophy } from 'lucide-react';
 import { Workspace } from '@/types';
@@ -53,7 +53,8 @@ const PRODUCT_COLORS = [
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const { products, createProduct, deleteProduct } = useProducts(workspace.id);
   const { epics, createEpic } = useEpics(workspace.id);
-  const { prompts } = usePrompts(workspace.id);
+  const promptsContext = usePromptsContext();
+  const { prompts = [] } = promptsContext || {};
   const { achievements, stats } = useGamification();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';

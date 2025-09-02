@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus } from 'lucide-react';
-import { usePrompts } from '@/hooks/usePrompts';
+import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useToast } from '@/hooks/use-toast';
@@ -18,9 +18,10 @@ interface MinimalPromptListProps {
   selectedProductId?: string;
   selectedEpicId?: string;
   searchQuery: string;
-  onQuickAdd: () => void;
-  hoveredPromptId?: string | null;
-  onPromptHover?: (promptId: string | null) => void;
+  hoveredPromptId?: string;
+  onPromptHover: (promptId: string | undefined) => void;
+  onCopy: (prompt: Prompt) => void;
+  showCompletedItems?: boolean;
 }
 
 export function MinimalPromptList({ 
@@ -28,15 +29,13 @@ export function MinimalPromptList({
   selectedProductId, 
   selectedEpicId, 
   searchQuery, 
-  onQuickAdd,
-  hoveredPromptId,
-  onPromptHover
+  hoveredPromptId, 
+  onPromptHover,
+  onCopy,
+  showCompletedItems = false
 }: MinimalPromptListProps) {
-  const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(
-    workspace.id,
-    undefined, // Ne pas filtrer côté serveur - optimistic updates
-    undefined
-  );
+  const promptsContext = usePromptsContext();
+  const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
   const { epics } = useEpics(workspace.id);
   const { products } = useProducts(workspace.id);
   const { toast } = useToast();
@@ -55,7 +54,7 @@ export function MinimalPromptList({
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const isNotDone = prompt.status !== 'done';
+    const isNotDone = showCompletedItems || prompt.status !== 'done';
 
     return matchesProduct && matchesEpic && matchesSearch && isNotDone;
   });
@@ -253,12 +252,6 @@ export function MinimalPromptList({
               : 'Create your first prompt to get started'
             }
           </p>
-          {!searchQuery && (
-            <Button onClick={onQuickAdd}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Prompt
-            </Button>
-          )}
         </div>
       </div>
     );
