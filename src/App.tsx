@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Achievements from "./pages/Achievements";
+import TypeformChatBubble from "./components/TypeformChatBubble";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            <TypeformChatBubble />
           </TooltipProvider>
         </ThemeInitializer>
       </AuthProvider>
