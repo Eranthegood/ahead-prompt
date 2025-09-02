@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2, Flame } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Loader2, Flame, RotateCcw } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { generateTitleFromContent } from '@/lib/titleUtils';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import type { Workspace, Epic, Product, PromptPriority } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -49,6 +50,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasContent, setHasContent] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [draftRestored, setDraftRestored] = useState(false);
   const { toast } = useToast();
   const { awardXP } = useGamification();
 
@@ -66,6 +68,18 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     },
   });
 
+  // Auto-save hook
+  const { clearDraft } = useAutoSave({
+    key: 'quick_prompt',
+    editor,
+    isOpen,
+    onRestore: (content) => {
+      setDraftRestored(true);
+      setHasContent(true);
+      setTimeout(() => setDraftRestored(false), 3000); // Hide indicator after 3s
+    },
+  });
+
   // Filter epics by selected product (either from props or local selection)
   const activeProductId = selectedProductId || (selectedProduct !== 'none' ? selectedProduct : undefined);
   const filteredEpics = activeProductId 
@@ -75,23 +89,25 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Validation: Check if either epic or product is selected
   const hasValidAssignment = (selectedEpic !== 'none') || !!selectedProductId || (selectedProduct !== 'none');
 
-  // Reset form when dialog opens
+  // Reset form when dialog opens (only if no draft is restored)
   useEffect(() => {
     if (isOpen && editor) {
-      editor.commands.setContent('');
-      setSelectedEpic('none');
-      setSelectedPriority(2); // Reset to normal priority
-      setHasContent(false);
-      setGeneratedPrompt('');
-      // Set default product if no selectedProductId
-      setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
+      // Only reset if no draft was restored
       setTimeout(() => {
+        if (!draftRestored && editor.isEmpty) {
+          editor.commands.setContent('');
+          setSelectedEpic('none');
+          setSelectedPriority(2);
+          setHasContent(false);
+          setGeneratedPrompt('');
+          setSelectedProduct(selectedProductId ? 'none' : (products.length > 0 ? products[0].id : 'none'));
+        }
         if (editor.view) {
           editor.commands.focus();
         }
       }, 100);
     }
-  }, [isOpen, editor, selectedProductId, products]);
+  }, [isOpen, editor, selectedProductId, products, draftRestored]);
 
   // Handle save with immediate creation and background AI generation
   const handleSave = async () => {
@@ -132,6 +148,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
       // Save immediately for instant UI feedback
       const createdPrompt = await onSave(promptData);
+      
+      // Clear draft after successful save
+      clearDraft();
       
       // Show success feedback immediately
       toast({
@@ -203,8 +222,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             Your Idea
+            {draftRestored && (
+              <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
+                <RotateCcw className="h-4 w-4" />
+                <span>Draft restored</span>
+              </div>
+            )}
           </DialogTitle>
           <DialogDescription className="sr-only">
             Create a new prompt idea with rich text formatting and optional epic or product assignment.

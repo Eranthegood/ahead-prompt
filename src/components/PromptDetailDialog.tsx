@@ -7,13 +7,14 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { generateTitleFromContent } from '@/lib/titleUtils';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import { Prompt, Product, Epic } from '@/types';
 
 interface PromptDetailDialogProps {
@@ -32,6 +33,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [textLength, setTextLength] = useState(0);
+  const [draftRestored, setDraftRestored] = useState(false);
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
 
@@ -51,9 +53,20 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     },
   });
 
-  // Reset form when prompt changes
+  // Auto-save hook
+  const { clearDraft } = useAutoSave({
+    key: prompt ? `prompt_${prompt.id}` : 'prompt_edit',
+    editor,
+    isOpen: open,
+    onRestore: (content) => {
+      setDraftRestored(true);
+      setTimeout(() => setDraftRestored(false), 3000); // Hide indicator after 3s
+    },
+  });
+
+  // Reset form when prompt changes (but preserve draft if one exists)
   useEffect(() => {
-    if (prompt && editor) {
+    if (prompt && editor && !draftRestored) {
       // Load the original user content (description) into the editor
       const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
       
@@ -77,7 +90,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       const cleanText = stripHtmlAndNormalize(originalContent);
       setTextLength(cleanText.length);
     }
-  }, [prompt, editor]);
+  }, [prompt, editor, draftRestored]);
 
   const handleRegeneratePrompt = async () => {
     if (!editor || !prompt) return;
@@ -152,6 +165,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         epic_id: epicId === 'none' ? null : epicId,
       });
 
+      // Clear draft after successful save
+      clearDraft();
+      
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating prompt:', error);
@@ -181,8 +197,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         onKeyDown={handleKeyDown}
       >
         <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             Modifier l&apos;idée
+            {draftRestored && (
+              <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
+                <RotateCcw className="h-4 w-4" />
+                <span>Brouillon restauré</span>
+              </div>
+            )}
           </DialogTitle>
           <DialogDescription className="sr-only">
             Edit prompt details with rich text formatting, product and epic assignment.
