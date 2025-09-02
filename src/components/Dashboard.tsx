@@ -7,7 +7,7 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog } from '@/components/QuickPromptDialog';
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { usePromptsContext, PromptsProvider } from '@/context/PromptsContext';
+import { usePrompts } from '@/hooks/usePrompts';
 import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -24,9 +24,11 @@ const Dashboard = () => {
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   
   const { workspace, loading } = useWorkspace();
-  const promptsCtx = usePromptsContext();
-  const prompts = promptsCtx?.prompts || [];
-  const createPrompt = promptsCtx?.createPrompt as any; // will be defined when wrapped by provider
+  const { prompts, createPrompt, refetch: refetchPrompts } = usePrompts(
+    workspace?.id, 
+    selectedProductId === 'all' ? undefined : selectedProductId,
+    selectedEpicId
+  );
   const { epics } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
   const { products } = useProducts(workspace?.id);
   const { preferences, saveCompletedItemsPreference } = useUserPreferences();
@@ -108,11 +110,6 @@ const Dashboard = () => {
   }
 
   return (
-    <PromptsProvider 
-      workspaceId={workspace.id}
-      selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-      selectedEpicId={selectedEpicId}
-    >
     <SidebarProvider>
       <div className="min-h-screen w-full bg-background flex">
         {/* Global Sidebar Trigger - Always Visible */}
@@ -174,7 +171,6 @@ const Dashboard = () => {
         />
       </div>
       </SidebarProvider>
-    </PromptsProvider>
   );
 };
 

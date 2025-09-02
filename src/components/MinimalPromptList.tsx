@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus } from 'lucide-react';
 import { usePrompts } from '@/hooks/usePrompts';
-import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useToast } from '@/hooks/use-toast';
@@ -33,18 +32,11 @@ export function MinimalPromptList({
   hoveredPromptId,
   onPromptHover
 }: MinimalPromptListProps) {
-  const promptsCtx = usePromptsContext();
-  const hook = usePrompts(
+  const { prompts, loading, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = usePrompts(
     workspace.id,
     selectedProductId === 'all' ? undefined : selectedProductId,
     selectedEpicId
   );
-  const prompts = (promptsCtx?.prompts ?? hook.prompts);
-  const loading = (promptsCtx?.loading ?? hook.loading);
-  const updatePromptStatus = (promptsCtx?.updatePromptStatus ?? hook.updatePromptStatus);
-  const updatePromptPriority = (promptsCtx?.updatePromptPriority ?? hook.updatePromptPriority);
-  const duplicatePrompt = (promptsCtx?.duplicatePrompt ?? hook.duplicatePrompt);
-  const deletePrompt = (promptsCtx?.deletePrompt ?? hook.deletePrompt);
   const { epics } = useEpics(workspace.id);
   const { products } = useProducts(workspace.id);
   const { toast } = useToast();
