@@ -3,15 +3,10 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { PromptsProvider } from "@/context/PromptsContext";
 
 const Index = () => {
-  const { workspace, loading } = useWorkspace();
-  
-  // Only render PromptsProvider when workspace is loaded
-  if (loading || !workspace) {
-    return <Dashboard />;
-  }
+  const { workspace } = useWorkspace();
   
   return (
-    <PromptsProvider workspaceId={workspace.id}>
+    <PromptsProvider workspaceId={workspace?.id}>
       <Dashboard />
     </PromptsProvider>
   );
