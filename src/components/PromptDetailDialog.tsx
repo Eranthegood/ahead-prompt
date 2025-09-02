@@ -206,7 +206,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </div>
             )}
           </DialogTitle>
-          <DialogDescription className="sr-only">
+          <DialogDescription>
             Edit prompt details with rich text formatting, product and epic assignment.
           </DialogDescription>
         </DialogHeader>
