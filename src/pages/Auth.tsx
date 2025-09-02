@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Zap } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import chessKnightLogo from '@/assets/chess-knight-logo.png';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,11 +69,13 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-glow">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img 
+              src={chessKnightLogo} 
+              alt="Ahead Logo" 
+              className="w-8 h-8"
+            />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              Vibe Plan Forge
+              Ahead
             </h1>
           </div>
           <CardDescription className="text-muted-foreground">Prompts management platform</CardDescription>
