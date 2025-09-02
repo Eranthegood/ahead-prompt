@@ -304,6 +304,99 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Smart Prompt Generation Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <BlurFade delay={0.5} inView>
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  SMART PROMPT GENERATION
+                </h2>
+                
+                <h3 className="text-xl font-semibold text-primary">
+                  Stop Writing Prompts From Scratch Every Time
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-2">The Problem</h4>
+                    <p className="text-muted-foreground">
+                      You keep rewriting similar prompts, losing context between projects, and getting mediocre results 
+                      because your AI doesn&apos;t understand your specific requirements, coding style, or project architecture.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-2">The Solution</h4>
+                    <p className="text-muted-foreground">
+                      Ahead&apos;s Smart Prompt Generation uses your project&apos;s knowledge base to create contextually-rich 
+                      prompts that get better results. Upload your docs, design systems, and code standards once - every 
+                      generated prompt includes the relevant context automatically.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold mb-3">What You Get:</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Context-Aware Prompts</strong> - Automatically includes relevant project documentation</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Reusable Templates</strong> - Bug fixes, features, refactors pre-formatted for your tools</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Consistent Quality</strong> - Same high standards across all your prompts</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Time Saved</strong> - No more copy-pasting context or rewriting similar requests</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Example:</h4>
+                    <p className="text-sm text-muted-foreground italic">
+                      Instead of manually explaining your React component structure every time, Smart Prompt pulls your 
+                      style guide and generates: &quot;Using our established component patterns in /docs/components.md, create a 
+                      new UserProfile component that follows our TypeScript interfaces...&quot;
+                    </p>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <p className="font-semibold text-primary">
+                      The Result: Better AI responses in less time, with zero context switching.
+                    </p>
+                  </div>
+                  
+                  <Button size="lg" onClick={handleGetStarted} className="mt-6 px-8 py-6 text-lg font-medium group">
+                    Try Smart Prompts - Free
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </div>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={0.7} inView>
+              <div className="relative h-[400px] w-full bg-muted/30 rounded-lg flex items-center justify-center">
+                {/* Placeholder for image */}
+                <div className="text-center space-y-2">
+                  <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                    <Zap className="w-8 h-8 text-primary" />
+                  </div>
+                  <p className="text-muted-foreground">Smart Prompt Demo</p>
+                  <p className="text-sm text-muted-foreground">Image coming soon</p>
+                </div>
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border/5 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center">
