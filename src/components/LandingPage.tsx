@@ -217,6 +217,77 @@ export default function LandingPage() {
         </BlurFade>
       </section>
 
+      {/* Feature Demo Section */}
+      <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <BlurFade delay={0.5} inView>
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  Never Lose Your Next Brilliant Idea Again
+                </h2>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-primary mb-2">PAIN POINT</h3>
+                    <p className="text-muted-foreground">
+                      You're coding with AI when inspiration strikes - a perfect fix, an elegant refactor, the next feature. 
+                      But by the time Claude finishes generating, that brilliant idea is gone. Lost in the 2-4 minutes of waiting, 
+                      buried under new problems, forgotten in the chaos of context switching.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold text-primary mb-2">SOLUTION</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Ahead captures your ideas the instant they happen. Create a task in seconds, let our AI generate the 
+                      perfect prompt, then copy-paste to any tool when you're ready. Your creative flow stays intact, 
+                      your momentum never breaks.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">How it works:</h3>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Quick Capture</strong> - Turn any idea into a structured task instantly</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Smart Generation</strong> - AI creates optimized prompts using your project context</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>One-Click Deploy</strong> - Copy to Cursor, Claude, ChatGPT, or any AI tool</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <Button size="lg" onClick={handleGetStarted} className="mt-6 px-8 py-6 text-lg font-medium group">
+                    Start Building Faster Today - Free Demo Available
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </div>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={0.7} inView>
+              <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.1068032187271397' }}>
+                <iframe 
+                  src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
+                  loading="lazy" 
+                  title="Task creation demo" 
+                  allow="clipboard-write" 
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0 rounded-lg"
+                />
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border/5 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center">
