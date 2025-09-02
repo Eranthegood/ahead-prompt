@@ -18,7 +18,7 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not set');
     }
 
-    const { rawIdea } = await req.json();
+    const { rawIdea, knowledgeContext } = await req.json();
     
     if (!rawIdea || typeof rawIdea !== 'string' || rawIdea.trim().length === 0) {
       return new Response(
@@ -31,8 +31,12 @@ serve(async (req) => {
     }
 
     console.log('Transforming prompt for idea:', rawIdea);
+    if (knowledgeContext) {
+      console.log('Including knowledge context:', knowledgeContext.length, 'items');
+    }
 
-    const systemPrompt = `Tu es un expert en création de prompts pour Lovable. Transforme l'idée brute en prompt structuré suivant le framework CLEAR :
+    // Build context-aware system prompt
+    let systemPrompt = `Tu es un expert en création de prompts pour Lovable. Transforme l'idée brute en prompt structuré suivant le framework CLEAR :
 
 Concise (150 mots max), Logique (ordre d'implémentation), Explicite (technologies spécifiques), Adaptive (MVP suggéré), Reflective (critères mesurables).
 
@@ -44,6 +48,18 @@ Structure obligatoire :
 → Point de départ MVP
 
 Format markdown prêt à copier-coller. Réponds UNIQUEMENT avec le prompt transformé, sans commentaires additionnels.`;
+
+    // Add knowledge context if provided
+    if (knowledgeContext && Array.isArray(knowledgeContext) && knowledgeContext.length > 0) {
+      systemPrompt += `\n\nCONTEXTE PROJET DISPONIBLE (à intégrer dans la réponse si pertinent) :`;
+      knowledgeContext.forEach((item, index) => {
+        systemPrompt += `\n\n${index + 1}. ${item.title} (${item.category}):\n${item.content}`;
+        if (item.tags && item.tags.length > 0) {
+          systemPrompt += `\nTags: ${item.tags.join(', ')}`;
+        }
+      });
+      systemPrompt += `\n\nUtilise ces informations pour enrichir et personnaliser le prompt selon le contexte du projet.`;
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

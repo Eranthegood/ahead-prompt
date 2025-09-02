@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
+import { useKnowledge } from '@/hooks/useKnowledge';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import type { Prompt, PromptStatus } from '@/types';
 
@@ -14,6 +15,7 @@ interface CreatePromptData {
   product_id?: string;
   generated_prompt?: string;
   generated_at?: string;
+  knowledge_context?: string[];
 }
 
 export const usePrompts = (workspaceId?: string, selectedProductId?: string, selectedEpicId?: string) => {
@@ -21,6 +23,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { awardXP } = useGamification();
+  const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
 
   // Helper function to handle optimistic updates with rollback capability
   const withOptimisticUpdate = async <T,>(
@@ -181,19 +184,17 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     return payload;
   };
 
-  // Auto-generate prompt if content is sufficient
-  const autoGeneratePrompt = async (promptId: string, content: string) => {
-    console.log(`Starting auto-generation for prompt ${promptId} with ${content.length} characters`);
+  // Automatically generate prompt using AI service with knowledge context
+  const autoGeneratePrompt = async (promptId: string, content: string, knowledgeContext?: string[]) => {
+    const cleanContent = stripHtmlAndNormalize(content);
+    
+    console.log(`Auto-generating prompt for: ${promptId}, content length: ${cleanContent.length}`);
     
     try {
-      const cleanContent = stripHtmlAndNormalize(content);
-      
-      // Only auto-generate if we have sufficient content (more than just a title)
-      if (cleanContent.length > 20) {
-        console.log(`Auto-generating prompt for sufficient content: ${cleanContent.length} characters`);
-        
-        // Step 1: Update status to 'generating' with enhanced error handling
-        console.log(`Step 1: Setting status to 'generating' for prompt ${promptId}`);
+      // Only auto-generate if content is substantial
+      if (cleanContent.length > 15) {
+        // Step 1: Set status to generating
+        console.log(`Step 1: Setting generating status for prompt ${promptId}`);
         await withOptimisticUpdate(
           (prev) => prev.map(p => 
             p.id === promptId 
@@ -222,10 +223,16 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
           )
         );
         
-        // Step 2: Call the transform service with timeout
+        // Step 2: Get selected knowledge items and call the transform service
         console.log(`Step 2: Calling transform service for prompt ${promptId}`);
+        const selectedKnowledgeItems = knowledgeContext 
+          ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
+          : [];
+          
+        console.log(`Including ${selectedKnowledgeItems.length} knowledge items in transformation`);
+        
         const response = await Promise.race([
-          PromptTransformService.transformPrompt(content),
+          PromptTransformService.transformPrompt(content, selectedKnowledgeItems),
           new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Transform timeout')), 30000)
           )
@@ -383,11 +390,11 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   };
 
   // Handle post-creation tasks (XP, auto-generation, toast)
-  const handlePostCreationTasks = async (prompt: Prompt, title: string) => {
+  const handlePostCreationTasks = async (prompt: Prompt, title: string, knowledgeContext?: string[]) => {
     // Auto-generate prompt if we have description content
     if (prompt.description) {
       // Don't await this - let it run in background
-      autoGeneratePrompt(prompt.id, prompt.description);
+      autoGeneratePrompt(prompt.id, prompt.description, knowledgeContext);
     }
 
     // Award XP for creating a prompt
@@ -449,7 +456,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
 
       // Handle post-creation tasks
-      await handlePostCreationTasks(realPrompt, promptData.title);
+      await handlePostCreationTasks(realPrompt, promptData.title, promptData.knowledge_context);
 
       return realPrompt;
     } catch (error) {
@@ -626,7 +633,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
       // Auto-generate prompt if description was updated and has sufficient content
       if (updates.description) {
-        // Don't await this - let it run in background
+        // Don't await this - let it run in background  
         autoGeneratePrompt(promptId, updates.description);
       }
 

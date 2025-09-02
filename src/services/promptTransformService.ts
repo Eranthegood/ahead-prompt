@@ -12,6 +12,7 @@ export const stripHtmlAndNormalize = (html: string): string => {
 
 export interface TransformPromptRequest {
   rawIdea: string;
+  knowledgeContext?: string[];
 }
 
 export interface TransformPromptResponse {
@@ -31,7 +32,10 @@ const HISTORY_KEY = 'prompt_transform_history';
 const MAX_HISTORY_ITEMS = 10;
 
 export class PromptTransformService {
-  static async transformPrompt(rawIdea: string): Promise<TransformPromptResponse> {
+  static async transformPrompt(
+    rawIdea: string, 
+    knowledgeItems?: any[]
+  ): Promise<TransformPromptResponse> {
     try {
       // Clean and validate the input
       const cleanIdea = stripHtmlAndNormalize(rawIdea);
@@ -44,8 +48,21 @@ export class PromptTransformService {
         };
       }
 
+      // Prepare knowledge context if provided
+      const knowledgeContext = knowledgeItems && knowledgeItems.length > 0 
+        ? knowledgeItems.map(item => ({
+            title: item.title,
+            content: item.content,
+            category: item.category,
+            tags: item.tags || []
+          }))
+        : undefined;
+
       const { data, error } = await supabase.functions.invoke('transform-prompt', {
-        body: { rawIdea: cleanIdea }
+        body: { 
+          rawIdea: cleanIdea,
+          knowledgeContext
+        }
       });
 
       if (error) {

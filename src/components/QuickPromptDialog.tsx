@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw, BookOpen, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
-import type { Workspace, Epic, Product, PromptPriority } from '@/types';
+import { useKnowledge } from '@/hooks/useKnowledge';
+import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
 interface CreatePromptData {
@@ -21,6 +24,7 @@ interface CreatePromptData {
   priority?: PromptPriority;
   generated_prompt?: string;
   generated_at?: string;
+  knowledge_context?: string[];
 }
 
 interface QuickPromptDialogProps {
@@ -93,6 +97,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
   const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
   
+  // Knowledge state
+  const [enableKnowledge, setEnableKnowledge] = useState(true); // Default enabled
+  const [selectedKnowledgeIds, setSelectedKnowledgeIds] = useState<string[]>([]);
+  
+  // Load knowledge items
+  const productIdForKnowledge = selectedProduct || selectedProductId;
+  const { knowledgeItems } = useKnowledge(workspace.id, productIdForKnowledge || undefined);
+  
   // Performance tracking
   const [startTime] = useState(Date.now());
   const { trackPromptCreation, trackError } = usePromptMetrics();
@@ -151,6 +163,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     setSelectedProduct(selectedProductId || null);
     setDraftRestored(false);
     
+    // Reset knowledge selection but keep useKnowledge enabled
+    setSelectedKnowledgeIds([]);
+    
     // Focus editor after a brief delay to ensure DOM is ready
     if (editor && editor.view && editor.view.dom) {
       setTimeout(() => {
@@ -159,15 +174,36 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     }
   };
 
+  // Handle knowledge selection
+  const handleKnowledgeToggle = (knowledgeId: string) => {
+    setSelectedKnowledgeIds(prev => 
+      prev.includes(knowledgeId) 
+        ? prev.filter(id => id !== knowledgeId)
+        : [...prev, knowledgeId]
+    );
+  };
+
+  // Get selected knowledge items
+  const selectedKnowledgeItems = knowledgeItems.filter(item => 
+    selectedKnowledgeIds.includes(item.id)
+  );
+
   // Create prompt data object from form state
   const createPromptData = (content: string): CreatePromptData => {
     const inferredProductId = selectedProduct || (selectedEpic ? epics.find(e => e.id === selectedEpic)?.product_id || null : null);
+    
+    // Include knowledge context if enabled and items selected
+    const knowledgeContext = enableKnowledge && selectedKnowledgeIds.length > 0 
+      ? selectedKnowledgeIds 
+      : undefined;
+    
     return {
       title: generateTitleFromContent(content),
       description: content,
       epic_id: selectedEpic || undefined,
       product_id: inferredProductId || undefined,
       priority: selectedPriority,
+      knowledge_context: knowledgeContext,
     };
   };
 
@@ -325,6 +361,70 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 onProductChange={handleProductChange}
                 onEpicChange={handleEpicChange}
               />
+
+              {/* Knowledge Integration Section */}
+              <div className="space-y-3 p-3 border rounded-md bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-muted-foreground" />
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Utiliser les connaissances
+                    </label>
+                  </div>
+                  <Switch 
+                    checked={enableKnowledge} 
+                    onCheckedChange={setEnableKnowledge}
+                    aria-label="Toggle knowledge usage"
+                  />
+                </div>
+
+                {enableKnowledge && knowledgeItems.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      Sélectionnez les connaissances à inclure ({knowledgeItems.length} disponible{knowledgeItems.length > 1 ? 's' : ''})
+                    </div>
+                    <div className="max-h-32 overflow-y-auto space-y-1">
+                      {knowledgeItems.map(item => (
+                        <div 
+                          key={item.id}
+                          className={`text-xs p-2 rounded cursor-pointer transition-colors ${
+                            selectedKnowledgeIds.includes(item.id) 
+                              ? 'bg-primary/20 text-primary border border-primary/30' 
+                              : 'bg-background hover:bg-muted border border-border'
+                          }`}
+                          onClick={() => handleKnowledgeToggle(item.id)}
+                        >
+                          <div className="font-medium truncate">{item.title}</div>
+                          <div className="text-muted-foreground truncate">{item.category}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedKnowledgeIds.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {selectedKnowledgeItems.map(item => (
+                          <Badge 
+                            key={item.id} 
+                            variant="secondary" 
+                            className="text-xs flex items-center gap-1"
+                          >
+                            {item.title}
+                            <X 
+                              className="h-3 w-3 cursor-pointer" 
+                              onClick={() => handleKnowledgeToggle(item.id)}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {enableKnowledge && knowledgeItems.length === 0 && (
+                  <div className="text-xs text-muted-foreground">
+                    Aucune connaissance disponible pour ce produit.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
