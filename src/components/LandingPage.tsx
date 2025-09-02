@@ -142,68 +142,76 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <BlurFade delay={0.8} inView>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Turn Wait Time Into Win Time
+              Never Lose Your Next Brilliant Idea Again
             </h2>
           </BlurFade>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <BlurFade delay={0.9} inView>
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <Code className="w-8 h-8 text-primary" />
-                </div>
-                <div className="text-sm text-primary font-medium">STEP 1</div>
-                <h3 className="font-semibold">Launch prompt in Cursor/Claude</h3>
-              </div>
-            </BlurFade>
-            
-            <BlurFade delay={1} inView>
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <ToggleLeft className="w-8 h-8 text-primary" />
-                </div>
-                <div className="text-sm text-primary font-medium">STEP 2</div>
-                <h3 className="font-semibold">Switch to Ahead</h3>
-              </div>
-            </BlurFade>
-            
-            <BlurFade delay={1.1} inView>
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <div className="flex space-x-1">
-                    <Circle className="w-2 h-2 text-primary fill-current" />
-                    <Circle className="w-2 h-2 text-primary fill-current" />
-                    <Circle className="w-2 h-2 text-primary fill-current" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="space-y-8">
+              <BlurFade delay={0.9} inView>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-destructive mb-3">PAIN POINT</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      You're coding with AI when inspiration strikes - a perfect fix, an elegant refactor, the next feature. 
+                      But by the time Claude finishes generating, that brilliant idea is gone. Lost in the 2-4 minutes of waiting, 
+                      buried under new problems, forgotten in the chaos of context switching.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-bold text-primary mb-3">SOLUTION</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">
+                      Ahead captures your ideas the instant they happen. Create a task in seconds, let our AI generate the perfect prompt, 
+                      then copy-paste to any tool when you're ready. Your creative flow stays intact, your momentum never breaks.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <p className="font-semibold text-foreground mb-2">How it works:</p>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-muted-foreground"><strong className="text-foreground">Quick Capture</strong> - Turn any idea into a structured task instantly</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-muted-foreground"><strong className="text-foreground">Smart Generation</strong> - AI creates optimized prompts using your project context</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-muted-foreground"><strong className="text-foreground">One-Click Deploy</strong> - Copy to Cursor, Claude, ChatGPT, or any AI tool</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-sm text-primary font-medium">STEP 3</div>
-                <h3 className="font-semibold">Prepare your next 3 moves</h3>
-              </div>
-            </BlurFade>
-            
-            <BlurFade delay={1.2} inView>
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <Clipboard className="w-8 h-8 text-primary" />
+              </BlurFade>
+              
+              <BlurFade delay={1.2} inView>
+                <div className="pt-4">
+                  <Button size="lg" onClick={handleGetStarted} className="px-8 py-6 text-lg font-medium group">
+                    Start Building Faster Today - Free Demo Available
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
                 </div>
-                <div className="text-sm text-primary font-medium">STEP 4</div>
-                <h3 className="font-semibold">Copy-paste instantly</h3>
+              </BlurFade>
+            </div>
+            
+            {/* Demo */}
+            <BlurFade delay={1.0} inView>
+              <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.1068032187271397' }}>
+                <iframe 
+                  src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
+                  loading="lazy" 
+                  title="Task creation demo" 
+                  allow="clipboard-write" 
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0 rounded-lg"
+                />
               </div>
             </BlurFade>
           </div>
-          
-          <BlurFade delay={1.3} inView>
-            <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.0136' }}>
-              <iframe 
-                src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" 
-                loading="lazy" 
-                title="Ahead Demo" 
-                allow="clipboard-write" 
-                allowFullScreen
-                className="absolute inset-0 w-full h-full border-0 rounded-lg"
-              />
-            </div>
-          </BlurFade>
         </div>
       </section>
 
