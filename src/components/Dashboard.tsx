@@ -144,7 +144,7 @@ const Dashboard = () => {
           <MinimalPromptList workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
         </div>
 
-        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onNavigate={() => {}} // No longer needed with simplified interface
+        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} // No longer needed with simplified interface
       />
 
         <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onCreateProduct={() => {

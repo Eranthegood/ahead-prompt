@@ -36,6 +36,7 @@ interface CommandPaletteProps {
   workspace: Workspace;
   onNavigate?: (tab: string) => void;
   injectedQuery?: string; // optional external query (e.g., from header search)
+  onSetSearchQuery?: (query: string) => void; // update header/list search
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ 
@@ -43,7 +44,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onOpenChange, 
   workspace,
   onNavigate, 
-  injectedQuery
+  injectedQuery,
+  onSetSearchQuery
 }) => {
   const [query, setQuery] = useState('');
   const [prompts, setPrompts] = useState<Prompt[]>([]);
@@ -299,7 +301,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             {prompts.map((prompt) => (
               <CommandItem 
                 key={prompt.id}
-                onSelect={() => copyPromptForLovable(prompt)}
+                onSelect={() => {
+                  if (onSetSearchQuery) {
+                    onSetSearchQuery(prompt.title);
+                  }
+                  onOpenChange(false);
+                }}
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center">
@@ -322,7 +329,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 </div>
                 <div className="flex items-center gap-1">
                   <Copy className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Copy</span>
+                  <span className="text-xs text-muted-foreground">Locate</span>
                 </div>
               </CommandItem>
             ))}
@@ -335,7 +342,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             {completedPrompts.map((prompt) => (
               <CommandItem 
                 key={prompt.id}
-                onSelect={() => copyPromptForLovable(prompt)}
+                onSelect={() => {
+                  if (onSetSearchQuery) {
+                    onSetSearchQuery(prompt.title);
+                  }
+                  onOpenChange(false);
+                }}
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center">
@@ -349,7 +361,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 </div>
                 <div className="flex items-center gap-1">
                   <Copy className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Copy</span>
+                  <span className="text-xs text-muted-foreground">Locate</span>
                 </div>
               </CommandItem>
             ))}
