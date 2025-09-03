@@ -285,7 +285,7 @@ export const useGamification = () => {
 
   // Award XP for various actions
   const awardXP = useCallback(async (action: keyof typeof XP_REWARDS, additionalData?: any) => {
-    if (!user?.id || !stats) return;
+    if (!isGamificationEnabled || !user?.id || !stats) return;
 
     const xpAmount = XP_REWARDS[action];
     const newXP = stats.total_xp + xpAmount;
@@ -352,24 +352,31 @@ export const useGamification = () => {
   }, [user?.id, stats, checkAchievements, toast]);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && isGamificationEnabled) {
       setLoading(true);
       Promise.all([
         initializeUserStats(),
         fetchAchievements()
       ]).finally(() => setLoading(false));
+    } else if (!isGamificationEnabled) {
+      setStats(null);
+      setAchievements([]);
+      setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, isGamificationEnabled]);
 
   return {
-    stats,
-    achievements,
-    loading,
+    stats: isGamificationEnabled ? stats : null,
+    achievements: isGamificationEnabled ? achievements : [],
+    loading: isGamificationEnabled ? loading : false,
     awardXP,
     hasUnlockedFeature,
+    isGamificationEnabled,
     refetch: () => {
-      fetchUserStats();
-      fetchAchievements();
+      if (isGamificationEnabled) {
+        fetchUserStats();
+        fetchAchievements();
+      }
     }
   };
 };
