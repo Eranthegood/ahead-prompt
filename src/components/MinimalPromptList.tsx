@@ -325,7 +325,7 @@ export function MinimalPromptList({
             <div className="mb-3 flex items-center gap-2">
               <div className="h-px bg-destructive flex-1" />
               <Badge variant="destructive" className="bg-destructive/20 text-destructive-foreground">
-                🔥 Priorité Haute ({highPriorityPrompts.length})
+                🔥 High priority ({highPriorityPrompts.length})
               </Badge>
               <div className="h-px bg-destructive flex-1" />
             </div>
