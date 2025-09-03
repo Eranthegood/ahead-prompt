@@ -236,8 +236,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       // Clear draft and show success
       clearDraft();
       toast({
-        title: 'Prompt créé!',
-        description: 'Votre prompt va être généré automatiquement.',
+        title: 'Prompt created!',
+        description: 'Your prompt will be generated automatically.',
         variant: 'default'
       });
       
@@ -251,8 +251,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         contentLength: content.length,
       });
       toast({
-        title: 'Erreur',
-        description: 'Impossible de créer le prompt. Veuillez réessayer.',
+        title: 'Error',
+        description: 'Failed to create prompt. Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -333,11 +333,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               {/* Priority selector */}
               <div>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                  Priorité
+                  Priority
                 </label>
                 <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
                   <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Sélectionner une priorité..." />
+                    <SelectValue placeholder="Select a priority..." />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border shadow-lg z-50">
                     {PRIORITY_OPTIONS.map((option) => (
@@ -368,7 +368,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
                     <label className="text-sm font-medium text-muted-foreground">
-                      Utiliser les connaissances
+                      Use knowledge
                     </label>
                   </div>
                   <Switch 
@@ -381,7 +381,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 {enableKnowledge && knowledgeItems.length > 0 && (
                   <div className="space-y-2">
                     <div className="text-xs text-muted-foreground">
-                      Sélectionnez les connaissances à inclure ({knowledgeItems.length} disponible{knowledgeItems.length > 1 ? 's' : ''})
+                      Select knowledge to include ({knowledgeItems.length} available)
                     </div>
                     <div className="max-h-32 overflow-y-auto space-y-1">
                       {knowledgeItems.map(item => (
@@ -421,7 +421,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
                 {enableKnowledge && knowledgeItems.length === 0 && (
                   <div className="text-xs text-muted-foreground">
-                    Aucune connaissance disponible pour ce produit.
+                    No knowledge available for this product.
                   </div>
                 )}
               </div>
