@@ -233,27 +233,6 @@ export function UserDropdownMenu() {
 
           <DropdownMenuSeparator />
 
-          {/* Bottom Items */}
-          {bottomItems.map((item) => (
-            <DropdownMenuItem 
-              key={item.label}
-              onClick={item.onClick}
-              className="flex items-center justify-between py-2 px-2 cursor-pointer hover:bg-muted/50 rounded-md"
-            >
-              <div className="flex items-center gap-3">
-                <item.icon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{item.label}</span>
-              </div>
-              {item.badge && (
-                <Badge variant={item.badgeVariant} className="text-xs px-1.5 py-0.5">
-                  {item.badge}
-                </Badge>
-              )}
-            </DropdownMenuItem>
-          ))}
-
-          <DropdownMenuSeparator />
-
           {/* Logout */}
           <DropdownMenuItem 
             onClick={handleLogout}
