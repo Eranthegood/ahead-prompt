@@ -73,14 +73,22 @@ export function MinimalPromptList({
       epic
     };
   }).sort((a, b) => {
-    // Sort by priority first (1 = High, 2 = Normal, 3 = Low)
+    // First, sort by status - in_progress prompts always come first
+    if (a.status === 'in_progress' && b.status !== 'in_progress') {
+      return -1;
+    }
+    if (b.status === 'in_progress' && a.status !== 'in_progress') {
+      return 1;
+    }
+    
+    // Then sort by priority (1 = High, 2 = Normal, 3 = Low)
     const priorityA = a.priority || 3;
     const priorityB = b.priority || 3;
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
     }
     
-    // Then by creation date (newest first)
+    // Finally by creation date (newest first)
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
