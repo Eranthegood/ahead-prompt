@@ -71,7 +71,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 flex items-center justify-center px-6 pb-20">
+      <main className="flex-1 flex items-center justify-center px-6 pb-20 pt-16 md:pt-24">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <BlurFade delay={0.25} inView>
             <div className="space-y-6">
