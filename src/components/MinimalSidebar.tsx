@@ -306,16 +306,16 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   return (
     <TooltipProvider>
       <Sidebar className="border-r" collapsible="icon">
-        <SidebarContent className={`${isCollapsed ? 'px-2 py-4' : 'p-4'} flex flex-col min-h-full`}>
+        <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
           {/* Workspace Name */}
           {!isCollapsed && (
-            <div className="mb-6">
-              <h2 className="text-lg font-medium text-foreground">{workspace.name}</h2>
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">{workspace.name}</h2>
             </div>
           )}
 
           {/* Add Prompt Action */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -337,14 +337,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               <>
                 <Button 
                   onClick={onQuickAdd}
-                  className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base"
                   size="sm"
                   aria-label="Add Prompt"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Prompt
                 </Button>
-                <p className="text-xs text-muted-foreground mt-2 px-1">
+                <p className="text-xs text-muted-foreground mt-2 px-1 hidden sm:block">
                   Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">T</kbd> for bugs
                 </p>
               </>
@@ -352,7 +352,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           </div>
 
           {/* Quick Actions */}
-          <div className="mb-4 space-y-2">
+          <div className="mb-3 sm:mb-4 space-y-1 sm:space-y-2">
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -386,16 +386,16 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             ) : (
               <Button 
                 variant="ghost" 
-                className="w-full justify-start text-left font-normal"
+                className="w-full justify-start text-left font-normal text-sm sm:text-base py-2"
                 onClick={() => {
                   onProductSelect('all');
                   onEpicSelect(undefined);
                 }}
                 aria-label={`All Prompts (${allActivePromptsCount})`}
               >
-                <FileText className="mr-3 h-4 w-4" />
+                <FileText className="mr-2 sm:mr-3 h-4 w-4" />
                 All Prompts
-                <Badge variant="secondary" className="ml-auto">
+                <Badge variant="secondary" className="ml-auto text-xs">
                   {allActivePromptsCount}
                 </Badge>
               </Button>
@@ -405,18 +405,18 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           {/* Products with Epic Hierarchy */}
           <SidebarGroup className="mt-2">
             {!isCollapsed && (
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-medium text-muted-foreground">Products</h3>
+              <div className="mb-2 sm:mb-3 flex items-center justify-between">
+                <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">Products</h3>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="h-6 w-6 p-0"
+                      className="h-5 w-5 sm:h-6 sm:w-6 p-0"
                       onClick={() => setIsCreateProductOpen(true)}
                       aria-label="Create Product"
                     >
-                      <Plus className="h-3 w-3" />
+                      <Plus className="h-2 w-2 sm:h-3 sm:w-3" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -429,7 +429,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             <SidebarGroupContent>
               <div className="space-y-1">
                 {productsWithData.length === 0 ? (
-                  <div className={`${isCollapsed ? 'py-2' : 'py-4'} text-center`}>
+                  <div className={`${isCollapsed ? 'py-2' : 'py-3 sm:py-4'} text-center`}>
                     {isCollapsed ? (
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -450,13 +450,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                       </Tooltip>
                     ) : (
                       <>
-                        <p className="text-sm text-muted-foreground mb-2">No products yet</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-2">No products yet</p>
                         <Button 
                           size="sm" 
                           variant="outline"
                           onClick={() => setIsCreateProductOpen(true)}
+                          className="text-xs sm:text-sm py-1 px-2 sm:px-3"
                         >
-                          <Plus className="h-3 w-3 mr-1" />
+                          <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                           Add Product
                         </Button>
                       </>

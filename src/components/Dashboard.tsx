@@ -127,15 +127,10 @@ const Dashboard = () => {
       </div>;
   }
   return <SidebarProvider>
-      <div className="min-h-screen w-full bg-background flex">
-        {/* Global Sidebar Trigger - Always Visible */}
-        <div className="fixed top-4 left-4 z-50 lg:hidden">
-          <SidebarTrigger className="bg-background shadow-md border" />
-        </div>
-        
+      <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">        
         <MinimalSidebar workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onProductSelect={setSelectedProductId} onEpicSelect={setSelectedEpicId} showCompletedItems={preferences.showCompletedItems} onToggleCompletedItems={handleToggleCompletedItems} onQuickAdd={handleQuickAdd} searchQuery={searchQuery} />
         
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <MinimalHeader workspace={workspace} searchQuery={searchQuery} onSearchChange={setSearchQuery} showMetrics={showMetrics} onToggleMetrics={() => setShowMetrics(!showMetrics)} />
           
           {/* Metrics Dashboard - conditionally shown */}

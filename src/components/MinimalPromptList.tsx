@@ -293,23 +293,23 @@ export function MinimalPromptList({
   }
 
   return (
-    <div className="flex-1 p-6">
+    <div className="flex-1 p-3 sm:p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-2">
+      <div className="mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-semibold mb-2">
           {selectedEpicId ? 
             `Epic: ${epics.find(e => e.id === selectedEpicId)?.name || 'Unknown'}` :
             selectedProductId === 'all' || !selectedProductId ? 'All Prompts' : 
             products.find(p => p.id === selectedProductId)?.name || 'Prompts'}
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
           {searchQuery && (
             <span className="ml-2 text-primary">
-              • Recherche: "{searchQuery}"
+              • Search: "{searchQuery}"
               {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
-                <span className="text-xs ml-1">
-                  (trouvé dans: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
+                <span className="text-xs ml-1 hidden sm:inline">
+                  (found in: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
                 </span>
               )}
             </span>
@@ -318,7 +318,7 @@ export function MinimalPromptList({
       </div>
 
       {/* Prompt List */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* High Priority Section */}
         {highPriorityPrompts.length > 0 && (
           <div>
@@ -329,7 +329,7 @@ export function MinimalPromptList({
               </Badge>
               <div className="h-px bg-destructive flex-1" />
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {highPriorityPrompts.map((prompt) => (
                 <PromptCard 
                   key={prompt.id} 

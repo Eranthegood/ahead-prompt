@@ -62,25 +62,25 @@ const ProductPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <Button variant="ghost" size="sm" asChild className="mr-4">
+        <div className="container flex h-14 sm:h-16 items-center px-3 sm:px-6">
+          <Button variant="ghost" size="sm" asChild className="mr-2 sm:mr-4 p-2 sm:px-3">
             <Link to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </Link>
           </Button>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
             <div 
-              className="w-3 h-3 rounded-full" 
+              className="w-3 h-3 rounded-full shrink-0" 
               style={{ backgroundColor: product.color || '#3B82F6' }}
             />
-            <h1 className="font-semibold">{product.name}</h1>
-            <Badge variant="secondary">{totalPrompts} prompts</Badge>
+            <h1 className="font-semibold text-sm sm:text-base truncate">{product.name}</h1>
+            <Badge variant="secondary" className="text-xs shrink-0">{totalPrompts} prompts</Badge>
           </div>
         </div>
       </div>
 
-      <div className="container py-6">
+      <div className="container py-3 sm:py-6 px-3 sm:px-6">
         <div className="grid gap-6">
           {/* Product Header */}
           <Card>
@@ -113,14 +113,14 @@ const ProductPage = () => {
 
           {/* Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full max-w-md grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="epics">Epics</TabsTrigger>
-              <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+            <TabsList className="grid w-full max-w-md grid-cols-3 h-9 sm:h-10 text-xs sm:text-sm">
+              <TabsTrigger value="overview" className="px-2 sm:px-3">Overview</TabsTrigger>
+              <TabsTrigger value="epics" className="px-2 sm:px-3">Epics</TabsTrigger>
+              <TabsTrigger value="knowledge" className="px-2 sm:px-3">Knowledge</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+              <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
                 {/* Direct Prompts */}
                 <Card>
                   <CardHeader>
