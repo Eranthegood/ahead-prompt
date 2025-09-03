@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { PromptTransformService } from '@/services/promptTransformService';
 import { PromptCard } from '@/components/PromptCard';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
+import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
 
 interface MinimalPromptListProps {
   workspace: Workspace;
@@ -45,52 +46,62 @@ export function MinimalPromptList({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  // Apply client-side filtering for instant optimistic updates
-  const filteredPrompts = prompts.filter(prompt => {
-    // Filter by selected product/epic
-    const matchesProduct = !selectedProductId || selectedProductId === 'all' || prompt.product_id === selectedProductId;
-    const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
-    
-    // Filter by search
-    const matchesSearch = !searchQuery || 
-      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Hide completed based on user preference
-    const includeByCompletion = showCompletedItems ? true : prompt.status !== 'done';
+  // Enhanced search with fuzzy matching and multi-field search
+  const searchResults = useMemo(() => {
+    // First apply basic filters (product/epic/completion status)
+    const basicFilteredPrompts = prompts.filter(prompt => {
+      const matchesProduct = !selectedProductId || selectedProductId === 'all' || prompt.product_id === selectedProductId;
+      const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
+      const includeByCompletion = showCompletedItems ? true : prompt.status !== 'done';
+      return matchesProduct && matchesEpic && includeByCompletion;
+    });
 
-    return matchesProduct && matchesEpic && matchesSearch && includeByCompletion;
-  });
-
-  // Get product and epic info for each prompt and sort by priority first, then by status
-  const promptsWithInfo = filteredPrompts.map(prompt => {
-    const product = products.find(p => p.id === prompt.product_id);
-    const epic = epics.find(e => e.id === prompt.epic_id);
-    
-    return {
+    // Add product and epic info for search
+    const searchablePrompts: SearchablePrompt[] = basicFilteredPrompts.map(prompt => ({
       ...prompt,
-      product,
-      epic
-    };
-  }).sort((a, b) => {
-    // First, sort by status - in_progress prompts always come first
-    if (a.status === 'in_progress' && b.status !== 'in_progress') {
-      return -1;
-    }
-    if (b.status === 'in_progress' && a.status !== 'in_progress') {
-      return 1;
-    }
-    
-    // Then sort by priority (1 = High, 2 = Normal, 3 = Low)
-    const priorityA = a.priority || 3;
-    const priorityB = b.priority || 3;
-    if (priorityA !== priorityB) {
-      return priorityA - priorityB;
-    }
-    
-    // Finally by creation date (newest first)
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
+      product: products.find(p => p.id === prompt.product_id),
+      epic: epics.find(e => e.id === prompt.epic_id)
+    }));
+
+    // Apply enhanced search
+    return searchPrompts(searchablePrompts, searchQuery, {
+      minScore: searchQuery ? 0.1 : 0,
+      maxResults: 200
+    });
+  }, [prompts, selectedProductId, selectedEpicId, showCompletedItems, searchQuery, products, epics]);
+
+  const filteredPrompts = searchResults.map(result => result.prompt);
+
+  // Sort prompts with search relevance consideration
+  const promptsWithInfo = useMemo(() => {
+    return filteredPrompts.sort((a, b) => {
+      // If we have search results, use search score for initial sorting
+      if (searchQuery) {
+        const scoreA = searchResults.find(r => r.prompt.id === a.id)?.score || 0;
+        const scoreB = searchResults.find(r => r.prompt.id === b.id)?.score || 0;
+        if (Math.abs(scoreA - scoreB) > 0.1) { // Only use search score if there's a meaningful difference
+          return scoreB - scoreA;
+        }
+      }
+      // First, sort by status - in_progress prompts always come first
+      if (a.status === 'in_progress' && b.status !== 'in_progress') {
+        return -1;
+      }
+      if (b.status === 'in_progress' && a.status !== 'in_progress') {
+        return 1;
+      }
+      
+      // Then sort by priority (1 = High, 2 = Normal, 3 = Low)
+      const priorityA = a.priority || 3;
+      const priorityB = b.priority || 3;
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+      
+      // Finally by creation date (newest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [filteredPrompts, searchResults, searchQuery]);
 
   // Group prompts by priority and status
   const highPriorityPrompts = promptsWithInfo.filter(p => (p.priority || 3) === 1);
@@ -293,6 +304,16 @@ export function MinimalPromptList({
         </h2>
         <p className="text-muted-foreground">
           {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
+          {searchQuery && (
+            <span className="ml-2 text-primary">
+              • Recherche: "{searchQuery}"
+              {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
+                <span className="text-xs ml-1">
+                  (trouvé dans: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
+                </span>
+              )}
+            </span>
+          )}
         </p>
       </div>
 
