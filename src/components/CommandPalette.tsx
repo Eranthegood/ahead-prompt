@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   CommandDialog,
   CommandEmpty,
@@ -29,6 +29,10 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
+import { usePromptsContext } from '@/context/PromptsContext';
+import { useProducts } from '@/hooks/useProducts';
+import { useEpics } from '@/hooks/useEpics';
+import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -55,6 +59,25 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Local, fuzzy prompt search aligned with list view
+  const promptsContext = usePromptsContext();
+  const contextPrompts = promptsContext?.prompts || [];
+  const { products: allProducts } = useProducts(workspace.id);
+  const { epics: allEpics } = useEpics(workspace.id);
+
+  const clientPromptResults = useMemo(() => {
+    if (!query.trim()) return [] as { prompt: SearchablePrompt; score: number }[];
+    const searchable: SearchablePrompt[] = contextPrompts.map((p) => ({
+      ...p,
+      product: allProducts.find((prod) => prod.id === p.product_id),
+      epic: allEpics.find((e) => e.id === p.epic_id),
+    }));
+    return searchPrompts(searchable, query, { minScore: 0.05, maxResults: 10 });
+  }, [contextPrompts, allProducts, allEpics, query]);
+
+  const activeClientPrompts = useMemo(() => clientPromptResults.map(r => r.prompt).filter(p => p.status !== 'done'), [clientPromptResults]);
+  const completedClientPrompts = useMemo(() => clientPromptResults.map(r => r.prompt).filter(p => p.status === 'done'), [clientPromptResults]);
 
   // Sync external injected query from header search
   useEffect(() => {
@@ -296,9 +319,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         )}
 
         {/* Active Prompts */}
-        {prompts.length > 0 && (
+        {activeClientPrompts.length > 0 && (
           <CommandGroup heading="Active Prompts">
-            {prompts.map((prompt) => (
+            {activeClientPrompts.map((prompt) => (
               <CommandItem 
                 key={prompt.id}
                 onSelect={() => {
@@ -337,9 +360,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         )}
 
         {/* Completed Prompts */}
-        {completedPrompts.length > 0 && (
+        {completedClientPrompts.length > 0 && (
           <CommandGroup heading="Completed Prompts">
-            {completedPrompts.map((prompt) => (
+            {completedClientPrompts.map((prompt) => (
               <CommandItem 
                 key={prompt.id}
                 onSelect={() => {
