@@ -40,17 +40,6 @@ export function MinimalHeader({
       </div>
 
       <div className="flex items-center gap-3">
-        {onToggleMetrics && (
-          <Button
-            variant={showMetrics ? 'default' : 'outline'}
-            size="sm"
-            onClick={onToggleMetrics}
-            className="text-xs"
-          >
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Métriques
-          </Button>
-        )}
         <UserDropdownMenu />
       </div>
     </header>
