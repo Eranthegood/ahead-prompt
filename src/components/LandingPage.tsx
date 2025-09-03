@@ -381,15 +381,12 @@ export default function LandingPage() {
             </BlurFade>
             
             <BlurFade delay={0.7} inView>
-              <div className="relative h-[400px] w-full bg-muted/30 rounded-lg flex items-center justify-center">
-                {/* Placeholder for image */}
-                <div className="text-center space-y-2">
-                  <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                    <Zap className="w-8 h-8 text-primary" />
-                  </div>
-                  <p className="text-muted-foreground">Smart Prompt Demo</p>
-                  <p className="text-sm text-muted-foreground">Image coming soon</p>
-                </div>
+              <div className="relative h-[400px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/lovable-uploads/55ae261f-bec5-4f29-bb84-cd997afc58ec.png" 
+                  alt="Smart Prompt Generation interface showing AI-powered prompt editing with rich formatting and context-aware generation"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </BlurFade>
           </div>
