@@ -303,6 +303,91 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Stay 3 Moves Ahead Feature Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <BlurFade delay={0.5} inView>
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  STAY 3 MOVES AHEAD
+                </h2>
+                
+                <h3 className="text-xl font-semibold text-primary">
+                  Turn AI Wait Time Into Strategic Advantage
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-2">The Problem</h4>
+                    <p className="text-muted-foreground">
+                      While your AI generates code (2-4 minutes), your brain is already racing with the next 3-4 ideas - bug fixes, optimizations, new features. But by the time the AI finishes, those brilliant ideas are forgotten, your creative flow is broken, and you're back to reactive coding.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-2">The Solution</h4>
+                    <p className="text-muted-foreground">
+                      Ahead lets you capture and queue your next moves instantly while AI works. Instead of waiting passively, you're always preparing the next prompt, the next improvement, the next breakthrough. Transform downtime into planning time.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold mb-3">What You Get:</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Lightning Capture</strong> - Queue 5 tasks in under 30 seconds</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Maintained Flow</strong> - Never lose creative momentum during AI wait times</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Strategic Thinking</strong> - Plan your next 3-4 moves while current one executes</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
+                        <span><strong>Instant Deployment</strong> - Copy-paste queued prompts the moment AI is ready</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Example:</h4>
+                    <p className="text-sm text-muted-foreground italic">
+                      You send a login component to Claude. Instead of scrolling Twitter, you queue: "Add error handling", "Create responsive design", "Write unit tests", "Add loading states". When Claude finishes, boom - your next prompt is ready to go.
+                    </p>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <p className="font-semibold text-primary">
+                      The Result: You build faster because you think faster. Turn reactive development into strategic execution.
+                    </p>
+                  </div>
+                  
+                  <Button size="lg" onClick={handleSignIn} className="mt-6 px-8 py-6 text-lg font-medium group">
+                    Stay 3 Moves Ahead - Free
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </div>
+              </div>
+            </BlurFade>
+            
+            <BlurFade delay={0.7} inView>
+              <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png" 
+                  alt="Ahead.love interface showing queued prompts and tasks, demonstrating how to stay 3 moves ahead while AI generates code"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+      </section>
+
       {/* Smart Prompt Generation Section */}
       <section className="py-16 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
