@@ -81,7 +81,7 @@ export default function LandingPage() {
                 while AI generates your code
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                The workspace developers love for capturing ideas during AI wait time.
+                Queue your next prompts while AI works
               </p>
             </div>
           </BlurFade>
