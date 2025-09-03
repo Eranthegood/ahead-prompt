@@ -35,13 +35,15 @@ interface CommandPaletteProps {
   onOpenChange: (open: boolean) => void;
   workspace: Workspace;
   onNavigate?: (tab: string) => void;
+  injectedQuery?: string; // optional external query (e.g., from header search)
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ 
   open, 
   onOpenChange, 
   workspace,
-  onNavigate 
+  onNavigate, 
+  injectedQuery
 }) => {
   const [query, setQuery] = useState('');
   const [prompts, setPrompts] = useState<Prompt[]>([]);
@@ -51,6 +53,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Sync external injected query from header search
+  useEffect(() => {
+    if (typeof injectedQuery === 'string') {
+      setQuery(injectedQuery);
+    }
+  }, [injectedQuery]);
 
   useEffect(() => {
     if (open && query.length > 1) {

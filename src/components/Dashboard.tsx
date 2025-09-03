@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { MinimalHeader } from '@/components/MinimalHeader';
@@ -102,6 +102,15 @@ const Dashboard = () => {
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
   };
+
+  // Auto-open universal search when typing in header (2+ chars)
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length >= 2) {
+      setCommandPaletteOpen(true);
+    }
+  }, [searchQuery]);
+
   if (loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -135,7 +144,7 @@ const Dashboard = () => {
           <MinimalPromptList workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
         </div>
 
-        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} onNavigate={() => {}} // No longer needed with simplified interface
+        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onNavigate={() => {}} // No longer needed with simplified interface
       />
 
         <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onCreateProduct={() => {
