@@ -118,7 +118,7 @@ export function TruncatedTitle({
           onClick={() => setIsDialogOpen(true)}
           className="h-6 px-2 text-xs text-primary hover:text-primary-glow"
         >
-          voir plus
+          see more
         </Button>
         {showCopyButton && (
           <Button
@@ -170,7 +170,7 @@ export function TruncatedTitle({
         onClick={() => setIsDialogOpen(true)}
         className="h-6 px-2 text-xs text-primary hover:text-primary-glow"
       >
-        voir plus
+        see more
       </Button>
       {showCopyButton && (
         <Button
