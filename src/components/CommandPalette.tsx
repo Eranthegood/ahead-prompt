@@ -33,6 +33,7 @@ import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
+import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -58,6 +59,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Local, fuzzy prompt search aligned with list view
@@ -325,9 +328,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               <CommandItem 
                 key={prompt.id}
                 onSelect={() => {
-                  if (onSetSearchQuery) {
-                    onSetSearchQuery(prompt.title);
-                  }
+                  setSelectedPrompt(prompt);
+                  setDetailDialogOpen(true);
                   onOpenChange(false);
                 }}
                 className="flex items-center justify-between"
@@ -351,8 +353,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Copy className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Locate</span>
+                  <FileText className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Open</span>
                 </div>
               </CommandItem>
             ))}
@@ -366,9 +368,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               <CommandItem 
                 key={prompt.id}
                 onSelect={() => {
-                  if (onSetSearchQuery) {
-                    onSetSearchQuery(prompt.title);
-                  }
+                  setSelectedPrompt(prompt);
+                  setDetailDialogOpen(true);
                   onOpenChange(false);
                 }}
                 className="flex items-center justify-between"
@@ -383,8 +384,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Copy className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Locate</span>
+                  <FileText className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Open</span>
                 </div>
               </CommandItem>
             ))}
@@ -483,6 +484,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           </CommandGroup>
         )}
       </CommandList>
+      
+      {/* Detail Dialog */}
+      <PromptDetailDialog
+        prompt={selectedPrompt}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        products={allProducts}
+        epics={allEpics}
+      />
     </CommandDialog>
   );
 };
