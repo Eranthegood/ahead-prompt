@@ -621,11 +621,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </div>
             </div>
 
-            <div className="border rounded-md bg-muted/20 p-4 max-h-[500px] overflow-y-auto">
-              <div 
-                className="prose-content prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: generatedPrompt || 'Aucun prompt généré. Cliquez sur le bouton pour générer un prompt basé sur votre contenu.' }}
-              />
+            <div className="border rounded-lg bg-slate-950 dark:bg-slate-900 p-4 max-h-[500px] overflow-y-auto">
+              <div className="relative">
+                <div className="absolute top-0 right-0 text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-bl text-mono">
+                  AI Prompt
+                </div>
+                <pre className="font-mono text-sm text-slate-100 dark:text-slate-200 whitespace-pre-wrap leading-relaxed pt-6">
+                  {generatedPrompt ? 
+                    generatedPrompt.replace(/<[^>]*>/g, '') : 
+                    'Aucun prompt généré. Cliquez sur le bouton pour générer un prompt basé sur votre contenu.'
+                  }
+                </pre>
+              </div>
             </div>
             
             {prompt.generated_at && (
