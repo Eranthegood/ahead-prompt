@@ -438,7 +438,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             onClick={handleSave} 
             disabled={!hasContent || isLoading}
           >
-            {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+            {isLoading ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </DialogContent>
