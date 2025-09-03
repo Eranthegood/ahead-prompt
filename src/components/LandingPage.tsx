@@ -381,11 +381,11 @@ export default function LandingPage() {
             </BlurFade>
             
             <BlurFade delay={0.7} inView>
-              <div className="relative h-[400px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
                 <img 
                   src="/lovable-uploads/55ae261f-bec5-4f29-bb84-cd997afc58ec.png" 
                   alt="Smart Prompt Generation interface showing AI-powered prompt editing with rich formatting and context-aware generation"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </BlurFade>
