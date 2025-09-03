@@ -39,9 +39,12 @@ export const useGamification = () => {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const [loading, setLoading] = useState(true);
+  const { preferences } = useUserPreferences();
+  const isGamificationEnabled = preferences.gamificationEnabled;
 
   // Check if user has unlocked a premium feature
   const hasUnlockedFeature = (feature: keyof typeof PREMIUM_FEATURES): boolean => {
+    if (!isGamificationEnabled) return true;
     if (!stats) return false;
     return stats.current_level >= PREMIUM_FEATURES[feature];
   };
