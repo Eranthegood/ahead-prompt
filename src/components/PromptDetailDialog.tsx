@@ -132,6 +132,43 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     }
   };
 
+  const handleRegenerateFromOriginal = async () => {
+    if (!prompt || !prompt.description?.trim()) return;
+    
+    setIsRegenerating(true);
+    try {
+      const response = await PromptTransformService.transformPrompt(prompt.description);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      if (response.transformedPrompt) {
+        setGeneratedPrompt(response.transformedPrompt);
+        
+        // Persist to database immediately
+        await updatePrompt(prompt.id, {
+          generated_prompt: response.transformedPrompt,
+          generated_at: new Date().toISOString(),
+        });
+      }
+
+      toast({
+        title: 'Prompt régénéré depuis le texte original',
+        description: 'Le prompt a été régénéré et sauvegardé avec succès'
+      });
+    } catch (error) {
+      console.error('Error regenerating prompt from original:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de régénérer le prompt depuis le texte original',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   const handleCopyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(generatedPrompt);
@@ -501,19 +538,35 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     }}
                     className="text-sm"
                   />
-                  <Textarea
+                   <Textarea
                     placeholder="Description du prompt"
                     value={prompt.description || ''}
                     onChange={(e) => {
                       if (prompt) {
-                        // Update the local prompt object
-                        const updatedPrompt = { ...prompt, description: e.target.value };
-                        // This would need to be handled by the parent component
-                        // For now, we'll just update locally
+                        updatePrompt(prompt.id, { description: e.target.value });
                       }
                     }}
                     className="text-sm min-h-[100px]"
                   />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRegenerateFromOriginal}
+                    disabled={isRegenerating || !prompt.description?.trim()}
+                    className="w-full"
+                  >
+                    {isRegenerating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Régénération...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Régénérer depuis le texte original
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             )}
