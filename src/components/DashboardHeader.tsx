@@ -32,17 +32,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ workspace }) =
       </div>
 
       <div className="flex items-center gap-3">
-        {stats && (
-          <div className="hidden lg:block">
-            <XPProgressBar stats={stats} animate={true} />
-          </div>
-        )}
-        
-        {stats && (
-          <div className="hidden md:block">
-            <StreakDisplay stats={stats} />
-          </div>
-        )}
         
         <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
           <Command className="w-3 h-3" />

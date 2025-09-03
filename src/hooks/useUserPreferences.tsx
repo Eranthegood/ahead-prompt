@@ -6,6 +6,7 @@ interface UserPreferences {
   showCompletedItems: boolean;
   theme: 'light' | 'dark' | 'system';
   compactMode: boolean;
+  gamificationEnabled: boolean;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -16,6 +17,7 @@ const defaultPreferences: UserPreferences = {
   showCompletedItems: true,
   theme: 'light', // Default to light theme to avoid dark mode issues before unlock
   compactMode: false,
+  gamificationEnabled: false, // Disabled by default
 };
 
 export const useUserPreferences = () => {
@@ -78,6 +80,13 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save gamification preference
+  const saveGamificationPreference = (enabled: boolean) => {
+    updatePreferences({
+      gamificationEnabled: enabled,
+    });
+  };
+
   return {
     preferences,
     loading,
@@ -86,5 +95,6 @@ export const useUserPreferences = () => {
     saveCompletedItemsPreference,
     saveThemePreference,
     saveCompactModePreference,
+    saveGamificationPreference,
   };
 };

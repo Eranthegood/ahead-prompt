@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { UserStats, UserAchievement, XP_REWARDS, ACHIEVEMENTS } from '@/types/gamification';
 
 // Create a global event emitter for XP animations

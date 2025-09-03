@@ -35,7 +35,7 @@ import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 export function UserDropdownMenu() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { stats } = useGamification();
+  const { stats, isGamificationEnabled } = useGamification();
   const { 
     theme, 
     setTheme, 
@@ -66,7 +66,7 @@ export function UserDropdownMenu() {
       label: 'Profil',
       shortcut: '⌘P',
       onClick: () => navigate('/profile'),
-      badge: stats ? `Niveau ${stats.current_level}` : null,
+      badge: stats && isGamificationEnabled ? `Niveau ${stats.current_level}` : null,
       badgeVariant: 'secondary' as const
     },
     {
@@ -155,7 +155,7 @@ export function UserDropdownMenu() {
                 <p className="text-xs text-muted-foreground truncate">
                   {user?.email}
                 </p>
-                {stats && (
+                {stats && isGamificationEnabled && (
                   <div className="flex items-center gap-1">
                     <Crown className="h-3 w-3 text-accent" />
                     <span className="text-xs text-accent font-medium">

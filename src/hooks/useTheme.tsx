@@ -7,7 +7,7 @@ export const useTheme = () => {
   const { hasUnlockedFeature, stats, loading: gamificationLoading } = useGamification();
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
-  // Check if dark mode is unlocked
+  // Check if dark mode is unlocked (always unlocked if gamification is disabled)
   const isDarkModeUnlocked = hasUnlockedFeature('DARK_MODE');
 
   // Get effective theme considering level restrictions and loading states

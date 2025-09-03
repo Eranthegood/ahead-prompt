@@ -43,18 +43,6 @@ export default function Settings() {
         </div>
 
         <div className="grid gap-6">
-          {/* Premium Features Unlock Card */}
-          {(!isDarkModeUnlocked || !hasUnlockedFeature('COMPACT_MODE')) && (
-            <PremiumFeatureCard
-              featureName="Mode Sombre Premium"
-              requiredLevel={PREMIUM_FEATURES.DARK_MODE}
-              isUnlocked={isDarkModeUnlocked}
-              xpNeeded={xpNeededForDarkMode}
-              currentLevel={currentLevel}
-              icon={<Moon className="h-5 w-5 text-primary" />}
-              description="Débloquez une interface élégante et moderne avec le mode sombre exclusif"
-            />
-          )}
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
@@ -65,26 +53,10 @@ export default function Settings() {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <Label>Theme</Label>
-                    {!isDarkModeUnlocked && (
-                      <Badge variant="secondary" className="text-xs">
-                        <Crown className="mr-1 h-3 w-3" />
-                        Niveau {requiredLevel} requis
-                      </Badge>
-                    )}
-                  </div>
+                  <Label>Theme</Label>
                   <p className="text-sm text-muted-foreground">
-                    {isDarkModeUnlocked 
-                      ? "Choose your preferred theme" 
-                      : `Atteignez le niveau ${requiredLevel} pour débloquer le mode sombre`
-                    }
+                    Choose your preferred theme
                   </p>
-                  {!isDarkModeUnlocked && xpNeededForDarkMode > 0 && (
-                    <p className="text-xs text-primary">
-                      {xpNeededForDarkMode} XP restants (Niveau {currentLevel}/{requiredLevel})
-                    </p>
-                  )}
                 </div>
                 <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => setTheme(value)}>
                   <SelectTrigger className="w-32">
@@ -97,78 +69,31 @@ export default function Settings() {
                         Light
                       </div>
                     </SelectItem>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div>
-                          <SelectItem 
-                            value="dark" 
-                            disabled={!isDarkModeUnlocked}
-                            className={!isDarkModeUnlocked ? "opacity-50" : ""}
-                          >
-                            <div className="flex items-center">
-                              {!isDarkModeUnlocked ? (
-                                <Lock className="mr-2 h-4 w-4" />
-                              ) : (
-                                <Moon className="mr-2 h-4 w-4" />
-                              )}
-                              Dark
-                            </div>
-                          </SelectItem>
-                        </div>
-                      </TooltipTrigger>
-                      {!isDarkModeUnlocked && (
-                        <TooltipContent>
-                          <p>Atteignez le niveau {requiredLevel} pour débloquer</p>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div>
-                          <SelectItem 
-                            value="system" 
-                            disabled={!isDarkModeUnlocked}
-                            className={!isDarkModeUnlocked ? "opacity-50" : ""}
-                          >
-                            <div className="flex items-center">
-                              {!isDarkModeUnlocked ? (
-                                <Lock className="mr-2 h-4 w-4" />
-                              ) : (
-                                <Monitor className="mr-2 h-4 w-4" />
-                              )}
-                              System
-                            </div>
-                          </SelectItem>
-                        </div>
-                      </TooltipTrigger>
-                      {!isDarkModeUnlocked && (
-                        <TooltipContent>
-                          <p>Atteignez le niveau {requiredLevel} pour débloquer</p>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
+                    <SelectItem value="dark">
+                      <div className="flex items-center">
+                        <Moon className="mr-2 h-4 w-4" />
+                        Dark
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="system">
+                      <div className="flex items-center">
+                        <Monitor className="mr-2 h-4 w-4" />
+                        System
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <Label>Compact Mode</Label>
-                    {!hasUnlockedFeature('COMPACT_MODE') && (
-                      <Badge variant="secondary" className="text-xs">
-                        <Crown className="mr-1 h-3 w-3" />
-                        Niveau {PREMIUM_FEATURES.COMPACT_MODE} requis
-                      </Badge>
-                    )}
-                  </div>
+                  <Label>Compact Mode</Label>
                   <p className="text-sm text-muted-foreground">
                     Use a more compact interface
                   </p>
                 </div>
                 <Switch 
-                  disabled={!hasUnlockedFeature('COMPACT_MODE')}
-                  checked={preferences.compactMode && hasUnlockedFeature('COMPACT_MODE')}
+                  checked={preferences.compactMode}
                 />
               </div>
             </CardContent>

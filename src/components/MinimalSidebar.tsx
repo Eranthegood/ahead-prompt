@@ -56,7 +56,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const { epics, createEpic, updateEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
-  const { achievements, stats } = useGamification();
+  const { achievements, stats, isGamificationEnabled } = useGamification();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
   
