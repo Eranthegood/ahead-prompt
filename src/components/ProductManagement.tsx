@@ -16,12 +16,12 @@ interface ProductManagementProps {
 }
 
 const PRODUCT_COLORS = [
-  { value: '#3B82F6', label: 'Bleu' },
-  { value: '#10B981', label: 'Vert' },
-  { value: '#8B5CF6', label: 'Violet' },
+  { value: '#3B82F6', label: 'Blue' },
+  { value: '#10B981', label: 'Green' },
+  { value: '#8B5CF6', label: 'Purple' },
   { value: '#F59E0B', label: 'Orange' },
-  { value: '#EF4444', label: 'Rouge' },
-  { value: '#6B7280', label: 'Gris' },
+  { value: '#EF4444', label: 'Red' },
+  { value: '#6B7280', label: 'Gray' },
 ];
 
 export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace }) => {
@@ -75,7 +75,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
   };
 
   const handleDelete = async (productId: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Tous les épics associés seront également supprimés.')) {
+    if (window.confirm('Are you sure you want to delete this product? All associated epics will also be deleted.')) {
       await deleteProduct(productId);
     }
   };
@@ -102,14 +102,14 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">Gestion des Produits</h2>
+          <h2 className="text-2xl font-semibold">Product Management</h2>
           <p className="text-muted-foreground">
-            Organisez vos prompts par produit pour une meilleure structure
+            Organize your prompts by product for better structure
           </p>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          Nouveau Produit
+          New Product
         </Button>
       </div>
 
@@ -141,14 +141,14 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleOpenEdit(product)}>
                     <Edit className="w-4 h-4 mr-2" />
-                    Modifier
+                    Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => handleDelete(product.id)}
                     className="text-destructive"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Supprimer
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -156,10 +156,10 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
 
             <CardContent>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Créé le {new Date(product.created_at).toLocaleDateString()}</span>
+                <span>Created on {new Date(product.created_at).toLocaleDateString()}</span>
                 <Badge variant="outline">
                   <Package className="w-3 h-3 mr-1" />
-                  Produit
+                  Product
                 </Badge>
               </div>
             </CardContent>
@@ -170,13 +170,13 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
           <Card className="col-span-full">
             <CardContent className="text-center py-8">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-medium mb-2">Aucun produit</h3>
+              <h3 className="font-medium mb-2">No products</h3>
               <p className="text-muted-foreground mb-4">
-                Créez votre premier produit pour organiser vos prompts
+                Create your first product to organize your prompts
               </p>
               <Button onClick={() => setIsCreateDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Créer un produit
+                Create product
               </Button>
             </CardContent>
           </Card>
@@ -192,36 +192,36 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Package className="w-5 h-5" />
-              {editingProduct ? 'Modifier le produit' : 'Nouveau Produit'}
+              {editingProduct ? 'Edit product' : 'New Product'}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="product-name">Nom du produit</Label>
+              <Label htmlFor="product-name">Product name</Label>
               <Input
                 id="product-name"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ex: Application Mobile, Site Web..."
+                placeholder="Ex: Mobile App, Website..."
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="product-description">Description (optionnel)</Label>
+              <Label htmlFor="product-description">Description (optional)</Label>
               <Textarea
                 id="product-description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Décrivez brièvement ce produit..."
+                placeholder="Briefly describe this product..."
                 rows={3}
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label>Couleur</Label>
+              <Label>Color</Label>
               <div className="flex items-center gap-2 mt-2">
                 {PRODUCT_COLORS.map((color) => (
                   <button
@@ -255,15 +255,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
                 onClick={handleCloseDialog}
                 disabled={isSubmitting}
               >
-                Annuler
+                Cancel
               </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={!formData.name.trim() || isSubmitting}
               >
                 {isSubmitting 
-                  ? (editingProduct ? 'Mise à jour...' : 'Création...')
-                  : (editingProduct ? 'Mettre à jour' : 'Créer')
+                  ? (editingProduct ? 'Updating...' : 'Creating...')
+                  : (editingProduct ? 'Update' : 'Create')
                 }
               </Button>
             </div>

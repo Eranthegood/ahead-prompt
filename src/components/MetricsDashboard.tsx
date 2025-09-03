@@ -27,14 +27,14 @@ export const MetricsDashboard: React.FC = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Prompts Créés
+            Prompts Created
           </CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{analytics.totalPrompts}</div>
           <p className="text-xs text-muted-foreground">
-            Activité récente: {analytics.recentActivity}
+            Recent activity: {analytics.recentActivity}
           </p>
         </CardContent>
       </Card>
@@ -43,7 +43,7 @@ export const MetricsDashboard: React.FC = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Temps de Réponse
+            Response Time
           </CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -56,7 +56,7 @@ export const MetricsDashboard: React.FC = () => {
               {React.createElement(getStatusIcon(analytics.performanceStatus), { 
                 className: "h-3 w-3 mr-1" 
               })}
-              {analytics.performanceStatus === 'good' ? 'Performant' : 'À améliorer'}
+              {analytics.performanceStatus === 'good' ? 'Good Performance' : 'Needs Improvement'}
             </Badge>
           </div>
         </CardContent>
@@ -66,7 +66,7 @@ export const MetricsDashboard: React.FC = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Taux d'Allocation
+            Allocation Rate
           </CardTitle>
           <Target className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -75,7 +75,7 @@ export const MetricsDashboard: React.FC = () => {
             {(analytics.allocationRate * 100).toFixed(1)}%
           </div>
           <p className="text-xs text-muted-foreground">
-            {analytics.productSelections} produits, {analytics.epicSelections} épiques
+            {analytics.productSelections} products, {analytics.epicSelections} epics
           </p>
         </CardContent>
       </Card>
@@ -84,7 +84,7 @@ export const MetricsDashboard: React.FC = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Taux d'Erreur
+            Error Rate
           </CardTitle>
           <AlertCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -97,7 +97,7 @@ export const MetricsDashboard: React.FC = () => {
               {React.createElement(getStatusIcon(analytics.qualityStatus), { 
                 className: "h-3 w-3 mr-1" 
               })}
-              {analytics.qualityStatus === 'good' ? 'Stable' : 'Instable'}
+              {analytics.qualityStatus === 'good' ? 'Stable' : 'Unstable'}
             </Badge>
           </div>
         </CardContent>

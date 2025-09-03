@@ -31,7 +31,7 @@ export const useProducts = (workspaceId?: string) => {
       console.error('Error fetching products:', error);
       toast({
         title: 'Erreur',
-        description: 'Impossible de charger les produits',
+        description: 'Unable to load products',
         variant: 'destructive',
       });
     } finally {
@@ -75,8 +75,8 @@ export const useProducts = (workspaceId?: string) => {
         setProducts(prev => prev.filter(p => p.id !== optimisticProduct.id));
         
         toast({
-          title: 'Erreur',
-          description: 'Impossible de créer le produit. Veuillez réessayer.',
+        title: 'Error',
+        description: 'Unable to create product. Please try again.',
           variant: 'destructive',
         });
         throw error;
@@ -86,8 +86,8 @@ export const useProducts = (workspaceId?: string) => {
       setProducts(prev => prev.map(p => p.id === optimisticProduct.id ? data : p));
 
       toast({
-        title: 'Produit créé',
-        description: `"${productData.name}" a été créé avec succès`,
+        title: 'Product created',
+        description: `"${productData.name}" has been created successfully`,
       });
 
       return data;
@@ -113,14 +113,14 @@ export const useProducts = (workspaceId?: string) => {
       ));
 
       toast({
-        title: 'Produit mis à jour',
-        description: 'Les modifications ont été sauvegardées',
+        title: 'Product updated',
+        description: 'Changes have been saved',
       });
     } catch (error: any) {
       console.error('Error updating product:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour le produit',
+        title: 'Error',
+        description: 'Unable to update product',
         variant: 'destructive',
       });
     }
@@ -139,14 +139,14 @@ export const useProducts = (workspaceId?: string) => {
       setProducts(prev => prev.filter(p => p.id !== productId));
 
       toast({
-        title: 'Produit supprimé',
-        description: 'Le produit a été supprimé avec succès',
+        title: 'Product deleted',
+        description: 'Product has been deleted successfully',
       });
     } catch (error: any) {
       console.error('Error deleting product:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer le produit',
+        title: 'Error',
+        description: 'Unable to delete product',
         variant: 'destructive',
       });
     }

@@ -171,12 +171,12 @@ export type PromptPriority = 1 | 2 | 3;
 
 export const PRIORITY_LABELS = {
   1: 'High',
-  2: 'medium', 
-  3: 'Basse'
+  2: 'Medium', 
+  3: 'Low'
 } as const;
 
 export const PRIORITY_OPTIONS = [
   { value: 1, label: 'High', variant: 'destructive' as const },
-  { value: 2, label: 'medium', variant: 'secondary' as const },
-  { value: 3, label: 'Basse', variant: 'outline' as const }
+  { value: 2, label: 'Medium', variant: 'secondary' as const },
+  { value: 3, label: 'Low', variant: 'outline' as const }
 ] as const;

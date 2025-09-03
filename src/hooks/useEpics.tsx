@@ -39,8 +39,8 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
     } catch (error: any) {
       console.error('Error fetching epics:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les épics',
+        title: 'Error',
+        description: 'Unable to load epics',
         variant: 'destructive',
       });
     } finally {
@@ -90,14 +90,14 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
         // Contextual error messages
         if (error.message?.includes('product_id')) {
           toast({
-            title: 'Erreur',
-            description: 'Le produit sélectionné n\'existe pas.',
+            title: 'Error',
+            description: 'The selected product doesn\'t exist.',
             variant: 'destructive',
           });
         } else {
           toast({
-            title: 'Erreur',
-            description: 'Impossible de créer l\'épic. Veuillez réessayer.',
+            title: 'Error',
+            description: 'Unable to create epic. Please try again.',
             variant: 'destructive',
           });
         }
@@ -113,8 +113,8 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
 
       // 🎉 Success notification
       toast({
-        title: 'Épic créé',
-        description: `"${epicData.name}" a été créé avec succès`,
+        title: 'Epic created',
+        description: `"${epicData.name}" has been created successfully`,
       });
 
       return realEpic;

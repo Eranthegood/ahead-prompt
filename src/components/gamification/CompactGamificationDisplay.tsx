@@ -16,7 +16,7 @@ export const CompactGamificationDisplay: React.FC<CompactGamificationDisplayProp
     <div className="space-y-2">
       {/* Simple level and XP display */}
       <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">Niveau {stats.current_level}</span>
+        <span className="text-muted-foreground">Level {stats.current_level}</span>
         <span className="text-xs text-muted-foreground">{stats.total_xp} XP</span>
       </div>
       
@@ -30,7 +30,7 @@ export const CompactGamificationDisplay: React.FC<CompactGamificationDisplayProp
           asChild
         >
           <Link to="/achievements">
-            {achievements.length} succès →
+            {achievements.length} achievements →
           </Link>
         </Button>
       </div>

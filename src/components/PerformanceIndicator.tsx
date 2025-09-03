@@ -43,10 +43,10 @@ export const PerformanceIndicator: React.FC = () => {
         </TooltipTrigger>
         <TooltipContent>
           <div className="text-xs space-y-1">
-            <p><strong>Performance:</strong> {analytics.performanceStatus === 'good' ? 'Excellente' : 'À améliorer'}</p>
-            <p><strong>Prompts créés:</strong> {analytics.totalPrompts}</p>
-            <p><strong>Taux d'allocation:</strong> {(analytics.allocationRate * 100).toFixed(1)}%</p>
-            <p><strong>Taux d'erreur:</strong> {(analytics.errorRate * 100).toFixed(2)}%</p>
+            <p><strong>Performance:</strong> {analytics.performanceStatus === 'good' ? 'Excellent' : 'Needs Improvement'}</p>
+            <p><strong>Prompts created:</strong> {analytics.totalPrompts}</p>
+            <p><strong>Allocation rate:</strong> {(analytics.allocationRate * 100).toFixed(1)}%</p>
+            <p><strong>Error rate:</strong> {(analytics.errorRate * 100).toFixed(2)}%</p>
           </div>
         </TooltipContent>
       </Tooltip>

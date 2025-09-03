@@ -25,12 +25,12 @@ interface QuickEpicDialogProps {
 }
 
 const EPIC_COLORS = [
-  { value: '#8B5CF6', label: 'Violet' },
-  { value: '#3B82F6', label: 'Bleu' },
-  { value: '#10B981', label: 'Vert' },
+  { value: '#8B5CF6', label: 'Purple' },
+  { value: '#3B82F6', label: 'Blue' },
+  { value: '#10B981', label: 'Green' },
   { value: '#F59E0B', label: 'Orange' },
-  { value: '#EF4444', label: 'Rouge' },
-  { value: '#EC4899', label: 'Rose' },
+  { value: '#EF4444', label: 'Red' },
+  { value: '#EC4899', label: 'Pink' },
 ];
 
 export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
@@ -120,7 +120,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <Target className="w-5 h-5 text-primary" />
-            Création rapide d'épic
+            Quick Epic Creation
           </DialogTitle>
         </DialogHeader>
 
@@ -129,7 +129,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
           <div>
             <Input
               ref={nameInputRef}
-              placeholder="Nom de l'épic..."
+              placeholder="Epic name..."
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="text-lg font-medium h-12 border-none bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground"
@@ -140,7 +140,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
           {/* 📝 Description - Optional */}
           <div>
             <Textarea
-              placeholder="Description (optionnel)..."
+              placeholder="Description (optional)..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -155,7 +155,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
             {products.length > 0 && (
               <Select value={selectedProduct} onValueChange={setSelectedProduct}>
                 <SelectTrigger className="flex-1 h-9 text-sm">
-                  <SelectValue placeholder="Produit..." />
+                  <SelectValue placeholder="Product..." />
                 </SelectTrigger>
                 <SelectContent>
                   {products.map((product) => (
@@ -182,7 +182,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
                       className="w-3 h-3 rounded-full" 
                       style={{ backgroundColor: color }}
                     />
-                    <span>Couleur</span>
+                    <span>Color</span>
                   </div>
                 </SelectValue>
               </SelectTrigger>
@@ -215,9 +215,9 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
           {/* 🚀 Action buttons */}
           <div className="flex items-center justify-between pt-4 border-t border-border/50">
             <div className="text-xs text-muted-foreground">
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Enter</kbd> pour créer
+              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Enter</kbd> to create
               <span className="mx-2">•</span>
-              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> pour annuler
+              <kbd className="px-1.5 py-0.5 text-xs bg-muted rounded">Esc</kbd> to cancel
             </div>
 
             <div className="flex gap-2">
@@ -227,7 +227,7 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
                 onClick={onClose}
                 disabled={isLoading}
               >
-                Annuler
+                Cancel
               </Button>
               <Button
                 size="sm"
@@ -238,12 +238,12 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-                    Création...
+                    Creating...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Target className="w-3 h-3" />
-                    Créer
+                    Create
                   </div>
                 )}
               </Button>

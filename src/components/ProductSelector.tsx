@@ -18,12 +18,12 @@ interface ProductSelectorProps {
 }
 
 const PRODUCT_COLORS = [
-  { value: '#3B82F6', label: 'Bleu' },
-  { value: '#10B981', label: 'Vert' },
-  { value: '#8B5CF6', label: 'Violet' },
+  { value: '#3B82F6', label: 'Blue' },
+  { value: '#10B981', label: 'Green' },
+  { value: '#8B5CF6', label: 'Purple' },
   { value: '#F59E0B', label: 'Orange' },
-  { value: '#EF4444', label: 'Rouge' },
-  { value: '#6B7280', label: 'Gris' },
+  { value: '#EF4444', label: 'Red' },
+  { value: '#6B7280', label: 'Gray' },
 ];
 
 export const ProductSelector: React.FC<ProductSelectorProps> = ({
@@ -80,7 +80,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                   {selectedProduct.name}
                 </div>
               ) : (
-                showAllOption ? 'Tous les produits' : 'Sélectionner un produit'
+                showAllOption ? 'All products' : 'Select a product'
               )}
             </SelectValue>
           </div>
@@ -90,7 +90,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
             <SelectItem value="all">
               <div className="flex items-center gap-2">
                 <Package className="w-4 h-4" />
-                Tous les produits
+                All products
               </div>
             </SelectItem>
           )}
@@ -117,43 +117,43 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <Plus className="w-4 h-4 mr-1" />
-            Nouveau
+            New
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Package className="w-5 h-5" />
-              Nouveau Produit
+              New Product
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="product-name">Nom du produit</Label>
+              <Label htmlFor="product-name">Product name</Label>
               <Input
                 id="product-name"
                 value={newProductName}
                 onChange={(e) => setNewProductName(e.target.value)}
-                placeholder="Ex: Application Mobile, Site Web..."
+                placeholder="Ex: Mobile App, Website..."
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="product-description">Description (optionnel)</Label>
+              <Label htmlFor="product-description">Description (optional)</Label>
               <Textarea
                 id="product-description"
                 value={newProductDescription}
                 onChange={(e) => setNewProductDescription(e.target.value)}
-                placeholder="Décrivez brièvement ce produit..."
+                placeholder="Briefly describe this product..."
                 rows={3}
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label>Couleur</Label>
+              <Label>Color</Label>
               <div className="flex items-center gap-2 mt-2">
                 {PRODUCT_COLORS.map((color) => (
                   <button
@@ -187,13 +187,13 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                 onClick={() => setIsCreateDialogOpen(false)}
                 disabled={isCreating}
               >
-                Annuler
+                Cancel
               </Button>
               <Button
                 onClick={handleCreateProduct}
                 disabled={!newProductName.trim() || isCreating}
               >
-                {isCreating ? 'Création...' : 'Créer'}
+                {isCreating ? 'Creating...' : 'Create'}
               </Button>
             </div>
           </div>

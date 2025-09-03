@@ -50,12 +50,12 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
             <SelectTrigger className="h-9">
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="Sélectionner un produit (optionnel)" />
+                <SelectValue placeholder="Select a product (optional)" />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-lg z-50">
               <SelectItem value="none">
-                <span className="text-muted-foreground">Aucun produit</span>
+                <span className="text-muted-foreground">No product</span>
               </SelectItem>
               {products.map((product) => (
                 <SelectItem key={product.id} value={product.id}>
@@ -89,12 +89,12 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
             <SelectTrigger className="h-9">
               <div className="flex items-center gap-2">
                 <Hash className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="Sélectionner une épique (optionnel)" />
+                <SelectValue placeholder="Select an epic (optional)" />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-lg z-50">
               <SelectItem value="none">
-                <span className="text-muted-foreground">Aucune épique</span>
+                <span className="text-muted-foreground">No epic</span>
               </SelectItem>
               {filteredEpics.map((epic) => (
                 <SelectItem key={epic.id} value={epic.id}>
@@ -112,7 +112,7 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
           
           {selectedProductId && filteredEpics.length === 0 && (
             <p className="text-xs text-muted-foreground mt-1 italic">
-              Aucune épique disponible pour ce produit
+              No epics available for this product
             </p>
           )}
         </div>
