@@ -75,16 +75,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             {/* Navigation rapide */}
             <nav className="hidden md:flex items-center gap-1">
               <Button
-                variant={isActivePage('/') ? 'secondary' : 'ghost'}
-                onClick={() => navigate('/')}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Home className="w-4 h-4" />
-                Dashboard
-              </Button>
-              
-              <Button
                 variant={isActivePage('/integrations') ? 'secondary' : 'ghost'}
                 onClick={() => navigate('/integrations')}
                 size="sm"
