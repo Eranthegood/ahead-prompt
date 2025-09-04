@@ -385,10 +385,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 onClick={() => navigate('/')}
               >
                 <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
-                  <div className="flex items-center gap-2">
-                    <ProcessedLogo className="w-6 h-6" />
-                    <span>Ahead</span>
-                  </div>
+                  <span>Ahead</span>
                 </h2>
               </Button>
             </div>
