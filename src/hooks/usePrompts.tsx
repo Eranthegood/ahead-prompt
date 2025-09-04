@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { useKnowledge } from '@/hooks/useKnowledge';
+import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import type { Prompt, PromptStatus } from '@/types';
 
@@ -26,6 +27,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const { toast } = useToast();
   const { awardXP } = useGamification();
   const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
+  const { trackPromptCreated, trackPromptCompleted } = useMixpanelContext();
 
   // Helper function to handle optimistic updates with rollback capability
   const withOptimisticUpdate = async <T,>(
@@ -414,6 +416,14 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     // Award XP for creating a prompt
     awardXP('PROMPT_CREATE');
 
+    // Track prompt creation
+    trackPromptCreated({
+      promptId: prompt.id,
+      productId: prompt.product_id || undefined,
+      epicId: prompt.epic_id || undefined,
+      priority: prompt.priority
+    });
+
     // Success notification
     toast({
       title: 'Prompt créé',
@@ -503,6 +513,17 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       // Award XP for completing a prompt
       if (status === 'done') {
         awardXP('PROMPT_COMPLETE');
+        
+        // Track prompt completion
+        const prompt = prompts.find(p => p.id === promptId);
+        if (prompt) {
+          trackPromptCompleted({
+            promptId: promptId,
+            completionTime: prompt.created_at ? 
+              Math.round((new Date().getTime() - new Date(prompt.created_at).getTime()) / (1000 * 60)) : 
+              undefined
+          });
+        }
       }
     } catch (error) {
       console.error('Error updating prompt status:', error);

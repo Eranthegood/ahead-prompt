@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
+import { useMixpanelContext } from '@/components/MixpanelProvider';
 import type { Epic } from '@/types';
 
 interface CreateEpicData {
@@ -16,6 +17,7 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { awardXP } = useGamification();
+  const { trackEpicCreated } = useMixpanelContext();
 
   // Fetch epics
   const fetchEpics = async () => {
@@ -110,6 +112,13 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
 
       // Award XP for creating an epic
       awardXP('EPIC_CREATE');
+
+      // Track epic creation
+      trackEpicCreated({
+        epicId: realEpic.id,
+        productId: realEpic.product_id || '',
+        color: realEpic.color || undefined
+      });
 
       // 🎉 Success notification
       toast({

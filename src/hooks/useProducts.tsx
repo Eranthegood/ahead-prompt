@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useMixpanelContext } from '@/components/MixpanelProvider';
 import type { Product } from '@/types';
 
 export interface CreateProductData {
@@ -14,6 +15,7 @@ export const useProducts = (workspaceId?: string) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { trackProductCreated } = useMixpanelContext();
 
   // Fetch products
   const fetchProducts = async () => {
@@ -85,6 +87,12 @@ export const useProducts = (workspaceId?: string) => {
 
       // Replace with real data
       setProducts(prev => prev.map(p => p.id === optimisticProduct.id ? data : p));
+
+      // Track product creation
+      trackProductCreated({
+        productId: data.id,
+        color: data.color || undefined
+      });
 
       toast({
         title: 'Product created',

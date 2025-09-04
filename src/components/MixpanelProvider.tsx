@@ -9,6 +9,8 @@ interface MixpanelContextType {
   trackPromptCompleted: (promptData: { promptId: string; completionTime?: number }) => void;
   trackEpicCreated: (epicData: { epicId: string; productId: string; color?: string }) => void;
   trackProductCreated: (productData: { productId: string; color?: string }) => void;
+  trackUserLogin: (userData: { userId: string; provider?: string }) => void;
+  trackUserSignup: (userData: { userId: string; provider?: string }) => void;
   trackTestEvent: () => void;
   setUserProperties: (properties: Record<string, any>) => void;
 }
@@ -29,7 +31,11 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
   }, [location, mixpanel]);
 
   return (
-    <MixpanelContext.Provider value={mixpanel}>
+    <MixpanelContext.Provider value={{
+      ...mixpanel,
+      trackUserLogin: mixpanel.trackUserLogin,
+      trackUserSignup: mixpanel.trackUserSignup
+    }}>
       {children}
     </MixpanelContext.Provider>
   );

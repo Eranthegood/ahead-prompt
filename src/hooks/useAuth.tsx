@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useMixpanelContext } from '@/components/MixpanelProvider';
 
 interface AuthContextType {
   user: User | null;
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { trackUserLogin, trackUserSignup } = useMixpanelContext();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -28,6 +30,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Track login events
+        if (event === 'SIGNED_IN' && session?.user) {
+          trackUserLogin({
+            userId: session.user.id,
+            provider: session.user.app_metadata?.provider || 'email'
+          });
+        }
       }
     );
 
@@ -39,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [trackUserLogin]);
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -63,6 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast({
           title: "Account created!",
           description: "Check your email to confirm your account."
+        });
+        
+        // Track successful user signup
+        trackUserSignup({
+          userId: email, // Use email as temporary ID since user might not be confirmed yet
+          provider: 'email'
         });
       }
 
