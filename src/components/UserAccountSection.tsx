@@ -98,7 +98,7 @@ export function UserAccountSection() {
       {/* User Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start p-2 h-auto max-w-full">
+          <Button variant="ghost" className="w-full justify-start p-2 h-auto max-w-full transform translate-y-[-50px]">
             <div className="flex items-center gap-3 w-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
