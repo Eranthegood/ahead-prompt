@@ -26,7 +26,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   
-  // Pages qui n'ont pas besoin du header (landing page, auth)
+  // Pages qui n'ont pas besoin du header - now only auth page 
   const noHeaderPages = ['/auth'];
   const shouldShowHeader = !noHeaderPages.includes(location.pathname);
   
