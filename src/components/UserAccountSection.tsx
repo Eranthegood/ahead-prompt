@@ -83,7 +83,7 @@ export function UserAccountSection() {
   }
 
   return (
-    <div className="border-t pt-4">
+    <div className="border-t pt-4 px-2">
       {/* XP Badge */}
       {stats && (
         <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full text-sm mb-3">
@@ -98,7 +98,7 @@ export function UserAccountSection() {
       {/* User Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start p-2 h-auto">
+          <Button variant="ghost" className="w-full justify-start p-2 h-auto max-w-full">
             <div className="flex items-center gap-3 w-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
@@ -117,7 +117,7 @@ export function UserAccountSection() {
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 bg-background border-border z-50" align="start" side="top">
+        <DropdownMenuContent className="w-56 bg-background border-border z-[60]" align="end" side="right" sideOffset={8}>
           <DropdownMenuItem onClick={() => navigate('/profile')}>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
