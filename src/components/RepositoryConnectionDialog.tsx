@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2, ExternalLink, Search } from 'lucide-react';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { useProducts } from '@/hooks/useProducts';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -28,8 +28,15 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
   const [defaultBranch, setDefaultBranch] = useState('main');
   const [isLoading, setIsLoading] = useState(false);
   const [repositories, setRepositories] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const githubIntegration = integrations.find(i => i.id === 'github');
+
+  // Filter repositories based on search term
+  const filteredRepositories = repositories.filter(repo =>
+    repo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    repo.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     if (isOpen && githubIntegration?.metadata?.repositories) {
@@ -85,14 +92,29 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
         <div className="space-y-6">
           {repositories.length > 0 && (
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Sélectionner un repository existant</Label>
+              <Label className="text-sm font-medium">
+                Sélectionner un repository existant ({filteredRepositories.length} sur {repositories.length})
+              </Label>
+              
+              {repositories.length > 10 && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher un repository..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              )}
+              
               <Select value={selectedRepo} onValueChange={setSelectedRepo}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir un repository..." />
                 </SelectTrigger>
-                <SelectContent>
-                  {repositories.map((repo: any) => (
-                    <SelectItem key={repo.id} value={repo.html_url}>
+                <SelectContent className="max-h-60">
+                  {filteredRepositories.map((repo: any) => (
+                    <SelectItem key={repo.full_name} value={repo.html_url}>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{repo.name}</span>
                         {repo.private && (
@@ -101,6 +123,11 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
                       </div>
                     </SelectItem>
                   ))}
+                  {filteredRepositories.length === 0 && searchTerm && (
+                    <div className="px-3 py-2 text-sm text-muted-foreground">
+                      Aucun repository trouvé pour "{searchTerm}"
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>

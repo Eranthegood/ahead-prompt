@@ -19,6 +19,8 @@ interface GitHubRepo {
   full_name: string;
   private: boolean;
   html_url: string;
+  updated_at?: string;
+  created_at?: string;
 }
 
 serve(async (req) => {
@@ -51,15 +53,40 @@ serve(async (req) => {
     const userData: GitHubUser = await userResponse.json();
     console.log('GitHub user validated:', userData.login);
 
-    // Get user repositories
-    const reposResponse = await fetch('https://api.github.com/user/repos?sort=updated&per_page=10', {
-      headers: {
-        'Authorization': `token ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-      },
+    // Get user repositories with comprehensive fetching
+    const allRepos: GitHubRepo[] = [];
+    
+    // Fetch repositories with different sorting to get a comprehensive list
+    const sortOptions = ['updated', 'created', 'pushed', 'full_name'];
+    
+    for (const sort of sortOptions) {
+      const reposResponse = await fetch(`https://api.github.com/user/repos?sort=${sort}&per_page=100&type=all&visibility=all`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+      
+      if (reposResponse.ok) {
+        const reposData: GitHubRepo[] = await reposResponse.json();
+        
+        // Add repos that aren't already in our list (deduplicate by full_name)
+        for (const repo of reposData) {
+          if (!allRepos.some(existing => existing.full_name === repo.full_name)) {
+            allRepos.push(repo);
+          }
+        }
+      }
+    }
+    
+    // Sort final list by updated date (most recent first)
+    allRepos.sort((a, b) => {
+      const dateA = new Date(a.updated_at || a.created_at || 0).getTime();
+      const dateB = new Date(b.updated_at || b.created_at || 0).getTime();
+      return dateB - dateA;
     });
-
-    const reposData: GitHubRepo[] = await reposResponse.json();
+    
+    console.log(`Fetched ${allRepos.length} repositories for user ${userData.login}`);
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -97,11 +124,13 @@ serve(async (req) => {
           name: userData.name,
           avatar_url: userData.avatar_url,
           public_repos: userData.public_repos,
-          repositories: reposData.map(repo => ({
+          repositories: allRepos.map(repo => ({
             name: repo.name,
             full_name: repo.full_name,
             private: repo.private,
-            html_url: repo.html_url
+            html_url: repo.html_url,
+            updated_at: repo.updated_at,
+            created_at: repo.created_at
           }))
         }
       }, {
@@ -124,11 +153,13 @@ serve(async (req) => {
         avatar_url: userData.avatar_url,
         public_repos: userData.public_repos
       },
-      repositories: reposData.map(repo => ({
+      repositories: allRepos.map(repo => ({
         name: repo.name,
         full_name: repo.full_name,
         private: repo.private,
-        html_url: repo.html_url
+        html_url: repo.html_url,
+        updated_at: repo.updated_at,
+        created_at: repo.created_at
       }))
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
