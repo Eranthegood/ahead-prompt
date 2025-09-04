@@ -19,7 +19,7 @@ interface DraggableProductItemProps {
   isCollapsed: boolean;
   isExpanded: boolean;
   isSelected: boolean;
-  isEpicSelected: boolean;
+  selectedEpicId?: string;
   onToggleExpanded: () => void;
   onProductSelect: () => void;
   onEpicSelect: (epicId: string) => void;
@@ -33,7 +33,7 @@ export function DraggableProductItem({
   isCollapsed,
   isExpanded,
   isSelected,
-  isEpicSelected,
+  selectedEpicId,
   onToggleExpanded,
   onProductSelect,
   onEpicSelect,
@@ -191,7 +191,7 @@ export function DraggableProductItem({
                 <SidebarMenuButton 
                   className="flex-1 justify-between"
                   onClick={onProductSelect}
-                  isActive={isSelected && !isEpicSelected}
+                  isActive={isSelected && !selectedEpicId}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div 
@@ -242,7 +242,7 @@ export function DraggableProductItem({
                 size="sm"
                 className="text-xs justify-between"
                 onClick={() => onEpicSelect(epic.id)}
-                isActive={isEpicSelected}
+                isActive={selectedEpicId === epic.id}
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <Hash className="w-2 h-2 flex-shrink-0" />
