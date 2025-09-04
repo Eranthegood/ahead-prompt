@@ -7,13 +7,15 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Github, Settings, GitBranch, ExternalLink } from 'lucide-react';
+import { Github, Settings, GitBranch, ExternalLink, ArrowLeft, ChevronRight } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 export default function GitCursorSettings() {
+  const navigate = useNavigate();
   const { products, refetch: refetchProducts } = useProducts();
   const { epics, refetch: refetchEpics } = useEpics();
   const [loading, setLoading] = useState<string | null>(null);
@@ -64,6 +66,39 @@ export default function GitCursorSettings() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => navigate('/')}
+          className="p-0 h-auto hover:bg-transparent"
+        >
+          Accueil
+        </Button>
+        <ChevronRight className="h-4 w-4" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => navigate('/integrations')}
+          className="p-0 h-auto hover:bg-transparent"
+        >
+          Intégrations
+        </Button>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground">Configuration Repository</span>
+      </nav>
+
+      {/* Back Button */}
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate('/integrations')}
+        className="mb-4 -ml-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Retour aux intégrations
+      </Button>
+
       <div className="flex items-center gap-3">
         <Github className="h-8 w-8" />
         <div>

@@ -15,7 +15,8 @@ import {
   Zap,
   Shield,
   BookOpen,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -150,6 +151,29 @@ export default function CursorIntegration() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')}
+              className="p-0 h-auto hover:bg-transparent"
+            >
+              Accueil
+            </Button>
+            <ChevronRight className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/integrations')}
+              className="p-0 h-auto hover:bg-transparent"
+            >
+              Intégrations
+            </Button>
+            <ChevronRight className="h-4 w-4" />
+            <span className="text-foreground">Configuration Cursor</span>
+          </nav>
+
           <Button 
             variant="ghost" 
             onClick={() => navigate('/integrations')}
@@ -401,11 +425,19 @@ export default function CursorIntegration() {
                 </Button>
 
                 {isConfigured && (
-                  <Button size="sm" className="w-full justify-start" onClick={() => navigate('/')}>
-                    <Zap className="h-4 w-4 mr-2" />
-                    Commencer à utiliser
-                    <ChevronRight className="h-3 w-3 ml-auto" />
-                  </Button>
+                  <>
+                    <Button size="sm" className="w-full justify-start" onClick={() => navigate('/settings/git-cursor')}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurer Repository
+                      <ChevronRight className="h-3 w-3 ml-auto" />
+                    </Button>
+                    
+                    <Button size="sm" className="w-full justify-start" onClick={() => navigate('/')}>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Commencer à utiliser
+                      <ChevronRight className="h-3 w-3 ml-auto" />
+                    </Button>
+                  </>
                 )}
               </CardContent>
             </Card>
