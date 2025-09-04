@@ -1,3 +1,4 @@
+import { MixpanelProvider } from '@/components/MixpanelProvider';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,58 +30,60 @@ function App() {
       <AuthProvider>
         <ThemeInitializer>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppLayout>
-                <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/" element={<Home />} />
-                  <Route path="/product/:productId" element={
-                    <ProtectedRoute>
-                      <ProductPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings" element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings/git-cursor" element={
-                    <ProtectedRoute>
-                      <GitCursorSettings />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/shortcuts" element={
-                    <ProtectedRoute>
-                      <KeyboardShortcuts />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrations" element={
-                    <ProtectedRoute>
-                      <Integrations />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrations/cursor" element={
-                    <ProtectedRoute>
-                      <CursorIntegration />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/achievements" element={
-                    <ProtectedRoute>
-                      <Achievements />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AppLayout>
-            </BrowserRouter>
-            <FeedbackBubble />
+            <MixpanelProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppLayout>
+                  <Routes>
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/product/:productId" element={
+                      <ProtectedRoute>
+                        <ProductPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/settings" element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/settings/git-cursor" element={
+                      <ProtectedRoute>
+                        <GitCursorSettings />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/shortcuts" element={
+                      <ProtectedRoute>
+                        <KeyboardShortcuts />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/integrations" element={
+                      <ProtectedRoute>
+                        <Integrations />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/integrations/cursor" element={
+                      <ProtectedRoute>
+                        <CursorIntegration />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/achievements" element={
+                      <ProtectedRoute>
+                        <Achievements />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              </BrowserRouter>
+              <FeedbackBubble />
+            </MixpanelProvider>
           </TooltipProvider>
         </ThemeInitializer>
       </AuthProvider>
