@@ -314,36 +314,36 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
-                Smart Prompt Generation
+                Smart Prompts That Know Your Code
               </h2>
                
               <p className="text-xl text-muted-foreground">
-                Stop writing prompts from scratch. Get context-aware prompts that know your project inside out.
+                Your AI gets smarter. Your prompts get better. Your results get faster.
               </p>
                
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Auto-context</strong> - Includes your docs & standards</span>
+                  <span><strong>Zero setup</strong> - Works with your existing docs</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Reusable templates</strong> - Bug fixes, features, refactors</span>
+                  <span><strong>Perfect context</strong> - Every time, automatically</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Better results</strong> - Consistent quality every time</span>
+                  <span><strong>Better code</strong> - First try, every try</span>
                 </div>
               </div>
                 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground italic">
-                  "Instead of explaining your React patterns every time, Smart Prompts auto-includes your style guide and component docs."
+              <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
+                <p className="text-sm font-medium">
+                  💡 "My prompts went from generic to genius. AI finally understands my codebase."
                 </p>
               </div>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Try Free Now
+                Get Smart Prompts Free
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
