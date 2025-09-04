@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 const FeedbackBubble = () => {
   const [open, setOpen] = useState(false);
@@ -17,7 +17,11 @@ const FeedbackBubble = () => {
     e.preventDefault();
     
     if (!email || !message) {
-      toast.error("Please fill in all fields");
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -25,7 +29,7 @@ const FeedbackBubble = () => {
     
     try {
       const { error } = await supabase
-        .from('feedback')
+        .from('feedback' as any)
         .insert([
           {
             email: email.trim(),
@@ -35,13 +39,20 @@ const FeedbackBubble = () => {
 
       if (error) throw error;
 
-      toast.success("Thank you for your feedback!");
+      toast({
+        title: "Success",
+        description: "Thank you for your feedback!"
+      });
       setEmail("");
       setMessage("");
       setOpen(false);
     } catch (error) {
       console.error('Error submitting feedback:', error);
-      toast.error("Failed to submit feedback. Please try again.");
+      toast({
+        title: "Error", 
+        description: "Failed to submit feedback. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
