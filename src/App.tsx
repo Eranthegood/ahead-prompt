@@ -20,6 +20,7 @@ import GitCursorSettings from "./pages/GitCursorSettings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Integrations from "./pages/Integrations";
 import CursorIntegration from "./pages/CursorIntegration";
+import CursorMultiAgentLanding from "./pages/CursorMultiAgentLanding";
 import GitHubIntegration from "./pages/GitHubIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
@@ -44,6 +45,7 @@ function App() {
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/cursor-multi-agent" element={<CursorMultiAgentLanding />} />
                     <Route path="/build" element={
                       <ProtectedRoute>
                         <Dashboard />
