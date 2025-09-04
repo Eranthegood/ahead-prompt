@@ -238,7 +238,7 @@ export default function LandingPage() {
               </p>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Try, it's free
+                Try it now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
