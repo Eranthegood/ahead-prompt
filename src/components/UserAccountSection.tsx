@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Plug } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useNavigate } from 'react-router-dom';
@@ -58,11 +58,6 @@ export function UserAccountSection() {
             <DropdownMenuItem onClick={() => navigate('/settings')}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={() => navigate('/integrations')}>
-              <Plug className="mr-2 h-4 w-4" />
-              <span>Integrations</span>
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => navigate('/shortcuts')}>
@@ -131,11 +126,6 @@ export function UserAccountSection() {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => navigate('/integrations')}>
-            <Plug className="mr-2 h-4 w-4" />
-            <span>Integrations</span>
           </DropdownMenuItem>
           
           <DropdownMenuItem onClick={() => navigate('/shortcuts')}>

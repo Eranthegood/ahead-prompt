@@ -169,8 +169,8 @@ export function PromptCard({
               </div>
                   
                   <div className="flex items-center gap-2 ml-4">
-                     {/* Send to Cursor Button - Show only for properly configured products */}
-                     {prompt.product?.github_repo_url && prompt.product?.cursor_enabled && (
+                    {/* Send to Cursor Button - Show if product has GitHub repo */}
+                    {prompt.product?.github_repo_url && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -189,7 +189,7 @@ export function PromptCard({
                                   : 'opacity-60 hover:opacity-100 text-purple-600 hover:text-purple-700'
                               }`}
                             >
-                              <img src="/lovable-uploads/7658f39d-f631-4804-864a-57309b5c4066.png" alt="Cursor" className="h-4 w-4" />
+                              <ExternalLink className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -376,7 +376,7 @@ export function PromptCard({
                             e.stopPropagation();
                             setShowCursorDialog(true);
                           }}
-                          disabled={!prompt.product?.github_repo_url || !prompt.product?.cursor_enabled || (!prompt.description && !prompt.generated_prompt)}
+                          disabled={!prompt.description && !prompt.generated_prompt}
                           className="flex items-center gap-2"
                         >
                           <ExternalLink className="h-4 w-4" />

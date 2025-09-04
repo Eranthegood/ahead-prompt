@@ -384,9 +384,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 className="w-full justify-start p-0 h-auto hover:bg-transparent"
                 onClick={() => navigate('/')}
               >
-                <h2 className="text-lg sm:text-xl font-medium text-foreground truncate">
+                <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
                   <div className="flex items-center gap-2">
-                    <ProcessedLogo className="w-8 h-8" />
+                    <ProcessedLogo className="w-6 h-6" />
                     <span>Ahead</span>
                   </div>
                 </h2>
