@@ -169,8 +169,8 @@ export function PromptCard({
               </div>
                   
                   <div className="flex items-center gap-2 ml-4">
-                    {/* Send to Cursor Button - Show if product has GitHub repo */}
-                    {prompt.product?.github_repo_url && (
+                     {/* Send to Cursor Button - Show only for properly configured products */}
+                     {prompt.product?.github_repo_url && prompt.product?.cursor_enabled && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -376,7 +376,7 @@ export function PromptCard({
                             e.stopPropagation();
                             setShowCursorDialog(true);
                           }}
-                          disabled={!prompt.description && !prompt.generated_prompt}
+                          disabled={!prompt.product?.github_repo_url || !prompt.product?.cursor_enabled || (!prompt.description && !prompt.generated_prompt)}
                           className="flex items-center gap-2"
                         >
                           <ExternalLink className="h-4 w-4" />
