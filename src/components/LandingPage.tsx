@@ -387,7 +387,6 @@ export default function LandingPage() {
         mainLinks={[
           { href: "/", label: "Home" },
           { href: "/build", label: "Dashboard" },
-          { href: "/features", label: "Features" },
           { href: "/pricing", label: "Pricing" }
         ]}
         legalLinks={[
