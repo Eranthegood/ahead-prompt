@@ -114,6 +114,15 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
       }
 
       if (data.error) {
+        // Check if it's a Cursor billing/trial limit error
+        if (data.details && data.details.includes('Free trial usage limit reached')) {
+          toast({
+            title: 'Cursor Trial Limit Reached',
+            description: 'Your Cursor free trial has reached its usage limit. Please upgrade to Cursor Pro to continue using background agents.',
+            variant: 'destructive'
+          });
+          return;
+        }
         throw new Error(data.details || data.error);
       }
 
