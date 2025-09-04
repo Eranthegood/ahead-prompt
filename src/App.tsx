@@ -30,10 +30,10 @@ function App() {
       <AuthProvider>
         <ThemeInitializer>
           <TooltipProvider>
-            <MixpanelProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <MixpanelProvider>
                 <AppLayout>
                   <Routes>
                     <Route path="/auth" element={<Auth />} />
@@ -81,9 +81,9 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
-              </BrowserRouter>
-              <FeedbackBubble />
-            </MixpanelProvider>
+              </MixpanelProvider>
+            </BrowserRouter>
+            <FeedbackBubble />
           </TooltipProvider>
         </ThemeInitializer>
       </AuthProvider>
