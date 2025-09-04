@@ -8,11 +8,21 @@ export function useMixpanel() {
   useEffect(() => {
     // Identifier l'utilisateur si connecté
     if (user) {
-      mixpanelService.identify(user.id, {
-        email: user.email,
-        full_name: user.user_metadata?.full_name,
-        created_at: user.created_at,
-        provider: user.app_metadata?.provider
+      // First identify the user with their unique ID
+      mixpanelService.identify(user.id);
+      
+      // Then set user properties
+      mixpanelService.setUserProperties({
+        '$name': user.user_metadata?.full_name || user.email?.split('@')[0] || 'Anonymous',
+        '$email': user.email,
+        'user_id': user.id,
+        'created_at': user.created_at,
+        'auth_provider': user.app_metadata?.provider || 'email',
+        'plan': 'Free', // Default plan, can be updated based on subscription
+        'avatar_url': user.user_metadata?.avatar_url,
+        'phone': user.phone,
+        'email_confirmed': user.email_confirmed_at ? true : false,
+        'last_sign_in': user.last_sign_in_at
       });
     } else {
       // Réinitialiser si l'utilisateur se déconnecte

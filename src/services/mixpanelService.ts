@@ -29,14 +29,11 @@ class MixpanelService {
   }
 
   // Identifier un utilisateur
-  identify(userId: string, properties?: Record<string, any>) {
+  identify(userId: string) {
     if (!this.initialized) return;
     
     try {
       mixpanel.identify(userId);
-      if (properties) {
-        mixpanel.people.set(properties);
-      }
     } catch (error) {
       console.error('Error identifying user in Mixpanel:', error);
     }
