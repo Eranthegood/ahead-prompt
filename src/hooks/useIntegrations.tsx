@@ -15,6 +15,14 @@ export interface Integration {
 export function useIntegrations() {
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
+      id: 'github',
+      name: 'GitHub Integration',
+      description: 'Connect your GitHub repository for enhanced code context',
+      isConfigured: false,
+      isEnabled: false,
+      lastTestResult: null
+    },
+    {
       id: 'cursor',
       name: 'Cursor Background Agents',
       description: 'Génération de code autonome avec Cursor',
@@ -48,6 +56,55 @@ export function useIntegrations() {
 
     setIsLoading(true);
     try {
+      if (id === 'github') {
+        // Simulate GitHub token validation and storage
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        updateIntegration(id, {
+          isConfigured: true,
+          isEnabled: true,
+          lastTestResult: null
+        });
+
+        toast({
+          title: 'GitHub configuré',
+          description: 'Votre token GitHub a été configuré avec succès.',
+          variant: 'default'
+        });
+
+        return true;
+      }
+
+      if (id === 'cursor') {
+        // Check if GitHub is configured first
+        const githubIntegration = integrations.find(i => i.id === 'github');
+        if (!githubIntegration?.isConfigured) {
+          toast({
+            title: 'GitHub requis',
+            description: 'Vous devez d\'abord configurer l\'intégration GitHub.',
+            variant: 'destructive'
+          });
+          return false;
+        }
+
+        // Simulate API call to configure Cursor integration
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        updateIntegration(id, {
+          isConfigured: true,
+          isEnabled: true,
+          lastTestResult: null
+        });
+
+        toast({
+          title: 'Configuration sauvegardée',
+          description: 'Intégration configurée avec succès.',
+          variant: 'default'
+        });
+
+        return true;
+      }
+
       // In a real implementation, this would save to Supabase secrets
       // For now, we'll simulate the API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -81,6 +138,30 @@ export function useIntegrations() {
     setIsLoading(true);
     try {
       let testResult: 'success' | 'error' = 'success';
+      
+      if (id === 'github') {
+        // Simulate testing GitHub connection
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Mock GitHub API validation
+        const success = Math.random() > 0.2;
+        testResult = success ? 'success' : 'error';
+        
+        updateIntegration(id, {
+          lastTestResult: testResult,
+          lastTestTime: new Date()
+        });
+
+        toast({
+          title: testResult === 'success' ? 'Test réussi' : 'Test échoué',
+          description: testResult === 'success' 
+            ? 'Connexion GitHub réussie'
+            : 'Token GitHub invalide ou expiré',
+          variant: testResult === 'success' ? 'default' : 'destructive'
+        });
+
+        return testResult === 'success';
+      }
       
       if (id === 'cursor') {
         // Test Cursor API connection

@@ -64,20 +64,20 @@ export default function CursorIntegration() {
   const steps = [
     {
       number: 1,
-      title: 'Connecter GitHub à Lovable',
-      description: 'OBLIGATOIRE : Les agents Cursor travaillent sur vos repositories GitHub. Vous devez d\'abord connecter votre compte GitHub à Lovable.',
+      title: 'Configurer l\'intégration GitHub',
+      description: 'OBLIGATOIRE : Les agents Cursor travaillent sur vos repositories GitHub. Vous devez d\'abord configurer votre token GitHub.',
       action: (
         <div className="space-y-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to="/settings">
+            <Link to="/integrations/github">
               <Github className="h-4 w-4 mr-2" />
-              Connecter GitHub
+              Configurer GitHub
             </Link>
           </Button>
           <Alert>
             <Github className="h-4 w-4" />
             <AlertDescription className="text-xs">
-              Allez dans Paramètres → GitHub → "Connect to GitHub" pour configurer votre intégration.
+              Configurez votre Personal Access Token GitHub pour permettre à Cursor d'accéder à vos repositories.
             </AlertDescription>
           </Alert>
         </div>
@@ -210,10 +210,10 @@ export default function CursorIntegration() {
           <AlertDescription className="text-amber-800 dark:text-amber-200">
             <strong>Prérequis obligatoire :</strong> Vous devez d'abord{' '}
             <Link 
-              to="/settings" 
+              to="/integrations/github" 
               className="underline font-medium hover:no-underline"
             >
-              connecter votre compte GitHub à Lovable
+              configurer l'intégration GitHub
             </Link>
             {' '}car les agents Cursor travaillent directement sur vos repositories GitHub.
           </AlertDescription>
@@ -409,7 +409,7 @@ export default function CursorIntegration() {
                 </Button>
                 
                 <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                  <Link to="/settings">
+                  <Link to="/integrations/github">
                     <Github className="h-4 w-4 mr-2" />
                     Configurer GitHub
                     <ChevronRight className="h-3 w-3 ml-auto" />

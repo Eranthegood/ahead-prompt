@@ -31,7 +31,7 @@ const INTEGRATIONS_CONFIG = [
     name: 'GitHub Integration',
     description: 'Synchronisez automatiquement vos prompts avec vos repositories GitHub et créez des issues.',
     icon: Github,
-    isComingSoon: true
+    configPath: '/integrations/github'
   },
   {
     id: 'slack',
