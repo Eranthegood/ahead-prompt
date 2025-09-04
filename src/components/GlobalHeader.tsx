@@ -4,18 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-import { 
-  Search, 
-  Settings, 
-  User, 
-  LogOut, 
-  Home, 
-  Package, 
-  Zap,
-  Keyboard,
-  Plug,
-  Trophy
-} from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Search, Settings, User, LogOut, Keyboard, Trophy } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,8 +51,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-
-            {/* Navigation rapide - removed */}
+            {showSidebarTrigger && <SidebarTrigger className="mr-2" />}
           </div>
 
           {/* Barre de recherche */}
