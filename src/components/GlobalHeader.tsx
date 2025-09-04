@@ -3,9 +3,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Search, Settings, User, LogOut, Keyboard, Trophy } from 'lucide-react';
+import { 
+  Search, 
+  Settings, 
+  User, 
+  LogOut, 
+  Home, 
+  Package, 
+  Zap,
+  Keyboard,
+  Plug,
+  Trophy
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +32,9 @@ import { CommandPalette } from '@/components/CommandPalette';
 
 interface GlobalHeaderProps {
   showSearch?: boolean;
-  showSidebarTrigger?: boolean;
 }
 
-export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: GlobalHeaderProps) {
+export function GlobalHeader({ showSearch = true }: GlobalHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -51,7 +60,40 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-            {showSidebarTrigger && <SidebarTrigger className="mr-2" />}
+            <SidebarTrigger className="lg:hidden" />
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 font-semibold text-lg hover:bg-transparent"
+            >
+              <div className="w-8 h-8 bg-gradient-primary rounded-md flex items-center justify-center">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <span className="hidden sm:inline">Ahead.love</span>
+            </Button>
+
+            {/* Navigation rapide */}
+            <nav className="hidden md:flex items-center gap-1">
+              <Button
+                variant={isActivePage('/') ? 'secondary' : 'ghost'}
+                onClick={() => navigate('/')}
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Dashboard
+              </Button>
+              
+              <Button
+                variant={isActivePage('/integrations') ? 'secondary' : 'ghost'}
+                onClick={() => navigate('/integrations')}
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Plug className="w-4 h-4" />
+                Integrations
+              </Button>
+            </nav>
           </div>
 
           {/* Barre de recherche */}

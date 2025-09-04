@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { Workspace } from '@/types';
@@ -18,6 +19,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ workspace }) =
   return (
     <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4">
       <div className="flex items-center gap-3">
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+        
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-gradient-to-br from-primary to-primary-glow rounded-md flex items-center justify-center">
             <Zap className="w-4 h-4 text-primary-foreground" />

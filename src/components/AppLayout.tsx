@@ -45,24 +45,22 @@ export function AppLayout({ children }: AppLayoutProps) {
   if (shouldShowSidebar) {
     return (
       <PromptsProvider workspaceId={workspace.id}>
-        <SidebarProvider defaultOpen>
+        <SidebarProvider>
           <div className="min-h-screen w-full bg-background flex">
-            <div className="flex-shrink-0">
-              <MinimalSidebar 
-                workspace={workspace}
-                selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-                selectedEpicId={selectedEpicId}
-                onProductSelect={setSelectedProductId}
-                onEpicSelect={setSelectedEpicId}
-                showCompletedItems={preferences.showCompletedItems}
-                onToggleCompletedItems={handleToggleCompletedItems}
-                onQuickAdd={handleQuickAdd}
-                searchQuery=""
-              />
-            </div>
+            <MinimalSidebar 
+              workspace={workspace}
+              selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+              selectedEpicId={selectedEpicId}
+              onProductSelect={setSelectedProductId}
+              onEpicSelect={setSelectedEpicId}
+              showCompletedItems={preferences.showCompletedItems}
+              onToggleCompletedItems={handleToggleCompletedItems}
+              onQuickAdd={handleQuickAdd}
+              searchQuery=""
+            />
             
             <div className="flex-1 flex flex-col min-w-0">
-              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger />}
+              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} />}
               <main className="flex-1">
                 {children}
               </main>

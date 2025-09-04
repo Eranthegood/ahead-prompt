@@ -7,6 +7,7 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
@@ -304,9 +305,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
   return (
     <TooltipProvider>
-      <Sidebar className="border-r bg-background" collapsible="icon" style={{ minWidth: '280px' }}>
+      <Sidebar className="border-r" collapsible="icon">
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
-          {/* Workspace Name - removed */}
+          {/* Workspace Name */}
+          {!isCollapsed && (
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">{workspace.name}</h2>
+            </div>
+          )}
 
           {/* Add Prompt Action */}
           <div className="mb-4 sm:mb-6">
