@@ -42,7 +42,7 @@ import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, C
 import { Workspace, Product } from '@/types';
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 
-import { AdaptiveTitle } from './ui/adaptive-title';
+import { ProcessedLogo } from './ProcessedLogo';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
 import { KnowledgeBase } from './KnowledgeBase';
 
@@ -356,16 +356,11 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           {/* Logo and Brand */}
           {!isCollapsed && (
             <div className="mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg font-medium text-foreground truncate flex items-center justify-between">
+              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
                 <div className="flex items-center gap-2">
-                  <img 
-                    src={chessKnightLogo} 
-                    alt="Ahead Logo" 
-                    className="w-6 h-6"
-                  />
+                  <ProcessedLogo className="w-6 h-6" />
                   <span>Ahead</span>
                 </div>
-                <span className="text-sm font-normal text-muted-foreground">Again</span>
               </h2>
             </div>
           )}
