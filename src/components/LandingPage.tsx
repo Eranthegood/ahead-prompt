@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle } from "lucide-react";
+import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
+import { Footer } from "@/components/ui/footer";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 // Logo components
 const CursorLogo = ({ className }: { className?: string }) => (
@@ -522,10 +523,41 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/5 py-8">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          
-        </div>
-      </footer>
+      <Footer
+        logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />}
+        brandName="Ahead"
+        socialLinks={[
+          {
+            icon: <Github className="h-4 w-4" />,
+            href: "https://github.com/ahead-love",
+            label: "GitHub"
+          },
+          {
+            icon: <Twitter className="h-4 w-4" />,
+            href: "https://twitter.com/ahead_love",
+            label: "Twitter"
+          },
+          {
+            icon: <Mail className="h-4 w-4" />,
+            href: "mailto:hello@ahead.love",
+            label: "Email"
+          }
+        ]}
+        mainLinks={[
+          { href: "/", label: "Home" },
+          { href: "/build", label: "Dashboard" },
+          { href: "/features", label: "Features" },
+          { href: "/pricing", label: "Pricing" }
+        ]}
+        legalLinks={[
+          { href: "/privacy", label: "Privacy Policy" },
+          { href: "/terms", label: "Terms of Service" },
+          { href: "/cookies", label: "Cookie Policy" }
+        ]}
+        copyright={{
+          text: "© 2024 Ahead. All rights reserved.",
+          license: "Built with ❤️ for developers who stay ahead."
+        }}
+      />
     </div>;
 }
