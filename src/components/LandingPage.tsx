@@ -381,6 +381,7 @@ export default function LandingPage() {
         ]}
         mainLinks={[
           { href: "/", label: "Home" },
+          { href: "/cursor-multi-agent", label: "Features" },
           { href: "/build", label: "Dashboard" },
           { href: "/pricing", label: "Pricing" }
         ]}

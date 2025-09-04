@@ -72,6 +72,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
   // Navigation items for authenticated users
   const navItems = [
     { label: 'Dashboard', path: '/build', icon: Home },
+    { label: 'Features', path: '/cursor-multi-agent', icon: Zap },
     { label: 'Pricing', path: '/pricing', icon: Package },
   ];
 
@@ -219,6 +220,9 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
                 {/* Desktop buttons for non-auth users */}
                 <div className="hidden md:flex items-center gap-2">
+                  <Button variant="ghost" onClick={() => handleNavigate('/cursor-multi-agent')}>
+                    Features
+                  </Button>
                   <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
                     Pricing
                   </Button>
@@ -235,6 +239,13 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         {!user && mobileMenuOpen && (
           <div className="md:hidden border-t border-border bg-background">
             <div className="container py-4 space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => handleNavigate('/cursor-multi-agent')}
+              >
+                Features
+              </Button>
               <Button
                 variant="ghost"
                 className="w-full justify-start"
