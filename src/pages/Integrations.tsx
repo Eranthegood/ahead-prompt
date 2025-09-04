@@ -288,6 +288,40 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
           )}
         </div>
       )}
+
+      {/* Show configured Cursor user info */}
+      {'metadata' in integrationData && integrationData.metadata && integration.id === 'cursor' && integrationData.isConfigured && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold">C</span>
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">{integrationData.metadata.username || 'Cursor User'}</div>
+              {integrationData.metadata.email && (
+                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
+              )}
+            </div>
+            <div className="text-sm text-green-600 font-medium">
+              Token configuré ✓
+            </div>
+          </div>
+          <div className="pt-3 border-t">
+            <div className="text-sm font-medium mb-2">Capacités disponibles:</div>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs">
+                Background Agents
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                Code Generation
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                Auto PR Creation
+              </Badge>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

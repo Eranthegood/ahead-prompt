@@ -11,6 +11,9 @@ export interface Integration {
   lastTestResult?: 'success' | 'error' | null;
   lastTestTime?: Date;
   metadata?: any;
+  configuration?: {
+    token?: string;
+  };
 }
 
 export function useIntegrations() {
@@ -63,11 +66,12 @@ export function useIntegrations() {
         if (dbIntegration) {
           return {
             ...base,
-            isConfigured: dbIntegration.is_configured,
+            isConfigured: true,
             isEnabled: dbIntegration.is_enabled,
             lastTestResult: dbIntegration.last_test_result as 'success' | 'error' | null,
             lastTestTime: dbIntegration.last_test_time ? new Date(dbIntegration.last_test_time) : undefined,
             metadata: dbIntegration.metadata,
+            configuration: { token: 'configured' }, // Mock configuration for UI
           };
         }
         return base;
@@ -101,41 +105,97 @@ export function useIntegrations() {
     setIsLoading(true);
     try {
       if (id === 'github') {
-        // Validate with GitHub API through edge function
+        // GitHub validation using the edge function
         const { data, error } = await supabase.functions.invoke('validate-github-token', {
           body: { token: secretValue }
         });
 
-        if (error || !data?.success) {
-          toast.error(data?.error || 'Token GitHub invalide');
-          return false;
+        if (error || !data?.isValid) {
+          throw new Error(data?.error || 'Invalid GitHub token');
         }
 
-        toast.success(`GitHub configuré: ${data.user.login}`);
+        // Store the integration configuration
+        const { error: insertError } = await supabase
+          .from('integrations')
+          .upsert({
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            integration_type: id,
+            is_configured: true,
+            is_enabled: true,
+            metadata: data.user ? {
+              username: data.user.login,
+              name: data.user.name,
+              email: data.user.email,
+              avatarUrl: data.user.avatar_url,
+              repositories: data.repositories || []
+            } : null,
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error('Error storing integration:', insertError);
+          throw new Error('Failed to store integration configuration');
+        }
+
+        updateIntegration(id, {
+          isConfigured: true,
+          isEnabled: true,
+          configuration: { token: 'configured' },
+          metadata: data.user ? {
+            username: data.user.login,
+            name: data.user.name,
+            email: data.user.email,
+            avatarUrl: data.user.avatar_url,
+            repositories: data.repositories || []
+          } : null
+        });
+
+        toast.success('GitHub intégré avec succès!');
         await loadIntegrations(); // Reload from database
         return true;
         
       } else if (id === 'cursor') {
-        // Check if GitHub is configured first
-        const githubIntegration = integrations.find(i => i.id === 'github');
-        if (!githubIntegration?.isConfigured) {
-          toast.error('Veuillez configurer GitHub en premier');
-          return false;
+        // Cursor validation using the edge function
+        const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
+          body: { token: secretValue }
+        });
+
+        if (error || !data?.isValid) {
+          throw new Error(data?.error || 'Invalid Cursor API token');
         }
-        
-        if (secretValue.length < 10) {
-          toast.error('Token Cursor invalide');
-          return false;
+
+        // Store the integration configuration
+        const { error: insertError } = await supabase
+          .from('integrations')
+          .upsert({
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            integration_type: id,
+            is_configured: true,
+            is_enabled: true,
+            metadata: data.user ? {
+              username: data.user.username,
+              email: data.user.email
+            } : null,
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error('Error storing integration:', insertError);
+          throw new Error('Failed to store integration configuration');
         }
-        
-        // For now, just simulate Cursor configuration
+
         updateIntegration(id, {
           isConfigured: true,
           isEnabled: true,
-          lastTestResult: null,
+          configuration: { token: 'configured' },
+          metadata: data.user ? {
+            username: data.user.username,
+            email: data.user.email
+          } : null
         });
-        
-        toast.success('Cursor configuré avec succès');
+
+        toast.success('Cursor intégré avec succès!');
+        await loadIntegrations(); // Reload from database
         return true;
       }
 
@@ -156,45 +216,61 @@ export function useIntegrations() {
       let testResult: 'success' | 'error' = 'success';
       
       if (id === 'github') {
-        // Simulate testing GitHub connection
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const integration = integrations.find(i => i.id === 'github');
+        const token = integration?.configuration?.token;
         
-        // Mock GitHub API validation
-        const success = Math.random() > 0.2;
-        testResult = success ? 'success' : 'error';
-        
+        if (!token) {
+          testResult = 'error';
+          toast.error('Aucun token GitHub configuré');
+        } else {
+          const { data, error } = await supabase.functions.invoke('validate-github-token', {
+            body: { token }
+          });
+
+          testResult = (!error && data?.isValid) ? 'success' : 'error';
+          
+          if (testResult === 'success') {
+            toast.success('Connexion GitHub réussie');
+          } else {
+            toast.error('Token GitHub invalide ou expiré');
+          }
+        }
+
         updateIntegration(id, {
           lastTestResult: testResult,
           lastTestTime: new Date()
         });
 
-        if (testResult === 'success') {
-          toast.success('Connexion GitHub réussie');
-        } else {
-          toast.error('Token GitHub invalide ou expiré');
-        }
-
         return testResult === 'success';
       }
       
       if (id === 'cursor') {
-        // Test Cursor API connection
-        const { data, error } = await supabase.functions.invoke('send-to-cursor', {
-          body: {
-            prompt: 'Test connection',
-            repository: 'https://github.com/test/test',
-            // This is a test call - it might fail, which is expected
-          }
-        });
+        const integration = integrations.find(i => i.id === 'cursor');
+        const token = integration?.configuration?.token;
         
-        // If we get a specific error about missing API key, that means the endpoint works
-        if (error && error.message?.includes('CURSOR_API_KEY')) {
-          testResult = 'success'; // Endpoint is working, just needs API key
-        } else if (data?.error && data.error.includes('Cursor API key')) {
-          testResult = 'success'; // Same case
-        } else if (error) {
+        if (!token) {
           testResult = 'error';
+          toast.error('Aucun token Cursor configuré');
+        } else {
+          const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
+            body: { token }
+          });
+
+          testResult = (!error && data?.isValid) ? 'success' : 'error';
+          
+          if (testResult === 'success') {
+            toast.success('Connexion Cursor réussie');
+          } else {
+            toast.error('Token Cursor invalide ou expiré');
+          }
         }
+
+        updateIntegration(id, {
+          lastTestResult: testResult,
+          lastTestTime: new Date()
+        });
+
+        return testResult === 'success';
       } else {
         // Simulate test for other integrations
         await new Promise(resolve => setTimeout(resolve, 1500));
