@@ -24,7 +24,7 @@ const INTEGRATIONS_CONFIG = [
     icon: Code,
     logo: '/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png',
     configPath: '/integrations/cursor',
-    repositoryConfigPath: '/settings/git-cursor'
+    repositoryConfigPath: '/settings/repository-mapping'
   },
   {
     id: 'github',

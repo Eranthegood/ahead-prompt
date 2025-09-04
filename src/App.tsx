@@ -19,6 +19,7 @@ import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Integrations from "./pages/Integrations";
 import CursorIntegration from "./pages/CursorIntegration";
 import GitHubIntegration from "./pages/GitHubIntegration";
+import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
 
 import FeedbackBubble from "./components/FeedbackBubble";
@@ -77,6 +78,11 @@ function App() {
                      <Route path="/integrations/github" element={
                        <ProtectedRoute>
                          <GitHubIntegration />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/settings/repository-mapping" element={
+                       <ProtectedRoute>
+                         <RepositoryMapping />
                        </ProtectedRoute>
                      } />
                     <Route path="/achievements" element={
