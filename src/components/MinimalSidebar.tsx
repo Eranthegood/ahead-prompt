@@ -7,7 +7,6 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
@@ -305,7 +304,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
   return (
     <TooltipProvider>
-      <Sidebar className="border-r shrink-0 relative z-40 pointer-events-auto" collapsible="icon">
+      <Sidebar className="border-r shrink-0" collapsible="icon">
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
           {/* Workspace Name */}
           {!isCollapsed && (
@@ -388,6 +387,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 variant="ghost" 
                 className="w-full justify-start text-left font-normal text-sm sm:text-base py-2"
                 onClick={() => {
+                  console.log('All Prompts button clicked - DEBUG');
                   onProductSelect('all');
                   onEpicSelect(undefined);
                 }}
