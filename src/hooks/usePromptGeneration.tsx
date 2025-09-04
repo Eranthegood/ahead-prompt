@@ -15,7 +15,9 @@ export function usePromptGeneration({ workspaceId, productId }: UsePromptGenerat
 
   const generateWithKnowledge = async (
     rawIdea: string, 
-    selectedKnowledgeIds: string[] = []
+    selectedKnowledgeIds: string[] = [],
+    provider: 'openai' | 'claude' = 'openai',
+    model?: string
   ) => {
     if (!rawIdea?.trim()) {
       throw new Error('Raw idea is required for generation');
@@ -33,7 +35,9 @@ export function usePromptGeneration({ workspaceId, productId }: UsePromptGenerat
       // Transform the prompt with knowledge context
       const result = await PromptTransformService.transformPrompt(
         rawIdea,
-        selectedKnowledgeItems
+        selectedKnowledgeItems,
+        provider,
+        model
       );
 
       if (!result.success) {

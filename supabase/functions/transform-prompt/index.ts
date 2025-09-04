@@ -13,13 +13,21 @@ serve(async (req) => {
   }
 
   try {
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set');
+    const { rawIdea, knowledgeContext, provider = 'openai', model } = await req.json();
+    
+    // Validate required API keys based on provider
+    if (provider === 'openai') {
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      if (!OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY is not set');
+      }
+    } else if (provider === 'claude') {
+      const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+      if (!ANTHROPIC_API_KEY) {
+        throw new Error('ANTHROPIC_API_KEY is not set');
+      }
     }
 
-    const { rawIdea, knowledgeContext } = await req.json();
-    
     if (!rawIdea || typeof rawIdea !== 'string' || rawIdea.trim().length === 0) {
       return new Response(
         JSON.stringify({ error: 'rawIdea is required and must be a non-empty string' }), 
@@ -30,7 +38,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Transforming prompt for idea:', rawIdea);
+    console.log('Transforming prompt for idea:', rawIdea, 'using provider:', provider);
     if (knowledgeContext) {
       console.log('Including knowledge context:', knowledgeContext.length, 'items');
     }
@@ -61,33 +69,72 @@ Format markdown prêt à copier-coller. Réponds UNIQUEMENT avec le prompt trans
       systemPrompt += `\n\nUtilise ces informations pour enrichir et personnaliser le prompt selon le contexte du projet.`;
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: rawIdea }
-        ],
-        max_tokens: 800,
-        temperature: 0.7,
-      }),
-    });
+    let transformedPrompt: string;
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    if (provider === 'claude') {
+      const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+      const claudeModel = model || 'claude-sonnet-4-20250514';
+      
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': ANTHROPIC_API_KEY!,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: claudeModel,
+          max_tokens: 800,
+          messages: [
+            {
+              role: 'user',
+              content: `${systemPrompt}\n\nUser request: ${rawIdea}`
+            }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Claude API error:', errorData);
+        throw new Error(`Claude API error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      transformedPrompt = data.content[0].text;
+    } else {
+      // OpenAI provider
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      const openaiModel = model || 'gpt-4o';
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: openaiModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: rawIdea }
+          ],
+          max_tokens: 800,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('OpenAI API error:', errorData);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      transformedPrompt = data.choices[0].message.content;
     }
 
-    const data = await response.json();
-    const transformedPrompt = data.choices[0].message.content;
-
-    console.log('Successfully transformed prompt');
+    console.log('Successfully transformed prompt using provider:', provider);
 
     return new Response(
       JSON.stringify({ transformedPrompt }), 

@@ -16,6 +16,8 @@ interface CreatePromptData {
   generated_prompt?: string;
   generated_at?: string;
   knowledge_context?: string[];
+  ai_provider?: 'openai' | 'claude';
+  ai_model?: string;
 }
 
 export const usePrompts = (workspaceId?: string, selectedProductId?: string, selectedEpicId?: string) => {
@@ -185,7 +187,13 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   };
 
   // Automatically generate prompt using AI service with knowledge context
-  const autoGeneratePrompt = async (promptId: string, content: string, knowledgeContext?: string[]) => {
+  const autoGeneratePrompt = async (
+    promptId: string, 
+    content: string, 
+    knowledgeContext?: string[],
+    provider: 'openai' | 'claude' = 'openai',
+    model?: string
+  ) => {
     const cleanContent = stripHtmlAndNormalize(content);
     
     console.log(`Auto-generating prompt for: ${promptId}, content length: ${cleanContent.length}`);
@@ -232,7 +240,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
         console.log(`Including ${selectedKnowledgeItems.length} knowledge items in transformation`);
         
         const response = await Promise.race([
-          PromptTransformService.transformPrompt(content, selectedKnowledgeItems),
+          PromptTransformService.transformPrompt(content, selectedKnowledgeItems, provider, model),
           new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Transform timeout')), 30000)
           )
@@ -390,11 +398,17 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   };
 
   // Handle post-creation tasks (XP, auto-generation, toast)
-  const handlePostCreationTasks = async (prompt: Prompt, title: string, knowledgeContext?: string[]) => {
+  const handlePostCreationTasks = async (prompt: Prompt, title: string, promptData: CreatePromptData) => {
     // Auto-generate prompt if we have description content
     if (prompt.description) {
       // Don't await this - let it run in background
-      autoGeneratePrompt(prompt.id, prompt.description, knowledgeContext);
+      autoGeneratePrompt(
+        prompt.id, 
+        prompt.description, 
+        promptData.knowledge_context,
+        promptData.ai_provider || 'openai',
+        promptData.ai_model
+      );
     }
 
     // Award XP for creating a prompt
@@ -456,7 +470,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       setPrompts(prev => prev.map(p => p.id === optimisticPrompt.id ? realPrompt : p));
 
       // Handle post-creation tasks
-      await handlePostCreationTasks(realPrompt, promptData.title, promptData.knowledge_context);
+      await handlePostCreationTasks(realPrompt, promptData.title, promptData);
 
       return realPrompt;
     } catch (error) {

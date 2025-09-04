@@ -12,7 +12,9 @@ export const stripHtmlAndNormalize = (html: string): string => {
 
 export interface TransformPromptRequest {
   rawIdea: string;
-  knowledgeContext?: string[];
+  knowledgeContext?: any[];
+  provider?: 'openai' | 'claude';
+  model?: string;
 }
 
 export interface TransformPromptResponse {
@@ -34,7 +36,9 @@ const MAX_HISTORY_ITEMS = 10;
 export class PromptTransformService {
   static async transformPrompt(
     rawIdea: string, 
-    knowledgeItems?: any[]
+    knowledgeItems?: any[],
+    provider: 'openai' | 'claude' = 'openai',
+    model?: string
   ): Promise<TransformPromptResponse> {
     try {
       // Clean and validate the input
@@ -61,7 +65,9 @@ export class PromptTransformService {
       const { data, error } = await supabase.functions.invoke('transform-prompt', {
         body: { 
           rawIdea: cleanIdea,
-          knowledgeContext
+          knowledgeContext,
+          provider,
+          model
         }
       });
 

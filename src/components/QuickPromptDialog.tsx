@@ -13,6 +13,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
+import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -25,6 +26,8 @@ interface CreatePromptData {
   generated_prompt?: string;
   generated_at?: string;
   knowledge_context?: string[];
+  ai_provider?: 'openai' | 'claude';
+  ai_model?: string;
 }
 
 interface QuickPromptDialogProps {
@@ -96,6 +99,12 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
   const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
+  
+  // AI Provider state
+  const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
+    provider: 'openai',
+    model: 'gpt-4o'
+  });
   
   // Knowledge state
   const [enableKnowledge, setEnableKnowledge] = useState(true); // Default enabled
@@ -204,6 +213,8 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       product_id: inferredProductId || undefined,
       priority: selectedPriority,
       knowledge_context: knowledgeContext,
+      ai_provider: providerConfig.provider,
+      ai_model: providerConfig.model,
     };
   };
 
@@ -361,6 +372,17 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 onProductChange={handleProductChange}
                 onEpicChange={handleEpicChange}
               />
+
+              {/* AI Provider Selection */}
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-muted-foreground">
+                  AI Provider
+                </div>
+                <ProviderSelector
+                  value={providerConfig}
+                  onChange={setProviderConfig}
+                />
+              </div>
 
               {/* Knowledge Integration Section */}
               <div className="space-y-3 p-3 border rounded-md bg-muted/30">
