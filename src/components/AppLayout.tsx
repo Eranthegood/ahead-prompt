@@ -115,7 +115,7 @@ function SidebarContent({
   children: React.ReactNode;
 }) {
   const { products } = useProducts(workspace.id);
-  const { epics } = useEpics(workspace.id, selectedProductId === 'all' ? undefined : selectedProductId);
+  const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
 
   const handleQuickAdd = () => {
