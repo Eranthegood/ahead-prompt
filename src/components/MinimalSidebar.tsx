@@ -56,7 +56,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats, isGamificationEnabled } = useGamification();
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === 'collapsed';
   
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
@@ -335,12 +335,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             ) : (
               <>
                 <Button 
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); console.log('Add Prompt clicked'); onQuickAdd(); }}
-                  className="relative z-50 pointer-events-auto w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base"
+                  onClick={() => {
+                    console.log('Add Prompt clicked');
+                    setOpenMobile?.(false);
+                    onQuickAdd();
+                  }}
+                  className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base"
                   size="sm"
                   aria-label="Add Prompt"
-                  data-testid="add-prompt-button"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Prompt
