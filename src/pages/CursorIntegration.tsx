@@ -162,12 +162,12 @@ export default function CursorIntegration() {
                       <p className="text-sm text-muted-foreground mb-3">
                         Cursor agents work on GitHub repositories. Make sure your GitHub integration is configured.
                       </p>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link to="/integrations/github">
-                          <Github className="h-4 w-4 mr-2" />
-                          Setup GitHub Integration
-                        </Link>
-                      </Button>
+                       <Button variant="outline" size="sm" asChild>
+                         <Link to="/integrations">
+                           <Github className="h-4 w-4 mr-2" />
+                           Setup GitHub Integration
+                         </Link>
+                       </Button>
                     </div>
                   </div>
 
