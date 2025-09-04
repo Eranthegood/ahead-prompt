@@ -60,7 +60,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             />
             
             <div className="flex-1 flex flex-col min-w-0">
-              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} />}
+              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
               <main className="flex-1">
                 {children}
               </main>
@@ -73,7 +73,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} />}
+      {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
       <main className={shouldShowHeader ? '' : 'min-h-screen'}>
         {children}
       </main>

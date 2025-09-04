@@ -32,9 +32,10 @@ import { CommandPalette } from '@/components/CommandPalette';
 
 interface GlobalHeaderProps {
   showSearch?: boolean;
+  showSidebarTrigger?: boolean;
 }
 
-export function GlobalHeader({ showSearch = true }: GlobalHeaderProps) {
+export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: GlobalHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -60,7 +61,7 @@ export function GlobalHeader({ showSearch = true }: GlobalHeaderProps) {
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-            <SidebarTrigger className="lg:hidden" />
+            {showSidebarTrigger && <SidebarTrigger className="lg:hidden" />}
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
