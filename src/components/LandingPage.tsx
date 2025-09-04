@@ -369,11 +369,6 @@ export default function LandingPage() {
         brandName="Ahead"
         socialLinks={[
           {
-            icon: <Github className="h-4 w-4" />,
-            href: "https://github.com/ahead-love",
-            label: "GitHub"
-          },
-          {
             icon: <Twitter className="h-4 w-4" />,
             href: "https://twitter.com/ahead_love",
             label: "Twitter"
