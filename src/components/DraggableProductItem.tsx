@@ -241,7 +241,10 @@ export function DraggableProductItem({
                 key={epic.id}
                 size="sm"
                 className="text-xs justify-between"
-                onClick={() => onEpicSelect(epic.id)}
+                onClick={() => {
+                  onProductSelect();
+                  onEpicSelect(epic.id);
+                }}
                 isActive={selectedEpicId === epic.id}
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">

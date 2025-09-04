@@ -322,7 +322,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       // Small delay to ensure dialog is fully rendered
       setTimeout(resetForm, 100);
     }
-  }, [isOpen, editor, selectedProductId, selectedEpicId, products, clearDraft]);
+  }, [isOpen, editor, selectedProductId, selectedEpicId, products, epics, clearDraft]);
 
   if (!editor) return null;
 
