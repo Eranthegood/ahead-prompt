@@ -61,6 +61,16 @@ export function MinimalPromptList({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
+  // Derive effective product when only epic is selected
+  const effectiveProductId = useMemo(() => {
+    if (selectedProductId && selectedProductId !== 'all') return selectedProductId;
+    if (selectedEpicId) {
+      const epic = epics.find(e => e.id === selectedEpicId);
+      return epic?.product_id;
+    }
+    return undefined;
+  }, [selectedProductId, selectedEpicId, epics]);
+
   // Enhanced search with fuzzy matching and multi-field search
   const searchResults = useMemo(() => {
     // First apply basic filters (product/epic/completion status)
@@ -334,20 +344,20 @@ export function MinimalPromptList({
         <nav className="mb-2">
           <div className="flex items-center text-sm text-muted-foreground">
             <span className="font-medium">All prompts</span>
-            {selectedProductId && selectedProductId !== 'all' && (
+            {effectiveProductId && (
               <>
                 <span className="mx-2">›</span>
                 <span className="font-medium text-foreground">
-                  {products.find(p => p.id === selectedProductId)?.name || 'Unknown Product'}
+                  {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
                 </span>
-                {selectedEpicId && (
-                  <>
-                    <span className="mx-2">›</span>
-                    <span className="font-medium text-foreground">
-                      {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
-                    </span>
-                  </>
-                )}
+              </>
+            )}
+            {selectedEpicId && (
+              <>
+                <span className="mx-2">›</span>
+                <span className="font-medium text-foreground">
+                  {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
+                </span>
               </>
             )}
           </div>
