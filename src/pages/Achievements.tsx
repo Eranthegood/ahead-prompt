@@ -1,6 +1,4 @@
-import { ArrowLeft, Trophy, Zap, Target, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Trophy, Zap, Target, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useGamification } from '@/hooks/useGamification';
@@ -30,29 +28,9 @@ const Achievements = () => {
   const levelTitle = LEVEL_TITLES[stats.current_level as keyof typeof LEVEL_TITLES] || 'Master';
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour au tableau de bord
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-primary" />
-              <h1 className="text-2xl font-bold">Succès & Progression</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Niveau Actuel</CardTitle>
@@ -162,8 +140,7 @@ const Achievements = () => {
           </Card>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default Achievements;

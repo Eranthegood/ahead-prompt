@@ -27,20 +27,11 @@ export default function Settings() {
   const { hasUnlockedFeature } = useGamification();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl mx-auto py-8 px-4">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">Customize your application preferences</p>
-        </div>
+    <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground">Customize your application preferences</p>
+      </div>
 
         <div className="grid gap-6">
           <Card>
@@ -204,6 +195,5 @@ export default function Settings() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
