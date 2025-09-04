@@ -140,7 +140,11 @@ export default function CursorIntegration() {
           
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-muted">
-              <Code className="h-8 w-8" />
+              <img 
+                src="/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png" 
+                alt="Cursor logo"
+                className="h-8 w-8 object-contain"
+              />
             </div>
             <div>
               <h1 className="text-3xl font-bold">Cursor Background Agents</h1>

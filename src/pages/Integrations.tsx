@@ -17,6 +17,7 @@ const INTEGRATIONS = [
     name: 'Cursor Background Agents',
     description: 'Envoyez vos prompts directement vers Cursor pour une génération de code autonome sur vos repos GitHub.',
     icon: Code,
+    logo: '/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png',
     status: 'available',
     path: '/integrations/cursor'
   },
@@ -67,7 +68,15 @@ function IntegrationCard({ integration }: { integration: typeof INTEGRATIONS[0] 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-lg bg-muted">
-              <Icon className="h-6 w-6" />
+              {integration.logo ? (
+                <img 
+                  src={integration.logo} 
+                  alt={`${integration.name} logo`}
+                  className="h-6 w-6 object-contain"
+                />
+              ) : (
+                <Icon className="h-6 w-6" />
+              )}
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg">{integration.name}</CardTitle>
