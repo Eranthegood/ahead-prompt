@@ -263,68 +263,38 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
-                STAY 3 MOVES AHEAD
+                Stay 3 Moves Ahead
               </h2>
-              
-              <h3 className="text-xl font-semibold text-primary">
-                Turn AI Wait Time Into Strategic Advantage
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-primary mb-2">The Problem</h4>
-                  <p className="text-muted-foreground">
-                    While your AI generates code (2-4 minutes), your brain is already racing with the next 3-4 ideas - bug fixes, optimizations, new features. But by the time the AI finishes, those brilliant ideas are forgotten, your creative flow is broken, and you're back to reactive coding.
-                  </p>
+               
+              <p className="text-xl text-muted-foreground">
+                While AI works, your brain races ahead. Capture those brilliant ideas instantly instead of losing them.
+              </p>
+               
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Queue tasks in seconds</strong> - Never wait idle again</span>
                 </div>
-                
-                <div>
-                  <h4 className="text-lg font-semibold text-primary mb-2">The Solution</h4>
-                  <p className="text-muted-foreground">
-                    Ahead lets you capture and queue your next moves instantly while AI works. Instead of waiting passively, you're always preparing the next prompt, the next improvement, the next breakthrough. Transform downtime into planning time.
-                  </p>
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Maintain creative flow</strong> - Zero momentum loss</span>
                 </div>
-                
-                <div>
-                  <h4 className="text-lg font-semibold mb-3">What You Get:</h4>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Lightning Capture</strong> - Queue 5 tasks in under 30 seconds</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Maintained Flow</strong> - Never lose creative momentum during AI wait times</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Strategic Thinking</strong> - Plan your next 3-4 moves while current one executes</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Instant Deployment</strong> - Copy-paste queued prompts the moment AI is ready</span>
-                    </li>
-                  </ul>
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Always ready</strong> - Next prompt waits for you</span>
                 </div>
-                
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Example:</h4>
-                  <p className="text-sm text-muted-foreground italic">
-                    You send a login component to Claude. Instead of scrolling Twitter, you queue: "Add error handling", "Create responsive design", "Write unit tests", "Add loading states". When Claude finishes, boom - your next prompt is ready to go.
-                  </p>
-                </div>
-                
-                <div className="pt-2">
-                  <p className="font-semibold text-primary">
-                    The Result: You build faster because you think faster. Turn reactive development into strategic execution.
-                  </p>
-                </div>
-                
-                <Button size="lg" onClick={handleSignIn} className="mt-6 px-8 py-6 text-lg font-medium group">
-                  Stay 3 Moves Ahead - Free
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
               </div>
+                
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground italic">
+                  "Send login component to Claude → Queue error handling, responsive design, tests → When Claude finishes, boom - next prompt ready."
+                </p>
+              </div>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                Try Free Now
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
             </div>
             
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
@@ -344,73 +314,38 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
-                SMART PROMPT GENERATION
+                Smart Prompt Generation
               </h2>
-              
-              <h3 className="text-xl font-semibold text-primary">
-                Stop Writing Prompts From Scratch Every Time
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-primary mb-2">The Problem</h4>
-                  <p className="text-muted-foreground">
-                    You keep rewriting similar prompts, losing context between projects, and getting mediocre results 
-                    because your AI doesn&apos;t understand your specific requirements, coding style, or project architecture.
-                  </p>
+               
+              <p className="text-xl text-muted-foreground">
+                Stop writing prompts from scratch. Get context-aware prompts that know your project inside out.
+              </p>
+               
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Auto-context</strong> - Includes your docs & standards</span>
                 </div>
-                
-                <div>
-                  <h4 className="text-lg font-semibold text-primary mb-2">The Solution</h4>
-                  <p className="text-muted-foreground">
-                    Ahead&apos;s Smart Prompt Generation uses your project&apos;s knowledge base to create contextually-rich 
-                    prompts that get better results. Upload your docs, design systems, and code standards once - every 
-                    generated prompt includes the relevant context automatically.
-                  </p>
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Reusable templates</strong> - Bug fixes, features, refactors</span>
                 </div>
-                
-                <div>
-                  <h4 className="text-lg font-semibold mb-3">What You Get:</h4>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Context-Aware Prompts</strong> - Automatically includes relevant project documentation</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Reusable Templates</strong> - Bug fixes, features, refactors pre-formatted for your tools</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Consistent Quality</strong> - Same high standards across all your prompts</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></span>
-                      <span><strong>Time Saved</strong> - No more copy-pasting context or rewriting similar requests</span>
-                    </li>
-                  </ul>
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Better results</strong> - Consistent quality every time</span>
                 </div>
-                
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Example:</h4>
-                  <p className="text-sm text-muted-foreground italic">
-                    Instead of manually explaining your React component structure every time, Smart Prompt pulls your 
-                    style guide and generates: &quot;Using our established component patterns in /docs/components.md, create a 
-                    new UserProfile component that follows our TypeScript interfaces...&quot;
-                  </p>
-                </div>
-                
-                <div className="pt-2">
-                  <p className="font-semibold text-primary">
-                    The Result: Better AI responses in less time, with zero context switching.
-                  </p>
-                </div>
-                
-                <Button size="lg" onClick={handleSignIn} className="mt-6 px-8 py-6 text-lg font-medium group">
-                  Try Smart Prompts - Free
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
               </div>
+                
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground italic">
+                  "Instead of explaining your React patterns every time, Smart Prompts auto-includes your style guide and component docs."
+                </p>
+              </div>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                Try Free Now
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
             </div>
             
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
