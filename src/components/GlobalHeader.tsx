@@ -59,42 +59,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
     <>
       <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-full items-center justify-between px-4">
-          {/* Logo et navigation principale */}
-          <div className="flex items-center gap-6">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 font-semibold text-lg hover:bg-transparent"
-            >
-              <div className="w-8 h-8 bg-gradient-primary rounded-md flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="hidden sm:inline">Ahead.love</span>
-            </Button>
-
-            {/* Navigation rapide */}
-            <nav className="hidden md:flex items-center gap-1">
-              <Button
-                variant={isActivePage('/') ? 'secondary' : 'ghost'}
-                onClick={() => navigate('/')}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Home className="w-4 h-4" />
-                Dashboard
-              </Button>
-              
-              <Button
-                variant={isActivePage('/integrations') ? 'secondary' : 'ghost'}
-                onClick={() => navigate('/integrations')}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Plug className="w-4 h-4" />
-                Integrations
-              </Button>
-            </nav>
-          </div>
+          {/* Logo et navigation principale removed */}
 
           {/* Barre de recherche */}
           {showSearch && workspace && (
