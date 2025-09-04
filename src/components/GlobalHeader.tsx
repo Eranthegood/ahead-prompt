@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+
 import { 
   Search, 
   Settings, 
@@ -61,7 +61,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-            {showSidebarTrigger && <SidebarTrigger className="lg:hidden" />}
             <Button
               variant="ghost"
               onClick={() => navigate('/')}

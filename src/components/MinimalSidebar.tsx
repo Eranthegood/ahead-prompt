@@ -306,6 +306,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   return (
     <TooltipProvider>
       <Sidebar className="border-r" collapsible="icon">
+        <div className="p-2 flex justify-end">
+          <SidebarTrigger className="m-0" />
+        </div>
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
           {/* Workspace Name */}
           {!isCollapsed && (
