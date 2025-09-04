@@ -61,16 +61,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 font-semibold text-lg hover:bg-transparent"
-            >
-              <div className="w-8 h-8 bg-gradient-primary rounded-md flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="hidden sm:inline">Ahead.love</span>
-            </Button>
 
             {/* Navigation rapide */}
             <nav className="hidden md:flex items-center gap-1">
