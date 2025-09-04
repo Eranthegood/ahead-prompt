@@ -328,6 +328,10 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary"></span>
+                  <span><strong>Knowledge Box</strong> - Store docs, links, code snippets once</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary"></span>
                   <span><strong>Perfect context</strong> - Every time, automatically</span>
                 </div>
                 <div className="flex items-center gap-3">
