@@ -243,14 +243,14 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.1068032187271397' }}>
+            <div style={{ position: 'relative', boxSizing: 'content-box', maxHeight: '80vh', width: '100%', aspectRatio: '2.1068032187271397', padding: '40px 0 40px 0' }}>
               <iframe 
                 src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
                 loading="lazy" 
                 title="Task creation demo" 
                 allow="clipboard-write" 
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                 allowFullScreen
-                className="absolute inset-0 w-full h-full border-0 rounded-lg"
               />
             </div>
           </div>
