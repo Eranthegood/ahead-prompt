@@ -333,8 +333,10 @@ export function MinimalPromptList({
       <div className="mb-4 sm:mb-6">
         <nav className="mb-2">
           <div className="flex items-center text-sm text-muted-foreground">
-            {selectedProductId && selectedProductId !== 'all' ? (
+            <span className="font-medium">All prompts</span>
+            {selectedProductId && selectedProductId !== 'all' && (
               <>
+                <span className="mx-2">›</span>
                 <span className="font-medium text-foreground">
                   {products.find(p => p.id === selectedProductId)?.name || 'Unknown Product'}
                 </span>
@@ -347,8 +349,6 @@ export function MinimalPromptList({
                   </>
                 )}
               </>
-            ) : (
-              <span className="font-medium">All prompts</span>
             )}
           </div>
         </nav>
