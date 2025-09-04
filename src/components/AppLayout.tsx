@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { QuickPromptDialog } from './QuickPromptDialog';
+import Dashboard from './Dashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useProducts } from '@/hooks/useProducts';
@@ -148,7 +149,13 @@ function SidebarContent({
         <div className="flex-1 flex flex-col min-w-0">
           {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
           <main className="flex-1">
-            {children}
+            {React.isValidElement(children) && children.type === Dashboard 
+              ? React.cloneElement(children as React.ReactElement<any>, {
+                  selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
+                  selectedEpicId: selectedEpicId
+                })
+              : children
+            }
           </main>
         </div>
 
