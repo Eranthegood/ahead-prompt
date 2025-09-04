@@ -199,6 +199,66 @@ export default function CursorIntegration() {
           {/* Main Configuration */}
           <div className="lg:col-span-2 space-y-6">
             
+            {/* Data Flow Explanation */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Comment ça marche ?</CardTitle>
+                <CardDescription>
+                  Comprendre le flux de données entre Ahead.love, Cursor et GitHub
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                    <div className="text-2xl">📝</div>
+                    <div className="flex-1">
+                      <p className="font-medium text-blue-900 dark:text-blue-100">1. Vous créez un prompt dans Ahead.love</p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">Rédigez votre demande de feature ou bugfix</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    <div className="w-8 border-t-2 border-dashed border-muted-foreground"></div>
+                    <span className="mx-2 text-xs text-muted-foreground">envoi</span>
+                    <div className="w-8 border-t-2 border-dashed border-muted-foreground"></div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800">
+                    <img 
+                      src="/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png" 
+                      alt="Cursor logo"
+                      className="h-6 w-6 object-contain"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-purple-900 dark:text-purple-100">2. Cursor reçoit votre prompt</p>
+                      <p className="text-sm text-purple-700 dark:text-purple-300">L'API Cursor crée un Background Agent autonome</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    <div className="w-8 border-t-2 border-dashed border-muted-foreground"></div>
+                    <span className="mx-2 text-xs text-muted-foreground">travaille sur</span>
+                    <div className="w-8 border-t-2 border-dashed border-muted-foreground"></div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                    <Github className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    <div className="flex-1">
+                      <p className="font-medium text-green-900 dark:text-green-100">3. L'agent travaille sur votre repo GitHub</p>
+                      <p className="text-sm text-green-700 dark:text-green-300">Génère le code, crée des commits, et optionnellement une Pull Request</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>Important :</strong> Votre prompt ne va pas directement sur GitHub. Il est envoyé à Cursor via API, 
+                    puis Cursor crée un agent qui travaille de manière autonome sur votre repository GitHub.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Features Overview */}
             <Card>
               <CardHeader>
