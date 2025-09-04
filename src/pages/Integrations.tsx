@@ -108,11 +108,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
     if (integration.isComingSoon) return;
     
     if (!integrationData.isConfigured) {
-      if (integration.id === 'cursor') {
-        navigate(integration.configPath);
-      } else {
-        setShowTokenField(true);
-      }
+      setShowTokenField(true);
     } else if (integrationData.isEnabled && integration.repositoryConfigPath) {
       navigate(integration.repositoryConfigPath);
     } else {
