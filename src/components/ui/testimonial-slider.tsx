@@ -89,11 +89,11 @@ export const TestimonialSlider = ({
           ))}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex flex-wrap justify-center gap-3">
         {testimonials.map((testimonial, index) => (
           <button
             key={index}
-            className={`flex flex-col items-center rounded-lg px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary/30 ${
+            className={`flex flex-col items-center rounded-lg px-4 py-3 text-sm sm:text-base shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary/30 ${
               active === index
                 ? "bg-primary text-primary-foreground shadow-primary/10"
                 : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
@@ -103,8 +103,8 @@ export const TestimonialSlider = ({
               setAutorotate(false);
             }}
           >
-            <span className="font-medium">{testimonial.name}</span>
-            <span className="text-muted-foreground text-xs mt-0.5">
+            <span className="font-semibold">{testimonial.name}</span>
+            <span className="text-foreground/70 text-sm mt-1">
               {testimonial.role}
             </span>
           </button>
