@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Integrations from "./pages/Integrations";
+import CursorIntegration from "./pages/CursorIntegration";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -54,6 +55,11 @@ function App() {
                 <Route path="/integrations" element={
                   <ProtectedRoute>
                     <Integrations />
+                  </ProtectedRoute>
+                } />
+                <Route path="/integrations/cursor" element={
+                  <ProtectedRoute>
+                    <CursorIntegration />
                   </ProtectedRoute>
                 } />
                 <Route path="*" element={<NotFound />} />
