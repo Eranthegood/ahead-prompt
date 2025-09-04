@@ -38,6 +38,10 @@ export function MinimalPromptList({
 }: MinimalPromptListProps) {
   const promptsContext = usePromptsContext();
   const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
+  const { products } = useProducts(workspace.id);
+  const { epics } = useEpics(workspace.id);
+  const { toast } = useToast();
+  
   console.debug('[MinimalPromptList] Render with props:', { 
     selectedProductId, 
     selectedEpicId, 
@@ -45,9 +49,14 @@ export function MinimalPromptList({
     promptCount: prompts?.length, 
     loading 
   });
-  const { products } = useProducts(workspace.id);
-  const { epics } = useEpics(workspace.id);
-  const { toast } = useToast();
+  console.debug('[MinimalPromptList] Products loaded:', products.map(p => ({ id: p.id, name: p.name })));
+  console.debug('[MinimalPromptList] Title calculation:', {
+    selectedProductId,
+    selectedEpicId,
+    hasEpic: !!selectedEpicId,
+    isAllProducts: selectedProductId === 'all' || !selectedProductId,
+    foundProduct: selectedProductId ? products.find(p => p.id === selectedProductId) : null
+  });
   
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
