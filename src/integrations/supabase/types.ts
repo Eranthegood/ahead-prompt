@@ -221,6 +221,7 @@ export type Database = {
           github_repo_url: string | null
           id: string
           name: string
+          order_index: number | null
           updated_at: string
           workspace_id: string
         }
@@ -233,6 +234,7 @@ export type Database = {
           github_repo_url?: string | null
           id?: string
           name: string
+          order_index?: number | null
           updated_at?: string
           workspace_id: string
         }
@@ -245,6 +247,7 @@ export type Database = {
           github_repo_url?: string | null
           id?: string
           name?: string
+          order_index?: number | null
           updated_at?: string
           workspace_id?: string
         }

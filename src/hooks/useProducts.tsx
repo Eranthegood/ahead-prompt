@@ -3,10 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Product } from '@/types';
 
-interface CreateProductData {
+export interface CreateProductData {
   name: string;
   description?: string;
   color?: string;
+  order_index?: number;
 }
 
 export const useProducts = (workspaceId?: string) => {
@@ -23,7 +24,7 @@ export const useProducts = (workspaceId?: string) => {
         .from('products')
         .select('*')
         .eq('workspace_id', workspaceId)
-        .order('created_at', { ascending: false });
+        .order('order_index', { ascending: true });
 
       if (error) throw error;
       setProducts(data || []);
@@ -126,6 +127,36 @@ export const useProducts = (workspaceId?: string) => {
     }
   };
 
+  // Reorder products
+  const reorderProducts = async (reorderedProducts: Product[]): Promise<void> => {
+    if (!workspaceId) return;
+
+    try {
+      // Update order_index for each product using individual UPDATE queries
+      for (let i = 0; i < reorderedProducts.length; i++) {
+        const product = reorderedProducts[i];
+        const { error } = await supabase
+          .from('products')
+          .update({ order_index: i })
+          .eq('id', product.id);
+        
+        if (error) throw error;
+      }
+
+      // Update local state to reflect new order
+      setProducts(reorderedProducts);
+    } catch (error: any) {
+      console.error('Error reordering products:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to reorder products',
+        variant: 'destructive',
+      });
+      // Refetch to restore correct order
+      fetchProducts();
+    }
+  };
+
   // Delete product
   const deleteProduct = async (productId: string): Promise<void> => {
     try {
@@ -199,6 +230,7 @@ export const useProducts = (workspaceId?: string) => {
     loading,
     createProduct,
     updateProduct,
+    reorderProducts,
     deleteProduct,
     refetch: fetchProducts,
   };

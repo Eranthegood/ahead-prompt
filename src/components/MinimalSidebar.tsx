@@ -18,6 +18,21 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { DraggableProductItem } from '@/components/DraggableProductItem';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
@@ -51,13 +66,25 @@ const PRODUCT_COLORS = [
 ];
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
-  const { products, createProduct, updateProduct, deleteProduct } = useProducts(workspace.id);
+  const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
   const { epics, createEpic, updateEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats, isGamificationEnabled } = useGamification();
   const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === 'collapsed';
+  
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   
   const [isCompletedExpanded, setIsCompletedExpanded] = useState(false);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
@@ -302,6 +329,19 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     setSelectedKnowledgeProduct(undefined);
   };
 
+  // Handle drag end for product reordering
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = productsWithData.findIndex(product => product.id === active.id);
+      const newIndex = productsWithData.findIndex(product => product.id === over.id);
+      
+      const reorderedProducts = arrayMove(productsWithData, oldIndex, newIndex);
+      reorderProducts(reorderedProducts);
+    }
+  };
+
   return (
     <TooltipProvider>
       <Sidebar className="border-r shrink-0" collapsible="icon">
@@ -431,318 +471,81 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             )}
             
             <SidebarGroupContent>
-              <div className="space-y-1">
-                {productsWithData.length === 0 ? (
-                  <div className={`${isCollapsed ? 'py-2' : 'py-3 sm:py-4'} text-center`}>
-                    {isCollapsed ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            className="aspect-square p-0"
-                            onClick={() => setIsCreateProductOpen(true)}
-                            aria-label="No products - Click to add"
-                          >
-                            <Package className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>No products yet</p>
-                          <p className="text-xs text-muted-foreground">Click to add product</p>
-                        </TooltipContent>
-                      </Tooltip>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={productsWithData.map(p => p.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-1">
+                    {productsWithData.length === 0 ? (
+                      <div className={`${isCollapsed ? 'py-2' : 'py-3 sm:py-4'} text-center`}>
+                        {isCollapsed ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="aspect-square p-0"
+                                onClick={() => setIsCreateProductOpen(true)}
+                                aria-label="No products - Click to add"
+                              >
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              <p>No products yet</p>
+                              <p className="text-xs text-muted-foreground">Click to add product</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <>
+                            <p className="text-xs sm:text-sm text-muted-foreground mb-2">No products yet</p>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => setIsCreateProductOpen(true)}
+                              className="text-xs sm:text-sm py-1 px-2 sm:px-3"
+                            >
+                              <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                              Add Product
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     ) : (
-                      <>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-2">No products yet</p>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => setIsCreateProductOpen(true)}
-                          className="text-xs sm:text-sm py-1 px-2 sm:px-3"
-                        >
-                          <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-                          Add Product
-                        </Button>
-                      </>
+                      productsWithData.map((product) => (
+                        <DraggableProductItem
+                          key={product.id}
+                          product={product}
+                          isCollapsed={isCollapsed}
+                          isExpanded={expandedProducts.has(product.id)}
+                          isSelected={selectedProductId === product.id}
+                          isEpicSelected={!!selectedEpicId}
+                          onToggleExpanded={() => toggleProductExpanded(product.id)}
+                          onProductSelect={() => {
+                            console.log('Product clicked:', product.name, product.id);
+                            setOpenMobile?.(false);
+                            onProductSelect(product.id);
+                            onEpicSelect(undefined);
+                          }}
+                          onEpicSelect={(epicId) => {
+                            console.log('Epic clicked:', epicId);
+                            setOpenMobile?.(false);
+                            onEpicSelect(epicId);
+                          }}
+                          onDeleteProduct={() => handleDeleteProduct(product.id)}
+                          onOpenKnowledge={() => handleOpenKnowledge(product)}
+                          onCreateEpic={() => {
+                            setSelectedProductForEpic(product.id);
+                            setIsCreateEpicOpen(true);
+                          }}
+                        />
+                      ))
                     )}
                   </div>
-                ) : (
-                  productsWithData.map((product) => (
-                    <div key={product.id}>
-                      {isCollapsed ? (
-                        /* Collapsed Product Display */
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <ContextMenu>
-                              <ContextMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  className={`w-full aspect-square p-0 relative ${
-                                    selectedProductId === product.id ? 'bg-accent' : ''
-                                  }`}
-                                  onClick={() => {
-                                    console.log('Product clicked (collapsed):', product.name, product.id);
-                                    setOpenMobile(false);
-                                    onProductSelect(product.id);
-                                    onEpicSelect(undefined);
-                                  }}
-                                  aria-label={`${product.name} (${product.promptCount} prompts)`}
-                                >
-                                  <div className="relative">
-                                    <div 
-                                      className="w-4 h-4 rounded" 
-                                      style={{ backgroundColor: product.color || '#6B7280' }}
-                                    />
-                                    {product.promptCount > 0 && (
-                                      <Badge 
-                                        variant="secondary" 
-                                        className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center"
-                                      >
-                                        {product.promptCount > 99 ? '99+' : product.promptCount}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </Button>
-                              </ContextMenuTrigger>
-                              <ContextMenuContent className="w-48">
-                                <ContextMenuItem 
-                                  onClick={() => handleOpenKnowledge(product)}
-                                  className="flex items-center gap-2"
-                                >
-                                  <BookOpen className="h-4 w-4" />
-                                  Manage Knowledge
-                                </ContextMenuItem>
-                                <ContextMenuSeparator />
-                                <ContextMenuItem 
-                                  onClick={() => {
-                                    setSelectedProductForEpic(product.id);
-                                    setIsCreateEpicOpen(true);
-                                  }}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Hash className="h-4 w-4" />
-                                  Create Epic
-                                </ContextMenuItem>
-                                <ContextMenuSeparator />
-                                <ContextMenuItem 
-                                  onClick={() => handleDeleteProduct(product.id)}
-                                  className="flex items-center gap-2 text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                  Delete Product
-                                </ContextMenuItem>
-                              </ContextMenuContent>
-                            </ContextMenu>
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <div className="max-w-xs">
-                              <p className="font-medium">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{product.promptCount} prompts</p>
-                              {product.epics.length > 0 && (
-                                <div className="mt-1">
-                                  <p className="text-xs text-muted-foreground">Epics:</p>
-                                  <ul className="text-xs">
-                                    {product.epics.slice(0, 3).map(epic => (
-                                      <li key={epic.id} className="flex items-center gap-1">
-                                        <div 
-                                          className="w-2 h-2 rounded-full" 
-                                          style={{ backgroundColor: epic.color }} 
-                                        />
-                                        {epic.name} ({epic.promptCount})
-                                      </li>
-                                    ))}
-                                    {product.epics.length > 3 && (
-                                      <li className="text-muted-foreground">+{product.epics.length - 3} more</li>
-                                    )}
-                                  </ul>
-                                </div>
-                              )}
-                              <p className="text-xs text-muted-foreground mt-1">Right-click for options</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        /* Expanded Product Display */
-                        <Collapsible 
-                          open={expandedProducts.has(product.id)}
-                          onOpenChange={() => toggleProductExpanded(product.id)}
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center">
-                              <CollapsibleTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 mr-1"
-                                  aria-label={`${expandedProducts.has(product.id) ? 'Collapse' : 'Expand'} ${product.name}`}
-                                >
-                                  <ChevronRight className={`h-3 w-3 transition-transform duration-200 ${
-                                    expandedProducts.has(product.id) ? 'rotate-90' : ''
-                                  }`} />
-                                </Button>
-                              </CollapsibleTrigger>
-                              
-                              <ContextMenu>
-                                <ContextMenuTrigger asChild>
-                                  <SidebarMenuButton 
-                                    className="flex-1 justify-between"
-                                    onClick={() => {
-                                      console.log('Product clicked (expanded):', product.name, product.id);
-                                      setOpenMobile(false);
-                                      onProductSelect(product.id);
-                                      onEpicSelect(undefined);
-                                    }}
-                                    isActive={selectedProductId === product.id && !selectedEpicId}
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                                      <div 
-                                        className="w-2 h-2 rounded-full flex-shrink-0" 
-                                        style={{ backgroundColor: product.color || '#6B7280' }}
-                                      />
-                                      <Package className="h-3 w-3 flex-shrink-0" />
-                                      <AdaptiveTitle 
-                                        className="text-sm"
-                                        reservedSpace={40}
-                                        minSize={11}
-                                        maxSize={14}
-                                      >
-                                        {product.name}
-                                      </AdaptiveTitle>
-                                    </div>
-                                    <Badge variant="secondary" className="text-xs flex-shrink-0">
-                                      {product.promptCount}
-                                    </Badge>
-                                  </SidebarMenuButton>
-                                </ContextMenuTrigger>
-                                <ContextMenuContent className="w-48">
-                                  <ContextMenuItem 
-                                    onClick={() => handleOpenKnowledge(product)}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <BookOpen className="h-4 w-4" />
-                                    Manage Knowledge
-                                  </ContextMenuItem>
-                                  <ContextMenuSeparator />
-                                  <ContextMenuItem 
-                                    onClick={() => {
-                                      setSelectedProductForEpic(product.id);
-                                      setIsCreateEpicOpen(true);
-                                    }}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <Hash className="h-4 w-4" />
-                                    Create Epic
-                                  </ContextMenuItem>
-                                  <ContextMenuItem 
-                                    onClick={() => handleEditProduct(product)}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <Edit3 className="h-4 w-4" />
-                                    Edit Product
-                                  </ContextMenuItem>
-                                  <ContextMenuSeparator />
-                                  <ContextMenuItem 
-                                    onClick={() => handleDeleteProduct(product.id)}
-                                    className="flex items-center gap-2 text-destructive focus:text-destructive"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                    Delete Product
-                                  </ContextMenuItem>
-                                </ContextMenuContent>
-                              </ContextMenu>
-                            </div>
-
-                            {/* Epic List */}
-                            <CollapsibleContent className="ml-4">
-                              <div className="space-y-1">
-                                {product.epics.length > 0 && (
-                                  <>
-                                     {product.epics.map((epic) => (
-                                       <ContextMenu key={epic.id}>
-                                         <ContextMenuTrigger asChild>
-                                           <SidebarMenuButton
-                                             className="w-full justify-between text-xs"
-                                              onClick={() => {
-                                                console.log('Epic clicked:', epic.name, epic.id, 'in product:', product.name);
-                                                setOpenMobile(false);
-                                                onProductSelect(product.id);
-                                                onEpicSelect(epic.id);
-                                              }}
-                                             isActive={selectedEpicId === epic.id}
-                                             aria-label={`Epic: ${epic.name} (${epic.promptCount} prompts)`}
-                                           >
-                                             <div className="flex items-center gap-2 min-w-0 flex-1">
-                                               <div 
-                                                 className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
-                                                 style={{ backgroundColor: epic.color || '#8B5CF6' }}
-                                               />
-                                               <Hash className="h-3 w-3 flex-shrink-0" />
-                                               <AdaptiveTitle 
-                                                 className="text-xs"
-                                                 reservedSpace={30}
-                                                 minSize={10}
-                                                 maxSize={12}
-                                               >
-                                                 {epic.name}
-                                               </AdaptiveTitle>
-                                             </div>
-                                             {epic.promptCount > 0 && (
-                                               <Badge variant="outline" className="text-xs h-4">
-                                                 {epic.promptCount}
-                                               </Badge>
-                                             )}
-                                           </SidebarMenuButton>
-                                         </ContextMenuTrigger>
-                                          <ContextMenuContent className="w-48">
-                                            <ContextMenuItem 
-                                              onClick={() => handleOpenKnowledge(product)}
-                                              className="flex items-center gap-2"
-                                            >
-                                              <BookOpen className="h-4 w-4" />
-                                              Manage Knowledge
-                                            </ContextMenuItem>
-                                            <ContextMenuSeparator />
-                                            <ContextMenuItem 
-                                              onClick={() => handleEditEpic(epic)}
-                                              className="flex items-center gap-2"
-                                            >
-                                              <Edit3 className="h-4 w-4" />
-                                              Edit Epic
-                                            </ContextMenuItem>
-                                          </ContextMenuContent>
-                                       </ContextMenu>
-                                     ))}
-                                  </>
-                                )}
-                                
-                                {/* Show "No epics" when expanded but empty */}
-                                {expandedProducts.has(product.id) && product.epics.length === 0 && (
-                                  <div className="py-2 px-2">
-                                    <p className="text-xs text-muted-foreground mb-2">No epics yet</p>
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline" 
-                                      className="w-full text-xs h-7"
-                                      onClick={() => {
-                                        setSelectedProductForEpic(product.id);
-                                        setIsCreateEpicOpen(true);
-                                      }}
-                                    >
-                                      <Plus className="h-3 w-3 mr-1" />
-                                      Create Epic
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            </CollapsibleContent>
-                          </div>
-                        </Collapsible>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
+                </SortableContext>
+              </DndContext>
             </SidebarGroupContent>
           </SidebarGroup>
 
