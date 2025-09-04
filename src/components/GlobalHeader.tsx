@@ -61,7 +61,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         <div className="container flex h-full items-center justify-between px-4">
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
-            {showSidebarTrigger && <SidebarTrigger className="mr-2" />}
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
