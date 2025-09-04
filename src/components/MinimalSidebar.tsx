@@ -38,12 +38,15 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut } from 'lucide-react';
 import { Workspace, Product } from '@/types';
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 
-import { ProcessedLogo } from './ProcessedLogo';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
+import { UserAccountSection } from './UserAccountSection';
+import { ProcessedLogo } from './ProcessedLogo';
 import { KnowledgeBase } from './KnowledgeBase';
 
 interface MinimalSidebarProps {
@@ -569,6 +572,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               </SidebarGroupContent>
             </SidebarGroup>
           )}
+
+          {/* User Account Section */}
+          <SidebarGroup className="mt-auto">
+            <SidebarGroupContent>
+              <UserAccountSection />
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
       </Sidebar>
 

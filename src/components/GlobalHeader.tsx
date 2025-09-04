@@ -79,73 +79,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             </div>
           )}
 
-          {/* Menu utilisateur et actions */}
-          <div className="flex items-center gap-3">
-            {/* XP Badge */}
-            {stats && (
-              <div className="hidden sm:flex items-center gap-2 bg-muted px-3 py-1 rounded-full text-sm">
-                <Trophy className="w-4 h-4 text-yellow-500" />
-                <span className="font-medium">{stats.total_xp} XP</span>
-                <Badge variant="outline" className="text-xs">
-                  Lvl {stats.current_level}
-                </Badge>
-              </div>
-            )}
-
-            {/* Menu utilisateur */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-background border-border z-50" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.user_metadata?.full_name || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={() => navigate('/profile')}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => navigate('/shortcuts')}>
-                  <Keyboard className="mr-2 h-4 w-4" />
-                  <span>Keyboard Shortcuts</span>
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => navigate('/achievements')}>
-                  <Trophy className="mr-2 h-4 w-4" />
-                  <span>Achievements</span>
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={signOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {/* Menu utilisateur et actions removed - moved to sidebar */}
         </div>
       </header>
 
