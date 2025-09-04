@@ -169,6 +169,36 @@ export function PromptCard({
               </div>
                   
                   <div className="flex items-center gap-2 ml-4">
+                    {/* Send to Cursor Button - Show if product has GitHub repo */}
+                    {prompt.product?.github_repo_url && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isUsable) return;
+                                setShowCursorDialog(true);
+                              }}
+                              disabled={!isUsable}
+                              className={`h-8 w-8 p-0 transition-opacity ${
+                                !isUsable 
+                                  ? 'opacity-30 cursor-not-allowed' 
+                                  : 'opacity-60 hover:opacity-100 text-purple-600 hover:text-purple-700'
+                              }`}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {!isUsable ? 'Description trop courte pour être exploitable' : 'Send to Cursor'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+
                     {/* Quick Copy Button */}
                     <TooltipProvider>
                       <Tooltip>

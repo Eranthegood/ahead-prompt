@@ -8,12 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ExternalLink, Github, Settings, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import type { Prompt } from '@/types';
+import type { Prompt, Product, Epic } from '@/types';
 
 interface CursorConfigDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  prompt: Prompt;
+  prompt: Prompt & {
+    product?: Product;
+    epic?: Epic;
+  };
 }
 
 interface CursorAgentResponse {
@@ -33,10 +36,16 @@ const CURSOR_MODELS = [
 ];
 
 export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDialogProps) {
-  const [repository, setRepository] = useState('');
-  const [ref, setRef] = useState('main');
-  const [branchName, setBranchName] = useState('');
-  const [autoCreatePr, setAutoCreatePr] = useState(false);
+  // Auto-populate from mapping data
+  const defaultRepository = prompt.product?.github_repo_url || '';
+  const defaultBranch = prompt.product?.default_branch || 'main';
+  const suggestedBranchName = prompt.epic?.git_branch_name || '';
+  const autoCreatePrDefault = prompt.epic?.auto_create_pr ?? true;
+  
+  const [repository, setRepository] = useState(defaultRepository);
+  const [ref, setRef] = useState(defaultBranch);
+  const [branchName, setBranchName] = useState(suggestedBranchName);
+  const [autoCreatePr, setAutoCreatePr] = useState(autoCreatePrDefault);
   const [model, setModel] = useState('claude-4-sonnet');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CursorAgentResponse | null>(null);
@@ -121,10 +130,11 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
   };
 
   const handleClose = () => {
-    setRepository('');
-    setRef('main');
-    setBranchName('');
-    setAutoCreatePr(false);
+    // Reset to default values from mapping
+    setRepository(defaultRepository);
+    setRef(defaultBranch);
+    setBranchName(suggestedBranchName);
+    setAutoCreatePr(autoCreatePrDefault);
     setModel('claude-4-sonnet');
     setResult(null);
     onClose();
@@ -163,12 +173,26 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
               </div>
             </div>
 
+            {/* Auto-populated info banner */}
+            {defaultRepository && (
+              <div className="p-3 rounded-md bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="font-medium">Auto-configured from your repository mapping</span>
+                </div>
+                <div className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  Product: {prompt.product?.name} {prompt.epic && `• Epic: ${prompt.epic.name}`}
+                </div>
+              </div>
+            )}
+
             {/* Repository Configuration */}
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Github className="h-4 w-4" />
                   GitHub Repository *
+                  {defaultRepository && <Badge variant="outline" className="text-xs">Auto-filled</Badge>}
                 </label>
                 <Input
                   placeholder="https://github.com/user/repo"
@@ -186,7 +210,10 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Base branch</label>
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    Base branch
+                    {defaultBranch !== 'main' && <Badge variant="outline" className="text-xs">Auto-filled</Badge>}
+                  </label>
                   <Input
                     placeholder="main"
                     value={ref}
@@ -195,7 +222,10 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">New branch name</label>
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    New branch name
+                    {suggestedBranchName && <Badge variant="outline" className="text-xs">From epic</Badge>}
+                  </label>
                   <Input
                     placeholder="cursor/feature-xyz (optional)"
                     value={branchName}
