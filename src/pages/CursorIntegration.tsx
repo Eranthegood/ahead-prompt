@@ -46,10 +46,6 @@ export default function CursorIntegration() {
                 Connect Ahead.love with Cursor Background Agents
               </p>
             </div>
-            <Badge variant="default" className="ml-auto">
-              <Zap className="h-3 w-3 mr-1" />
-              Pro Feature
-            </Badge>
           </div>
         </div>
 
