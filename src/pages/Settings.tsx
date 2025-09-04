@@ -12,6 +12,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
 import { PremiumFeatureCard } from '@/components/PremiumFeatureCard';
+import { ColorThemeSelector } from '@/components/ColorThemeSelector';
+import { Separator } from '@/components/ui/separator';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -94,6 +96,18 @@ export default function Settings() {
                 <Switch 
                   checked={preferences.compactMode}
                 />
+              </div>
+
+              <Separator />
+              
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base">Interface Colors</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Customize the color scheme of interface elements
+                  </p>
+                </div>
+                <ColorThemeSelector />
               </div>
             </CardContent>
           </Card>
@@ -202,6 +216,6 @@ export default function Settings() {
             <Button>Save Settings</Button>
           </div>
         </div>
-      </div>
-    );
-  }
+    </div>
+  );
+}
