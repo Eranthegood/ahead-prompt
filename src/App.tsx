@@ -11,6 +11,7 @@ import { AppLayout } from "@/components/AppLayout";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./components/Dashboard";
 import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -40,6 +41,11 @@ function App() {
                   <Routes>
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/" element={<Home />} />
+                    <Route path="/build" element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } />
                     <Route path="/product/:productId" element={
                       <ProtectedRoute>
                         <ProductPage />

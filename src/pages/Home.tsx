@@ -1,8 +1,17 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
-import Dashboard from "@/components/Dashboard";
+
 const Home = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/build', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -12,7 +21,7 @@ const Home = () => {
     );
   }
 
-  return user ? <Dashboard /> : <LandingPage />;
+  return <LandingPage />;
 };
 
 export default Home;

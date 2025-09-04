@@ -29,7 +29,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   
   const handleSignIn = () => {
-    navigate('/auth');
+    navigate('/build');
   };
 
   const testimonials = [
