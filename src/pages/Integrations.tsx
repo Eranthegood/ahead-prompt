@@ -20,7 +20,7 @@ const INTEGRATIONS_CONFIG = [
   {
     id: 'cursor',
     name: 'Cursor Background Agents',
-    description: 'Envoyez vos prompts directement vers Cursor pour une génération de code autonome sur vos repos GitHub.',
+    description: 'Send your prompts directly to Cursor for autonomous code generation on your GitHub repos.',
     icon: Code,
     logo: '/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png',
     configPath: '/integrations/cursor',
@@ -29,14 +29,14 @@ const INTEGRATIONS_CONFIG = [
   {
     id: 'github',
     name: 'GitHub Integration',
-    description: 'Synchronisez automatiquement vos prompts avec vos repositories GitHub et créez des issues.',
+    description: 'Automatically sync your prompts with your GitHub repositories and create issues.',
     icon: Github,
     configPath: '/integrations/github'
   },
   {
     id: 'slack',
     name: 'Slack Notifications',
-    description: 'Recevez des notifications Slack quand vos agents Cursor terminent leurs tâches.',
+    description: 'Receive Slack notifications when your Cursor agents complete their tasks.',
     icon: Zap,
     isComingSoon: true
   }
@@ -45,7 +45,7 @@ const INTEGRATIONS_CONFIG = [
 const getStatusConfig = (integration: any, integrationData: any) => {
   if (integration.isComingSoon) {
     return {
-      label: 'Bientôt disponible',
+      label: 'Coming Soon',
       variant: 'secondary' as const,
       icon: AlertCircle,
       color: 'text-muted-foreground'
@@ -54,7 +54,7 @@ const getStatusConfig = (integration: any, integrationData: any) => {
   
   if (!integrationData.isConfigured) {
     return {
-      label: 'Non configuré',
+      label: 'Not Configured',
       variant: 'outline' as const,
       icon: AlertCircle,
       color: 'text-orange-600'
@@ -63,7 +63,7 @@ const getStatusConfig = (integration: any, integrationData: any) => {
   
   if (integrationData.isEnabled) {
     return {
-      label: 'Connecté',
+      label: 'Connected',
       variant: 'default' as const,
       icon: CheckCircle,
       color: 'text-green-600'
@@ -71,7 +71,7 @@ const getStatusConfig = (integration: any, integrationData: any) => {
   }
   
   return {
-    label: 'Déconnecté',
+    label: 'Disconnected',
     variant: 'destructive' as const,
     icon: XCircle,
     color: 'text-red-600'
@@ -129,9 +129,9 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const getActionButtonText = () => {
     if (integration.isComingSoon) return null;
     
-    if (!integrationData.isConfigured) return 'Configurer';
-    if (integrationData.isEnabled && integration.repositoryConfigPath) return 'Configurer Repository';
-    return 'Tester';
+    if (!integrationData.isConfigured) return 'Configure';
+    if (integrationData.isEnabled && integration.repositoryConfigPath) return 'Configure Repository';
+    return 'Test';
   };
   
   const actionButtonText = getActionButtonText();
@@ -206,8 +206,8 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               </label>
               <p className="text-xs text-muted-foreground">
                 {integration.id === 'github' 
-                  ? 'Saisissez votre Personal Access Token GitHub'
-                  : 'Saisissez votre token API'
+                  ? 'Enter your GitHub Personal Access Token'
+                  : 'Enter your API token'
                 }
               </p>
             </div>
@@ -225,7 +225,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                 onClick={handleTokenSubmit}
                 disabled={!token.trim() || isLoading}
               >
-                Configurer
+                Configure
               </Button>
               <Button 
                 size="sm" 
@@ -235,7 +235,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                   setToken('');
                 }}
               >
-                Annuler
+                Cancel
               </Button>
             </div>
           </div>
@@ -248,7 +248,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
           <div className="flex items-center gap-3 mb-3">
             <img 
               src={integrationData.metadata.avatar_url} 
-              alt="Avatar GitHub" 
+              alt="GitHub Avatar" 
               className="w-10 h-10 rounded-full"
             />
             <div className="flex-1">
@@ -256,12 +256,12 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               <div className="text-sm text-muted-foreground">@{integrationData.metadata.username}</div>
             </div>
             <div className="text-sm text-muted-foreground">
-              {integrationData.metadata.public_repos} repos publics
+              {integrationData.metadata.public_repos} public repos
             </div>
           </div>
           {integrationData.metadata.repositories && integrationData.metadata.repositories.length > 0 && (
             <div className="pt-3 border-t">
-              <div className="text-sm font-medium mb-2">Dépôts récents:</div>
+              <div className="text-sm font-medium mb-2">Recent repositories:</div>
               <div className="flex flex-wrap gap-2">
                 {integrationData.metadata.repositories.slice(0, 4).map((repo: any) => (
                   <a 
@@ -276,7 +276,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                 ))}
                 {integrationData.metadata.repositories.length > 4 && (
                   <span className="text-xs text-muted-foreground px-2 py-1">
-                    +{integrationData.metadata.repositories.length - 4} autres
+                    +{integrationData.metadata.repositories.length - 4} more
                   </span>
                 )}
               </div>
@@ -299,11 +299,11 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               )}
             </div>
             <div className="text-sm text-green-600 font-medium">
-              Token configuré ✓
+              Token configured ✓
             </div>
           </div>
           <div className="pt-3 border-t">
-            <div className="text-sm font-medium mb-2">Capacités disponibles:</div>
+            <div className="text-sm font-medium mb-2">Available capabilities:</div>
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="text-xs">
                 Background Agents
@@ -337,18 +337,18 @@ export default function Integrations() {
               onClick={() => navigate('/')}
               className="p-0 h-auto hover:bg-transparent"
             >
-              Accueil
+              Home
             </Button>
             <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground">Intégrations</span>
+            <span className="text-foreground">Integrations</span>
           </nav>
           
           <div className="flex items-center gap-3 mb-2">
             <Settings className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-bold">Intégrations</h1>
+            <h1 className="text-3xl font-bold">Integrations</h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Connectez vos outils préférés pour automatiser votre workflow de développement.
+            Connect your favorite tools to automate your development workflow.
           </p>
         </div>
 
@@ -361,10 +361,10 @@ export default function Integrations() {
         
         {/* Helpful Information */}
         <div className="mt-8 p-4 bg-muted/30 rounded-lg">
-          <h3 className="font-semibold mb-2">💡 Astuce</h3>
+          <h3 className="font-semibold mb-2">💡 Tip</h3>
           <p className="text-sm text-muted-foreground">
-            Activez Cursor pour envoyer automatiquement vos prompts vers vos repositories GitHub. 
-            Une fois configuré, vous verrez un bouton "Envoyer vers Cursor" sur vos prompts.
+            Enable Cursor to automatically send your prompts to your GitHub repositories. 
+            Once configured, you'll see a "Send to Cursor" button on your prompts.
           </p>
         </div>
       </div>
