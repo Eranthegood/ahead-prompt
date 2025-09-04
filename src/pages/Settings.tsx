@@ -12,30 +12,26 @@ import { useTheme } from '@/hooks/useTheme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
 import { PremiumFeatureCard } from '@/components/PremiumFeatureCard';
-import { ColorThemeSelector } from '@/components/ColorThemeSelector';
-import { Separator } from '@/components/ui/separator';
-
 export default function Settings() {
   const navigate = useNavigate();
-  const { 
-    theme, 
-    setTheme, 
-    isDarkModeUnlocked, 
-    xpNeededForDarkMode, 
-    currentLevel, 
-    requiredLevel 
+  const {
+    theme,
+    setTheme,
+    isDarkModeUnlocked,
+    xpNeededForDarkMode,
+    currentLevel,
+    requiredLevel
   } = useTheme();
-  const { preferences, saveCompletedItemsPreference } = useUserPreferences();
-  const { hasUnlockedFeature } = useGamification();
-
-  return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+  const {
+    preferences,
+    saveCompletedItemsPreference
+  } = useUserPreferences();
+  const {
+    hasUnlockedFeature
+  } = useGamification();
+  return <div className="container max-w-4xl mx-auto py-8 px-4">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mb-4 -ml-4"
-        >
+        <Button variant="ghost" onClick={() => navigate('/')} className="mb-4 -ml-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
@@ -93,21 +89,7 @@ export default function Settings() {
                     Use a more compact interface
                   </p>
                 </div>
-                <Switch 
-                  checked={preferences.compactMode}
-                />
-              </div>
-
-              <Separator />
-              
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-base">Interface Colors</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Customize the color scheme of interface elements
-                  </p>
-                </div>
-                <ColorThemeSelector />
+                <Switch checked={preferences.compactMode} />
               </div>
             </CardContent>
           </Card>
@@ -137,10 +119,7 @@ export default function Settings() {
                     Display completed prompts in the sidebar
                   </p>
                 </div>
-                <Switch 
-                  checked={preferences.showCompletedItems}
-                  onCheckedChange={saveCompletedItemsPreference}
-                />
+                <Switch checked={preferences.showCompletedItems} onCheckedChange={saveCompletedItemsPreference} />
               </div>
 
               <div className="flex items-center justify-between">
@@ -151,6 +130,30 @@ export default function Settings() {
                   </p>
                 </div>
                 <Switch defaultChecked />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Integrations</CardTitle>
+              <CardDescription>
+                Configure external tool integrations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <svg viewBox="0 0 24 24" className="h-5 w-5">
+                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor" />
+                    </svg>
+                  </div>
+                  
+                </div>
+                <Button variant="outline" onClick={() => navigate('/settings/git-cursor')}>
+                  Configure
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -189,6 +192,5 @@ export default function Settings() {
             <Button>Save Settings</Button>
           </div>
         </div>
-    </div>
-  );
+      </div>;
 }
