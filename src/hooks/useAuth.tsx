@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useMixpanelContext } from '@/components/MixpanelProvider';
+import mixpanelService from '@/services/mixpanelService';
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { trackUserLogin, trackUserSignup } = useMixpanelContext();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -33,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Track login events
         if (event === 'SIGNED_IN' && session?.user) {
-          trackUserLogin({
+          mixpanelService.trackUserLogin({
             userId: session.user.id,
             provider: session.user.app_metadata?.provider || 'email'
           });
@@ -49,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [trackUserLogin]);
+  }, []);
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -76,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         
         // Track successful user signup
-        trackUserSignup({
+        mixpanelService.trackUserSignup({
           userId: email, // Use email as temporary ID since user might not be confirmed yet
           provider: 'email'
         });
