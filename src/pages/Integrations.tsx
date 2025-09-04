@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +80,9 @@ const getStatusConfig = (integration: any, integrationData: any) => {
 
 function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONFIG[0] }) {
   const navigate = useNavigate();
-  const { integrations, isLoading, toggleIntegration, testIntegration } = useIntegrations();
+  const { integrations, isLoading, toggleIntegration, testIntegration, configureIntegration } = useIntegrations();
+  const [showTokenField, setShowTokenField] = useState(false);
+  const [token, setToken] = useState('');
   const Icon = integration.icon;
   
   const integrationData = integrations.find(i => i.id === integration.id) || {
@@ -105,11 +107,25 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
     if (integration.isComingSoon) return;
     
     if (!integrationData.isConfigured) {
-      navigate(integration.configPath);
+      if (integration.id === 'cursor') {
+        navigate(integration.configPath);
+      } else {
+        setShowTokenField(true);
+      }
     } else if (integrationData.isEnabled && integration.repositoryConfigPath) {
       navigate(integration.repositoryConfigPath);
     } else {
       testIntegration(integration.id);
+    }
+  };
+
+  const handleTokenSubmit = async () => {
+    if (token.trim()) {
+      const success = await configureIntegration(integration.id, token);
+      if (success) {
+        setShowTokenField(false);
+        setToken('');
+      }
     }
   };
   
@@ -124,62 +140,110 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const actionButtonText = getActionButtonText();
   
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors">
-      {/* Left section - Logo, Name, Description */}
-      <div className="flex items-center gap-4 flex-1">
-        <div className="p-3 rounded-lg bg-muted">
-          {integration.logo ? (
-            <img 
-              src={integration.logo} 
-              alt={`${integration.name} logo`}
-              className="h-8 w-8 object-contain"
-            />
-          ) : (
-            <Icon className="h-8 w-8" />
-          )}
+    <div className="border rounded-lg hover:bg-muted/30 transition-colors">
+      <div className="flex items-center justify-between p-4">
+        {/* Left section - Logo, Name, Description */}
+        <div className="flex items-center gap-4 flex-1">
+          <div className="p-3 rounded-lg bg-muted">
+            {integration.logo ? (
+              <img 
+                src={integration.logo} 
+                alt={`${integration.name} logo`}
+                className="h-8 w-8 object-contain"
+              />
+            ) : (
+              <Icon className="h-8 w-8" />
+            )}
+          </div>
+          
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg">{integration.name}</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {integration.description}
+            </p>
+          </div>
         </div>
         
-        <div className="flex-1">
-          <h3 className="font-semibold text-lg">{integration.name}</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {integration.description}
-          </p>
+        {/* Right section - Status, Switch, Action Button */}
+        <div className="flex items-center gap-4">
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            <StatusIcon className={`h-4 w-4 ${statusConfig.color}`} />
+            <Badge variant={statusConfig.variant} className="text-xs">
+              {statusConfig.label}
+            </Badge>
+          </div>
+          
+          {/* Switch */}
+          {!integration.isComingSoon && (
+            <Switch
+              checked={integrationData.isEnabled}
+              onCheckedChange={handleSwitchToggle}
+              disabled={isLoading}
+              className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-red-500"
+            />
+          )}
+          
+          {/* Action Button */}
+          {actionButtonText && (
+            <Button
+              variant={integrationData.isEnabled ? "default" : "outline"}
+              size="sm"
+              onClick={handleActionButton}
+              disabled={isLoading || integration.isComingSoon}
+              className="min-w-[120px]"
+            >
+              {actionButtonText}
+            </Button>
+          )}
         </div>
       </div>
       
-      {/* Right section - Status, Switch, Action Button */}
-      <div className="flex items-center gap-4">
-        {/* Status Badge */}
-        <div className="flex items-center gap-2">
-          <StatusIcon className={`h-4 w-4 ${statusConfig.color}`} />
-          <Badge variant={statusConfig.variant} className="text-xs">
-            {statusConfig.label}
-          </Badge>
+      {/* Token Configuration Field */}
+      {showTokenField && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium">
+                {integration.id === 'github' ? 'Personal Access Token' : 'API Token'}
+              </label>
+              <p className="text-xs text-muted-foreground">
+                {integration.id === 'github' 
+                  ? 'Saisissez votre Personal Access Token GitHub'
+                  : 'Saisissez votre token API'
+                }
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="password"
+                placeholder={integration.id === 'github' ? 'ghp_xxxxxxxxxxxx' : 'Token...'}
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
+                onKeyDown={(e) => e.key === 'Enter' && handleTokenSubmit()}
+              />
+              <Button 
+                size="sm" 
+                onClick={handleTokenSubmit}
+                disabled={!token.trim() || isLoading}
+              >
+                Configurer
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => {
+                  setShowTokenField(false);
+                  setToken('');
+                }}
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
         </div>
-        
-        {/* Switch */}
-        {!integration.isComingSoon && (
-          <Switch
-            checked={integrationData.isEnabled}
-            onCheckedChange={handleSwitchToggle}
-            disabled={isLoading}
-            className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-red-500"
-          />
-        )}
-        
-        {/* Action Button */}
-        {actionButtonText && (
-          <Button
-            variant={integrationData.isEnabled ? "default" : "outline"}
-            size="sm"
-            onClick={handleActionButton}
-            disabled={isLoading || integration.isComingSoon}
-            className="min-w-[120px]"
-          >
-            {actionButtonText}
-          </Button>
-        )}
-      </div>
+      )}
     </div>
   );
 }
