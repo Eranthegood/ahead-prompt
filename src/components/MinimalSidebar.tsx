@@ -155,11 +155,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     });
   };
 
-  // Get total prompts count for "All Prompts" - shows all prompts in platform
-  const totalPromptsCount = prompts.length;
-
-  // Get active prompts count for filtering
-  const allActivePromptsCount = getActivePrompts('all').length;
+  // Get active prompts count for "All Prompts" - shows To do and In progress prompts
+  const activePromptsCount = prompts.filter(p => p.status === 'todo' || p.status === 'in_progress').length;
 
   // Organization with epic hierarchy and filtered counts
   const productsWithData = products.map(product => {
@@ -409,16 +406,16 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                       onProductSelect('all');
                       onEpicSelect(undefined);
                     }}
-                    aria-label={`All Prompts (${totalPromptsCount})`}
+                    aria-label={`All Prompts (${activePromptsCount})`}
                   >
                     <div className="relative">
                       <FileText className="h-4 w-4" />
-                      {totalPromptsCount > 0 && (
+                      {activePromptsCount > 0 && (
                         <Badge 
                           variant="secondary" 
                           className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center"
                         >
-                          {totalPromptsCount > 99 ? '99+' : totalPromptsCount}
+                          {activePromptsCount > 99 ? '99+' : activePromptsCount}
                         </Badge>
                       )}
                     </div>
@@ -426,7 +423,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 </TooltipTrigger>
                 <TooltipContent side="right">
                   <p>All Prompts</p>
-                  <p className="text-xs text-muted-foreground">{totalPromptsCount} total prompts</p>
+                  <p className="text-xs text-muted-foreground">{activePromptsCount} active prompts (To do + In progress)</p>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -438,12 +435,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   onProductSelect('all');
                   onEpicSelect(undefined);
                 }}
-                aria-label={`All Prompts (${totalPromptsCount})`}
+                aria-label={`All Prompts (${activePromptsCount})`}
               >
                 <FileText className="mr-2 sm:mr-3 h-4 w-4" />
                 All Prompts
                 <Badge variant="secondary" className="ml-auto text-xs">
-                  {totalPromptsCount}</Badge>
+                  {activePromptsCount}</Badge>
               </Button>
             )}
           </div>
