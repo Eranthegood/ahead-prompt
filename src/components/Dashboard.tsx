@@ -3,6 +3,7 @@ import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
+import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -16,6 +17,9 @@ interface DashboardProps {
   selectedProductId?: string;
   selectedEpicId?: string;
 }
+
+// Keep QuickPromptDialog referenced to avoid potential HMR stale reference errors
+void QPD_Keep;
 
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
