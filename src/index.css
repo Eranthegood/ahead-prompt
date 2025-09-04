@@ -70,6 +70,13 @@
     --sidebar-accent-foreground: 0 0% 15%;
     --sidebar-border: 0 0% 85%;
     --sidebar-ring: 344 100% 64%;
+
+    /* Illustration colors */
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 
   .dark {
@@ -125,6 +132,13 @@
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 18%;
     --sidebar-ring: 344 85% 58%;
+
+    /* Illustration colors (same in dark mode) */
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 }
 
@@ -251,4 +265,23 @@
   .bg-gradient-subtle {
     background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.5));
   }
+
+  /* Illustration color classes */
+  .illustration-1 { background-color: hsl(var(--illustration-1)); }
+  .illustration-2 { background-color: hsl(var(--illustration-2)); }
+  .illustration-3 { background-color: hsl(var(--illustration-3)); }
+  .illustration-4 { background-color: hsl(var(--illustration-4)); }
+  .illustration-5 { background-color: hsl(var(--illustration-5)); }
+
+  .text-illustration-1 { color: hsl(var(--illustration-1)); }
+  .text-illustration-2 { color: hsl(var(--illustration-2)); }
+  .text-illustration-3 { color: hsl(var(--illustration-3)); }
+  .text-illustration-4 { color: hsl(var(--illustration-4)); }
+  .text-illustration-5 { color: hsl(var(--illustration-5)); }
+
+  .border-illustration-1 { border-color: hsl(var(--illustration-1)); }
+  .border-illustration-2 { border-color: hsl(var(--illustration-2)); }
+  .border-illustration-3 { border-color: hsl(var(--illustration-3)); }
+  .border-illustration-4 { border-color: hsl(var(--illustration-4)); }
+  .border-illustration-5 { border-color: hsl(var(--illustration-5)); }
 }

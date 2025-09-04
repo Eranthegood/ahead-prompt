@@ -78,6 +78,13 @@ export default {
 					green: 'hsl(var(--epic-green))',
 					orange: 'hsl(var(--epic-orange))',
 					pink: 'hsl(var(--epic-pink))'
+				},
+				illustration: {
+					"1": "hsl(var(--illustration-1))",
+					"2": "hsl(var(--illustration-2))",
+					"3": "hsl(var(--illustration-3))",
+					"4": "hsl(var(--illustration-4))",
+					"5": "hsl(var(--illustration-5))",
 				}
 			},
 			borderRadius: {

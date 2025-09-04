@@ -23,6 +23,7 @@ import CursorIntegration from "./pages/CursorIntegration";
 import GitHubIntegration from "./pages/GitHubIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
+import ThemeDemo from "./pages/ThemeDemo";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -93,11 +94,16 @@ function App() {
                          <RepositoryMapping />
                        </ProtectedRoute>
                      } />
-                    <Route path="/achievements" element={
-                      <ProtectedRoute>
-                        <Achievements />
-                      </ProtectedRoute>
-                    } />
+                     <Route path="/achievements" element={
+                       <ProtectedRoute>
+                         <Achievements />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/theme-demo" element={
+                       <ProtectedRoute>
+                         <ThemeDemo />
+                       </ProtectedRoute>
+                     } />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
