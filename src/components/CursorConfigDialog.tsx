@@ -159,7 +159,7 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ExternalLink className="h-5 w-5" />
@@ -171,7 +171,7 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
         </DialogHeader>
 
         {!result ? (
-          <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto space-y-6 pr-1">
             {/* Prompt Preview */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Prompt to send</label>
@@ -287,33 +287,10 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
                 />
               </div>
             </div>
-
-            {/* Action buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleSendToCursor}
-                disabled={!repository.trim() || !validateRepository(repository.trim().replace(/\/$/, '')) || isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating Agent...
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Send to Cursor
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
         ) : (
           /* Success Result */
-          <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto space-y-6 pr-1">
             <div className="flex items-center gap-3 p-4 rounded-md bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
               <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
               <div>
@@ -361,6 +338,31 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
                 </Button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Action buttons - always visible at bottom */}
+        {!result && (
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSendToCursor}
+              disabled={!repository.trim() || !validateRepository(repository.trim().replace(/\/$/, '')) || isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating Agent...
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Send to Cursor
+                </>
+              )}
+            </Button>
           </div>
         )}
       </DialogContent>
