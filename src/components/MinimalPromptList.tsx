@@ -311,12 +311,27 @@ export function MinimalPromptList({
     <div className="flex-1 p-3 sm:p-6">
       {/* Header */}
       <div className="mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-semibold mb-2">
-          {selectedEpicId ? 
-            `Epic: ${epics.find(e => e.id === selectedEpicId)?.name || 'Unknown'}` :
-            selectedProductId === 'all' || !selectedProductId ? 'All Prompts' : 
-            products.find(p => p.id === selectedProductId)?.name || 'Prompts'}
-        </h2>
+        <nav className="mb-2">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <span className="font-medium">All prompts</span>
+            {(selectedProductId && selectedProductId !== 'all') && (
+              <>
+                <span className="mx-2">›</span>
+                <span className="font-medium text-foreground">
+                  {products.find(p => p.id === selectedProductId)?.name || 'Unknown Product'}
+                </span>
+              </>
+            )}
+            {selectedEpicId && (
+              <>
+                <span className="mx-2">›</span>
+                <span className="font-medium text-foreground">
+                  {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
+                </span>
+              </>
+            )}
+          </div>
+        </nav>
         <p className="text-sm sm:text-base text-muted-foreground">
           {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
           {searchQuery && (
