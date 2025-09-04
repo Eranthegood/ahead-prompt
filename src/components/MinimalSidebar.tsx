@@ -130,7 +130,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [selectedKnowledgeProduct, setSelectedKnowledgeProduct] = useState<Product | undefined>();
 
-  // Filter function to get prompts that match current view filters
+  // Filter function to get prompts that match current view filters (only active prompts)
   const getVisiblePrompts = (productFilter?: string, epicFilter?: string) => {
     return prompts.filter(prompt => {
       const matchesSearch = !searchQuery || 
@@ -142,8 +142,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
       const matchesEpic = !epicFilter || prompt.epic_id === epicFilter;
 
-      // Include all prompts that match the filters, regardless of status
-      return matchesSearch && matchesProduct && matchesEpic;
+      // Only show To do and In progress prompts in counts
+      const isActive = prompt.status === 'todo' || prompt.status === 'in_progress';
+
+      return matchesSearch && matchesProduct && matchesEpic && isActive;
     });
   };
 
