@@ -189,7 +189,7 @@ export function PromptCard({
                                   : 'opacity-60 hover:opacity-100 text-purple-600 hover:text-purple-700'
                               }`}
                             >
-                              <ExternalLink className="h-4 w-4" />
+                              <img src="/lovable-uploads/7658f39d-f631-4804-864a-57309b5c4066.png" alt="Cursor" className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
