@@ -13,7 +13,8 @@ import {
   UserPlus,
   HelpCircle,
   Mail,
-  Lock
+  Lock,
+  Plug
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -74,6 +75,13 @@ export function UserDropdownMenu() {
       label: 'Paramètres',
       shortcut: '⌘,',
       onClick: () => navigate('/settings'),
+      badge: null
+    },
+    {
+      icon: Plug,
+      label: 'Intégrations',
+      shortcut: '⌘I',
+      onClick: () => navigate('/integrations'),
       badge: null
     },
     {
