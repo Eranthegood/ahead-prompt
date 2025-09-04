@@ -166,10 +166,25 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     
     clearDraft();
     editor.commands.setContent('');
-    setSelectedEpic(selectedEpicId || null);
+    
+    // Handle epic selection and auto-select parent product
+    if (selectedEpicId) {
+      const selectedEpicData = epics.find(epic => epic.id === selectedEpicId);
+      if (selectedEpicData) {
+        setSelectedEpic(selectedEpicId);
+        // Auto-select the parent product
+        setSelectedProduct(selectedEpicData.product_id);
+      } else {
+        setSelectedEpic(null);
+        setSelectedProduct(selectedProductId || null);
+      }
+    } else {
+      setSelectedEpic(null);
+      setSelectedProduct(selectedProductId || null);
+    }
+    
     setSelectedPriority(2);
     setHasContent(false);
-    setSelectedProduct(selectedProductId || null);
     setDraftRestored(false);
     
     // Reset knowledge selection but keep useKnowledge enabled
