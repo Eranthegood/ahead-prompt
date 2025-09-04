@@ -310,12 +310,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           <SidebarTrigger className="m-0" />
         </div>
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
-          {/* Workspace Name */}
-          {!isCollapsed && (
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">{workspace.name}</h2>
-            </div>
-          )}
+          {/* Workspace Name - removed */}
 
           {/* Add Prompt Action */}
           <div className="mb-4 sm:mb-6">
