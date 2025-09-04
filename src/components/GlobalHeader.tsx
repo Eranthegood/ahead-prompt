@@ -59,17 +59,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
     <>
       <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-full items-center justify-between px-4">
-          {/* Home navigation */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')}
-            className="shrink-0"
-            aria-label="Home"
-          >
-            <Home className="h-4 w-4" />
-          </Button>
-
           {/* Barre de recherche */}
           {showSearch && workspace && (
             <div className="flex-1 max-w-lg mx-4">
