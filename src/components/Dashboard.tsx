@@ -12,7 +12,12 @@ import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
-const Dashboard = () => {
+interface DashboardProps {
+  selectedProductId?: string;
+  selectedEpicId?: string;
+}
+
+const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
@@ -130,18 +135,35 @@ const Dashboard = () => {
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
-        <MinimalPromptList workspace={workspace} selectedProductId={undefined} selectedEpicId={undefined} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
+        <MinimalPromptList 
+          workspace={workspace} 
+          selectedProductId={selectedProductId} 
+          selectedEpicId={selectedEpicId} 
+          searchQuery={searchQuery} 
+          hoveredPromptId={hoveredPromptId} 
+          onPromptHover={setHoveredPromptId} 
+          onCopy={handleCopyPrompt} 
+        />
       </div>
 
       <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
 
-      <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={undefined} selectedEpicId={undefined} onCreateProduct={() => {
-        // Simple callback pour ouvrir une création de produit
-        console.log('Create product requested - implement product creation dialog');
-      }} onCreateEpic={() => {
-        // Simple callback pour ouvrir une création d'épique
-        console.log('Create epic requested - implement epic creation dialog');
-      }} />
+        <QuickPromptDialog 
+          isOpen={quickPromptOpen} 
+          onClose={() => setQuickPromptOpen(false)} 
+          onSave={handleCreatePrompt} 
+          workspace={workspace} 
+          epics={epics} 
+          products={products} 
+          selectedProductId={selectedProductId} 
+          selectedEpicId={selectedEpicId} 
+          onCreateProduct={() => {
+            console.log('Create product requested - implement product creation dialog');
+          }} 
+          onCreateEpic={() => {
+            console.log('Create epic requested - implement epic creation dialog');
+          }} 
+        />
 
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
     </>

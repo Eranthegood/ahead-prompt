@@ -61,7 +61,10 @@ export function AppLayout({ children }: AppLayoutProps) {
           shouldShowHeader={shouldShowHeader}
           shouldShowSearch={shouldShowSearch}
           shouldShowSidebar={shouldShowSidebar}
-          children={children}
+          children={React.cloneElement(children as React.ReactElement, { 
+            selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
+            selectedEpicId 
+          })}
         />
       </PromptsProvider>
     );
