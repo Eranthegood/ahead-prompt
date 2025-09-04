@@ -157,33 +157,6 @@ export default function Settings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Integrations</CardTitle>
-              <CardDescription>
-                Configure external tool integrations
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <svg viewBox="0 0 24 24" className="h-5 w-5">
-                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Git & Cursor Configuration</h3>
-                    <p className="text-sm text-muted-foreground">Configure GitHub repositories and Cursor integration</p>
-                  </div>
-                </div>
-                <Button variant="outline" onClick={() => navigate('/settings/git-cursor')}>
-                  Configure
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Notifications</CardTitle>
               <CardDescription>
                 Control when and how you receive notifications
