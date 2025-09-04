@@ -52,6 +52,14 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
   
   const { toast } = useToast();
 
+  // Update form fields when prompt changes
+  React.useEffect(() => {
+    setRepository(defaultRepository);
+    setRef(defaultBranch);
+    setBranchName(suggestedBranchName);
+    setAutoCreatePr(autoCreatePrDefault);
+  }, [defaultRepository, defaultBranch, suggestedBranchName, autoCreatePrDefault]);
+
   const validateRepository = (url: string): boolean => {
     const githubRepoRegex = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/;
     return githubRepoRegex.test(url);
