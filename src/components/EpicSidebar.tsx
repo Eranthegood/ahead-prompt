@@ -135,6 +135,10 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
     }
   };
 
+  const handleConfigureGit = (itemId: string) => {
+    navigate('/settings/git-cursor');
+  };
+
   if (productsLoading || epicsLoading || promptsLoading) {
     return (
       <Sidebar className="border-r">
@@ -206,6 +210,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                         onEditProduct={handleEditProduct}
                         onDeleteProduct={handleDeleteProduct}
                         onNavigateToProduct={handleNavigateToProduct}
+                        onConfigureGit={handleConfigureGit}
                       >
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton className="w-full justify-between">
@@ -258,6 +263,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                     onAddPrompt={handleAddPrompt}
                                     onEditEpic={handleEditEpic}
                                     onDeleteEpic={handleDeleteEpic}
+                                    onConfigureGit={handleConfigureGit}
                                   >
                                     <CollapsibleTrigger asChild>
                                       <SidebarMenuButton className="w-full justify-between">

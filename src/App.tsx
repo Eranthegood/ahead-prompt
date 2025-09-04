@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import GitCursorSettings from "./pages/GitCursorSettings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Integrations from "./pages/Integrations";
 import CursorIntegration from "./pages/CursorIntegration";
@@ -45,6 +46,11 @@ function App() {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings/git-cursor" element={
+                  <ProtectedRoute>
+                    <GitCursorSettings />
                   </ProtectedRoute>
                 } />
                 <Route path="/shortcuts" element={

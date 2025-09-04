@@ -88,9 +88,12 @@ export type Database = {
       }
       epics: {
         Row: {
+          auto_create_pr: boolean | null
+          base_branch_override: string | null
           color: string | null
           created_at: string
           description: string | null
+          git_branch_name: string | null
           id: string
           name: string
           product_id: string
@@ -98,9 +101,12 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          auto_create_pr?: boolean | null
+          base_branch_override?: string | null
           color?: string | null
           created_at?: string
           description?: string | null
+          git_branch_name?: string | null
           id?: string
           name: string
           product_id: string
@@ -108,9 +114,12 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          auto_create_pr?: boolean | null
+          base_branch_override?: string | null
           color?: string | null
           created_at?: string
           description?: string | null
+          git_branch_name?: string | null
           id?: string
           name?: string
           product_id?: string
@@ -206,7 +215,10 @@ export type Database = {
         Row: {
           color: string | null
           created_at: string
+          cursor_enabled: boolean | null
+          default_branch: string | null
           description: string | null
+          github_repo_url: string | null
           id: string
           name: string
           updated_at: string
@@ -215,7 +227,10 @@ export type Database = {
         Insert: {
           color?: string | null
           created_at?: string
+          cursor_enabled?: boolean | null
+          default_branch?: string | null
           description?: string | null
+          github_repo_url?: string | null
           id?: string
           name: string
           updated_at?: string
@@ -224,7 +239,10 @@ export type Database = {
         Update: {
           color?: string | null
           created_at?: string
+          cursor_enabled?: boolean | null
+          default_branch?: string | null
           description?: string | null
+          github_repo_url?: string | null
           id?: string
           name?: string
           updated_at?: string

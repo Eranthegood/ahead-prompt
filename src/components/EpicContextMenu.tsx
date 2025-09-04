@@ -10,7 +10,9 @@ import {
   Plus, 
   Edit3, 
   Trash2, 
-  FileText
+  FileText,
+  Github,
+  GitBranch
 } from 'lucide-react';
 import { Epic } from '@/types';
 
@@ -20,6 +22,7 @@ interface EpicContextMenuProps {
   onAddPrompt: (epicId: string) => void;
   onEditEpic: (epic: Epic) => void;
   onDeleteEpic: (epic: Epic) => void;
+  onConfigureGit?: (epicId: string) => void;
 }
 
 export function EpicContextMenu({
@@ -28,6 +31,7 @@ export function EpicContextMenu({
   onAddPrompt,
   onEditEpic,
   onDeleteEpic,
+  onConfigureGit,
 }: EpicContextMenuProps) {
   return (
     <ContextMenu>
@@ -49,6 +53,15 @@ export function EpicContextMenu({
           <Edit3 className="h-4 w-4" />
           Edit Epic
         </ContextMenuItem>
+        {onConfigureGit && (
+          <ContextMenuItem 
+            onClick={() => onConfigureGit(epic.id)}
+            className="flex items-center gap-2"
+          >
+            <GitBranch className="h-4 w-4" />
+            Git Settings
+          </ContextMenuItem>
+        )}
         <ContextMenuSeparator />
         <ContextMenuItem 
           onClick={() => onDeleteEpic(epic)}

@@ -148,6 +148,9 @@ export interface Database {
 export type Workspace = Database['public']['Tables']['workspaces']['Row'];
 export type Epic = Database['public']['Tables']['epics']['Row'] & {
   product_id?: string; // Add product_id to Epic interface
+  git_branch_name?: string | null;
+  auto_create_pr?: boolean;
+  base_branch_override?: string | null;
 };
 export type Prompt = Database['public']['Tables']['prompts']['Row'];
 export type KnowledgeItem = Database['public']['Tables']['knowledge_items']['Row'];
@@ -159,6 +162,9 @@ export interface Product {
   name: string;
   description: string | null;
   color: string;
+  github_repo_url?: string | null;
+  default_branch?: string;
+  cursor_enabled?: boolean;
   created_at: string;
   updated_at: string;
 }

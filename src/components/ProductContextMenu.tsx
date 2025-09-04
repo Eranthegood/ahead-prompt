@@ -11,7 +11,9 @@ import {
   Edit3, 
   Trash2, 
   Hash,
-  ExternalLink
+  ExternalLink,
+  Github,
+  Settings
 } from 'lucide-react';
 import { Product } from '@/types';
 
@@ -22,6 +24,7 @@ interface ProductContextMenuProps {
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (product: Product) => void;
   onNavigateToProduct: (productId: string) => void;
+  onConfigureGit?: (productId: string) => void;
 }
 
 export function ProductContextMenu({
@@ -31,6 +34,7 @@ export function ProductContextMenu({
   onEditProduct,
   onDeleteProduct,
   onNavigateToProduct,
+  onConfigureGit,
 }: ProductContextMenuProps) {
   return (
     <ContextMenu>
@@ -60,6 +64,15 @@ export function ProductContextMenu({
           <Edit3 className="h-4 w-4" />
           Edit Product
         </ContextMenuItem>
+        {onConfigureGit && (
+          <ContextMenuItem 
+            onClick={() => onConfigureGit(product.id)}
+            className="flex items-center gap-2"
+          >
+            <Github className="h-4 w-4" />
+            Configure Git/Cursor
+          </ContextMenuItem>
+        )}
         <ContextMenuSeparator />
         <ContextMenuItem 
           onClick={() => onDeleteProduct(product)}
