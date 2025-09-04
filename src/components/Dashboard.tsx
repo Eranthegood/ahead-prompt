@@ -131,7 +131,7 @@ const Dashboard = () => {
         <MinimalSidebar workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onProductSelect={setSelectedProductId} onEpicSelect={setSelectedEpicId} showCompletedItems={preferences.showCompletedItems} onToggleCompletedItems={handleToggleCompletedItems} onQuickAdd={handleQuickAdd} searchQuery={searchQuery} />
         
         <div className="flex-1 flex flex-col min-w-0">
-          <MinimalHeader workspace={workspace} searchQuery={searchQuery} onSearchChange={setSearchQuery} showMetrics={showMetrics} onToggleMetrics={() => setShowMetrics(!showMetrics)} />
+          <MinimalHeader workspace={workspace} />
           
           {/* Metrics Dashboard - conditionally shown */}
           {showMetrics}
