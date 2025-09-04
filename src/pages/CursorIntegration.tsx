@@ -53,6 +53,43 @@ export default function CursorIntegration() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             
+            {/* How it Works */}
+            <Card>
+              <CardHeader>
+                <CardTitle>How It Works</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">1. Intelligent Prompt Batching</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Queue related prompts in logical groups</li>
+                      <li>• Ahead analyzes dependencies automatically</li>
+                      <li>• Creates optimal batches for Cursor Agent processing</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">2. Parallel Execution Engine</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Push entire batch to Cursor with one click</li>
+                      <li>• Multiple AI agents work simultaneously</li>
+                      <li>• Real-time progress tracking across all tasks</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">3. GitHub Integration</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Automatic branch management for each batch</li>
+                      <li>• Commit messages generated from prompt context</li>
+                      <li>• Seamless merge coordination between parallel work</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* What is Cursor Integration */}
             <Card>
               <CardHeader>
@@ -213,43 +250,6 @@ export default function CursorIntegration() {
                     </div>
                   </div>
 
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* How it Works */}
-            <Card>
-              <CardHeader>
-                <CardTitle>How It Works</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">1. Intelligent Prompt Batching</h3>
-                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                      <li>• Queue related prompts in logical groups</li>
-                      <li>• Ahead analyzes dependencies automatically</li>
-                      <li>• Creates optimal batches for Cursor Agent processing</li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">2. Parallel Execution Engine</h3>
-                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                      <li>• Push entire batch to Cursor with one click</li>
-                      <li>• Multiple AI agents work simultaneously</li>
-                      <li>• Real-time progress tracking across all tasks</li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">3. GitHub Integration</h3>
-                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                      <li>• Automatic branch management for each batch</li>
-                      <li>• Commit messages generated from prompt context</li>
-                      <li>• Seamless merge coordination between parallel work</li>
-                    </ul>
-                  </div>
                 </div>
               </CardContent>
             </Card>
