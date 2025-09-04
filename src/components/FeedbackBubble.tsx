@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,20 +6,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 const FeedbackBubble = () => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Get current user
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !message) {
+    // Validate required fields based on auth status
+    if (!message || (!user && !email)) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: user ? "Please enter your message" : "Please fill in all fields",
         variant: "destructive"
       });
       return;
@@ -28,14 +48,20 @@ const FeedbackBubble = () => {
     setIsSubmitting(true);
     
     try {
+      const feedbackData: any = {
+        message: message.trim()
+      };
+
+      // Add user_id if authenticated, otherwise add email
+      if (user) {
+        feedbackData.user_id = user.id;
+      } else {
+        feedbackData.email = email.trim();
+      }
+
       const { error } = await supabase
         .from('feedback' as any)
-        .insert([
-          {
-            email: email.trim(),
-            message: message.trim()
-          }
-        ]);
+        .insert([feedbackData]);
 
       if (error) throw error;
 
@@ -75,15 +101,17 @@ const FeedbackBubble = () => {
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          {!user && (
+            <div>
+              <Input
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
           
           <div>
             <Textarea
