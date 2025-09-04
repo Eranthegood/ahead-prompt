@@ -22,7 +22,7 @@ const INTEGRATIONS_CONFIG = [
     name: 'Cursor Background Agents',
     description: 'Envoyez vos prompts directement vers Cursor pour une génération de code autonome sur vos repos GitHub.',
     icon: Code,
-    logo: '/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png',
+    logo: '/lovable-uploads/7658f39d-f631-4804-864a-57309b5c4066.png',
     configPath: '/integrations/cursor',
     repositoryConfigPath: '/settings/repository-mapping'
   },

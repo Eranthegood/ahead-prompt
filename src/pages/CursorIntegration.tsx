@@ -186,7 +186,7 @@ export default function CursorIntegration() {
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-muted">
               <img 
-                src="/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png" 
+                src="/lovable-uploads/7658f39d-f631-4804-864a-57309b5c4066.png" 
                 alt="Cursor logo"
                 className="h-8 w-8 object-contain"
               />
@@ -249,7 +249,7 @@ export default function CursorIntegration() {
                   
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800">
                     <img 
-                      src="/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png" 
+                      src="/lovable-uploads/7658f39d-f631-4804-864a-57309b5c4066.png" 
                       alt="Cursor logo"
                       className="h-6 w-6 object-contain"
                     />
