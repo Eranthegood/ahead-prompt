@@ -83,7 +83,7 @@ export function UserAccountSection() {
   }
 
   return (
-    <div className="border-t pt-4 px-2">
+    <div className="border-t pt-2 px-2 -mt-2">
       {/* XP Badge */}
       {stats && (
         <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full text-sm mb-3">
