@@ -62,18 +62,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           {/* Logo et navigation principale */}
           <div className="flex items-center gap-6">
 
-            {/* Navigation rapide */}
-            <nav className="hidden md:flex items-center gap-1">
-              <Button
-                variant={isActivePage('/integrations') ? 'secondary' : 'ghost'}
-                onClick={() => navigate('/integrations')}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Plug className="w-4 h-4" />
-                Integrations
-              </Button>
-            </nav>
+            {/* Navigation rapide - removed */}
           </div>
 
           {/* Barre de recherche */}
