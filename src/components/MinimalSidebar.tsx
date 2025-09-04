@@ -130,7 +130,24 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [selectedKnowledgeProduct, setSelectedKnowledgeProduct] = useState<Product | undefined>();
 
-  // Filter function to match search and exclude completed
+  // Filter function to get prompts that match current view filters
+  const getVisiblePrompts = (productFilter?: string, epicFilter?: string) => {
+    return prompts.filter(prompt => {
+      const matchesSearch = !searchQuery || 
+        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesProduct = !productFilter || productFilter === 'all' || 
+        prompt.product_id === productFilter;
+
+      const matchesEpic = !epicFilter || prompt.epic_id === epicFilter;
+
+      // Include all prompts that match the filters, regardless of status
+      return matchesSearch && matchesProduct && matchesEpic;
+    });
+  };
+
+  // Keep the original function for backward compatibility where needed
   const getActivePrompts = (productFilter?: string, epicFilter?: string) => {
     return prompts.filter(prompt => {
       const matchesSearch = !searchQuery || 
@@ -166,20 +183,20 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   // Organization with epic hierarchy and filtered counts
   const productsWithData = products.map(product => {
     const productEpics = getFilteredEpics(product.id);
-    const directPrompts = getActivePrompts(product.id).filter(p => !p.epic_id);
+    const directPrompts = getVisiblePrompts(product.id).filter(p => !p.epic_id);
     
     const epicsWithCounts = productEpics.map(epic => ({
       ...epic,
-      promptCount: getActivePrompts(product.id, epic.id).length
+      promptCount: getVisiblePrompts(product.id, epic.id).length
     }));
 
-    const totalActivePrompts = getActivePrompts(product.id).length;
+    const totalVisiblePrompts = getVisiblePrompts(product.id).length;
     
     return {
       ...product,
       epics: epicsWithCounts,
       directPrompts,
-      promptCount: totalActivePrompts
+      promptCount: totalVisiblePrompts
     };
   });
 
