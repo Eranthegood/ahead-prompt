@@ -119,7 +119,7 @@ export default function LandingPage() {
           <BlurFade delay={0.9} inView>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-6 opacity-60">
               <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                <span>Built with</span>
+                <span>Integration with</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 group cursor-pointer">
