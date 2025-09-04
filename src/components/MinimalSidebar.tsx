@@ -40,6 +40,7 @@ import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen } from 'lucide-react';
 import { Workspace, Product } from '@/types';
+import chessKnightLogo from "@/assets/chess-knight-logo.png";
 
 import { AdaptiveTitle } from './ui/adaptive-title';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
@@ -357,9 +358,11 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             <div className="mb-4 sm:mb-6">
               <h2 className="text-base sm:text-lg font-medium text-foreground truncate flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gradient-primary rounded flex items-center justify-center">
-                    <Hash className="w-4 h-4 text-white" />
-                  </div>
+                  <img 
+                    src={chessKnightLogo} 
+                    alt="Ahead Logo" 
+                    className="w-6 h-6"
+                  />
                   <span>Ahead</span>
                 </div>
                 <span className="text-sm font-normal text-muted-foreground">Again</span>
