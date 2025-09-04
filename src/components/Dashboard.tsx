@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { MinimalSidebar } from '@/components/MinimalSidebar';
 import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
@@ -18,8 +16,6 @@ const Dashboard = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<string>('all');
-  const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
@@ -41,7 +37,7 @@ const Dashboard = () => {
   });
   const {
     epics
-  } = useEpics(workspace?.id, selectedProductId === 'all' ? undefined : selectedProductId);
+  } = useEpics(workspace?.id);
   const {
     products
   } = useProducts(workspace?.id);
@@ -126,23 +122,20 @@ const Dashboard = () => {
         </div>
       </div>;
   }
-  return <SidebarProvider>
-      <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">        
-        <MinimalSidebar workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onProductSelect={setSelectedProductId} onEpicSelect={setSelectedEpicId} showCompletedItems={preferences.showCompletedItems} onToggleCompletedItems={handleToggleCompletedItems} onQuickAdd={handleQuickAdd} searchQuery={searchQuery} />
+  return (
+    <>
+      <div className="flex-1 flex flex-col min-w-0">
+        <MinimalHeader workspace={workspace} />
         
-        <div className="flex-1 flex flex-col min-w-0">
-          <MinimalHeader workspace={workspace} />
-          
-          {/* Metrics Dashboard - conditionally shown */}
-          {showMetrics}
-          
-          <MinimalPromptList workspace={workspace} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
-        </div>
+        {/* Metrics Dashboard - conditionally shown */}
+        {showMetrics}
+        
+        <MinimalPromptList workspace={workspace} selectedProductId={undefined} selectedEpicId={undefined} searchQuery={searchQuery} hoveredPromptId={hoveredPromptId} onPromptHover={setHoveredPromptId} onCopy={handleCopyPrompt} />
+      </div>
 
-        <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} // No longer needed with simplified interface
-      />
+      <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
 
-        <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId} selectedEpicId={selectedEpicId} onCreateProduct={() => {
+      <QuickPromptDialog isOpen={quickPromptOpen} onClose={() => setQuickPromptOpen(false)} onSave={handleCreatePrompt} workspace={workspace} epics={epics} products={products} selectedProductId={undefined} selectedEpicId={undefined} onCreateProduct={() => {
         // Simple callback pour ouvrir une création de produit
         console.log('Create product requested - implement product creation dialog');
       }} onCreateEpic={() => {
@@ -150,8 +143,8 @@ const Dashboard = () => {
         console.log('Create epic requested - implement epic creation dialog');
       }} />
 
-        <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
-      </div>
-    </SidebarProvider>;
+      <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
+    </>
+  );
 };
 export default Dashboard;
