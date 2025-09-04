@@ -71,6 +71,7 @@ const PRODUCT_COLORS = [
 ];
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
+  const navigate = useNavigate();
   const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
   const { epics, createEpic, updateEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
@@ -376,14 +377,39 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
           {/* Logo and Brand */}
-          {!isCollapsed && (
+          {!isCollapsed ? (
             <div className="mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
-                <div className="flex items-center gap-2">
-                  <ProcessedLogo className="w-6 h-6" />
-                  <span>Ahead</span>
-                </div>
-              </h2>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start p-0 h-auto hover:bg-transparent"
+                onClick={() => navigate('/')}
+              >
+                <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
+                  <div className="flex items-center gap-2">
+                    <ProcessedLogo className="w-6 h-6" />
+                    <span>Ahead</span>
+                  </div>
+                </h2>
+              </Button>
+            </div>
+          ) : (
+            <div className="mb-4 sm:mb-6 flex justify-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="w-8 h-8 p-0"
+                    onClick={() => navigate('/')}
+                    aria-label="Home"
+                  >
+                    <ProcessedLogo className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Ahead - Go Home</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           )}
 
@@ -437,6 +463,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                     variant="ghost" 
                     className="w-full aspect-square p-0"
                     onClick={() => {
+                      navigate('/');
                       onProductSelect('all');
                       onEpicSelect(undefined);
                     }}
@@ -465,7 +492,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 variant="ghost" 
                 className="w-full justify-start text-left font-normal text-sm sm:text-base py-2"
                 onClick={() => {
-                  console.log('All Prompts button clicked - DEBUG');
+                  navigate('/');
                   onProductSelect('all');
                   onEpicSelect(undefined);
                 }}

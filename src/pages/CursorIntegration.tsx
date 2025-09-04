@@ -17,7 +17,7 @@ import {
   BookOpen,
   ChevronRight
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CursorIntegration() {
@@ -68,10 +68,10 @@ export default function CursorIntegration() {
       action: (
         <div className="space-y-2">
           <Button variant="outline" size="sm" asChild>
-            <a href="/settings" rel="noopener noreferrer">
+            <Link to="/settings">
               <Github className="h-4 w-4 mr-2" />
               Connecter GitHub
-            </a>
+            </Link>
           </Button>
           <Alert>
             <Github className="h-4 w-4" />
@@ -185,12 +185,12 @@ export default function CursorIntegration() {
           <Github className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           <AlertDescription className="text-amber-800 dark:text-amber-200">
             <strong>Prérequis obligatoire :</strong> Vous devez d'abord{' '}
-            <a 
-              href="/settings" 
+            <Link 
+              to="/settings" 
               className="underline font-medium hover:no-underline"
             >
               connecter votre compte GitHub à Lovable
-            </a>
+            </Link>
             {' '}car les agents Cursor travaillent directement sur vos repositories GitHub.
           </AlertDescription>
         </Alert>
@@ -385,11 +385,11 @@ export default function CursorIntegration() {
                 </Button>
                 
                 <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                  <a href="/settings">
+                  <Link to="/settings">
                     <Github className="h-4 w-4 mr-2" />
                     Configurer GitHub
                     <ChevronRight className="h-3 w-3 ml-auto" />
-                  </a>
+                  </Link>
                 </Button>
 
                 <Button variant="outline" size="sm" className="w-full justify-start" asChild>

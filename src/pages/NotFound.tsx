@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
@@ -18,7 +18,7 @@ const NotFound = () => {
           Vibe Plan Forge
         </h1>
         <p className="text-xl text-muted-foreground mb-8">
-          Please <a href="/auth" className="text-primary hover:text-primary-glow underline">sign in</a> to access your workspace
+          Please <Link to="/auth" className="text-primary hover:text-primary-glow underline">sign in</Link> to access your workspace
         </p>
       </div>
     </div>
