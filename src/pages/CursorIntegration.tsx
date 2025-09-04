@@ -63,6 +63,27 @@ export default function CursorIntegration() {
   const steps = [
     {
       number: 1,
+      title: 'Connecter GitHub à Lovable',
+      description: 'OBLIGATOIRE : Les agents Cursor travaillent sur vos repositories GitHub. Vous devez d\'abord connecter votre compte GitHub à Lovable.',
+      action: (
+        <div className="space-y-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/settings" rel="noopener noreferrer">
+              <Github className="h-4 w-4 mr-2" />
+              Connecter GitHub
+            </a>
+          </Button>
+          <Alert>
+            <Github className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              Allez dans Paramètres → GitHub → "Connect to GitHub" pour configurer votre intégration.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )
+    },
+    {
+      number: 2,
       title: 'Créer un compte Cursor Pro',
       description: 'Rendez-vous sur cursor.com et créez un compte Pro pour accéder aux Background Agents.',
       action: (
@@ -75,7 +96,7 @@ export default function CursorIntegration() {
       )
     },
     {
-      number: 2,
+      number: 3,
       title: 'Générer une clé API',
       description: 'Dans votre Dashboard Cursor, allez dans Integrations et générez une nouvelle clé API.',
       action: (
@@ -88,13 +109,13 @@ export default function CursorIntegration() {
       )
     },
     {
-      number: 3,
+      number: 4,
       title: 'Configurer la clé API',
       description: 'Saisissez votre clé API ci-dessous pour l\'enregistrer de manière sécurisée.',
       action: null
     },
     {
-      number: 4,
+      number: 5,
       title: 'Commencer à utiliser',
       description: 'Une fois configuré, vous pourrez envoyer vos prompts directement vers Cursor depuis vos cartes de prompt.',
       action: null
@@ -159,6 +180,21 @@ export default function CursorIntegration() {
           </div>
         </div>
 
+        {/* Prerequisites Alert */}
+        <Alert className="mb-6 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20">
+          <Github className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
+            <strong>Prérequis obligatoire :</strong> Vous devez d'abord{' '}
+            <a 
+              href="/settings" 
+              className="underline font-medium hover:no-underline"
+            >
+              connecter votre compte GitHub à Lovable
+            </a>
+            {' '}car les agents Cursor travaillent directement sur vos repositories GitHub.
+          </AlertDescription>
+        </Alert>
+
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Configuration */}
           <div className="lg:col-span-2 space-y-6">
@@ -216,7 +252,7 @@ export default function CursorIntegration() {
                           {step.action}
                           
                           {/* API Key Configuration */}
-                          {step.number === 3 && (
+                          {step.number === 4 && (
                             <div className="mt-4 p-4 border rounded-lg bg-muted/50">
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
@@ -289,6 +325,14 @@ export default function CursorIntegration() {
                 </Button>
                 
                 <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                  <a href="/settings">
+                    <Github className="h-4 w-4 mr-2" />
+                    Configurer GitHub
+                    <ChevronRight className="h-3 w-3 ml-auto" />
+                  </a>
+                </Button>
+
+                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                   <a href="https://www.cursor.com/settings" target="_blank" rel="noopener noreferrer">
                     <Key className="h-4 w-4 mr-2" />
                     Dashboard Cursor
@@ -313,6 +357,14 @@ export default function CursorIntegration() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Alert>
+                  <Github className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    <strong>Important :</strong> Assurez-vous d'avoir connecté GitHub à Lovable avant de configurer Cursor. 
+                    Les agents travaillent sur vos repositories GitHub.
+                  </AlertDescription>
+                </Alert>
+
+                <Alert>
                   <AlertDescription className="text-sm">
                     Une fois configuré, vous verrez l'option "Envoyer vers Cursor" dans le menu contextuel de vos prompts.
                   </AlertDescription>
@@ -320,13 +372,22 @@ export default function CursorIntegration() {
                 
                 <div className="text-sm text-muted-foreground">
                   <p className="mb-2">
-                    <strong>Prérequis :</strong>
+                    <strong>Prérequis obligatoires :</strong>
                   </p>
                   <ul className="space-y-1 ml-4">
+                    <li>• <strong>Intégration GitHub Lovable</strong> (obligatoire)</li>
                     <li>• Compte Cursor Pro actif</li>
-                    <li>• Repository GitHub configuré</li>
-                    <li>• Clé API valide</li>
+                    <li>• Repository GitHub accessible</li>
+                    <li>• Clé API Cursor valide</li>
                   </ul>
+                  <p className="mt-3 text-xs">
+                    <a 
+                      href="/settings" 
+                      className="text-primary hover:underline"
+                    >
+                      → Configurer GitHub dans les paramètres
+                    </a>
+                  </p>
                 </div>
               </CardContent>
             </Card>
