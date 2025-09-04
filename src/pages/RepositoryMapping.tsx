@@ -1,19 +1,26 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, Settings, Check, X, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, Settings, Check, X, ExternalLink, GitBranch } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { RepositoryConnectionDialog } from '@/components/RepositoryConnectionDialog';
+import { BranchMappingDialog } from '@/components/BranchMappingDialog';
 
 const RepositoryMapping = () => {
   const navigate = useNavigate();
   const { workspace } = useWorkspace();
   const { products } = useProducts(workspace?.id);
   const { epics } = useEpics(workspace?.id);
-  const [editingBranch, setEditingBranch] = useState<string | null>(null);
+  const [connectingProduct, setConnectingProduct] = useState<{ id: string; name: string } | null>(null);
+  const [mappingEpic, setMappingEpic] = useState<{ 
+    id: string; 
+    name: string; 
+    productId: string; 
+    repositoryUrl?: string; 
+  } | null>(null);
 
   // Calculate connection status
   const connectedProducts = products.filter(p => p.github_repo_url);
@@ -23,14 +30,12 @@ const RepositoryMapping = () => {
     return epics.filter(epic => epic.product_id === productId);
   };
 
-  const handleConnectRepository = (productId: string) => {
-    // This would open a dialog to connect a repository
-    console.log('Connect repository for product:', productId);
+  const handleConnectRepository = (productId: string, productName: string) => {
+    setConnectingProduct({ id: productId, name: productName });
   };
 
-  const handleCreateBranch = (productId: string) => {
-    // This would create a new epic/branch
-    console.log('Create new branch for product:', productId);
+  const handleMapBranch = (epicId: string, epicName: string, productId: string, repositoryUrl?: string) => {
+    setMappingEpic({ id: epicId, name: epicName, productId, repositoryUrl });
   };
 
   const getStatusColor = (isConnected: boolean) => {
@@ -96,7 +101,7 @@ const RepositoryMapping = () => {
                   
                   {!isConnected && (
                     <Button 
-                      onClick={() => handleConnectRepository(product.id)}
+                      onClick={() => handleConnectRepository(product.id, product.name)}
                       size="sm"
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
@@ -120,13 +125,13 @@ const RepositoryMapping = () => {
                         <div className="flex items-center justify-between">
                           <h3 className="font-medium">Branches</h3>
                           <Button 
-                            onClick={() => handleCreateBranch(product.id)}
+                            onClick={() => navigate(`/product/${product.id}`)}
                             size="sm"
                             variant="outline"
                             className="text-xs"
                           >
                             <Plus className="w-3 h-3 mr-1" />
-                            New Branch
+                            Créer Epic
                           </Button>
                         </div>
                         
@@ -151,10 +156,26 @@ const RepositoryMapping = () => {
                                 </div>
                                 
                                 <div className="flex items-center gap-2">
+                                  {epic.git_branch_name ? (
+                                    <Badge variant="outline" className="text-xs">
+                                      <GitBranch className="w-3 h-3 mr-1" />
+                                      Mappée
+                                    </Badge>
+                                  ) : (
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => handleMapBranch(epic.id, epic.name, product.id, product.github_repo_url)}
+                                      className="text-xs"
+                                    >
+                                      <GitBranch className="w-3 h-3 mr-1" />
+                                      Mapper
+                                    </Button>
+                                  )}
                                   <Button 
                                     size="sm" 
                                     variant="ghost"
-                                    onClick={() => setEditingBranch(epic.id)}
+                                    onClick={() => handleMapBranch(epic.id, epic.name, product.id, product.github_repo_url)}
                                   >
                                     <Settings className="w-3 h-3" />
                                   </Button>
@@ -191,6 +212,27 @@ const RepositoryMapping = () => {
           )}
         </div>
       </div>
+
+      {/* Dialogs */}
+      {connectingProduct && (
+        <RepositoryConnectionDialog
+          isOpen={!!connectingProduct}
+          onClose={() => setConnectingProduct(null)}
+          productId={connectingProduct.id}
+          productName={connectingProduct.name}
+        />
+      )}
+
+      {mappingEpic && (
+        <BranchMappingDialog
+          isOpen={!!mappingEpic}
+          onClose={() => setMappingEpic(null)}
+          epicId={mappingEpic.id}
+          epicName={mappingEpic.name}
+          productId={mappingEpic.productId}
+          repositoryUrl={mappingEpic.repositoryUrl}
+        />
+      )}
     </div>
   );
 };
