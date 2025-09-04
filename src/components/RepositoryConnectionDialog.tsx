@@ -17,9 +17,18 @@ interface RepositoryConnectionDialogProps {
   onClose: () => void;
   productId: string;
   productName: string;
+  currentRepositoryUrl?: string;
+  isReconnection?: boolean;
 }
 
-export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, productName }: RepositoryConnectionDialogProps) => {
+export const RepositoryConnectionDialog = ({ 
+  isOpen, 
+  onClose, 
+  productId, 
+  productName, 
+  currentRepositoryUrl,
+  isReconnection = false 
+}: RepositoryConnectionDialogProps) => {
   const { integrations } = useIntegrations();
   const { workspace } = useWorkspace();
   const { refetch } = useProducts(workspace?.id);
@@ -29,6 +38,7 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
   const [isLoading, setIsLoading] = useState(false);
   const [repositories, setRepositories] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [mappedEpicsCount, setMappedEpicsCount] = useState(0);
 
   const githubIntegration = integrations.find(i => i.id === 'github');
 
@@ -39,10 +49,30 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
   );
 
   useEffect(() => {
-    if (isOpen && githubIntegration?.metadata?.repositories) {
-      setRepositories(githubIntegration.metadata.repositories);
+    if (isOpen) {
+      if (githubIntegration?.metadata?.repositories) {
+        setRepositories(githubIntegration.metadata.repositories);
+      }
+      
+      // Load mapped epics count for reconnection
+      if (isReconnection && workspace?.id) {
+        const loadMappedEpics = async () => {
+          const { data: epics } = await supabase
+            .from('epics')
+            .select('git_branch_name')
+            .eq('product_id', productId)
+            .not('git_branch_name', 'is', null);
+          setMappedEpicsCount(epics?.length || 0);
+        };
+        loadMappedEpics();
+      }
+      
+      // Pre-fill current repo if reconnecting
+      if (isReconnection && currentRepositoryUrl) {
+        setCustomRepo(currentRepositoryUrl);
+      }
     }
-  }, [isOpen, githubIntegration]);
+  }, [isOpen, githubIntegration, isReconnection, currentRepositoryUrl, workspace?.id, productId]);
 
   const handleConnect = async () => {
     const repoUrl = selectedRepo || customRepo;
@@ -65,7 +95,7 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
       if (error) throw error;
 
       await refetch();
-      toast.success(`Repository connecté au produit ${productName}`);
+      toast.success(`Repository ${isReconnection ? 'changé' : 'connecté'} au produit ${productName}`);
       onClose();
     } catch (error) {
       console.error('Error connecting repository:', error);
@@ -86,10 +116,31 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Connecter un repository à {productName}</DialogTitle>
+          <DialogTitle>
+            {isReconnection ? `Changer le repository de ${productName}` : `Connecter un repository à ${productName}`}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
+          {isReconnection && (
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 text-orange-600 mt-0.5">⚠️</div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-orange-800">Changement de repository</h4>
+                  <p className="text-sm text-orange-700">
+                    Repository actuel : <code className="bg-orange-100 px-1 rounded text-xs">{currentRepositoryUrl}</code>
+                  </p>
+                  {mappedEpicsCount > 0 && (
+                    <p className="text-sm text-orange-700">
+                      ⚠️ Ce produit a {mappedEpicsCount} epic(s) avec des branches mappées. 
+                      Les mappings seront préservés mais vérifiez que les branches existent dans le nouveau repository.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           {repositories.length > 0 && (
             <div className="space-y-3">
               <Label className="text-sm font-medium">
@@ -164,7 +215,7 @@ export const RepositoryConnectionDialog = ({ isOpen, onClose, productId, product
               className="flex-1"
             >
               {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Connecter le repository
+              {isReconnection ? 'Changer le repository' : 'Connecter le repository'}
             </Button>
             <Button variant="outline" onClick={onClose}>
               Annuler

@@ -14,7 +14,7 @@ const RepositoryMapping = () => {
   const { workspace } = useWorkspace();
   const { products } = useProducts(workspace?.id);
   const { epics } = useEpics(workspace?.id);
-  const [connectingProduct, setConnectingProduct] = useState<{ id: string; name: string } | null>(null);
+  const [connectingProduct, setConnectingProduct] = useState<{ id: string; name: string; currentRepo?: string; isReconnection?: boolean } | null>(null);
   const [mappingEpic, setMappingEpic] = useState<{ 
     id: string; 
     name: string; 
@@ -30,8 +30,8 @@ const RepositoryMapping = () => {
     return epics.filter(epic => epic.product_id === productId);
   };
 
-  const handleConnectRepository = (productId: string, productName: string) => {
-    setConnectingProduct({ id: productId, name: productName });
+  const handleConnectRepository = (productId: string, productName: string, currentRepo?: string, isReconnection = false) => {
+    setConnectingProduct({ id: productId, name: productName, currentRepo, isReconnection });
   };
 
   const handleMapBranch = (epicId: string, epicName: string, productId: string, repositoryUrl?: string) => {
@@ -99,15 +99,25 @@ const RepositoryMapping = () => {
                     </div>
                   </div>
                   
-                  {!isConnected && (
-                    <Button 
-                      onClick={() => handleConnectRepository(product.id, product.name)}
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      Connect
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {!isConnected ? (
+                      <Button 
+                        onClick={() => handleConnectRepository(product.id, product.name)}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Connect
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handleConnectRepository(product.id, product.name, product.github_repo_url, true)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Change Repository
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Repository and Branches */}
@@ -220,6 +230,8 @@ const RepositoryMapping = () => {
           onClose={() => setConnectingProduct(null)}
           productId={connectingProduct.id}
           productName={connectingProduct.name}
+          currentRepositoryUrl={connectingProduct.currentRepo}
+          isReconnection={connectingProduct.isReconnection}
         />
       )}
 
