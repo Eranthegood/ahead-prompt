@@ -482,6 +482,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                     selectedProductId === product.id ? 'bg-accent' : ''
                                   }`}
                                   onClick={() => {
+                                    console.log('Product clicked (collapsed):', product.name, product.id);
+                                    setOpenMobile(false);
                                     onProductSelect(product.id);
                                     onEpicSelect(undefined);
                                   }}
@@ -586,6 +588,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                   <SidebarMenuButton 
                                     className="flex-1 justify-between"
                                     onClick={() => {
+                                      console.log('Product clicked (expanded):', product.name, product.id);
+                                      setOpenMobile(false);
                                       onProductSelect(product.id);
                                       onEpicSelect(undefined);
                                     }}
@@ -659,10 +663,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                          <ContextMenuTrigger asChild>
                                            <SidebarMenuButton
                                              className="w-full justify-between text-xs"
-                                             onClick={() => {
-                                               onProductSelect(product.id);
-                                               onEpicSelect(epic.id);
-                                             }}
+                                              onClick={() => {
+                                                console.log('Epic clicked:', epic.name, epic.id, 'in product:', product.name);
+                                                setOpenMobile(false);
+                                                onProductSelect(product.id);
+                                                onEpicSelect(epic.id);
+                                              }}
                                              isActive={selectedEpicId === epic.id}
                                              aria-label={`Epic: ${epic.name} (${epic.promptCount} prompts)`}
                                            >

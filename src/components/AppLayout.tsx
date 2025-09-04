@@ -47,7 +47,11 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   if (shouldShowSidebar) {
     return (
-      <PromptsProvider workspaceId={workspace.id}>
+      <PromptsProvider 
+        workspaceId={workspace.id}
+        selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        selectedEpicId={selectedEpicId}
+      >
         <SidebarContent 
           workspace={workspace}
           selectedProductId={selectedProductId}

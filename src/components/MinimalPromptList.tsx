@@ -38,7 +38,13 @@ export function MinimalPromptList({
 }: MinimalPromptListProps) {
   const promptsContext = usePromptsContext();
   const { prompts = [], loading = false, updatePromptStatus, updatePromptPriority, duplicatePrompt, deletePrompt } = promptsContext || {};
-  console.debug('[MinimalPromptList] using PromptsContext', { count: prompts?.length, loading });
+  console.debug('[MinimalPromptList] Render with props:', { 
+    selectedProductId, 
+    selectedEpicId, 
+    searchQuery,
+    promptCount: prompts?.length, 
+    loading 
+  });
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
