@@ -59,6 +59,13 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
     <>
       <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-full items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            {/* Sidebar Trigger for mobile */}
+            {showSidebarTrigger && (
+              <SidebarTrigger className="md:hidden" />
+            )}
+          </div>
+
           {/* Barre de recherche */}
           {showSearch && workspace && (
             <div className="flex-1 max-w-lg mx-4">
@@ -77,7 +84,9 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             </div>
           )}
 
-          {/* Menu utilisateur et actions removed - moved to sidebar */}
+          <div className="flex items-center gap-2">
+            {/* Spacer to balance layout */}
+          </div>
         </div>
       </header>
 
