@@ -117,14 +117,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       }
 
       toast({
-        title: 'Prompt régénéré',
-        description: 'Le prompt a été régénéré et sauvegardé avec succès'
+        title: 'Prompt Regenerated',
+        description: 'Prompt has been regenerated and saved successfully'
       });
     } catch (error) {
       console.error('Error regenerating prompt:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de régénérer le prompt',
+        title: 'Error',
+        description: 'Unable to regenerate prompt',
         variant: 'destructive'
       });
     } finally {
@@ -154,14 +154,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       }
 
       toast({
-        title: 'Prompt régénéré depuis le texte original',
-        description: 'Le prompt a été régénéré et sauvegardé avec succès'
+        title: 'Prompt regenerated from original text',
+        description: 'Prompt has been regenerated and saved successfully'
       });
     } catch (error) {
       console.error('Error regenerating prompt from original:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de régénérer le prompt depuis le texte original',
+        title: 'Error',
+        description: 'Unable to regenerate prompt from original text',
         variant: 'destructive'
       });
     } finally {
@@ -173,14 +173,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     try {
       await navigator.clipboard.writeText(generatedPrompt);
       toast({
-        title: 'Copié',
-        description: 'Le prompt a été copié dans le presse-papiers'
+        title: 'Copied',
+        description: 'Prompt has been copied to clipboard'
       });
     } catch (error) {
       console.error('Error copying prompt:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de copier le prompt',
+        title: 'Error',
+        description: 'Unable to copy prompt',
         variant: 'destructive'
       });
     }
@@ -237,11 +237,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       >
         <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-            Modifier l&apos;idée
+            Edit Idea
             {draftRestored && (
               <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
                 <RotateCcw className="h-4 w-4" />
-                <span>Brouillon restauré</span>
+                <span>Draft restored</span>
               </div>
             )}
           </DialogTitle>
@@ -259,7 +259,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               className="flex-1 rounded-none h-12"
               size="sm"
             >
-              Édition
+              Edit
             </Button>
             <Button
               variant={activeTab === 'preview' ? 'default' : 'ghost'}
@@ -267,7 +267,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               className="flex-1 rounded-none h-12"
               size="sm"
             >
-              Aperçu
+              Preview
             </Button>
           </div>
         </div>
@@ -281,11 +281,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Créé le {format(new Date(prompt.created_at), 'dd/MM/yyyy')}</span>
+                    <span>Created on {format(new Date(prompt.created_at), 'MM/dd/yyyy')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    <span>Modifié le {format(new Date(prompt.updated_at), 'dd/MM/yyyy')}</span>
+                    <span>Modified on {format(new Date(prompt.updated_at), 'MM/dd/yyyy')}</span>
                   </div>
                 </div>
 
@@ -296,7 +296,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
                     <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                     <AlertDescription className="text-orange-800 dark:text-orange-200">
-                      Ajoutez un peu plus de contexte pour une meilleure génération IA.
+                      Add more context for better AI generation.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -348,16 +348,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 {/* Assignment - Stacked */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Produit</Label>
+                    <Label>Product</Label>
                     <Select value={productId} onValueChange={(value) => {
                       setProductId(value);
                       if (value === 'none') setEpicId('none');
                     }}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Aucun produit</SelectItem>
+                        <SelectItem value="none">No product</SelectItem>
                         {products.map((product) => (
                           <SelectItem key={product.id} value={product.id}>
                             {product.name}
@@ -371,10 +371,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     <Label>Epic</Label>
                     <Select value={epicId} onValueChange={setEpicId} disabled={productId === 'none'}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Aucun epic</SelectItem>
+                        <SelectItem value="none">No epic</SelectItem>
                         {filteredEpics.map((epic) => (
                           <SelectItem key={epic.id} value={epic.id}>
                             {epic.name}
@@ -389,7 +389,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               /* Preview Tab */
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium">Prompt généré</h3>
+                  <h3 className="font-medium">Generated Prompt</h3>
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
@@ -411,7 +411,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="border rounded-md bg-muted/20 p-4 max-h-[300px] overflow-y-auto">
                   <div 
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: generatedPrompt || 'Aucun prompt généré. Utilisez le bouton ci-dessus pour générer un prompt basé sur votre contenu.' }}
+                    dangerouslySetInnerHTML={{ __html: generatedPrompt || 'No prompt generated. Use the button above to generate a prompt based on your content.' }}
                   />
                 </div>
               </div>
@@ -421,14 +421,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
           {/* Mobile Actions */}
           <div className="border-t p-4 flex gap-3 flex-shrink-0">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Annuler
+              Cancel
             </Button>
             <Button 
               onClick={handleSave} 
               disabled={saving || !editor?.getHTML() || editor?.getHTML() === '<p></p>'}
               className="flex-1"
             >
-              {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+              {saving ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>
@@ -441,11 +441,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span>Créé le {format(new Date(prompt.created_at), 'dd/MM/yyyy')}</span>
+                <span>Created on {format(new Date(prompt.created_at), 'MM/dd/yyyy')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                <span>Modifié le {format(new Date(prompt.updated_at), 'dd/MM/yyyy')}</span>
+                <span>Modified on {format(new Date(prompt.updated_at), 'MM/dd/yyyy')}</span>
               </div>
             </div>
 
@@ -456,7 +456,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
                 <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  Ajoutez un peu plus de contexte pour une meilleure génération IA.
+                  Add more context for better AI generation.
                 </AlertDescription>
               </Alert>
             )}
@@ -526,10 +526,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             {/* Original Text Edit */}
             {prompt && (
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">Texte original</Label>
+                <Label className="text-sm font-medium text-muted-foreground">Original Text</Label>
                 <div className="space-y-2">
                   <Input
-                    placeholder="Titre du prompt"
+                    placeholder="Prompt title"
                     value={prompt.title || ''}
                     onChange={(e) => {
                       if (prompt) {
@@ -539,7 +539,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     className="text-sm"
                   />
                    <Textarea
-                    placeholder="Description du prompt"
+                    placeholder="Prompt description"
                     value={prompt.description || ''}
                     onChange={(e) => {
                       if (prompt) {
@@ -558,12 +558,12 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     {isRegenerating ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Régénération...
+                        Regenerating...
                       </>
                     ) : (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2" />
-                        Régénérer depuis le texte original
+                        Regenerate from original text
                       </>
                     )}
                   </Button>
@@ -582,7 +582,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             {/* Product and Epic assignment */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Produit</Label>
+                <Label>Product</Label>
                 <Select value={productId} onValueChange={(value) => {
                   setProductId(value);
                   if (value === 'none') {
@@ -590,10 +590,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   }
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un produit..." />
+                    <SelectValue placeholder="Select a product..." />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                    <SelectItem value="none">Aucun produit</SelectItem>
+                    <SelectItem value="none">No product</SelectItem>
                     {products.map((product) => (
                       <SelectItem key={product.id} value={product.id}>
                         <div className="flex items-center gap-2">
@@ -610,10 +610,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <Label>Epic</Label>
                 <Select value={epicId} onValueChange={setEpicId} disabled={productId === 'none'}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un epic..." />
+                    <SelectValue placeholder="Select an epic..." />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                    <SelectItem value="none">Aucun epic</SelectItem>
+                    <SelectItem value="none">No epic</SelectItem>
                     {filteredEpics.map((epic) => (
                       <SelectItem key={epic.id} value={epic.id}>
                         <div className="flex items-center gap-2">
@@ -635,13 +635,13 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Annuler
+                Cancel
               </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={saving || !editor.getHTML() || editor.getHTML() === '<p></p>'}
               >
-                {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+                {saving ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>
@@ -649,14 +649,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
           {/* Desktop Right Panel - Generated Prompt Preview */}
           <div className="w-80 border-l pl-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Prompt généré</h3>
+              <h3 className="text-lg font-semibold">Generated Prompt</h3>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleRegeneratePrompt}
                   disabled={isRegenerating || textLength === 0}
-                  title={textLength === 0 ? "Ajoutez du contenu pour régénérer" : "Régénérer le prompt"}
+                  title={textLength === 0 ? "Add content to regenerate" : "Regenerate prompt"}
                 >
                   {isRegenerating ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -682,7 +682,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <pre className="font-mono text-sm text-foreground whitespace-pre-wrap leading-relaxed pt-6">
                   {generatedPrompt ? 
                     generatedPrompt.replace(/<[^>]*>/g, '') : 
-                    'Aucun prompt généré. Cliquez sur le bouton pour générer un prompt basé sur votre contenu.'
+                    'No prompt generated. Click the button to generate a prompt based on your content.'
                   }
                 </pre>
               </div>
@@ -690,7 +690,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             
             {prompt.generated_at && (
               <p className="text-xs text-muted-foreground">
-                Généré le {format(new Date(prompt.generated_at), 'dd/MM/yyyy à HH:mm')}
+                Generated on {format(new Date(prompt.generated_at), 'MM/dd/yyyy at HH:mm')}
               </p>
             )}
           </div>
