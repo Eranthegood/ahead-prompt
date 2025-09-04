@@ -60,7 +60,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             />
             
             <div className="flex-1 flex flex-col min-w-0">
-              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} />}
+              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger />}
               <main className="flex-1">
                 {children}
               </main>
