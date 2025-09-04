@@ -220,43 +220,35 @@ export default function CursorIntegration() {
             {/* How it Works */}
             <Card>
               <CardHeader>
-                <CardTitle>How it Works</CardTitle>
-                <CardDescription>
-                  Understanding the flow from prompt to code
-                </CardDescription>
+                <CardTitle>How It Works</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border">
-                    <div className="text-2xl">📝</div>
-                    <div>
-                      <p className="font-medium text-sm">Create a prompt in Ahead.love</p>
-                      <p className="text-xs text-muted-foreground">Write your feature request or bug fix</p>
-                    </div>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">1. Intelligent Prompt Batching</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Queue related prompts in logical groups</li>
+                      <li>• Ahead analyzes dependencies automatically</li>
+                      <li>• Creates optimal batches for Cursor Agent processing</li>
+                    </ul>
                   </div>
                   
-                  <div className="flex items-center justify-center">
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">2. Parallel Execution Engine</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Push entire batch to Cursor with one click</li>
+                      <li>• Multiple AI agents work simultaneously</li>
+                      <li>• Real-time progress tracking across all tasks</li>
+                    </ul>
                   </div>
                   
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20 border">
-                    <div className="text-2xl">🤖</div>
-                    <div>
-                      <p className="font-medium text-sm">Cursor receives your prompt</p>
-                      <p className="text-xs text-muted-foreground">Creates a Background Agent to work on your task</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-center">
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border">
-                    <Github className="h-6 w-6 text-green-600" />
-                    <div>
-                      <p className="font-medium text-sm">Agent works on your GitHub repo</p>
-                      <p className="text-xs text-muted-foreground">Generates code, commits changes, and creates PRs</p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">3. GitHub Integration</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground ml-4">
+                      <li>• Automatic branch management for each batch</li>
+                      <li>• Commit messages generated from prompt context</li>
+                      <li>• Seamless merge coordination between parallel work</li>
+                    </ul>
                   </div>
                 </div>
               </CardContent>
