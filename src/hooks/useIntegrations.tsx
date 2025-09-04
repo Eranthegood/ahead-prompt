@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Integration {
@@ -10,29 +10,77 @@ export interface Integration {
   isEnabled: boolean;
   lastTestResult?: 'success' | 'error' | null;
   lastTestTime?: Date;
+  metadata?: any;
 }
 
 export function useIntegrations() {
-  const [integrations, setIntegrations] = useState<Integration[]>([
-    {
-      id: 'github',
-      name: 'GitHub Integration',
-      description: 'Connect your GitHub repository for enhanced code context',
-      isConfigured: false,
-      isEnabled: false,
-      lastTestResult: null
-    },
-    {
-      id: 'cursor',
-      name: 'Cursor Background Agents',
-      description: 'Génération de code autonome avec Cursor',
-      isConfigured: false,
-      isEnabled: false,
-      lastTestResult: null
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load integrations from database
+  useEffect(() => {
+    loadIntegrations();
+  }, []);
+
+  const loadIntegrations = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: dbIntegrations, error } = await supabase
+        .from('integrations')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Create base integrations with defaults
+      const baseIntegrations: Integration[] = [
+        {
+          id: 'github',
+          name: 'GitHub Integration',
+          description: 'Connect your GitHub repository for enhanced code context',
+          isConfigured: false,
+          isEnabled: false,
+          lastTestResult: null,
+        },
+        {
+          id: 'cursor',
+          name: 'Cursor Background Agents',
+          description: 'Génération de code autonome avec Cursor',
+          isConfigured: false,
+          isEnabled: false,
+          lastTestResult: null,
+        },
+      ];
+
+      // Merge with database data
+      const mergedIntegrations = baseIntegrations.map(base => {
+        const dbIntegration = dbIntegrations?.find(db => db.integration_type === base.id);
+        if (dbIntegration) {
+          return {
+            ...base,
+            isConfigured: dbIntegration.is_configured,
+            isEnabled: dbIntegration.is_enabled,
+            lastTestResult: dbIntegration.last_test_result as 'success' | 'error' | null,
+            lastTestTime: dbIntegration.last_test_time ? new Date(dbIntegration.last_test_time) : undefined,
+            metadata: dbIntegration.metadata,
+          };
+        }
+        return base;
+      });
+
+      setIntegrations(mergedIntegrations);
+    } catch (error) {
+      console.error('Error loading integrations:', error);
+      toast.error('Erreur lors du chargement des intégrations');
+    } finally {
+      setIsLoading(false);
     }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  };
 
   const updateIntegration = useCallback((id: string, updates: Partial<Integration>) => {
     setIntegrations(prev => 
@@ -46,93 +94,61 @@ export function useIntegrations() {
 
   const configureIntegration = useCallback(async (id: string, secretValue: string) => {
     if (!secretValue.trim()) {
-      toast({
-        title: 'Clé API requise',
-        description: 'Veuillez saisir votre clé API.',
-        variant: 'destructive'
-      });
+      toast.error('Clé API requise');
       return false;
     }
 
     setIsLoading(true);
     try {
       if (id === 'github') {
-        // Simulate GitHub token validation and storage
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        updateIntegration(id, {
-          isConfigured: true,
-          isEnabled: true,
-          lastTestResult: null
+        // Validate with GitHub API through edge function
+        const { data, error } = await supabase.functions.invoke('validate-github-token', {
+          body: { token: secretValue }
         });
 
-        toast({
-          title: 'GitHub configuré',
-          description: 'Votre token GitHub a été configuré avec succès.',
-          variant: 'default'
-        });
-
-        return true;
-      }
-
-      if (id === 'cursor') {
-        // Check if GitHub is configured first
-        const githubIntegration = integrations.find(i => i.id === 'github');
-        if (!githubIntegration?.isConfigured) {
-          toast({
-            title: 'GitHub requis',
-            description: 'Vous devez d\'abord configurer l\'intégration GitHub.',
-            variant: 'destructive'
-          });
+        if (error || !data?.success) {
+          toast.error(data?.error || 'Token GitHub invalide');
           return false;
         }
 
-        // Simulate API call to configure Cursor integration
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast.success(`GitHub configuré: ${data.user.login}`);
+        await loadIntegrations(); // Reload from database
+        return true;
         
+      } else if (id === 'cursor') {
+        // Check if GitHub is configured first
+        const githubIntegration = integrations.find(i => i.id === 'github');
+        if (!githubIntegration?.isConfigured) {
+          toast.error('Veuillez configurer GitHub en premier');
+          return false;
+        }
+        
+        if (secretValue.length < 10) {
+          toast.error('Token Cursor invalide');
+          return false;
+        }
+        
+        // For now, just simulate Cursor configuration
         updateIntegration(id, {
           isConfigured: true,
           isEnabled: true,
-          lastTestResult: null
+          lastTestResult: null,
         });
-
-        toast({
-          title: 'Configuration sauvegardée',
-          description: 'Intégration configurée avec succès.',
-          variant: 'default'
-        });
-
+        
+        toast.success('Cursor configuré avec succès');
         return true;
       }
 
-      // In a real implementation, this would save to Supabase secrets
-      // For now, we'll simulate the API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      updateIntegration(id, {
-        isConfigured: true,
-        isEnabled: true,
-        lastTestResult: null
-      });
-
-      toast({
-        title: 'Configuration sauvegardée',
-        description: 'Intégration configurée avec succès.',
-        variant: 'default'
-      });
-
-      return true;
+      toast.error('Type d\'intégration non supporté');
+      return false;
     } catch (error) {
-      toast({
-        title: 'Erreur de configuration',
-        description: 'Impossible de sauvegarder la configuration.',
-        variant: 'destructive'
-      });
+      console.error('Erreur lors de la configuration:', error);
+      toast.error('Erreur lors de la configuration');
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [toast, updateIntegration]);
+  }, [integrations, loadIntegrations]);
 
   const testIntegration = useCallback(async (id: string) => {
     setIsLoading(true);
@@ -152,13 +168,11 @@ export function useIntegrations() {
           lastTestTime: new Date()
         });
 
-        toast({
-          title: testResult === 'success' ? 'Test réussi' : 'Test échoué',
-          description: testResult === 'success' 
-            ? 'Connexion GitHub réussie'
-            : 'Token GitHub invalide ou expiré',
-          variant: testResult === 'success' ? 'default' : 'destructive'
-        });
+        if (testResult === 'success') {
+          toast.success('Connexion GitHub réussie');
+        } else {
+          toast.error('Token GitHub invalide ou expiré');
+        }
 
         return testResult === 'success';
       }
@@ -191,13 +205,11 @@ export function useIntegrations() {
         lastTestTime: new Date()
       });
 
-      toast({
-        title: testResult === 'success' ? 'Test réussi' : 'Test échoué',
-        description: testResult === 'success' 
-          ? 'L\'intégration fonctionne correctement.'
-          : 'Vérifiez votre configuration.',
-        variant: testResult === 'success' ? 'default' : 'destructive'
-      });
+      if (testResult === 'success') {
+        toast.success('L\'intégration fonctionne correctement.');
+      } else {
+        toast.error('Vérifiez votre configuration.');
+      }
 
       return testResult === 'success';
     } catch (error) {
@@ -206,16 +218,12 @@ export function useIntegrations() {
         lastTestTime: new Date()
       });
 
-      toast({
-        title: 'Test échoué',
-        description: 'Impossible de tester la connexion.',
-        variant: 'destructive'
-      });
+      toast.error('Impossible de tester la connexion.');
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [toast, updateIntegration]);
+  }, [updateIntegration]);
 
   const toggleIntegration = useCallback(async (id: string, enabled: boolean) => {
     setIsLoading(true);
@@ -225,24 +233,20 @@ export function useIntegrations() {
       
       updateIntegration(id, { isEnabled: enabled });
       
-      toast({
-        title: enabled ? 'Intégration activée' : 'Intégration désactivée',
-        description: `L'intégration a été ${enabled ? 'activée' : 'désactivée'} avec succès.`,
-        variant: 'default'
-      });
+      if (enabled) {
+        toast.success('Intégration activée');
+      } else {
+        toast.success('Intégration désactivée');
+      }
       
       return true;
     } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de modifier l\'état de l\'intégration.',
-        variant: 'destructive'
-      });
+      toast.error('Impossible de modifier l\'état de l\'intégration.');
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [toast, updateIntegration]);
+  }, [updateIntegration]);
 
   const removeIntegration = useCallback(async (id: string) => {
     setIsLoading(true);
@@ -257,24 +261,16 @@ export function useIntegrations() {
         lastTestTime: undefined
       });
 
-      toast({
-        title: 'Configuration supprimée',
-        description: 'L\'intégration a été déconfigurée.',
-        variant: 'default'
-      });
+      toast.success('L\'intégration a été déconfigurée.');
 
       return true;
     } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la configuration.',
-        variant: 'destructive'
-      });
+      toast.error('Impossible de supprimer la configuration.');
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [toast, updateIntegration]);
+  }, [updateIntegration]);
 
   return {
     integrations,
@@ -282,6 +278,7 @@ export function useIntegrations() {
     configureIntegration,
     testIntegration,
     toggleIntegration,
-    removeIntegration
+    removeIntegration,
+    loadIntegrations,
   };
 }

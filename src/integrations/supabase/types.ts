@@ -167,6 +167,45 @@ export type Database = {
         }
         Relationships: []
       }
+      integrations: {
+        Row: {
+          created_at: string
+          id: string
+          integration_type: string
+          is_configured: boolean
+          is_enabled: boolean
+          last_test_result: string | null
+          last_test_time: string | null
+          metadata: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          integration_type: string
+          is_configured?: boolean
+          is_enabled?: boolean
+          last_test_result?: string | null
+          last_test_time?: string | null
+          metadata?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          integration_type?: string
+          is_configured?: boolean
+          is_enabled?: boolean
+          last_test_result?: string | null
+          last_test_time?: string | null
+          metadata?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       knowledge_items: {
         Row: {
           category: string | null

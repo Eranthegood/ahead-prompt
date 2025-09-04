@@ -88,7 +88,8 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const integrationData = integrations.find(i => i.id === integration.id) || {
     isConfigured: false,
     isEnabled: false,
-    lastTestResult: null
+    lastTestResult: null,
+    metadata: null
   };
   
   const statusConfig = getStatusConfig(integration, integrationData);
@@ -242,6 +243,49 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               </Button>
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* Show configured GitHub user info */}
+      {'metadata' in integrationData && integrationData.metadata && integration.id === 'github' && integrationData.isConfigured && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <img 
+              src={integrationData.metadata.avatar_url} 
+              alt="Avatar GitHub" 
+              className="w-10 h-10 rounded-full"
+            />
+            <div className="flex-1">
+              <div className="font-medium">{integrationData.metadata.name || integrationData.metadata.username}</div>
+              <div className="text-sm text-muted-foreground">@{integrationData.metadata.username}</div>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {integrationData.metadata.public_repos} repos publics
+            </div>
+          </div>
+          {integrationData.metadata.repositories && integrationData.metadata.repositories.length > 0 && (
+            <div className="pt-3 border-t">
+              <div className="text-sm font-medium mb-2">Dépôts récents:</div>
+              <div className="flex flex-wrap gap-2">
+                {integrationData.metadata.repositories.slice(0, 4).map((repo: any) => (
+                  <a 
+                    key={repo.name} 
+                    href={repo.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs bg-background hover:bg-muted/50 rounded px-2 py-1 border transition-colors"
+                  >
+                    {repo.name} {repo.private && '🔒'}
+                  </a>
+                ))}
+                {integrationData.metadata.repositories.length > 4 && (
+                  <span className="text-xs text-muted-foreground px-2 py-1">
+                    +{integrationData.metadata.repositories.length - 4} autres
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
