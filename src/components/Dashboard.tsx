@@ -13,6 +13,14 @@ import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
+
+// Declare Supademo global function
+declare global {
+  interface Window {
+    Supademo: (id: string, options?: { variables?: { email?: string; name?: string; [key: string]: any } }) => void;
+  }
+}
+
 interface DashboardProps {
   selectedProductId?: string;
   selectedEpicId?: string;
@@ -54,6 +62,19 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     preferences,
     saveCompletedItemsPreference
   } = useUserPreferences();
+
+  // Initialize Supademo SDK for dynamic elements
+  useEffect(() => {
+    if (window.Supademo) {
+      window.Supademo("f69d8646ce4f145dc4df128f8ef97c60812ddbc21557f45e9b709a11ba7c8e23", {
+        variables: {
+          email: "", // optional user email
+          name: ""   // optional user name
+          // add your custom variables here
+        }
+      });
+    }
+  }, []);
 
   // Function to copy generated prompt
   const handleCopyPrompt = async (prompt: any) => {
