@@ -206,6 +206,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       ? selectedKnowledgeIds 
       : undefined;
     
+    console.log('Creating prompt with data:', {
+      epic_id: selectedEpic,
+      product_id: inferredProductId,
+      priority: selectedPriority,
+      knowledge_context: knowledgeContext,
+      ai_provider: providerConfig.provider,
+      ai_model: providerConfig.model,
+    });
+    
     return {
       title: generateTitleFromContent(content),
       description: content,
