@@ -352,10 +352,18 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         </div>
         
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
-          {/* Workspace Name */}
+          {/* Logo and Brand */}
           {!isCollapsed && (
             <div className="mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg font-medium text-foreground truncate">{workspace.name}</h2>
+              <h2 className="text-base sm:text-lg font-medium text-foreground truncate flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gradient-primary rounded flex items-center justify-center">
+                    <Hash className="w-4 h-4 text-white" />
+                  </div>
+                  <span>Ahead</span>
+                </div>
+                <span className="text-sm font-normal text-muted-foreground">Again</span>
+              </h2>
             </div>
           )}
 
