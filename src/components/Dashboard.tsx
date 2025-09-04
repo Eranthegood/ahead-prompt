@@ -4,7 +4,6 @@ import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
-import { MixpanelTestButton } from '@/components/MixpanelTestButton';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -132,16 +131,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     <>
       <div className="flex-1 flex flex-col min-w-0">
         <MinimalHeader workspace={workspace} />
-        
-        {/* Test Mixpanel - visible en développement */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="p-4 border-b border-border bg-muted/20">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Test Mixpanel:</span>
-              <MixpanelTestButton />
-            </div>
-          </div>
-        )}
         
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
