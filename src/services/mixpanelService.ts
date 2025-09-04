@@ -1,7 +1,7 @@
 import mixpanel from 'mixpanel-browser';
 
 // Configuration Mixpanel
-const MIXPANEL_TOKEN = 'YOUR_MIXPANEL_TOKEN'; // Remplacez par votre token Mixpanel
+const MIXPANEL_TOKEN = '403921a14a2085274aca10bf5a616324';
 
 class MixpanelService {
   private initialized = false;
