@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompts d'erreurs</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
+      #status { color: #555; margin-bottom: 12px; }
+      #list { border: 1px solid #ddd; border-radius: 8px; padding: 12px; max-width: 800px; }
+      .item { padding: 8px; border-bottom: 1px solid #eee; }
+      .item:last-child { border-bottom: none; }
+      .meta { color: #666; font-size: 12px; }
+      .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#f5f5f5; border:1px solid #e0e0e0; padding:1px 4px; border-radius:4px; }
+    </style>
+  </head>
+  <body>
+    <h1>Prompts d'erreurs</h1>
+    <p>Appuyez sur <span class="kbd">T</span> pour générer et envoyer une erreur au backend.</p>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useEffect, useState, useRef } = React;
+      const apiBase = '';
+
+      async function fetchErrors() {
+        const res = await fetch(apiBase + '/api/errors');
+        return await res.json();
+      }
+
+      async function postError(error) {
+        const payload = {
+          message: error.message || 'Erreur inconnue',
+          stack: error.stack || '',
+          source: 'keyboard',
+          meta: { userAgent: navigator.userAgent }
+        };
+        const t0 = performance.now();
+        const res = await fetch(apiBase + '/api/errors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const saved = await res.json();
+        const t1 = performance.now();
+        console.log('Erreur publiée:', saved, `(${Math.round(t1 - t0)}ms)`);
+        return saved;
+      }
+
+      function App() {
+        const [errors, setErrors] = useState([]);
+        const [status, setStatus] = useState('Chargement...');
+        const isPostingRef = useRef(false);
+
+        useEffect(() => {
+          (async () => {
+            try {
+              const initial = await fetchErrors();
+              setErrors(initial);
+              setStatus('Prêt');
+            } catch (e) {
+              console.error(e);
+              setStatus('Erreur de chargement');
+            }
+          })();
+        }, []);
+
+        useEffect(() => {
+          const onKeyDown = async (ev) => {
+            if (ev.key === 't' || ev.key === 'T') {
+              if (isPostingRef.current) return;
+              isPostingRef.current = true;
+              const synthetic = { _id: 'tmp-' + Date.now(), message: 'Erreur générée par la touche T', stack: '', source: 'keyboard', createdAt: new Date().toISOString() };
+              // Optimistic update
+              setErrors(prev => [synthetic, ...prev]);
+              try {
+                const saved = await postError(new Error(synthetic.message));
+                // Reconcile by refetching fresh list to maintain sort
+                const fresh = await fetchErrors();
+                setErrors(fresh);
+              } catch (e) {
+                console.error("Échec de l'envoi de l'erreur", e);
+                // Rollback optimistic insert on failure
+                setErrors(prev => prev.filter(e => e._id !== synthetic._id));
+              } finally {
+                isPostingRef.current = false;
+              }
+            }
+          };
+          document.addEventListener('keydown', onKeyDown);
+          return () => document.removeEventListener('keydown', onKeyDown);
+        }, []);
+
+        return (
+          <div>
+            <div id="status">{status}</div>
+            <div id="list">
+              {errors.map(e => (
+                <div className="item" key={e._id}>
+                  <div><strong>{e.message}</strong></div>
+                  {e.stack ? <pre className="meta">{e.stack}</pre> : null}
+                  <div className="meta">{new Date(e.createdAt).toLocaleString()} — source: {e.source || 'keyboard'}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+  </html>
+
