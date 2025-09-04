@@ -3,7 +3,7 @@ import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
-import { QuickPromptDialog } from '@/components/QuickPromptDialog';
+
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePromptsContext } from '@/context/PromptsContext';
@@ -19,7 +19,7 @@ interface DashboardProps {
 
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [quickPromptOpen, setQuickPromptOpen] = useState(false);
+  
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
@@ -73,9 +73,9 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-    'cmd+n': () => setQuickPromptOpen(true),
-    'ctrl+n': () => setQuickPromptOpen(true),
-    'q': () => setQuickPromptOpen(true),
+'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
     't': () => setDebugConsoleOpen(true),
     'c': async () => {
       // If hovering over a prompt, copy its generated prompt
@@ -100,10 +100,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const handleToggleCompletedItems = (show: boolean) => {
     saveCompletedItemsPreference(show);
   };
-  const handleQuickAdd = () => {
-    setQuickPromptOpen(true);
-  };
-
   // Auto-open universal search when typing in header (2+ chars)
   useEffect(() => {
     const q = searchQuery.trim();
@@ -148,22 +144,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
 
       <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
 
-        <QuickPromptDialog 
-          isOpen={quickPromptOpen} 
-          onClose={() => setQuickPromptOpen(false)} 
-          onSave={handleCreatePrompt} 
-          workspace={workspace} 
-          epics={epics} 
-          products={products} 
-          selectedProductId={selectedProductId} 
-          selectedEpicId={selectedEpicId} 
-          onCreateProduct={() => {
-            console.log('Create product requested - implement product creation dialog');
-          }} 
-          onCreateEpic={() => {
-            console.log('Create epic requested - implement epic creation dialog');
-          }} 
-        />
 
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
     </>

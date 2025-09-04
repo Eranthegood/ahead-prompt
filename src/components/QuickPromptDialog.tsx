@@ -163,6 +163,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Reset form when dialog opens
   const resetForm = () => {
     if (!editor) return;
+    console.info('[QuickPromptDialog] resetForm start', {
+      selectedEpicId,
+      selectedProductId,
+      epicsCount: epics.length,
+    });
     
     clearDraft();
     editor.commands.setContent('');
@@ -170,6 +175,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     // Handle epic selection and auto-select parent product
     if (selectedEpicId) {
       const selectedEpicData = epics.find(epic => epic.id === selectedEpicId);
+      console.info('[QuickPromptDialog] found epic', { exists: !!selectedEpicData, productId: selectedEpicData?.product_id });
       if (selectedEpicData) {
         setSelectedEpic(selectedEpicId);
         // Auto-select the parent product
@@ -197,7 +203,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       }, 150);
     }
   };
-
   // Handle knowledge selection
   const handleKnowledgeToggle = (knowledgeId: string) => {
     setSelectedKnowledgeIds(prev => 

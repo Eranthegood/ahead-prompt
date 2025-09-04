@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
@@ -122,6 +122,18 @@ function SidebarContent({
     setQuickPromptOpen(true);
   };
 
+  useEffect(() => {
+    const handler = () => {
+      console.log('[AppLayout] open-quick-prompt event received');
+      setQuickPromptOpen(true);
+    };
+    // @ts-ignore - custom event name
+    window.addEventListener('open-quick-prompt', handler as EventListener);
+    return () => {
+      // @ts-ignore - custom event name
+      window.removeEventListener('open-quick-prompt', handler as EventListener);
+    };
+  }, []);
   const handleSavePrompt = async (promptData: any) => {
     if (promptsContext?.createPrompt) {
       const result = await promptsContext.createPrompt(promptData);
