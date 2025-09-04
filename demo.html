@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Démonstration - Classes CSS Thème</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+        
+        .demo-card {
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .demo-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .demo-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .demo-card code {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-family: monospace;
+            display: block;
+            margin: 1rem 0;
+        }
+        
+        .demo-border {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="title">Démonstration des Classes CSS</h1>
+        <p style="color: white; opacity: 0.9;">Exemples d'utilisation des classes .illustration-1 à .illustration-5</p>
+    </header>
+
+    <main class="demo-grid">
+        <!-- Classe illustration-1 -->
+        <div class="demo-card">
+            <h3>Classe .illustration-1</h3>
+            <div class="color-preview illustration-1">Illustration 1</div>
+            <code>.illustration-1</code>
+            <p>Couleur primaire - Parfaite pour les éléments principaux</p>
+            
+            <div class="demo-border illustration-1-border">
+                <strong>Variante bordure :</strong><br>
+                <code>.illustration-1-border</code>
+            </div>
+        </div>
+
+        <!-- Classe illustration-2 -->
+        <div class="demo-card">
+            <h3>Classe .illustration-2</h3>
+            <div class="color-preview illustration-2">Illustration 2</div>
+            <code>.illustration-2</code>
+            <p>Couleur secondaire - Idéale pour les boutons d'action</p>
+            
+            <div class="demo-border illustration-2-border">
+                <strong>Variante bordure :</strong><br>
+                <code>.illustration-2-border</code>
+            </div>
+        </div>
+
+        <!-- Classe illustration-3 -->
+        <div class="demo-card">
+            <h3>Classe .illustration-3</h3>
+            <div class="color-preview illustration-3">Illustration 3</div>
+            <code>.illustration-3</code>
+            <p>Couleur de succès - Pour les messages positifs</p>
+            
+            <div class="demo-border illustration-3-border">
+                <strong>Variante bordure :</strong><br>
+                <code>.illustration-3-border</code>
+            </div>
+        </div>
+
+        <!-- Classe illustration-4 -->
+        <div class="demo-card">
+            <h3>Classe .illustration-4</h3>
+            <div class="color-preview illustration-4">Illustration 4</div>
+            <code>.illustration-4</code>
+            <p>Couleur d'attention - Pour attirer l'attention</p>
+            
+            <div class="demo-border illustration-4-border">
+                <strong>Variante bordure :</strong><br>
+                <code>.illustration-4-border</code>
+            </div>
+        </div>
+
+        <!-- Classe illustration-5 -->
+        <div class="demo-card">
+            <h3>Classe .illustration-5</h3>
+            <div class="color-preview illustration-5">Illustration 5</div>
+            <code>.illustration-5</code>
+            <p>Couleur complémentaire - Pour la navigation</p>
+            
+            <div class="demo-border illustration-5-border">
+                <strong>Variante bordure :</strong><br>
+                <code>.illustration-5-border</code>
+            </div>
+        </div>
+
+        <!-- Exemple d'utilisation combinée -->
+        <div class="demo-card" style="grid-column: 1 / -1;">
+            <h3>Exemple d'Utilisation Combinée</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+                <button class="btn illustration-1">Bouton Principal</button>
+                <button class="btn illustration-2">Action</button>
+                <button class="btn illustration-3">Succès</button>
+                <button class="btn illustration-4">Attention</button>
+                <button class="btn illustration-5">Secondaire</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                <div class="illustration-1" style="padding: 1rem; border-radius: 8px;">
+                    <h4>Card 1</h4>
+                    <p>Contenu avec fond illustration-1</p>
+                </div>
+                <div class="illustration-3" style="padding: 1rem; border-radius: 8px;">
+                    <h4>Card 2</h4>
+                    <p>Contenu avec fond illustration-3</p>
+                </div>
+                <div class="illustration-5" style="padding: 1rem; border-radius: 8px;">
+                    <h4>Card 3</h4>
+                    <p>Contenu avec fond illustration-5</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; background: #f8f9fa;">
+        <p><a href="index.html" style="color: var(--illustration-1); text-decoration: none; font-weight: bold;">← Retour à l'application principale</a></p>
+        <p style="margin-top: 1rem; color: #666;">
+            Changez de thème dans l'application principale pour voir les couleurs s'adapter automatiquement !
+        </p>
+    </footer>
+
+    <!-- Scripts pour synchroniser avec l'application principale -->
+    <script src="colorUtils.js"></script>
+    <script src="themeManager.js"></script>
+    <script>
+        // Initialiser le gestionnaire de thèmes pour synchroniser avec l'app principale
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeManager = new ThemeManager();
+            
+            // Appliquer le thème sauvegardé
+            const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+            themeManager.applyTheme(savedTheme);
+            
+            console.log('Démonstration des classes CSS chargée avec le thème:', savedTheme);
+        });
+    </script>
+</body>
+</html>
