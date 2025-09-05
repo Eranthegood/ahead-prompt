@@ -168,8 +168,13 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={item.action}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log(`Opening ${item.id} dialog`);
+                    item.action();
+                  }}
                   className="h-6 px-2 text-xs shrink-0"
+                  title={`Create ${item.title.toLowerCase()}`}
                 >
                   +
                 </Button>
