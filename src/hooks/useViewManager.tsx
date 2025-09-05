@@ -1,5 +1,8 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Product, Epic } from "@/types";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useViewPerformance } from "@/hooks/useViewPerformance";
+import { toast } from "sonner";
 
 export type ViewType = 'list' | 'kanban' | 'grid';
 export type FilterType = 'all' | 'active' | 'archived' | 'recent' | 'by-product';
@@ -21,25 +24,45 @@ export function useViewManager(
   products: Product[], 
   epics: Epic[], 
   config: ViewManagerConfig = {
-    enabledViews: ['list', 'kanban'],
+    enabledViews: ['list', 'kanban', 'grid'],
     defaultView: 'list',
     defaultFilter: 'all'
   }
 ) {
+  const { preferences, saveViewPreferences } = useUserPreferences();
+  const { startViewSwitch, endViewSwitch, metrics } = useViewPerformance();
+  
   const [viewState, setViewState] = useState<ViewState>({
-    activeView: config.defaultView,
-    activeFilter: config.defaultFilter,
+    activeView: preferences.lastViewType || config.defaultView,
+    activeFilter: preferences.lastFilterType || config.defaultFilter,
     searchQuery: "",
   });
 
-  // View actions
+  // View actions with performance tracking and persistence
   const setActiveView = useCallback((view: ViewType) => {
-    setViewState(prev => ({ ...prev, activeView: view }));
-  }, []);
+    startViewSwitch(viewState.activeView);
+    
+    setViewState(prev => {
+      const newState = { ...prev, activeView: view };
+      // Persist preferences
+      saveViewPreferences(view, prev.activeFilter);
+      return newState;
+    });
+    
+    // Small delay to ensure DOM update before measuring
+    setTimeout(() => {
+      endViewSwitch(view);
+    }, 50);
+  }, [viewState.activeView, startViewSwitch, endViewSwitch, saveViewPreferences]);
 
   const setActiveFilter = useCallback((filter: FilterType) => {
-    setViewState(prev => ({ ...prev, activeFilter: filter }));
-  }, []);
+    setViewState(prev => {
+      const newState = { ...prev, activeFilter: filter };
+      // Persist preferences
+      saveViewPreferences(prev.activeView, filter);
+      return newState;
+    });
+  }, [saveViewPreferences]);
 
   const setSearchQuery = useCallback((query: string) => {
     setViewState(prev => ({ ...prev, searchQuery: query }));
@@ -48,6 +71,42 @@ export function useViewManager(
   const setSelectedProductId = useCallback((productId?: string) => {
     setViewState(prev => ({ ...prev, selectedProductId: productId }));
   }, []);
+
+  // Keyboard shortcuts - moved after setActiveView declaration
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only trigger if not in input/textarea and no modifier keys
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.ctrlKey || e.metaKey || e.altKey
+      ) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'l':
+          if (config.enabledViews.includes('list')) {
+            setActiveView('list');
+            toast.success('📋 List View', { duration: 1000 });
+          }
+          break;
+        case 'k':
+          if (config.enabledViews.includes('kanban')) {
+            setActiveView('kanban');
+            toast.success('📊 Kanban View', { duration: 1000 });
+          }
+          break;
+        case 'g':
+          if (config.enabledViews.includes('grid')) {
+            setActiveView('grid');
+            toast.success('⊞ Grid View', { duration: 1000 });
+          }
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [config.enabledViews, setActiveView]);
 
   // Filtered data based on current state
   const filteredProducts = useMemo(() => {
@@ -188,5 +247,8 @@ export function useViewManager(
     // Utils
     stats,
     config,
+    
+    // Performance metrics
+    performanceMetrics: metrics,
   };
 }
