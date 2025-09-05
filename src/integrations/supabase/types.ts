@@ -167,6 +167,98 @@ export type Database = {
         }
         Relationships: []
       }
+      figma_design_elements: {
+        Row: {
+          created_at: string
+          description: string | null
+          element_type: string
+          figma_url: string | null
+          id: string
+          name: string
+          node_id: string
+          project_id: string
+          specs: Json | null
+          thumbnail_url: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          element_type: string
+          figma_url?: string | null
+          id?: string
+          name: string
+          node_id: string
+          project_id: string
+          specs?: Json | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          element_type?: string
+          figma_url?: string | null
+          id?: string
+          name?: string
+          node_id?: string
+          project_id?: string
+          specs?: Json | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "figma_design_elements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "figma_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      figma_projects: {
+        Row: {
+          created_at: string
+          figma_file_key: string
+          figma_file_name: string
+          id: string
+          last_synced_at: string | null
+          team_id: string | null
+          team_name: string | null
+          thumbnail_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          figma_file_key: string
+          figma_file_name: string
+          id?: string
+          last_synced_at?: string | null
+          team_id?: string | null
+          team_name?: string | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          figma_file_key?: string
+          figma_file_name?: string
+          id?: string
+          last_synced_at?: string | null
+          team_id?: string | null
+          team_name?: string | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           created_at: string
