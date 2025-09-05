@@ -24,6 +24,7 @@ import CursorMultiAgentLanding from "./pages/CursorMultiAgentLanding";
 import GitHubIntegration from "./pages/GitHubIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
 import PromptEnhancer from "./pages/PromptEnhancer";
+import PromptEnhancerComingSoon from "./pages/PromptEnhancerComingSoon";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 
@@ -102,11 +103,16 @@ function App() {
                          <Achievements />
                        </ProtectedRoute>
                      } />
-                     <Route path="/prompt-enhancer" element={
-                       <ProtectedRoute>
-                         <PromptEnhancer />
-                       </ProtectedRoute>
-                     } />
+                      <Route path="/prompt-enhancer" element={
+                        <ProtectedRoute>
+                          <PromptEnhancer />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/prompt-enhancer-coming-soon" element={
+                        <ProtectedRoute>
+                          <PromptEnhancerComingSoon />
+                        </ProtectedRoute>
+                      } />
                      <Route path="/theme-demo" element={
                        <ProtectedRoute>
                          <ThemeDemo />

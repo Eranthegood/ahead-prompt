@@ -11,6 +11,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { hasPromptEnhancerAccess } from '@/utils/accessControl';
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
@@ -82,9 +83,17 @@ export function UserAccountSection() {
               <span>Achievements</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => navigate('/prompt-enhancer')}>
+            <DropdownMenuItem onClick={() => {
+              const destination = hasPromptEnhancerAccess(user?.id) 
+                ? '/prompt-enhancer' 
+                : '/prompt-enhancer-coming-soon';
+              navigate(destination);
+            }}>
               <Sparkles className="mr-2 h-4 w-4" />
-              <span>Prompt Enhancer</span>
+              <div className="flex items-center gap-2">
+                <span>Prompt Enhancer</span>
+                <Badge variant="secondary" className="text-xs">Soon</Badge>
+              </div>
             </DropdownMenuItem>
             
             <DropdownMenuSeparator />
@@ -197,9 +206,17 @@ export function UserAccountSection() {
             <span>Achievements</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/prompt-enhancer')}>
+          <DropdownMenuItem onClick={() => {
+            const destination = hasPromptEnhancerAccess(user?.id) 
+              ? '/prompt-enhancer' 
+              : '/prompt-enhancer-coming-soon';
+            navigate(destination);
+          }}>
             <Sparkles className="mr-2 h-4 w-4" />
-            <span>Prompt Enhancer</span>
+            <div className="flex items-center gap-2">
+              <span>Prompt Enhancer</span>
+              <Badge variant="secondary" className="text-xs">Soon</Badge>
+            </div>
           </DropdownMenuItem>
 
           {/* Theme Switch */}
