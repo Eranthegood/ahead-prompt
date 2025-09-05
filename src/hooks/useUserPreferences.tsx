@@ -8,10 +8,6 @@ interface UserPreferences {
   compactMode: boolean;
   gamificationEnabled: boolean;
   autoSaveEnabled: boolean;
-  // View Manager Preferences
-  lastViewType: 'list' | 'kanban' | 'grid';
-  lastFilterType: 'all' | 'active' | 'archived' | 'recent' | 'by-product';
-  enableTransitionAnimations: boolean;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -24,10 +20,6 @@ const defaultPreferences: UserPreferences = {
   compactMode: false,
   gamificationEnabled: false, // Disabled by default
   autoSaveEnabled: false, // Disabled by default for better UX
-  // View Manager Preferences
-  lastViewType: 'list',
-  lastFilterType: 'all',
-  enableTransitionAnimations: true,
 };
 
 export const useUserPreferences = () => {
@@ -104,21 +96,6 @@ export const useUserPreferences = () => {
     });
   };
 
-  // Save view preferences
-  const saveViewPreferences = (viewType: 'list' | 'kanban' | 'grid', filterType: 'all' | 'active' | 'archived' | 'recent' | 'by-product') => {
-    updatePreferences({
-      lastViewType: viewType,
-      lastFilterType: filterType,
-    });
-  };
-
-  // Save transition animations preference
-  const saveTransitionAnimationsPreference = (enabled: boolean) => {
-    updatePreferences({
-      enableTransitionAnimations: enabled,
-    });
-  };
-
   return {
     preferences,
     loading,
@@ -129,7 +106,5 @@ export const useUserPreferences = () => {
     saveCompactModePreference,
     saveGamificationPreference,
     saveAutoSavePreference,
-    saveViewPreferences,
-    saveTransitionAnimationsPreference,
   };
 };

@@ -7,8 +7,6 @@ import { useViewManager, ViewManagerConfig } from "@/hooks/useViewManager";
 import { ViewToolbar } from "./ViewToolbar";
 import { ListView } from "./ListView/ListView";
 import { KanbanView, KanbanColumnData } from "./KanbanView/KanbanView";
-import { GridView } from "./GridView/GridView";
-import { ViewTransitionWrapper } from "@/components/ViewTransitionWrapper";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package, Zap } from "lucide-react";
@@ -36,7 +34,7 @@ export function ProductEpicViews({
   const { prompts, loading: promptsLoading } = usePrompts(workspace?.id);
 
   const viewConfig: ViewManagerConfig = {
-    enabledViews: ['list', 'kanban', 'grid'],
+    enabledViews: ['list', 'kanban'],
     defaultView: 'list',
     defaultFilter: 'all',
     ...config,
@@ -176,10 +174,7 @@ export function ProductEpicViews({
         onCreateEpic={onEpicCreate}
       />
 
-      <ViewTransitionWrapper 
-        viewType={viewState.activeView} 
-        className="flex-1 overflow-hidden"
-      >
+      <div className="flex-1 overflow-hidden">
         {viewState.activeView === 'list' && (
           <ListView
             products={filteredProducts}
@@ -214,28 +209,7 @@ export function ProductEpicViews({
             onCreateEpic={onEpicCreate}
           />
         )}
-
-        {viewState.activeView === 'grid' && (
-          <GridView
-            products={filteredProducts}
-            epics={filteredEpics}
-            productEpicCounts={productEpicCounts}
-            productPromptCounts={productPromptCounts}
-            epicPromptCounts={epicPromptCounts}
-            onProductClick={handleProductClick}
-            onEpicClick={handleEpicClick}
-            onProductEdit={onProductEdit}
-            onEpicEdit={onEpicEdit}
-            onProductDelete={handleProductDelete}
-            onEpicDelete={handleEpicDelete}
-            onProductDuplicate={handleProductDuplicate}
-            onEpicDuplicate={handleEpicDuplicate}
-            onCreateProduct={onProductCreate}
-            onCreateEpic={onEpicCreate}
-            searchQuery={viewState.searchQuery}
-          />
-        )}
-      </ViewTransitionWrapper>
+      </div>
     </div>
   );
 }
