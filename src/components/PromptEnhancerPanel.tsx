@@ -55,15 +55,18 @@ export function PromptEnhancerPanel() {
   const handleCreateEnhancer = async () => {
     if (!newEnhancerName.trim()) return;
     
-    await createEnhancer({
+    const newEnhancer = await createEnhancer({
       name: newEnhancerName,
       description: newEnhancerDescription || null,
       type: 'user',
       system_message: 'You are a helpful AI assistant.',
       prompt_template: 'Please help with: {raw_idea}\n\n{knowledge_context}',
       is_active: true,
-      workspace_id: null,
     });
+
+    if (newEnhancer) {
+      setSelectedEnhancer(newEnhancer);
+    }
     
     setShowCreateDialog(false);
     setNewEnhancerName('');

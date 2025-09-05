@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface PromptEnhancer {
   id: string;
@@ -50,6 +51,7 @@ export function usePromptEnhancers() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { workspace: currentWorkspace } = useWorkspace();
+  const { user } = useAuth();
 
   // Fetch enhancers
   const fetchEnhancers = async () => {
@@ -97,8 +99,8 @@ export function usePromptEnhancers() {
   };
 
   // Create new enhancer
-  const createEnhancer = async (enhancer: Omit<PromptEnhancer, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
-    if (!currentWorkspace?.id) return null;
+  const createEnhancer = async (enhancer: Omit<PromptEnhancer, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'workspace_id'>) => {
+    if (!currentWorkspace?.id || !user?.id) return null;
 
     try {
       const { data, error } = await supabase
@@ -106,6 +108,7 @@ export function usePromptEnhancers() {
         .insert({
           ...enhancer,
           workspace_id: currentWorkspace.id,
+          created_by: user.id,
         })
         .select()
         .single();
@@ -126,11 +129,11 @@ export function usePromptEnhancers() {
       });
       
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating enhancer:', error);
       toast({
         title: "Error",
-        description: "Failed to create enhancer",
+        description: error?.message || "Failed to create enhancer",
         variant: "destructive",
       });
       return null;
@@ -139,7 +142,7 @@ export function usePromptEnhancers() {
 
   // Duplicate enhancer
   const duplicateEnhancer = async (originalId: string, newName: string) => {
-    if (!currentWorkspace?.id) return null;
+    if (!currentWorkspace?.id || !user?.id) return null;
 
     try {
       const original = enhancers.find(e => e.id === originalId);
@@ -154,6 +157,7 @@ export function usePromptEnhancers() {
           system_message: original.system_message,
           prompt_template: original.prompt_template,
           workspace_id: currentWorkspace.id,
+          created_by: user.id,
         })
         .select()
         .single();
@@ -174,11 +178,11 @@ export function usePromptEnhancers() {
       });
       
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error duplicating enhancer:', error);
       toast({
         title: "Error",
-        description: "Failed to duplicate enhancer",
+        description: error?.message || "Failed to duplicate enhancer",
         variant: "destructive",
       });
       return null;
@@ -191,6 +195,8 @@ export function usePromptEnhancers() {
     prompt_template: string;
     commit_message?: string;
   }) => {
+    if (!user?.id) return null;
+
     try {
       const existingVersions = await fetchVersions(enhancerId);
       const nextVersionNumber = Math.max(0, ...existingVersions.map(v => v.version_number)) + 1;
@@ -200,6 +206,7 @@ export function usePromptEnhancers() {
         .insert({
           enhancer_id: enhancerId,
           version_number: nextVersionNumber,
+          created_by: user.id,
           ...versionData,
         })
         .select()
@@ -214,11 +221,11 @@ export function usePromptEnhancers() {
       });
       
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating version:', error);
       toast({
         title: "Error",
-        description: "Failed to create version",
+        description: error?.message || "Failed to create version",
         variant: "destructive",
       });
       return null;
