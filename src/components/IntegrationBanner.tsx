@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 
 // Logo components as SVGs for scalability
 const LovableLogo = ({ className }: { className?: string }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="1.5"/>
-    <circle cx="12" cy="12" r="3" fill="currentColor"/>
-    <path d="M8 10L12 12L16 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M8 14L12 12L16 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
+  <img 
+    src="/lovable-uploads/e521c86b-e7c5-41c2-b990-3147af0e30ce.png" 
+    alt="Lovable Logo" 
+    className={className}
+  />
 );
 
 const CursorLogo = ({ className }: { className?: string }) => (
