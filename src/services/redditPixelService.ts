@@ -10,7 +10,7 @@ declare global {
 
 // Configuration - Replace with your actual Reddit Pixel ID
 // You can get this from your Reddit Ads Manager
-const REDDIT_PIXEL_ID = 't2_XXXXXXXXX'; // Replace with your actual pixel ID
+const REDDIT_PIXEL_ID = 'a2_hm56jybr1umg'; // Your actual pixel ID
 
 export class RedditPixelService {
   private static initialized = false;
@@ -30,7 +30,7 @@ export class RedditPixelService {
       window.REDDIT_PIXEL_ID = REDDIT_PIXEL_ID;
       
       // Initialize Reddit pixel if not already done
-      if (window.rdt && REDDIT_PIXEL_ID !== 't2_XXXXXXXXX') {
+      if (window.rdt) {
         window.rdt('init', REDDIT_PIXEL_ID, {
           optOut: false,
           useDecimalCurrencyValues: true,
