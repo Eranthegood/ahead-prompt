@@ -367,18 +367,6 @@ export default function LandingPage() {
       <Footer
         logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />}
         brandName="Ahead"
-        socialLinks={[
-          {
-            icon: <Twitter className="h-4 w-4" />,
-            href: "https://twitter.com/ahead_love",
-            label: "Twitter"
-          },
-          {
-            icon: <Mail className="h-4 w-4" />,
-            href: "mailto:hello@ahead.love",
-            label: "Email"
-          }
-        ]}
         mainLinks={[
           { href: "/", label: "Home" },
           { href: "/cursor-multi-agent", label: "Features" },

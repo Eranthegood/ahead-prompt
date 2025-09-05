@@ -3,11 +3,6 @@ import { Button } from "@/components/ui/button"
 interface FooterProps {
   logo: React.ReactNode
   brandName: string
-  socialLinks: Array<{
-    icon: React.ReactNode
-    href: string
-    label: string
-  }>
   mainLinks: Array<{
     href: string
     label: string
@@ -25,7 +20,6 @@ interface FooterProps {
 export function Footer({
   logo,
   brandName,
-  socialLinks,
   mainLinks,
   legalLinks,
   copyright,
@@ -42,22 +36,6 @@ export function Footer({
             {logo}
             <span className="font-bold text-xl">{brandName}</span>
           </a>
-          <ul className="flex list-none mt-6 md:mt-0 space-x-3">
-            {socialLinks.map((link, i) => (
-              <li key={i}>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-10 w-10 rounded-full"
-                  asChild
-                >
-                  <a href={link.href} target="_blank" aria-label={link.label}>
-                    {link.icon}
-                  </a>
-                </Button>
-              </li>
-            ))}
-          </ul>
         </div>
         <div className="border-t mt-6 pt-6 md:mt-4 md:pt-8 lg:grid lg:grid-cols-10">
           <nav className="lg:mt-0 lg:col-[4/11]">
