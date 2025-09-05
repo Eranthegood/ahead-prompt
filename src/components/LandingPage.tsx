@@ -362,12 +362,6 @@ export default function LandingPage() {
             
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
               {/* Placeholder for future image */}
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                <div className="text-center space-y-2">
-                  <Zap className="w-16 h-16 mx-auto opacity-50" />
-                  <p className="text-sm">Workspace Demo Image</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
