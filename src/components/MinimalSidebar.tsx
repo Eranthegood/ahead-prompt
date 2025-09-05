@@ -583,7 +583,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                           key={product.id}
                           product={product}
                           isCollapsed={isCollapsed}
-                          isExpanded={expandedProducts.has(product.id)}
+                          isExpanded={expandedProducts.has(product.id) || product.epics.length === 0}
                           isSelected={selectedProductId === product.id}
                           selectedEpicId={selectedEpicId}
                           onToggleExpanded={() => toggleProductExpanded(product.id)}
