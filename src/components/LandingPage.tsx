@@ -163,14 +163,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section aria-labelledby="testimonials-heading" className="py-16 bg-background/50">
-        <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
-        <div className="max-w-5xl mx-auto px-6">
-          <TestimonialSlider testimonials={testimonials} />
-        </div>
-      </section>
-
       {/* Feature Demo Section */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
@@ -207,6 +199,14 @@ export default function LandingPage() {
             }} allowFullScreen />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section aria-labelledby="testimonials-heading" className="py-16 bg-background/50">
+        <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
+        <div className="max-w-5xl mx-auto px-6">
+          <TestimonialSlider testimonials={testimonials} />
         </div>
       </section>
 
