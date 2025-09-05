@@ -14,8 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { X, Lightbulb } from "lucide-react";
+import { X, Lightbulb, ExternalLink, FileImage } from "lucide-react";
 import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/useKnowledge";
+import { useIntegrations } from "@/hooks/useIntegrations";
+import { FigmaProjectSelector } from "./FigmaProjectSelector";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
 
 interface KnowledgeModalProps {
@@ -144,6 +146,7 @@ export function KnowledgeModal({
   editingItem,
 }: KnowledgeModalProps) {
   const { createKnowledgeItem, updateKnowledgeItem } = useKnowledge(workspace.id, product?.id);
+  const { integrations } = useIntegrations();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -151,6 +154,11 @@ export function KnowledgeModal({
   const [category, setCategory] = useState<KnowledgeCategory>("general");
   const [isProductSpecific, setIsProductSpecific] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showFigmaImport, setShowFigmaImport] = useState(false);
+
+  // Check if Figma is integrated
+  const figmaIntegration = integrations.find(i => i.id === 'figma');
+  const isFigmaIntegrated = figmaIntegration?.isConfigured && figmaIntegration?.isEnabled;
 
   useEffect(() => {
     if (editingItem) {
@@ -303,6 +311,57 @@ export function KnowledgeModal({
               <p className="text-xs text-muted-foreground mt-1">
                 {KNOWLEDGE_CATEGORIES[category].description}
               </p>
+            </div>
+          )}
+
+          {/* Design Guidelines Figma Integration */}
+          {!editingItem && category === "design" && (
+            <div className="p-3 bg-muted rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileImage className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium">Design Assets</span>
+                </div>
+                {!isFigmaIntegrated ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open('/integrations', '_blank')}
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    Connect Figma
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowFigmaImport(!showFigmaImport)}
+                  >
+                    {showFigmaImport ? 'Hide' : 'Import from Figma'}
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {!isFigmaIntegrated 
+                  ? "Connect Figma to import design files and enrich your design guidelines"
+                  : "Import design files from your Figma projects to enhance your guidelines"
+                }
+              </p>
+              
+              {/* Figma Import Panel */}
+              {showFigmaImport && isFigmaIntegrated && (
+                <div className="mt-3 pt-3 border-t">
+                  <FigmaProjectSelector 
+                    workspaceId={workspace.id}
+                    onProjectImported={(project) => {
+                      // Add imported project info to content
+                      const importText = `\n\n## Imported Figma File: ${project.figma_file_name}\n- File Key: ${project.figma_file_key}\n- Last Synced: ${new Date(project.last_synced_at || '').toLocaleDateString()}\n\n`;
+                      setContent(prev => prev + importText);
+                      setShowFigmaImport(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
 
