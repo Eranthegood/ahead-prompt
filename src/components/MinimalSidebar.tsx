@@ -102,11 +102,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     name: '',
     description: '',
     color: '#3B82F6',
+    icon: 'Package',
   });
   const [newEpicData, setNewEpicData] = useState({
     name: '',
     description: '',
     color: '#8B5CF6',
+    icon: 'Hash',
   });
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingEpic, setIsCreatingEpic] = useState(false);
@@ -239,7 +241,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       if (newProduct) {
         onProductSelect(newProduct.id);
         setIsCreateProductOpen(false);
-        setNewProductData({ name: '', description: '', color: '#3B82F6' });
+        setNewProductData({ name: '', description: '', color: '#3B82F6', icon: 'Package' });
       }
     } finally {
       setIsCreating(false);
@@ -260,7 +262,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
       if (newEpic) {
         setIsCreateEpicOpen(false);
-        setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
+        setNewEpicData({ name: '', description: '', color: '#8B5CF6', icon: 'Hash' });
         setSelectedProductForEpic('');
         // Expand the product to show the new epic
         setExpandedProducts(prev => new Set(prev).add(selectedProductForEpic));
@@ -663,30 +665,82 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </div>
 
             <div>
-              <Label>Color</Label>
-              <div className="flex items-center gap-2 mt-2">
-                {PRODUCT_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setNewProductData(prev => ({ ...prev, color: color.value }))}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      newProductData.color === color.value 
-                        ? 'border-primary scale-110' 
-                        : 'border-muted hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.label}
-                  />
-                ))}
-                <div className="flex items-center gap-2 ml-2">
-                  <Palette className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="color"
-                    value={newProductData.color}
-                    onChange={(e) => setNewProductData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-8 h-8 rounded border cursor-pointer"
-                  />
+              <Label>Icon & Color</Label>
+              
+              {/* Icon Selector */}
+              <div className="mt-2 mb-4">
+                <Label className="text-sm text-muted-foreground">Choose an icon</Label>
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  {[
+                    { icon: Package, name: 'Package' },
+                    { icon: Hash, name: 'Hash' },
+                    { icon: FileText, name: 'Document' },
+                    { icon: Plus, name: 'Plus' },
+                    { icon: Settings, name: 'Settings' },
+                    { icon: User, name: 'User' },
+                    { icon: Trophy, name: 'Trophy' },
+                    { icon: BookOpen, name: 'Book' },
+                    { icon: Sparkles, name: 'Sparkles' },
+                    { icon: TrendingUp, name: 'Trending' },
+                    { icon: BarChart3, name: 'Chart' },
+                    { icon: Github, name: 'Github' }
+                  ].map(({ icon: IconComponent, name }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setNewProductData(prev => ({ ...prev, icon: name }))}
+                      className={`p-2 rounded-lg border transition-all hover:scale-105 ${
+                        newProductData.icon === name 
+                          ? 'border-primary bg-primary/10 text-primary' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                      title={name}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Selector */}
+              <div>
+                <Label className="text-sm text-muted-foreground">Choose a color</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  {/* Preset Colors */}
+                  <div className="flex items-center gap-2">
+                    {PRODUCT_COLORS.map((color) => (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => setNewProductData(prev => ({ ...prev, color: color.value }))}
+                        className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                          newProductData.color === color.value 
+                            ? 'border-primary scale-110 shadow-md' 
+                            : 'border-muted-foreground/20'
+                        }`}
+                        style={{ backgroundColor: color.value }}
+                        title={color.label}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Custom Color Picker */}
+                  <div className="flex items-center gap-2 pl-3 border-l border-border">
+                    <Palette className="w-4 h-4 text-muted-foreground" />
+                    <label className="cursor-pointer">
+                      <input
+                        type="color"
+                        value={newProductData.color}
+                        onChange={(e) => setNewProductData(prev => ({ ...prev, color: e.target.value }))}
+                        className="sr-only"
+                      />
+                      <div 
+                        className="w-8 h-8 rounded-full border-2 border-muted-foreground/20 hover:scale-110 transition-all cursor-pointer"
+                        style={{ backgroundColor: newProductData.color }}
+                        title="Custom color"
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -745,37 +799,89 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </div>
 
             <div>
-              <Label>Color</Label>
-              <div className="flex items-center gap-2 mt-2">
-                {[
-                  { value: '#8B5CF6', label: 'Purple' },
-                  { value: '#10B981', label: 'Green' },
-                  { value: '#3B82F6', label: 'Blue' },
-                  { value: '#F59E0B', label: 'Orange' },
-                  { value: '#EF4444', label: 'Red' },
-                  { value: '#6B7280', label: 'Gray' },
-                ].map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setNewEpicData(prev => ({ ...prev, color: color.value }))}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      newEpicData.color === color.value 
-                        ? 'border-primary scale-110' 
-                        : 'border-muted hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.label}
-                  />
-                ))}
-                <div className="flex items-center gap-2 ml-2">
-                  <Palette className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="color"
-                    value={newEpicData.color}
-                    onChange={(e) => setNewEpicData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-8 h-8 rounded border cursor-pointer"
-                  />
+              <Label>Icon & Color</Label>
+              
+              {/* Icon Selector */}
+              <div className="mt-2 mb-4">
+                <Label className="text-sm text-muted-foreground">Choose an icon</Label>
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  {[
+                    { icon: Hash, name: 'Hash' },
+                    { icon: Package, name: 'Package' },
+                    { icon: FileText, name: 'Document' },
+                    { icon: Plus, name: 'Plus' },
+                    { icon: Settings, name: 'Settings' },
+                    { icon: User, name: 'User' },
+                    { icon: Trophy, name: 'Trophy' },
+                    { icon: BookOpen, name: 'Book' },
+                    { icon: Sparkles, name: 'Sparkles' },
+                    { icon: TrendingUp, name: 'Trending' },
+                    { icon: BarChart3, name: 'Chart' },
+                    { icon: Github, name: 'Github' }
+                  ].map(({ icon: IconComponent, name }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setNewEpicData(prev => ({ ...prev, icon: name }))}
+                      className={`p-2 rounded-lg border transition-all hover:scale-105 ${
+                        newEpicData.icon === name 
+                          ? 'border-primary bg-primary/10 text-primary' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                      title={name}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Selector */}
+              <div>
+                <Label className="text-sm text-muted-foreground">Choose a color</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  {/* Preset Colors */}
+                  <div className="flex items-center gap-2">
+                    {[
+                      { value: '#8B5CF6', label: 'Purple' },
+                      { value: '#10B981', label: 'Green' },
+                      { value: '#3B82F6', label: 'Blue' },
+                      { value: '#F59E0B', label: 'Orange' },
+                      { value: '#EF4444', label: 'Red' },
+                      { value: '#6B7280', label: 'Gray' },
+                    ].map((color) => (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => setNewEpicData(prev => ({ ...prev, color: color.value }))}
+                        className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                          newEpicData.color === color.value 
+                            ? 'border-primary scale-110 shadow-md' 
+                            : 'border-muted-foreground/20'
+                        }`}
+                        style={{ backgroundColor: color.value }}
+                        title={color.label}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Custom Color Picker */}
+                  <div className="flex items-center gap-2 pl-3 border-l border-border">
+                    <Palette className="w-4 h-4 text-muted-foreground" />
+                    <label className="cursor-pointer">
+                      <input
+                        type="color"
+                        value={newEpicData.color}
+                        onChange={(e) => setNewEpicData(prev => ({ ...prev, color: e.target.value }))}
+                        className="sr-only"
+                      />
+                      <div 
+                        className="w-8 h-8 rounded-full border-2 border-muted-foreground/20 hover:scale-110 transition-all cursor-pointer"
+                        style={{ backgroundColor: newEpicData.color }}
+                        title="Custom color"
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -785,7 +891,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   variant="outline"
                   onClick={() => {
                     setIsCreateEpicOpen(false);
-                    setNewEpicData({ name: '', description: '', color: '#8B5CF6' });
+                    setNewEpicData({ name: '', description: '', color: '#8B5CF6', icon: 'Hash' });
                     setSelectedProductForEpic('');
                   }}
                   disabled={isCreatingEpic}
