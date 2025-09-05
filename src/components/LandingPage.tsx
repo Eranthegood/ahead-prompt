@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
+import DisplayCards from "@/components/ui/display-cards";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 // Logo components
 const CursorLogo = ({
@@ -250,8 +251,8 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              <img src="/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png" alt="Ahead.love interface showing queued prompts and tasks, demonstrating how to stay 3 moves ahead while AI generates code" className="w-full h-full object-contain" />
+            <div className="flex items-center justify-center min-h-[600px]">
+              <DisplayCards />
             </div>
           </div>
         </div>
