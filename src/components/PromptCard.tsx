@@ -8,10 +8,13 @@ import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { useToast } from '@/hooks/use-toast';
+import { useCursorIntegration } from '@/hooks/useCursorIntegration';
+import { useCursorAgentPolling } from '@/hooks/useCursorAgentPolling';
+import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { CursorWorkflowProgress } from '@/components/CursorWorkflowProgress';
 import { CursorAgentModal } from '@/components/CursorAgentModal';
+import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 
@@ -56,6 +59,19 @@ export function PromptCard({
   const [showCursorDialog, setShowCursorDialog] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
   const { toast } = useToast();
+  const { sendToCursor, isLoading: cursorLoading, cancelAgent, mergePullRequest, updateAgentStatus } = useCursorIntegration();
+  
+  // Real-time agent polling for active Cursor agents
+  const isAgentActive = ['sent_to_cursor', 'cursor_working'].includes(prompt.status);
+  const { isPolling } = useCursorAgentPolling({
+    agentId: prompt.cursor_agent_id,
+    enabled: isAgentActive,
+    interval: 15000, // Poll every 15 seconds for active agents
+    onStatusUpdate: (agent) => {
+      console.log('Agent status update:', agent);
+      // The webhook will handle database updates, this is just for logging
+    }
+  });
   const priority = prompt.priority || 3;
   
   const playSlideSound = () => {
@@ -115,23 +131,50 @@ export function PromptCard({
                     variant="inline"
                   />
                   
-                  {/* Priority Badge */}
-                  {priority === 1 && (
-                    <Badge variant="destructive" className="text-xs flex items-center gap-1">
-                      <Flame className="h-3 w-3" />
-                      {PRIORITY_LABELS[priority]}
-                    </Badge>
-                  )}
-                  {priority === 2 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {PRIORITY_LABELS[priority]}
-                    </Badge>
-                  )}
-                  {priority === 3 && (
-                    <Badge variant="outline" className="text-xs opacity-60">
-                      {PRIORITY_LABELS[priority]}
-                    </Badge>
-                  )}
+                  {/* Priority Badge and Status Indicators */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Priority Badge */}
+                    {priority === 1 && (
+                      <Badge variant="destructive" className="text-xs flex items-center gap-1">
+                        <Flame className="h-3 w-3" />
+                        {PRIORITY_LABELS[priority]}
+                      </Badge>
+                    )}
+                    {priority === 2 && (
+                      <Badge variant="secondary" className="text-xs">
+                        {PRIORITY_LABELS[priority]}
+                      </Badge>
+                    )}
+                    {priority === 3 && (
+                      <Badge variant="outline" className="text-xs opacity-60">
+                        {PRIORITY_LABELS[priority]}
+                      </Badge>
+                    )}
+                    
+                    {/* Cursor Agent Working Indicator */}
+                    {prompt.status === 'cursor_working' && (
+                      <AgentWorkingIndicator size="sm" className="ml-1" />
+                    )}
+                    
+                    {/* Sending to Cursor Indicator */}
+                    {cursorLoading && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                        <span className="text-xs text-blue-600 dark:text-blue-400">Sending...</span>
+                      </div>
+                    )}
+                    
+                    {prompt.product && (
+                      <Badge variant="outline" className="text-xs">
+                        {prompt.product.name}
+                      </Badge>
+                    )}
+                    {prompt.epic && (
+                      <Badge variant="outline" className="text-xs">
+                        {prompt.epic.name}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 
                 {prompt.description ? (
@@ -188,13 +231,7 @@ export function PromptCard({
                       description: 'PR merge functionality coming soon!',
                     });
                   }}
-                  onCancel={() => {
-                    // TODO: Implement cancel agent functionality
-                    toast({
-                      title: 'Cancel Agent',
-                      description: 'Agent cancellation functionality coming soon!',
-                    });
-                  }}
+                  onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
                 />
               </div>
                   
@@ -452,12 +489,11 @@ export function PromptCard({
         agentStatus={prompt.cursor_agent_status}
         branchName={prompt.cursor_branch_name}
         logs={prompt.cursor_logs || {}}
-        onCancel={() => {
-          // TODO: Implement cancel agent functionality
-          setShowAgentModal(false);
-        }}
+        onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
         onRefresh={() => {
-          // TODO: Implement refresh agent status
+          if (prompt.cursor_agent_id) {
+            updateAgentStatus(prompt.cursor_agent_id);
+          }
         }}
       />
     </>
