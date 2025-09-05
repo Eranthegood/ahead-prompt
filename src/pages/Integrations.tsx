@@ -190,7 +190,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               disabled={isLoading || integration.isComingSoon}
               className="min-w-[120px]"
             >
-              {actionButtonText}
+              {actionButtonText || 'Configure'}
             </Button>
           )}
         </div>
