@@ -15,6 +15,13 @@ const REDDIT_PIXEL_ID = 't2_XXXXXXXXX'; // Replace with your actual pixel ID
 export class RedditPixelService {
   private static initialized = false;
 
+  // Generate unique conversion ID for tracking
+  private static generateConversionId(prefix: string, identifier: string): string {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${prefix}_${identifier}_${timestamp}_${random}`;
+  }
+
   static initialize() {
     if (this.initialized || typeof window === 'undefined') return;
     
@@ -64,8 +71,9 @@ export class RedditPixelService {
 
   // Track when user creates their first prompt (main conversion event)
   static trackFirstPromptCreated(userId: string) {
+    const conversionId = this.generateConversionId('first_prompt', userId);
     this.trackConversion('Purchase', {
-      conversionId: 'first_prompt_created',
+      conversionId: conversionId,
       customEventName: 'FirstPromptCreated',
       userId: userId,
       value: 1.0, // Assign a value to your conversion
@@ -75,22 +83,30 @@ export class RedditPixelService {
 
   // Track other engagement events
   static trackPromptCreated(promptId: string, userId: string) {
+    const conversionId = this.generateConversionId('prompt', `${promptId}_${userId}`);
     this.trackConversion('Custom', {
-      conversionId: 'prompt_created',
+      conversionId: conversionId,
       customEventName: 'PromptCreated', 
       userId: userId,
       promptId: promptId
     });
   }
 
-  static trackSignUp(userId: string) {
+  static trackSignUp(userId: string, userEmail?: string) {
+    const identifier = userId || userEmail || 'anonymous';
+    const conversionId = this.generateConversionId('signup', identifier);
     this.trackConversion('SignUp', {
-      userId: userId
+      conversionId: conversionId,
+      userId: userId,
+      userEmail: userEmail
     });
   }
 
   static trackViewContent(contentType: string, contentId?: string) {
+    const identifier = contentId || contentType;
+    const conversionId = this.generateConversionId('view', identifier);
     this.trackConversion('ViewContent', {
+      conversionId: conversionId,
       contentType: contentType,
       contentId: contentId
     });

@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import mixpanelService from '@/services/mixpanelService';
+import { RedditPixelService } from '@/services/redditPixelService';
 
 interface AuthContextType {
   user: User | null;
@@ -32,10 +33,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Track login events
         if (event === 'SIGNED_IN' && session?.user) {
+          const provider = session.user.app_metadata?.provider || 'email';
+          
           mixpanelService.trackUserLogin({
             userId: session.user.id,
-            provider: session.user.app_metadata?.provider || 'email'
+            provider: provider
           });
+          
+          // Track Reddit Pixel signup for new Google users
+          if (provider === 'google') {
+            setTimeout(() => {
+              RedditPixelService.trackSignUp(session.user.id, session.user.email);
+            }, 0);
+          }
         }
       }
     );
@@ -79,6 +89,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           userId: email, // Use email as temporary ID since user might not be confirmed yet
           provider: 'email'
         });
+        
+        // Track Reddit Pixel signup for email users
+        RedditPixelService.trackSignUp(email, email);
       }
 
       return { error };
