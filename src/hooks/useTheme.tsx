@@ -36,6 +36,18 @@ export const useTheme = () => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
+      
+      // Enhanced contrast adjustments for QuickPromptDialog in dark mode
+      if (theme === 'dark') {
+        // Apply additional high-contrast styles for better accessibility
+        root.style.setProperty('--quickprompt-enhanced-foreground', '0 0% 98%');
+        root.style.setProperty('--quickprompt-enhanced-muted', '0 0% 80%');
+      } else {
+        // Reset to default values for light mode
+        root.style.removeProperty('--quickprompt-enhanced-foreground');
+        root.style.removeProperty('--quickprompt-enhanced-muted');
+      }
+      
       console.log(`Theme applied: ${theme}, loading: ${isLoading}, unlocked: ${isDarkModeUnlocked}`);
     };
 

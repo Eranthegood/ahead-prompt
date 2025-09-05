@@ -426,6 +426,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       <DialogContent 
         className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col"
         onKeyDown={handleKeyDown}
+        data-dialog-content
       >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
@@ -460,7 +461,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             <div className="space-y-4">
               {/* Priority selector */}
               <div>
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                <label className="text-sm font-medium text-muted-foreground mb-2 block quickprompt-label">
                   Priority
                 </label>
                 <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
@@ -492,7 +493,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
               {/* AI Provider Selection */}
               <div className="space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
+                <div className="text-sm font-medium text-muted-foreground quickprompt-label">
                   AI Provider
                 </div>
                 <ProviderSelector
@@ -506,7 +507,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="text-sm font-medium text-muted-foreground quickprompt-label">
                       Use knowledge
                     </label>
                   </div>
@@ -519,22 +520,22 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
                 {enableKnowledge && knowledgeItems.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground quickprompt-muted">
                       Select knowledge to include ({knowledgeItems.length} available)
                     </div>
                     <div className="max-h-32 overflow-y-auto space-y-1">
                       {knowledgeItems.map(item => (
                         <div 
                           key={item.id}
-                          className={`text-xs p-2 rounded cursor-pointer transition-colors ${
+                          className={`text-xs p-2 rounded cursor-pointer transition-colors quickprompt-knowledge-item ${
                             selectedKnowledgeIds.includes(item.id) 
-                              ? 'bg-primary/20 text-primary border border-primary/30' 
+                              ? 'selected bg-primary/20 text-primary border border-primary/30' 
                               : 'bg-background hover:bg-muted border border-border'
                           }`}
                           onClick={() => handleKnowledgeToggle(item.id)}
                         >
                           <div className="font-medium truncate">{item.title}</div>
-                          <div className="text-muted-foreground truncate">{item.category}</div>
+                          <div className="text-muted-foreground truncate quickprompt-muted">{item.category}</div>
                         </div>
                       ))}
                     </div>
@@ -561,7 +562,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 {enableKnowledge && knowledgeItems.length === 0 && (
                   <button 
                     onClick={handleOpenKnowledge}
-                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer"
+                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer quickprompt-muted"
                   >
                     No knowledge available for this product. Click to add some →
                   </button>
