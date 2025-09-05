@@ -329,9 +329,6 @@ export function MinimalPromptList({
               window.dispatchEvent(event);
             }}
           >
-            {/* Gradient background overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary-glow/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
             <div className="relative z-10 flex flex-col items-center gap-6">
               <div className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10 group-hover:scale-110 transition-transform duration-300">
                 <Plus className="h-16 w-16 text-primary group-hover:text-primary-glow transition-colors duration-300" />
