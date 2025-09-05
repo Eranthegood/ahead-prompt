@@ -571,6 +571,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                               <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                               Add Product
                             </Button>
+                            <p className="text-xs text-muted-foreground mt-2 px-1 hidden sm:block">
+                              Tip: Create a product to organize your workflow
+                            </p>
                           </>
                         )}
                       </div>
