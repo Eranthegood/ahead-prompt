@@ -47,7 +47,7 @@ import { useNavigate } from 'react-router-dom';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
 import { UserAccountSection } from './UserAccountSection';
 import { ProcessedLogo } from './ProcessedLogo';
-import { KnowledgeBase } from './KnowledgeBase';
+import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -1059,15 +1059,15 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         </DialogContent>
       </Dialog>
 
-      {/* Knowledge Manager */}
+      {/* Knowledge Manager - Minimalist */}
       <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Knowledge for {selectedKnowledgeProduct?.name ?? 'Workspace'}</DialogTitle>
+        <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg">
+              {selectedKnowledgeProduct?.name ?? 'Knowledge'}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <KnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
-          </div>
+          <MinimalKnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
         </DialogContent>
       </Dialog>
     </TooltipProvider>
