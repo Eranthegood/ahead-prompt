@@ -321,8 +321,15 @@ export function MinimalPromptList({
       <div className="flex-1 flex items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-lg mx-auto">
           <div className="flex flex-col items-center gap-6">
-            <div className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10">
-              <Plus className="h-16 w-16 text-primary" />
+            <div 
+              className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10 cursor-pointer hover:scale-110 transition-transform duration-300"
+              onClick={() => {
+                console.log('[MinimalPromptList] Dispatching open-quick-prompt event');
+                const event = new CustomEvent('open-quick-prompt');
+                window.dispatchEvent(event);
+              }}
+            >
+              <Plus className="h-16 w-16 text-primary hover:text-primary-glow transition-colors duration-300" />
             </div>
             
             <div className="space-y-3">
