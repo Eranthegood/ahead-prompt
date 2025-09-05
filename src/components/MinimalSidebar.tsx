@@ -661,20 +661,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           {!isCollapsed && (
             <SidebarGroup className="mt-4">
               <SidebarGroupContent>
-                <div className="relative">
-                  {/* Dynamic progress indicator with animated gradient */}
-                  <div className="absolute -left-1 top-0 bottom-0 w-0.5 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="w-full bg-gradient-to-b from-primary via-primary/80 to-primary/60 transition-all duration-1000 ease-out shadow-sm"
-                      style={{ 
-                        height: `${Math.min(100, (productsWithData.filter(p => p.promptCount > 0).length / Math.max(1, productsWithData.length)) * 100)}%`,
-                        boxShadow: '0 0 8px rgba(var(--primary), 0.3)'
-                      }}
-                    />
-                  </div>
-                  
-                  <OnboardingChecklist workspace={workspace} />
-                </div>
+                <OnboardingChecklist workspace={workspace} />
               </SidebarGroupContent>
             </SidebarGroup>
           )}
