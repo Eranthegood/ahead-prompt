@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -355,6 +355,47 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     setIsKnowledgeModalOpen(false);
     setSelectedKnowledgeProduct(undefined);
   };
+
+  // Add event listeners for onboarding checklist actions
+  useEffect(() => {
+    const handleOpenKnowledgeDialog = () => {
+      console.log('Opening knowledge dialog from onboarding');
+      setIsKnowledgeModalOpen(true);
+    };
+
+    const handleOpenProductDialog = () => {
+      console.log('Opening product dialog from onboarding');
+      setIsCreateProductOpen(true);
+    };
+
+    const handleOpenEpicDialog = () => {
+      console.log('Opening epic dialog from onboarding');
+      // If we have products, set the first one as selected for epic creation
+      if (products && products.length > 0) {
+        setSelectedProductForEpic(products[0].id);
+      }
+      setIsCreateEpicOpen(true);
+    };
+
+    const handleOpenQuickPrompt = () => {
+      console.log('Opening quick prompt from onboarding');
+      onQuickAdd();
+    };
+
+    // Add event listeners
+    window.addEventListener('open-knowledge-dialog', handleOpenKnowledgeDialog);
+    window.addEventListener('open-product-dialog', handleOpenProductDialog);
+    window.addEventListener('open-epic-dialog', handleOpenEpicDialog);
+    window.addEventListener('open-quick-prompt', handleOpenQuickPrompt);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('open-knowledge-dialog', handleOpenKnowledgeDialog);
+      window.removeEventListener('open-product-dialog', handleOpenProductDialog);
+      window.removeEventListener('open-epic-dialog', handleOpenEpicDialog);
+      window.removeEventListener('open-quick-prompt', handleOpenQuickPrompt);
+    };
+  }, [products, onQuickAdd]);
 
   // Handle drag end for product reordering
   const handleDragEnd = (event: any) => {
