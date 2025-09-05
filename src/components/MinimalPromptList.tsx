@@ -320,33 +320,23 @@ export function MinimalPromptList({
     return (
       <div className="flex-1 flex items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-lg mx-auto">
-          <Button
-            variant="ghost"
-            className="relative flex flex-col items-center gap-6 p-16 hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary-glow/5 transition-all duration-300 cursor-pointer w-full min-w-[500px] rounded-2xl group hover:shadow-lg hover:shadow-primary/10 animate-fade-in"
-            onClick={() => {
-              console.log('[MinimalPromptList] Dispatching open-quick-prompt event');
-              const event = new CustomEvent('open-quick-prompt');
-              window.dispatchEvent(event);
-            }}
-          >
-            <div className="relative z-10 flex flex-col items-center gap-6">
-              <div className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10 group-hover:scale-110 transition-transform duration-300">
-                <Plus className="h-16 w-16 text-primary group-hover:text-primary-glow transition-colors duration-300" />
-              </div>
-              
-              <div className="space-y-3">
-                <h3 className="text-2xl font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                  {searchQuery ? 'No prompts found' : 'Start Building Something Amazing'}
-                </h3>
-                <p className="text-muted-foreground text-lg leading-relaxed max-w-md text-center mx-auto">
-                  {searchQuery 
-                    ? 'Try adjusting your search query to find what you\'re looking for'
-                    : 'Create your first AI prompt and accelerate your development workflow by 4x'
-                  }
-                </p>
-              </div>
+          <div className="flex flex-col items-center gap-6">
+            <div className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10">
+              <Plus className="h-16 w-16 text-primary" />
             </div>
-          </Button>
+            
+            <div className="space-y-3">
+              <h3 className="text-2xl font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                {searchQuery ? 'No prompts found' : 'Start Building Something Amazing'}
+              </h3>
+              <p className="text-muted-foreground text-lg leading-relaxed max-w-md text-center mx-auto">
+                {searchQuery 
+                  ? 'Try adjusting your search query to find what you\'re looking for'
+                  : 'Create your first AI prompt and accelerate your development workflow by 4x'
+                }
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
