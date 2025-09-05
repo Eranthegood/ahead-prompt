@@ -20,3 +20,6 @@ verify_jwt = true
 
 [functions.validate-cursor-token]
 verify_jwt = false
+
+[functions.send-reddit-conversion]
+verify_jwt = true

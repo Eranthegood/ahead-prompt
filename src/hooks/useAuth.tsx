@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import mixpanelService from '@/services/mixpanelService';
 import { RedditPixelService } from '@/services/redditPixelService';
+import { RedditConversionsApiService } from '@/services/redditConversionsApiService';
 
 interface AuthContextType {
   user: User | null;
@@ -44,6 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (provider === 'google') {
             setTimeout(() => {
               RedditPixelService.trackSignUp(session.user.id, session.user.email);
+              // Also track server-side
+              RedditConversionsApiService.trackSignUp(session.user.id, session.user.email);
             }, 0);
           }
         }
@@ -92,6 +95,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Track Reddit Pixel signup for email users
         RedditPixelService.trackSignUp(email, email);
+        // Also track server-side
+        RedditConversionsApiService.trackSignUp(email, email);
       }
 
       return { error };
