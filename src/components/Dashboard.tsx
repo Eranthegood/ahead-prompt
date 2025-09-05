@@ -3,7 +3,8 @@ import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
-
+import { ProductEpicViews } from '@/components/ProductEpicViews/ProductEpicViews';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePromptsContext } from '@/context/PromptsContext';
@@ -11,7 +12,7 @@ import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MessageSquare, Package } from 'lucide-react';
 
 // Declare Supademo global function
 declare global {
@@ -30,11 +31,19 @@ void QPD_Keep;
 
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
+  
+  // Tab state management
+  const [activeTab, setActiveTab] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (selectedProductId || selectedEpicId) return 'products';
+    return tabParam === 'products' ? 'products' : 'prompts';
+  });
+
   const {
     workspace,
     loading
@@ -61,6 +70,11 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     preferences,
     saveCompletedItemsPreference
   } = useUserPreferences();
+
+  // Calculate stats for tab badges
+  const promptsCount = prompts?.length || 0;
+  const productsCount = products?.length || 0;
+  const epicsCount = epics?.length || 0;
 
   // Initialize Supademo SDK for dynamic elements
   useEffect(() => {
@@ -97,10 +111,12 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
     't': () => setDebugConsoleOpen(true),
+    'p': () => setActiveTab('products'),
+    'r': () => setActiveTab('prompts'),
     'c': async () => {
       // If hovering over a prompt, copy its generated prompt
       if (hoveredPromptId) {
@@ -121,6 +137,17 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
       }
     }
   });
+
+  // Update URL when tab changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (activeTab === 'products') {
+      url.searchParams.set('tab', 'products');
+    } else {
+      url.searchParams.delete('tab');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [activeTab]);
   const handleToggleCompletedItems = (show: boolean) => {
     saveCompletedItemsPreference(show);
   };
@@ -150,23 +177,51 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   return (
     <>
       <div className="flex-1 flex flex-col min-w-0">
-        
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
-        <MinimalPromptList 
-          workspace={workspace} 
-          selectedProductId={selectedProductId} 
-          selectedEpicId={selectedEpicId} 
-          searchQuery={searchQuery} 
-          hoveredPromptId={hoveredPromptId} 
-          onPromptHover={setHoveredPromptId} 
-          onCopy={handleCopyPrompt} 
-        />
+        {/* Main Content with Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="prompts" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Prompts
+              {promptsCount > 0 && (
+                <span className="ml-auto bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+                  {promptsCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Products & Epics
+              {(productsCount > 0 || epicsCount > 0) && (
+                <span className="ml-auto bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+                  {productsCount + epicsCount}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="prompts" className="flex-1 mt-0">
+            <MinimalPromptList 
+              workspace={workspace} 
+              selectedProductId={selectedProductId} 
+              selectedEpicId={selectedEpicId} 
+              searchQuery={searchQuery} 
+              hoveredPromptId={hoveredPromptId} 
+              onPromptHover={setHoveredPromptId} 
+              onCopy={handleCopyPrompt} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="products" className="flex-1 mt-0">
+            <ProductEpicViews />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
-
 
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
     </>
