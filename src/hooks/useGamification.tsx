@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { RedditPixelService } from '@/services/redditPixelService';
-import { RedditConversionsApiService } from '@/services/redditConversionsApiService';
 import { UserStats, UserAchievement, XP_REWARDS, ACHIEVEMENTS } from '@/types/gamification';
 
 // Create a global event emitter for XP animations
@@ -159,9 +158,8 @@ export const useGamification = () => {
 
       // Track Reddit conversion for first prompt achievement
       if (achievement.name === 'first_prompt') {
-        console.log('[Reddit Pixel & API] First prompt achievement unlocked, tracking conversion');
+        console.log('[Reddit Pixel] First prompt achievement unlocked, tracking conversion');
         RedditPixelService.trackFirstPromptCreated(user.id);
-        RedditConversionsApiService.trackFirstPromptCreated(user.id);
       }
 
     } catch (error) {

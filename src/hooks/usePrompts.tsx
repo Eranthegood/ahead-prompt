@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { RedditPixelService } from '@/services/redditPixelService';
-import { RedditConversionsApiService } from '@/services/redditConversionsApiService';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface CreatePromptData {
@@ -430,9 +429,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
     // Track Reddit conversion for prompt creation
     if (user?.id) {
-      console.log('[Reddit Tracking] Prompt created, tracking client & server-side');
+      console.log('[Reddit Tracking] Prompt created, tracking client-side');
       RedditPixelService.trackPromptCreated(prompt.id, user.id);
-      RedditConversionsApiService.trackPromptCreated(user.id, prompt.id);
     }
 
     // Success notification

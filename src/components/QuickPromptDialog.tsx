@@ -16,7 +16,6 @@ import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
-import { RedditConversionsApiService } from '@/services/redditConversionsApiService';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -324,15 +323,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         variant: 'default'
       });
       
-      // Track general prompt creation with Reddit Pixel & Conversions API
+      // Track general prompt creation with Reddit Pixel
       if (workspace.owner_id) {
         RedditPixelService.trackPromptCreated(
           Math.random().toString(36).substr(2, 9), // temporary ID
           workspace.owner_id
-        );
-        RedditConversionsApiService.trackPromptCreated(
-          workspace.owner_id,
-          Math.random().toString(36).substr(2, 9) // temporary ID
         );
       }
       
