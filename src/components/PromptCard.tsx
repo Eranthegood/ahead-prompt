@@ -433,6 +433,17 @@ export function PromptCard({
         </Card>
       </PromptContextMenu>
       
+      {/* Cursor Config Dialog */}
+      <CursorConfigDialog
+        isOpen={showCursorDialog}
+        onClose={() => setShowCursorDialog(false)}
+        prompt={prompt}
+        onPromptUpdate={(promptId, updates) => {
+          // Update the prompt status when sent to Cursor
+          onStatusChange({ ...prompt, ...updates } as Prompt, updates.status as PromptStatus);
+        }}
+      />
+      
       {/* Cursor Agent Modal */}
       <CursorAgentModal
         isOpen={showAgentModal}
