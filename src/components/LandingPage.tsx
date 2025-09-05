@@ -313,6 +313,38 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Chaos Centralization Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Tired of 5 open tabs and half-written Notion blocks?
+              </h2>
+               
+              <p className="text-xl text-muted-foreground">
+                Centralize the chaos. Your copy-paste-ready prompt workspace that moves at brain speed.
+              </p>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                End the Chaos Free
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+              {/* Placeholder for future image */}
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <Zap className="w-16 h-16 mx-auto opacity-50" />
+                  <p className="text-sm">Workspace Demo Image</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
       href: "/",
