@@ -252,7 +252,35 @@ export default function LandingPage() {
             </div>
             
             <div className="flex items-center justify-center min-h-[600px]">
-              <DisplayCards />
+              <DisplayCards cards={[
+                {
+                  icon: <Code className="size-4 text-primary" />,
+                  title: "Bug Fix",
+                  description: "Fix authentication redirect issue",
+                  date: "Queued",
+                  iconClassName: "text-primary",
+                  titleClassName: "text-primary",
+                  className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+                },
+                {
+                  icon: <Zap className="size-4 text-yellow-400" />,
+                  title: "Feature",
+                  description: "Add dark mode toggle component",
+                  date: "Ready",
+                  iconClassName: "text-yellow-500",
+                  titleClassName: "text-yellow-500",
+                  className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+                },
+                {
+                  icon: <Layers className="size-4 text-green-400" />,
+                  title: "Refactor",
+                  description: "Split user service into modules",
+                  date: "Next",
+                  iconClassName: "text-green-500",
+                  titleClassName: "text-green-500",
+                  className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+                },
+              ]} />
             </div>
           </div>
         </div>
