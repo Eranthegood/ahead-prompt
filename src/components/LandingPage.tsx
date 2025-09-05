@@ -109,6 +109,32 @@ export default function LandingPage() {
         </div>
       </main>
 
+      {/* Chaos Centralization Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Tired of 5 open tabs and half-written Notion blocks?
+              </h2>
+               
+              <p className="text-xl text-muted-foreground">
+                Centralize the chaos. Your copy-paste-ready prompt workspace that moves at brain speed.
+              </p>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                End the Chaos Free
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+              {/* Placeholder for future image */}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Results Section */}
       
 
@@ -341,31 +367,6 @@ export default function LandingPage() {
       {/* Integration Banner */}
       <IntegrationBanner />
 
-      {/* Chaos Centralization Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Tired of 5 open tabs and half-written Notion blocks?
-              </h2>
-               
-              <p className="text-xl text-muted-foreground">
-                Centralize the chaos. Your copy-paste-ready prompt workspace that moves at brain speed.
-              </p>
-                
-              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                End the Chaos Free
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-            
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              {/* Placeholder for future image */}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
