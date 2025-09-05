@@ -97,32 +97,32 @@ export const IntegrationBanner: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-gradient-to-r from-background/50 via-background to-background/50 border-b border-border/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="text-center mb-4">
-          <h2 className="text-lg font-semibold text-foreground/90 mb-2">
+    <div className="w-full bg-gradient-to-r from-background/50 via-background to-background/50 border-y border-border/50">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="text-center mb-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground/90 mb-2">
             Seamlessly Integrated With Your Favorite Tools
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Connect your workflow with powerful integrations
           </p>
         </div>
         
-        <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 lg:gap-12">
+        <div className="grid grid-cols-5 gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-2xl mx-auto">
           {integrations.map((integration) => {
             const LogoComponent = integration.logo;
             return (
               <button
                 key={integration.name}
                 onClick={() => handleIntegrationClick(integration.path, integration.name)}
-                className="group flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-300 hover:bg-accent/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-accent/50"
+                className="group flex flex-col items-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-lg transition-all duration-300 hover:bg-accent/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-accent/50"
                 title={integration.description}
               >
                 <div className="relative">
-                  <LogoComponent className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground group-hover:text-foreground transition-all duration-300 group-hover:scale-110" />
+                  <LogoComponent className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-muted-foreground group-hover:text-foreground transition-all duration-300 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-primary/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm -z-10" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                <span className="text-xs sm:text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300 text-center">
                   {integration.name}
                 </span>
               </button>
@@ -130,7 +130,7 @@ export const IntegrationBanner: React.FC = () => {
           })}
         </div>
         
-        <div className="mt-4 text-center">
+        <div className="mt-4 sm:mt-6 text-center">
           <p className="text-xs text-muted-foreground/70">
             Click any logo to learn more about the integration
           </p>

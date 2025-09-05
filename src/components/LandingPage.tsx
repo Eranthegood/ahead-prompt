@@ -56,9 +56,6 @@ export default function LandingPage() {
     role: "Full-Stack Developer"
   }];
   return <div className="min-h-screen bg-background flex flex-col">
-      {/* Integration Banner */}
-      <IntegrationBanner />
-      
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
         <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
@@ -340,6 +337,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Integration Banner */}
+      <IntegrationBanner />
 
       {/* Chaos Centralization Section */}
       <section className="py-16 px-6 bg-background">
