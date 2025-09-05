@@ -319,19 +319,29 @@ export function MinimalPromptList({
   if (promptsWithInfo.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="mb-4">
-            <Plus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          </div>
-          <h3 className="text-lg font-medium mb-2">
-            {searchQuery ? 'No prompts found' : 'No prompts yet'}
-          </h3>
-          <p className="text-muted-foreground mb-6">
-            {searchQuery 
-              ? 'Try adjusting your search query'
-              : 'Create your first prompt to get started'
-            }
-          </p>
+        <div className="text-center max-w-md mx-auto">
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-4 p-8 hover:bg-muted/50 transition-colors cursor-pointer w-full"
+            onClick={() => {
+              console.log('[MinimalPromptList] Dispatching open-quick-prompt event');
+              const event = new CustomEvent('open-quick-prompt');
+              window.dispatchEvent(event);
+            }}
+          >
+            <div className="mb-2">
+              <Plus className="h-12 w-12 text-muted-foreground mx-auto" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">
+              {searchQuery ? 'No prompts found' : 'No prompts yet'}
+            </h3>
+            <p className="text-muted-foreground text-center">
+              {searchQuery 
+                ? 'Try adjusting your search query'
+                : 'Click here to create your first prompt'
+              }
+            </p>
+          </Button>
         </div>
       </div>
     );
