@@ -119,7 +119,7 @@ export default function Pricing() {
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Your feedback helps us create fair pricing for premium features
+                  And once ready, you will receive a special offer
                 </p>
               </div>
             </div>
