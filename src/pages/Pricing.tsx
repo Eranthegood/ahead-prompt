@@ -38,10 +38,18 @@ export default function Pricing() {
             </p>
           </BlurFade>
 
-          {/* Free Plan Card */}
           <BlurFade delay={0.6} inView>
-            <div className="max-w-md mx-auto mt-12">
-              {/* Content can be added here later */}
+            <div className="max-w-md mx-auto mt-12 p-8 border border-border rounded-lg bg-card">
+              <div className="text-center space-y-6">
+                <Gift className="w-12 h-12 mx-auto text-primary" />
+                <h3 className="text-2xl font-semibold">Always Free</h3>
+                <p className="text-muted-foreground">
+                  Everything you need to supercharge your development workflow.
+                </p>
+                <Button onClick={handleGetStarted} className="w-full">
+                  Start Building <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </BlurFade>
         </div>
