@@ -39,29 +39,29 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const checklistItems: ChecklistItem[] = [
     {
       id: 'product',
-      title: 'Créer votre premier produit',
-      description: 'Organisez vos projets en créant un produit',
+      title: 'Create your first product',
+      description: 'Organize your projects and prompts by creating a product workspace',
       completed: (products?.length || 0) > 0,
       action: () => window.dispatchEvent(new CustomEvent('open-product-dialog'))
     },
     {
       id: 'epic',
-      title: 'Créer votre premier epic',
-      description: 'Structurez votre travail avec des epics',
+      title: 'Create your first epic',
+      description: 'Group related features and organize your development workflow',
       completed: (epics?.length || 0) > 0,
       action: () => window.dispatchEvent(new CustomEvent('open-epic-dialog'))
     },
     {
       id: 'knowledge',
-      title: 'Ajouter vos premières connaissances',
-      description: 'Stockez des infos utiles pour vos prompts',
+      title: 'Add your knowledge base',
+      description: 'Store docs, links, and context to enhance your AI prompts',
       completed: (knowledgeItems?.length || 0) > 0,
       action: () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog'))
     },
     {
       id: 'prompt',
-      title: 'Créer votre premier prompt',
-      description: 'Commencez à planifier vos idées',
+      title: 'Create your first prompt',
+      description: 'Start capturing your development ideas and next moves',
       completed: (prompts?.length || 0) > 0,
       action: () => window.dispatchEvent(new CustomEvent('open-quick-prompt'))
     }
@@ -88,10 +88,10 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
       <div className="flex items-center justify-between mb-3">
         <div className="flex-1">
           <h3 className="text-sm font-medium text-foreground">
-            {isFullyCompleted ? '🎉 Setup complet' : '👋 Setup'}
+            {isFullyCompleted ? '🎉 Setup complete' : '👋 Getting started'}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {completedCount}/{totalCount} étapes
+            {completedCount}/{totalCount} steps completed
           </p>
         </div>
         <Button
@@ -160,7 +160,7 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
           {isFullyCompleted && (
             <div className="mt-3 p-2 bg-primary/10 rounded-md">
               <p className="text-xs text-foreground font-medium">
-                ✨ Setup terminé !
+                ✨ You're all set! Ready to build amazing things.
               </p>
             </div>
           )}
