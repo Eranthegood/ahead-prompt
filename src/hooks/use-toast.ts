@@ -169,7 +169,6 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  console.log('useToast function is being called');
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {
@@ -189,5 +188,4 @@ function useToast() {
   }
 }
 
-console.log('hooks/use-toast.ts module loaded, exporting useToast');
 export { useToast, toast }
