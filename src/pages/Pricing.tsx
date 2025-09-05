@@ -52,6 +52,28 @@ export default function Pricing() {
               </div>
             </div>
           </BlurFade>
+
+          {/* Pricing Feedback Section */}
+          <BlurFade delay={0.8} inView>
+            <div className="max-w-2xl mx-auto mt-16 p-8 border border-border rounded-lg bg-card/50">
+              <div className="text-center space-y-6">
+                <Sparkles className="w-10 h-10 mx-auto text-primary" />
+                <h3 className="text-xl font-semibold">Ready to buy to support?</h3>
+                <p className="text-muted-foreground">
+                  Give me some hint for the most fair pricing you&apos;re ready to buy
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+                  <Button variant="outline" className="h-12">$5/mo</Button>
+                  <Button variant="outline" className="h-12">$10/mo</Button>
+                  <Button variant="outline" className="h-12">$15/mo</Button>
+                  <Button variant="outline" className="h-12">$25/mo</Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Your feedback helps us create fair pricing for premium features
+                </p>
+              </div>
+            </div>
+          </BlurFade>
         </div>
       </main>
     </div>;
