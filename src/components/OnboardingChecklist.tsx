@@ -90,6 +90,7 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const completedCount = checklistItems.filter(item => item.completed).length;
   const totalCount = checklistItems.length;
   const isFullyCompleted = completedCount === totalCount;
+  const progressPercentage = (completedCount / totalCount) * 100;
 
   // Auto-complete onboarding when all items are done
   useEffect(() => {
@@ -101,7 +102,6 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
     }
   }, [isFullyCompleted, completedCount, workspace.id, onComplete]);
 
-  const progressPercentage = (completedCount / totalCount) * 100;
 
   return (
     <div className="border-b border-border/50 pb-4 mb-4">
@@ -134,31 +134,39 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
 
       {!isCollapsed && (
         <div className="space-y-2 mt-3">
-          {checklistItems.map((item) => (
+          {checklistItems.map((item, index) => (
             <div
               key={item.id}
               className={cn(
-                "flex items-center space-x-2 p-2 rounded-md transition-all text-xs",
+                "flex items-center space-x-2 p-2 rounded-md transition-all duration-300 text-xs group hover:scale-[1.02]",
                 item.completed
-                  ? "bg-primary/5 border-primary/10"
-                  : "hover:bg-muted/30"
+                  ? "bg-primary/10 border border-primary/20 shadow-sm"
+                  : "hover:bg-muted/50 border border-transparent hover:border-muted-foreground/10"
               )}
+              style={{ 
+                animationDelay: `${index * 100}ms`,
+                animation: item.completed ? 'pulse 2s ease-in-out' : undefined
+              }}
             >
               <div
                 className={cn(
-                  "w-4 h-4 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
+                  "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-500 flex-shrink-0 relative overflow-hidden",
                   item.completed
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : "border-muted-foreground"
+                    ? "bg-primary border-primary text-primary-foreground scale-110 shadow-sm"
+                    : "border-muted-foreground group-hover:border-primary/50 group-hover:scale-105"
                 )}
               >
-                {item.completed && <Check className="w-2.5 h-2.5" />}
+                {item.completed ? (
+                  <Check className="w-2.5 h-2.5 animate-in zoom-in duration-300" />
+                ) : (
+                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary/30 transition-colors" />
+                )}
               </div>
               
               <div className="flex-1 min-w-0">
                 <h4 className={cn(
-                  "font-medium text-xs line-clamp-2",
-                  item.completed ? "text-foreground" : "text-foreground"
+                  "font-medium text-xs line-clamp-2 transition-colors duration-200",
+                  item.completed ? "text-foreground" : "text-foreground group-hover:text-primary"
                 )}>
                   {item.title}
                 </h4>
@@ -173,19 +181,27 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
                     console.log(`Opening ${item.id} dialog`);
                     item.action();
                   }}
-                  className="h-6 px-2 text-xs shrink-0"
+                  className="h-6 px-2 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:scale-110"
                   title={`Create ${item.title.toLowerCase()}`}
                 >
                   +
                 </Button>
               )}
+
+              {item.completed && (
+                <div className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  ✓ Done
+                </div>
+              )}
             </div>
           ))}
 
           {isFullyCompleted && (
-            <div className="mt-3 p-2 bg-primary/10 rounded-md">
-              <p className="text-xs text-foreground font-medium">
-                ✨ You're all set! Ready to build amazing things.
+            <div className="mt-3 p-2 bg-gradient-to-r from-primary/10 to-primary/5 rounded-md border border-primary/20 animate-in slide-in-from-bottom duration-500">
+              <p className="text-xs text-foreground font-medium flex items-center gap-2">
+                <span className="animate-bounce">✨</span>
+                You're all set! Ready to build amazing things.
+                <span className="animate-pulse">🚀</span>
               </p>
             </div>
           )}
