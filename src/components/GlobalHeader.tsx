@@ -68,8 +68,8 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
               <SidebarTrigger className="md:hidden" />
             )}
             
-            {/* Logo - Hidden on /build route */}
-            {location.pathname !== '/build' && (
+            {/* Logo - Hidden on /build route and prompt enhancer coming soon page */}
+            {location.pathname !== '/build' && location.pathname !== '/prompt-enhancer-coming-soon' && (
               <div 
                 className="flex items-center gap-2 cursor-pointer" 
                 onClick={() => navigate('/')}
