@@ -42,8 +42,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [titleSaving, setTitleSaving] = useState(false);
   const { toast } = useToast();
   const { updatePrompt, updatePromptSilently } = usePrompts();
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
-  const titleSaveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const titleSaveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Rich text editor
   const editor = useEditor({
