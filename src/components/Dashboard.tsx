@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { MinimalHeader } from '@/components/MinimalHeader';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
@@ -151,7 +150,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   return (
     <>
       <div className="flex-1 flex flex-col min-w-0">
-        <MinimalHeader workspace={workspace} />
         
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
