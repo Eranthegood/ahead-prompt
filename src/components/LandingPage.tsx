@@ -267,6 +267,16 @@ export default function LandingPage() {
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+              {/* Placeholder for future image */}
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <Layers className="w-16 h-16 mx-auto opacity-50" />
+                  <p className="text-sm">Multi-Agent Demo Image</p>
+                </div>
+              </div>
+            </div>
+            
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
                 Queue Dozens of Prompts.<br />Run Them All at Once.
@@ -306,16 +316,6 @@ export default function LandingPage() {
                 Try Multi-Agent Free
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
-            </div>
-            
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              {/* Placeholder for future image */}
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                <div className="text-center space-y-2">
-                  <Layers className="w-16 h-16 mx-auto opacity-50" />
-                  <p className="text-sm">Multi-Agent Demo Image</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
