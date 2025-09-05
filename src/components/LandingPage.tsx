@@ -268,13 +268,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              {/* Placeholder for future image */}
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                <div className="text-center space-y-2">
-                  <Layers className="w-16 h-16 mx-auto opacity-50" />
-                  <p className="text-sm">Multi-Agent Demo Image</p>
-                </div>
-              </div>
+              <img src="/lovable-uploads/531f2ab5-a65a-4e09-a1cf-5a9bf9a5563e.png" alt="Cursor Multi-Agent Integration showing parallel prompt processing workflow" className="w-full h-full object-contain" />
             </div>
             
             <div className="space-y-6">
