@@ -58,6 +58,7 @@ export function PromptCard({
   const [isSliding, setIsSliding] = useState(false);
   const [showCursorDialog, setShowCursorDialog] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
+  console.log('PromptCard: useToast import result:', useToast);
   const { toast } = useToast();
   const { sendToCursor, isLoading: cursorLoading, cancelAgent, mergePullRequest, updateAgentStatus } = useCursorIntegration();
   
