@@ -40,6 +40,7 @@ interface DraggableProductItemProps {
   isExpanded: boolean;
   isSelected: boolean;
   selectedEpicId?: string;
+  totalEpicCount?: number;
   onToggleExpanded: () => void;
   onProductSelect: () => void;
   onEpicSelect: (epicId: string) => void;
@@ -54,6 +55,7 @@ export function DraggableProductItem({
   isExpanded,
   isSelected,
   selectedEpicId,
+  totalEpicCount = 0,
   onToggleExpanded,
   onProductSelect,
   onEpicSelect,
@@ -262,20 +264,22 @@ export function DraggableProductItem({
 
           <CollapsibleContent className="pl-7 space-y-1">
             {product.epics.length === 0 ? (
-              <div className="space-y-2 py-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onCreateEpic}
-                  className="w-full h-8 text-xs justify-start gap-2 text-muted-foreground hover:text-foreground border-dashed"
-                >
-                  <Plus className="w-3 h-3" />
-                  Create an Epic
-                </Button>
-                <p className="text-xs text-muted-foreground px-2">
-                  Tip: Create an epic to organize prompts
-                </p>
-              </div>
+              totalEpicCount === 0 && (
+                <div className="space-y-2 py-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onCreateEpic}
+                    className="w-full h-8 text-xs justify-start gap-2 text-muted-foreground hover:text-foreground border-dashed"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Create an Epic
+                  </Button>
+                  <p className="text-xs text-muted-foreground px-2">
+                    Tip: Create an epic to organize prompts
+                  </p>
+                </div>
+              )
             ) : (
               product.epics.map((epic) => (
                 <SidebarMenuButton

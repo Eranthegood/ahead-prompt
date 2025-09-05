@@ -586,6 +586,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                           isExpanded={expandedProducts.has(product.id) || product.epics.length === 0}
                           isSelected={selectedProductId === product.id}
                           selectedEpicId={selectedEpicId}
+                          totalEpicCount={epics.length}
                           onToggleExpanded={() => toggleProductExpanded(product.id)}
                           onProductSelect={() => {
                             console.log('Product clicked:', product.name, product.id);
