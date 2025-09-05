@@ -43,11 +43,6 @@ export default function LandingPage() {
     name: "Mike",
     role: "Indie Hacker"
   }, {
-    img: "https://randomuser.me/api/portraits/men/78.jpg",
-    quote: "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle.",
-    name: "Jeremy",
-    role: "Indie Hacker"
-  }, {
     img: "https://randomuser.me/api/portraits/men/54.jpg",
     quote: "Now I capture every brilliant idea the moment it hits. No more 'wait, what was that fix I thought of?' moments. My development flow is finally uninterrupted.",
     name: "Alex",
