@@ -3,8 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { useKnowledge } from '@/hooks/useKnowledge';
+import { useAuth } from '@/hooks/useAuth';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
+import { RedditPixelService } from '@/services/redditPixelService';
+import { RedditConversionsApiService } from '@/services/redditConversionsApiService';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface CreatePromptData {
@@ -28,6 +31,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const { awardXP } = useGamification();
   const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
   const { trackPromptCreated, trackPromptCompleted } = useMixpanelContext();
+  const { user } = useAuth();
 
   // Helper function to handle optimistic updates with rollback capability
   const withOptimisticUpdate = async <T,>(
@@ -423,6 +427,13 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       epicId: prompt.epic_id || undefined,
       priority: prompt.priority
     });
+
+    // Track Reddit conversion for prompt creation
+    if (user?.id) {
+      console.log('[Reddit Tracking] Prompt created, tracking client & server-side');
+      RedditPixelService.trackPromptCreated(prompt.id, user.id);
+      RedditConversionsApiService.trackPromptCreated(user.id, prompt.id);
+    }
 
     // Success notification
     toast({
