@@ -106,7 +106,7 @@ export function DraggableProductItem({
                       style={{ backgroundColor: product.color || '#6B7280' }}
                     >
                       {(() => {
-                        const IconComponent = getIconComponent(product.icon);
+                        const IconComponent = getIconComponent();
                         return <IconComponent className="w-4 h-4 text-white" />;
                       })()}
                     </div>
@@ -220,7 +220,7 @@ export function DraggableProductItem({
                 >
                    <div className="flex items-center gap-2 min-w-0 flex-1">
                      {(() => {
-                       const IconComponent = getIconComponent(product.icon);
+                       const IconComponent = getIconComponent();
                        return <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: product.color || '#6B7280' }} />;
                      })()}
                      <span className="truncate text-sm font-medium">

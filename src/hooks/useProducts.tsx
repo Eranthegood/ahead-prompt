@@ -8,7 +8,6 @@ export interface CreateProductData {
   name: string;
   description?: string;
   color?: string;
-  icon?: string;
   order_index?: number;
 }
 
@@ -54,7 +53,6 @@ export const useProducts = (workspaceId?: string) => {
       name: productData.name.trim(),
       description: productData.description?.trim() || null,
       color: productData.color || '#3B82F6',
-      icon: productData.icon || 'Package',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -67,7 +65,6 @@ export const useProducts = (workspaceId?: string) => {
         name: productData.name.trim(),
         description: productData.description?.trim() || undefined,
         color: productData.color || '#3B82F6',
-        icon: productData.icon || 'Package',
       };
 
       const { data, error } = await supabase

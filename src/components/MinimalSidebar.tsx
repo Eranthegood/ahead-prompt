@@ -102,7 +102,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     name: '',
     description: '',
     color: '#3B82F6',
-    icon: 'Package',
   });
   const [newEpicData, setNewEpicData] = useState({
     name: '',
@@ -122,7 +121,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     name: '',
     description: '',
     color: '#3B82F6',
-    icon: 'Package',
   });
   const [editEpicData, setEditEpicData] = useState({
     name: '',
@@ -237,13 +235,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         name: newProductData.name.trim(),
         description: newProductData.description.trim() || undefined,
         color: newProductData.color,
-        icon: newProductData.icon,
       });
 
       if (newProduct) {
         onProductSelect(newProduct.id);
         setIsCreateProductOpen(false);
-        setNewProductData({ name: '', description: '', color: '#3B82F6', icon: 'Package' });
+        setNewProductData({ name: '', description: '', color: '#3B82F6' });
       }
     } finally {
       setIsCreating(false);
@@ -291,7 +288,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       name: product.name,
       description: product.description || '',
       color: product.color || '#3B82F6',
-      icon: product.icon || 'Package',
     });
     setIsEditProductOpen(true);
   };
@@ -315,11 +311,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         name: editProductData.name.trim(),
         description: editProductData.description.trim() || undefined,
         color: editProductData.color,
-        icon: editProductData.icon,
       });
 
       setIsEditProductOpen(false);
-      setEditProductData({ name: '', description: '', color: '#3B82F6', icon: 'Package' });
+      setEditProductData({ name: '', description: '', color: '#3B82F6' });
       setEditingProduct(null);
     } catch (error) {
       console.error('Error updating product:', error);
@@ -672,39 +667,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               <Label>Icon & Color</Label>
               
               {/* Icon Selector */}
-              <div className="mt-2 mb-4">
-                <Label className="text-sm text-muted-foreground">Choose an icon</Label>
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  {[
-                    { icon: Package, name: 'Package' },
-                    { icon: Hash, name: 'Hash' },
-                    { icon: FileText, name: 'Document' },
-                    { icon: Plus, name: 'Plus' },
-                    { icon: Settings, name: 'Settings' },
-                    { icon: User, name: 'User' },
-                    { icon: Trophy, name: 'Trophy' },
-                    { icon: BookOpen, name: 'Book' },
-                    { icon: Sparkles, name: 'Sparkles' },
-                    { icon: TrendingUp, name: 'Trending' },
-                    { icon: BarChart3, name: 'Chart' },
-                    { icon: Github, name: 'Github' }
-                  ].map(({ icon: IconComponent, name }) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => setNewProductData(prev => ({ ...prev, icon: name }))}
-                      className={`p-2 rounded-lg border transition-all hover:scale-105 ${
-                        newProductData.icon === name 
-                          ? 'border-primary bg-primary/10 text-primary' 
-                          : 'border-muted hover:border-primary/50'
-                      }`}
-                      title={name}
-                    >
-                      <IconComponent className="w-4 h-4" />
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Color Selector */}
               <div>
@@ -947,40 +909,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             <div>
               <Label>Icon & Color</Label>
               
-              {/* Icon Selector */}
-              <div className="mt-2 mb-4">
-                <Label className="text-sm text-muted-foreground">Choose an icon</Label>
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  {[
-                    { icon: Package, name: 'Package' },
-                    { icon: Hash, name: 'Hash' },
-                    { icon: FileText, name: 'Document' },
-                    { icon: Plus, name: 'Plus' },
-                    { icon: Settings, name: 'Settings' },
-                    { icon: User, name: 'User' },
-                    { icon: Trophy, name: 'Trophy' },
-                    { icon: BookOpen, name: 'Book' },
-                    { icon: Sparkles, name: 'Sparkles' },
-                    { icon: TrendingUp, name: 'Trending' },
-                    { icon: BarChart3, name: 'Chart' },
-                    { icon: Github, name: 'Github' }
-                  ].map(({ icon: IconComponent, name }) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => setEditProductData(prev => ({ ...prev, icon: name }))}
-                      className={`p-2 rounded-lg border transition-all hover:scale-105 ${
-                        editProductData.icon === name 
-                          ? 'border-primary bg-primary/10 text-primary' 
-                          : 'border-muted hover:border-primary/50'
-                      }`}
-                      title={name}
-                    >
-                      <IconComponent className="w-4 h-4" />
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Color Selector */}
               <div>
