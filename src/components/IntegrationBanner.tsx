@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // Logo components as SVGs for scalability
 const LovableLogo = ({ className }: { className?: string }) => (
   <img 
-    src="/lovable-uploads/e521c86b-e7c5-41c2-b990-3147af0e30ce.png" 
+    src="/lovable-uploads/62d647f9-b070-4b25-b438-cdcc2582220a.png" 
     alt="Lovable Logo" 
     className={className}
   />
