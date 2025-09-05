@@ -137,7 +137,7 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
               
               <div className="flex-1 min-w-0">
                 <h4 className={cn(
-                  "font-medium text-xs truncate",
+                  "font-medium text-xs line-clamp-2",
                   item.completed ? "text-foreground" : "text-foreground"
                 )}>
                   {item.title}
