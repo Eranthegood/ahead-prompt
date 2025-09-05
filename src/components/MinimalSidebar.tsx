@@ -7,6 +7,7 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
@@ -371,6 +372,11 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       <Sidebar className="border-r shrink-0" collapsible="icon">
         
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
+          {/* Sidebar Trigger - Always visible at top */}
+          <div className={`${isCollapsed ? 'flex justify-center mb-2' : 'flex justify-end mb-2'}`}>
+            <SidebarTrigger className="h-8 w-8" />
+          </div>
+
           {/* Logo and Brand */}
           {!isCollapsed ? (
             <div className="mb-4 sm:mb-6">
