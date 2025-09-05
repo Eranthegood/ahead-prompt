@@ -167,10 +167,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Reset form when dialog opens
   const resetForm = () => {
     if (!editor) return;
-    console.info('[QuickPromptDialog] resetForm start', {
-      selectedEpicId,
-      selectedProductId,
+    console.info('[QuickPromptDialog] resetForm called', {
+      selectedEpicIdProp: selectedEpicId,
+      selectedProductIdProp: selectedProductId,
       epicsCount: epics.length,
+      productsCount: products.length,
     });
     
     clearDraft();
@@ -179,18 +180,32 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     // Handle epic selection and auto-select parent product
     if (selectedEpicId) {
       const selectedEpicData = epics.find(epic => epic.id === selectedEpicId);
-      console.info('[QuickPromptDialog] found epic', { exists: !!selectedEpicData, productId: selectedEpicData?.product_id });
+      console.info('[QuickPromptDialog] found epic for selectedEpicId', { 
+        epicId: selectedEpicId,
+        exists: !!selectedEpicData, 
+        productId: selectedEpicData?.product_id 
+      });
       if (selectedEpicData) {
         setSelectedEpic(selectedEpicId);
         // Auto-select the parent product
         setSelectedProduct(selectedEpicData.product_id);
+        console.info('[QuickPromptDialog] set epic and product', {
+          epicId: selectedEpicId,
+          productId: selectedEpicData.product_id,
+        });
       } else {
         setSelectedEpic(null);
         setSelectedProduct(selectedProductId || null);
+        console.info('[QuickPromptDialog] epic not found, using product only', {
+          productId: selectedProductId,
+        });
       }
     } else {
       setSelectedEpic(null);
       setSelectedProduct(selectedProductId || null);
+      console.info('[QuickPromptDialog] no epic, using product only', {
+        productId: selectedProductId,
+      });
     }
     
     setSelectedPriority(2);
@@ -346,13 +361,13 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     console.log('Epic selected:', epicId ? epics.find(e => e.id === epicId)?.name : 'none');
   };
 
-  // Reset form when dialog opens
+  // Reset form when dialog opens - only trigger on dialog open/close and when props change
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && editor) {
       // Small delay to ensure dialog is fully rendered
       setTimeout(resetForm, 100);
     }
-  }, [isOpen, editor, selectedProductId, selectedEpicId, products, epics, clearDraft]);
+  }, [isOpen, selectedProductId, selectedEpicId]);
 
   if (!editor) return null;
 
