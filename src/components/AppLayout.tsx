@@ -34,6 +34,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const noSidebarPages = ['/auth'];
   const shouldShowSidebar = user && workspace && !noSidebarPages.includes(location.pathname);
   
+  // Determine default collapsed state - collapsed on non-build pages
+  const shouldBeCollapsedByDefault = location.pathname !== '/build';
+  
   // Pages qui n'ont pas besoin de la barre de recherche
   const noSearchPages = ['/settings', '/profile', '/shortcuts', '/achievements'];
   const shouldShowSearch = !noSearchPages.some(path => location.pathname.startsWith(path));
@@ -46,6 +49,20 @@ export function AppLayout({ children }: AppLayoutProps) {
     setQuickPromptOpen(true);
   };
 
+  // Set up event listener for quick prompt
+  useEffect(() => {
+    const handler = () => {
+      console.log('[AppLayout] open-quick-prompt event received');
+      setQuickPromptOpen(true);
+    };
+    // @ts-ignore - custom event name
+    window.addEventListener('open-quick-prompt', handler as EventListener);
+    return () => {
+      // @ts-ignore - custom event name
+      window.removeEventListener('open-quick-prompt', handler as EventListener);
+    };
+  }, []);
+
   if (shouldShowSidebar) {
     return (
       <PromptsProvider 
@@ -53,7 +70,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
         selectedEpicId={selectedEpicId}
       >
-        <SidebarContent 
+        <SidebarWithContent 
           workspace={workspace}
           selectedProductId={selectedProductId}
           selectedEpicId={selectedEpicId}
@@ -66,15 +83,14 @@ export function AppLayout({ children }: AppLayoutProps) {
           shouldShowHeader={shouldShowHeader}
           shouldShowSearch={shouldShowSearch}
           shouldShowSidebar={shouldShowSidebar}
-          children={React.cloneElement(children as React.ReactElement, { 
-            selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
-            selectedEpicId 
-          })}
+          shouldBeCollapsedByDefault={shouldBeCollapsedByDefault}
+          children={children}
         />
       </PromptsProvider>
     );
   }
 
+  // For non-sidebar pages, still use the same structure but without sidebar
   return (
     <div className="min-h-screen bg-background">
       {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
@@ -85,7 +101,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   );
 }
 
-function SidebarContent({ 
+function SidebarWithContent({ 
   workspace,
   selectedProductId,
   selectedEpicId,
@@ -98,6 +114,7 @@ function SidebarContent({
   shouldShowHeader,
   shouldShowSearch,
   shouldShowSidebar,
+  shouldBeCollapsedByDefault,
   children
 }: {
   workspace: any;
@@ -112,28 +129,13 @@ function SidebarContent({
   shouldShowHeader: boolean;
   shouldShowSearch: boolean;
   shouldShowSidebar: boolean;
+  shouldBeCollapsedByDefault: boolean;
   children: React.ReactNode;
 }) {
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
 
-  const handleQuickAdd = () => {
-    setQuickPromptOpen(true);
-  };
-
-  useEffect(() => {
-    const handler = () => {
-      console.log('[AppLayout] open-quick-prompt event received');
-      setQuickPromptOpen(true);
-    };
-    // @ts-ignore - custom event name
-    window.addEventListener('open-quick-prompt', handler as EventListener);
-    return () => {
-      // @ts-ignore - custom event name
-      window.removeEventListener('open-quick-prompt', handler as EventListener);
-    };
-  }, []);
   const handleSavePrompt = async (promptData: any) => {
     if (promptsContext?.createPrompt) {
       const result = await promptsContext.createPrompt(promptData);
@@ -144,7 +146,7 @@ function SidebarContent({
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
       <div className="min-h-screen w-full bg-background flex">
         <MinimalSidebar 
           workspace={workspace}
@@ -154,7 +156,7 @@ function SidebarContent({
           onEpicSelect={setSelectedEpicId}
           showCompletedItems={preferences.showCompletedItems}
           onToggleCompletedItems={handleToggleCompletedItems}
-          onQuickAdd={handleQuickAdd}
+          onQuickAdd={() => setQuickPromptOpen(true)}
           searchQuery=""
         />
         
