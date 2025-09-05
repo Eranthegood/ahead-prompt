@@ -415,12 +415,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </div>
           )}
 
-          {/* Onboarding Checklist */}
-          {!isCollapsed && (
-            <div className="mb-4">
-              <OnboardingChecklist workspace={workspace} />
-            </div>
-          )}
 
           {/* Add Prompt Action */}
           <div className="mb-4 sm:mb-6">
@@ -622,6 +616,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </SidebarGroupContent>
           </SidebarGroup>
 
+          {/* Onboarding Checklist */}
+          {!isCollapsed && (
+            <SidebarGroup className="mt-4">
+              <SidebarGroupContent>
+                <OnboardingChecklist workspace={workspace} />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
 
           {/* Compact Gamification Display - Fixed at bottom */}
           {!isCollapsed && stats && (
