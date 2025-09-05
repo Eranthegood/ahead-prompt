@@ -121,9 +121,15 @@ export const useAutoSave = ({ key, editor, isOpen, onRestore, onBlurSave }: Auto
       
       const draft = loadDraft();
       if (draft && draft.content && draft.content !== '<p></p>') {
-        editor.commands.setContent(draft.content);
-        onRestore?.(draft.content);
-        hasRestoredRef.current = true;
+        // Only restore if the editor is currently empty to avoid overwriting loaded content
+        if (editor.isEmpty) {
+          editor.commands.setContent(draft.content);
+          onRestore?.(draft.content);
+          hasRestoredRef.current = true;
+        } else {
+          // Skip restoring to preserve existing content loaded by the component
+          // console.debug('useAutoSave: Draft available but editor has content, skipping auto-restore');
+        }
       }
     } else if (!isOpen) {
       hasRestoredRef.current = false;
