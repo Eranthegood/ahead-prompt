@@ -372,26 +372,28 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       <Sidebar className="border-r shrink-0" collapsible="icon">
         
         <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
-          {/* Sidebar Trigger - Always visible at top */}
-          <div className={`${isCollapsed ? 'flex justify-center mb-2' : 'flex justify-end mb-2'}`}>
-            <SidebarTrigger className="h-8 w-8" />
-          </div>
-
           {/* Logo and Brand */}
           {!isCollapsed ? (
             <div className="mb-4 sm:mb-6">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start p-0 h-auto hover:bg-transparent"
-                onClick={() => navigate('/')}
-              >
-                <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
-                  <span>Ahead</span>
-                </h2>
-              </Button>
+              <div className="flex items-center justify-between">
+                <Button 
+                  variant="ghost" 
+                  className="justify-start p-0 h-auto hover:bg-transparent"
+                  onClick={() => navigate('/')}
+                >
+                  <div className="flex items-center gap-2">
+                    <ProcessedLogo className="w-6 h-6" />
+                    <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
+                      <span>Ahead</span>
+                    </h2>
+                  </div>
+                </Button>
+                <SidebarTrigger className="h-5 w-5 shrink-0" />
+              </div>
             </div>
           ) : (
-            <div className="mb-4 sm:mb-6 flex justify-center">
+            <div className="mb-4 sm:mb-6 flex flex-col items-center gap-2">
+              <SidebarTrigger className="h-5 w-5" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
