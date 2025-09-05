@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useNavigate } from 'react-router-dom';
@@ -67,6 +67,11 @@ export function UserAccountSection() {
               <span>Achievements</span>
             </DropdownMenuItem>
             
+            <DropdownMenuItem onClick={() => navigate('/prompt-enhancer')}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              <span>Prompt Enhancer</span>
+            </DropdownMenuItem>
+            
             <DropdownMenuSeparator />
             
             <DropdownMenuItem onClick={signOut}>
@@ -111,6 +116,11 @@ export function UserAccountSection() {
           <DropdownMenuItem onClick={() => navigate('/achievements')}>
             <Trophy className="mr-2 h-4 w-4" />
             <span>Achievements</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => navigate('/prompt-enhancer')}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            <span>Prompt Enhancer</span>
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />

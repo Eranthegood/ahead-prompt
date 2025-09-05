@@ -38,7 +38,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles } from 'lucide-react';
 import { Workspace, Product } from '@/types';
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 

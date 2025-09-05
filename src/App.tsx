@@ -23,6 +23,7 @@ import CursorIntegration from "./pages/CursorIntegration";
 import CursorMultiAgentLanding from "./pages/CursorMultiAgentLanding";
 import GitHubIntegration from "./pages/GitHubIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
+import PromptEnhancer from "./pages/PromptEnhancer";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 
@@ -99,6 +100,11 @@ function App() {
                      <Route path="/achievements" element={
                        <ProtectedRoute>
                          <Achievements />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/prompt-enhancer" element={
+                       <ProtectedRoute>
+                         <PromptEnhancer />
                        </ProtectedRoute>
                      } />
                      <Route path="/theme-demo" element={

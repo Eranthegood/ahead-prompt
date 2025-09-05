@@ -330,6 +330,157 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_enhancer_versions: {
+        Row: {
+          commit_message: string | null
+          created_at: string
+          created_by: string | null
+          enhancer_id: string
+          id: string
+          prompt_template: string
+          system_message: string
+          version_number: number
+        }
+        Insert: {
+          commit_message?: string | null
+          created_at?: string
+          created_by?: string | null
+          enhancer_id: string
+          id?: string
+          prompt_template: string
+          system_message: string
+          version_number: number
+        }
+        Update: {
+          commit_message?: string | null
+          created_at?: string
+          created_by?: string | null
+          enhancer_id?: string
+          id?: string
+          prompt_template?: string
+          system_message?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_enhancer_versions_enhancer_id_fkey"
+            columns: ["enhancer_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_enhancers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_enhancers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          prompt_template: string
+          system_message: string
+          type: Database["public"]["Enums"]["enhancer_type"]
+          updated_at: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          prompt_template: string
+          system_message: string
+          type?: Database["public"]["Enums"]["enhancer_type"]
+          updated_at?: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          prompt_template?: string
+          system_message?: string
+          type?: Database["public"]["Enums"]["enhancer_type"]
+          updated_at?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_enhancers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_test_runs: {
+        Row: {
+          created_at: string
+          enhancer_version_id: string
+          error_message: string | null
+          execution_time: number | null
+          id: string
+          max_tokens: number | null
+          model_used: string
+          status: string
+          temperature: number | null
+          test_input: string
+          test_output: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          enhancer_version_id: string
+          error_message?: string | null
+          execution_time?: number | null
+          id?: string
+          max_tokens?: number | null
+          model_used?: string
+          status?: string
+          temperature?: number | null
+          test_input: string
+          test_output?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          enhancer_version_id?: string
+          error_message?: string | null
+          execution_time?: number | null
+          id?: string
+          max_tokens?: number | null
+          model_used?: string
+          status?: string
+          temperature?: number | null
+          test_input?: string
+          test_output?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_test_runs_enhancer_version_id_fkey"
+            columns: ["enhancer_version_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_enhancer_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_test_runs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompts: {
         Row: {
           created_at: string
@@ -513,7 +664,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      enhancer_type: "system" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -640,6 +791,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      enhancer_type: ["system", "user"],
+    },
   },
 } as const
