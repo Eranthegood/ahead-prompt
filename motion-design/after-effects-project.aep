@@ -1,0 +1,52 @@
+# Adobe After Effects Project Structure
+# This file represents the After Effects project configuration
+# For actual implementation, this would be opened in After Effects
+
+Project Name: Collaborative Repository Activity
+Composition Settings:
+- Width: 1920px
+- Height: 1080px
+- Frame Rate: 30fps
+- Duration: 10 seconds
+- Background Color: #0F172A
+
+Composition Structure:
+1. Background Layer
+   - Grid pattern animation
+   - Subtle background movement
+
+2. Repository Layer
+   - Central repository icon
+   - Pulsing glow effect
+   - Queue section with animated prompt indicators
+
+3. Agent Layers (4 agents)
+   - Agent 1: Generating state (Green)
+   - Agent 2: Coding state (Orange)
+   - Agent 3: PR Ready state (Red)
+   - Agent 4: Merged state (Purple)
+   - Each with floating animation and status updates
+
+4. Flow Lines Layer
+   - Animated connection lines
+   - Data packet animations flowing from agents to repository
+   - Different speeds for each agent
+
+5. Effects Layer
+   - Glow effects
+   - Particle systems
+   - Pulsing animations
+   - Status change animations
+
+Animation Timeline:
+0-2s: Agents appear with stagger effect
+2-4s: Flow lines animate in
+4-6s: Data packets begin flowing
+6-8s: Status changes and interactions
+8-10s: Loop preparation
+
+Key Animation Principles:
+- Smooth ease-in/ease-out transitions
+- Consistent timing for collaborative feel
+- Color-coded workflow states
+- Subtle secondary animations for polish
