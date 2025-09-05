@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { QuickPromptDialog } from './QuickPromptDialog';
+import { MobilePromptFAB } from './MobilePromptFAB';
 import Dashboard from './Dashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -186,6 +187,11 @@ function SidebarWithContent({
           epics={epics}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
           selectedEpicId={selectedEpicId}
+        />
+
+        <MobilePromptFAB 
+          onOpenPrompt={() => setQuickPromptOpen(true)}
+          isQuickPromptOpen={quickPromptOpen}
         />
       </div>
     </SidebarProvider>
