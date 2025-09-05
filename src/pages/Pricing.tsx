@@ -21,10 +21,6 @@ export default function Pricing() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="text-center space-y-8">
-          <BlurFade delay={0.1} inView>
-            
-          </BlurFade>
-
           <BlurFade delay={0.25} inView>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
               Enjoy this tool for{" "}
@@ -45,18 +41,8 @@ export default function Pricing() {
           {/* Free Plan Card */}
           <BlurFade delay={0.6} inView>
             <div className="max-w-md mx-auto mt-12">
-              
+              {/* Content can be added here later */}
             </div>
-          </BlurFade>
-
-          {/* Why Free Section */}
-          <BlurFade delay={0.8} inView>
-            
-          </BlurFade>
-
-          {/* CTA Section */}
-          <BlurFade delay={1.0} inView>
-            
           </BlurFade>
         </div>
       </main>
