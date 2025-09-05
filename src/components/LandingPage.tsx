@@ -6,6 +6,7 @@ import { Footer } from "@/components/ui/footer";
 import DisplayCards from "@/components/ui/display-cards";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
+import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
 // Logo components
 const CursorLogo = ({
   className
@@ -356,7 +357,10 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            
+            {/* Collaborative Animation */}
+            <div className="flex justify-center items-center">
+              <CollaborativeRepoAnimation />
+            </div>
           </div>
         </div>
       </section>
