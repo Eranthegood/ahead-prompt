@@ -97,7 +97,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   
   const handleSwitchToggle = async (checked: boolean) => {
     if (!integrationData.isConfigured) {
-      navigate(integration.configPath);
+      setShowTokenField(true);
       return;
     }
     
