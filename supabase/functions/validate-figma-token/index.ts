@@ -86,7 +86,7 @@ serve(async (req) => {
     }
 
     // Get recent files from teams
-    let recentFiles: FigmaFile[] = [];
+    const recentFiles: FigmaFile[] = [];
     for (const team of teams.slice(0, 3)) { // Limit to first 3 teams
       try {
         const filesResponse = await fetch(`https://api.figma.com/v1/teams/${team.id}/projects`, {

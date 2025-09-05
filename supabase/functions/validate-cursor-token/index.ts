@@ -50,7 +50,7 @@ serve(async (req) => {
 
     if (testResponse.ok) {
       // Token is valid - try to get user info if available
-      let userData = undefined
+      const userData = undefined
       
       // Cursor API might not have a user endpoint, so we'll just validate the token works
       const response: CursorValidationResponse = {

@@ -116,7 +116,7 @@ export function getImprovedColors(foregroundHsl: string, backgroundHsl: string):
   }
 
   let improvedForeground = foregroundHsl;
-  let improvedBackground = backgroundHsl;
+  const improvedBackground = backgroundHsl;
   
   // Increase lightness of foreground for better contrast in dark mode
   const backgroundLightness = parseInt(parseBackground[3]);
