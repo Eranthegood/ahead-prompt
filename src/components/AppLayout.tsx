@@ -132,6 +132,7 @@ function SidebarWithContent({
   shouldBeCollapsedByDefault: boolean;
   children: React.ReactNode;
 }) {
+  const location = useLocation();
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
@@ -145,8 +146,11 @@ function SidebarWithContent({
     return null;
   };
 
+  // Force sidebar to be open on /build page
+  const shouldForceOpen = location.pathname === '/build';
+
   return (
-    <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
+    <SidebarProvider defaultOpen={shouldForceOpen || !shouldBeCollapsedByDefault} open={shouldForceOpen ? true : undefined}>
       <div className="min-h-screen w-full bg-background flex">
         <MinimalSidebar 
           workspace={workspace}
