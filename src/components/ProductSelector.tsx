@@ -6,8 +6,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useProducts } from '@/hooks/useProducts';
-import { Package, Plus, Palette } from 'lucide-react';
+import { Package, Plus, Palette, BookOpen } from 'lucide-react';
+import { KnowledgeModal } from '@/components/KnowledgeModal';
 import type { Product, Workspace } from '@/types';
 
 interface ProductSelectorProps {
@@ -37,6 +39,9 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
   const [newProductName, setNewProductName] = useState('');
   const [newProductDescription, setNewProductDescription] = useState('');
   const [newProductColor, setNewProductColor] = useState('#3B82F6');
+  const [createKnowledge, setCreateKnowledge] = useState(false);
+  const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateProduct = async () => {
@@ -52,14 +57,33 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
 
       if (newProduct) {
         onProductChange(newProduct.id);
-        setIsCreateDialogOpen(false);
-        setNewProductName('');
-        setNewProductDescription('');
-        setNewProductColor('#3B82F6');
+        setCreatedProduct(newProduct);
+        
+        if (createKnowledge) {
+          setIsCreateDialogOpen(false);
+          setIsKnowledgeModalOpen(true);
+        } else {
+          handleCloseDialogs();
+        }
       }
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleCloseDialogs = () => {
+    setIsCreateDialogOpen(false);
+    setIsKnowledgeModalOpen(false);
+    setNewProductName('');
+    setNewProductDescription('');
+    setNewProductColor('#3B82F6');
+    setCreateKnowledge(false);
+    setCreatedProduct(null);
+  };
+
+  const handleKnowledgeModalClose = () => {
+    setIsKnowledgeModalOpen(false);
+    handleCloseDialogs();
   };
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
@@ -181,10 +205,22 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
               </div>
             </div>
 
+            <div className="flex items-center space-x-2 py-2">
+              <Switch
+                id="create-knowledge"
+                checked={createKnowledge}
+                onCheckedChange={setCreateKnowledge}
+              />
+              <Label htmlFor="create-knowledge" className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Add initial knowledge after creating product
+              </Label>
+            </div>
+
             <div className="flex justify-end gap-2 pt-4">
               <Button
                 variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={handleCloseDialogs}
                 disabled={isCreating}
               >
                 Cancel
@@ -193,12 +229,23 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                 onClick={handleCreateProduct}
                 disabled={!newProductName.trim() || isCreating}
               >
-                {isCreating ? 'Creating...' : 'Create'}
+                {isCreating ? 'Creating...' : createKnowledge ? 'Create & Add Knowledge' : 'Create'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Knowledge Modal */}
+      {createdProduct && (
+        <KnowledgeModal
+          open={isKnowledgeModalOpen}
+          onOpenChange={setIsKnowledgeModalOpen}
+          onClose={handleKnowledgeModalClose}
+          workspace={workspace}
+          product={createdProduct}
+        />
+      )}
     </div>
   );
 };

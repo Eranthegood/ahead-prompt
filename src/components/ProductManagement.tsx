@@ -6,9 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useProducts } from '@/hooks/useProducts';
-import { Package, Edit, Trash2, Plus, Palette, MoreVertical } from 'lucide-react';
+import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { KnowledgeModal } from '@/components/KnowledgeModal';
 import type { Product, Workspace } from '@/types';
 
 interface ProductManagementProps {
@@ -33,6 +35,9 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
     description: '',
     color: '#3B82F6',
   });
+  const [createKnowledge, setCreateKnowledge] = useState(false);
+  const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenEdit = (product: Product) => {
@@ -47,7 +52,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
   const handleCloseDialog = () => {
     setEditingProduct(null);
     setIsCreateDialogOpen(false);
+    setIsKnowledgeModalOpen(false);
     setFormData({ name: '', description: '', color: '#3B82F6' });
+    setCreateKnowledge(false);
+    setCreatedProduct(null);
+  };
+
+  const handleKnowledgeModalClose = () => {
+    setIsKnowledgeModalOpen(false);
+    handleCloseDialog();
   };
 
   const handleSubmit = async () => {
@@ -61,14 +74,22 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
           description: formData.description.trim() || undefined,
           color: formData.color,
         });
+        handleCloseDialog();
       } else {
-        await createProduct({
+        const newProduct = await createProduct({
           name: formData.name.trim(),
           description: formData.description.trim() || undefined,
           color: formData.color,
         });
+        
+        if (newProduct && createKnowledge) {
+          setCreatedProduct(newProduct);
+          setIsCreateDialogOpen(false);
+          setIsKnowledgeModalOpen(true);
+        } else {
+          handleCloseDialog();
+        }
       }
-      handleCloseDialog();
     } finally {
       setIsSubmitting(false);
     }
@@ -249,6 +270,21 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
               </div>
             </div>
 
+            {/* Knowledge creation option - only show when creating new product */}
+            {!editingProduct && (
+              <div className="flex items-center space-x-2 py-2">
+                <Switch
+                  id="create-knowledge"
+                  checked={createKnowledge}
+                  onCheckedChange={setCreateKnowledge}
+                />
+                <Label htmlFor="create-knowledge" className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Add initial knowledge after creating product
+                </Label>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2 pt-4">
               <Button
                 variant="outline"
@@ -263,13 +299,24 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
               >
                 {isSubmitting 
                   ? (editingProduct ? 'Updating...' : 'Creating...')
-                  : (editingProduct ? 'Update' : 'Create')
+                  : (editingProduct ? 'Update' : createKnowledge ? 'Create & Add Knowledge' : 'Create')
                 }
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Knowledge Modal */}
+      {createdProduct && (
+        <KnowledgeModal
+          open={isKnowledgeModalOpen}
+          onOpenChange={setIsKnowledgeModalOpen}
+          onClose={handleKnowledgeModalClose}
+          workspace={workspace}
+          product={createdProduct}
+        />
+      )}
     </div>
   );
 };
