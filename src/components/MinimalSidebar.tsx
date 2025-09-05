@@ -575,7 +575,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Create products to organize your prompts and ship faster</p>
+                                <p>Add Product</p>
+                                <p className="text-xs text-muted-foreground">Tip: Helps you ship faster and stay organized</p>
                               </TooltipContent>
                             </Tooltip>
                           </>
