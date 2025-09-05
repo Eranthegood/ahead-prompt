@@ -266,10 +266,10 @@ export default function LandingPage() {
       {/* Cursor Multi-Agent Section */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             <img src="/lovable-uploads/531f2ab5-a65a-4e09-a1cf-5a9bf9a5563e.png" alt="Cursor Multi-Agent Integration showing parallel prompt processing workflow" className="w-80 h-80 object-contain mx-auto" />
             
-            <div className="space-y-6">
+            <div className="space-y-6 lg:col-span-2">
               <h2 className="text-3xl md:text-4xl font-bold">
                 Queue Dozens of Prompts.<br />Run Them All at Once.
               </h2>
