@@ -97,15 +97,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   onCreateProduct,
   onCreateEpic,
 }) => {
-  // Debug logging for props
-  console.info('[QuickPromptDialog] Component rendered with props:', {
-    isOpen,
-    selectedProductId,
-    selectedEpicId,
-    productsCount: products.length,
-    epicsCount: epics.length
-  });
-  // Form state
+  // Form state - maintains user selections for product/epic assignment
   const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
   const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
@@ -173,62 +165,63 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       : epics;
   };
 
-  // Reset form when dialog opens
+  /**
+   * CRITICAL: Product/Epic assignment logic
+   * This function handles the core functionality of auto-assigning prompts to products/epics
+   * when the dialog opens. This logic is essential for the product/epic workflow.
+   */
   const resetForm = () => {
-    if (!editor) return;
-    console.info('[QuickPromptDialog] resetForm called', {
-      selectedEpicIdProp: selectedEpicId,
-      selectedProductIdProp: selectedProductId,
-      epicsCount: epics.length,
-      productsCount: products.length,
-    });
+    if (!editor) {
+      console.error('Editor not available for resetForm');
+      return;
+    }
     
+    // Clear previous form state
     clearDraft();
     editor.commands.setContent('');
     
-    // Handle epic selection and auto-select parent product
+    // CRITICAL LOGIC: Handle epic selection with automatic parent product selection
     if (selectedEpicId) {
+      // Find the epic and validate it exists
       const selectedEpicData = epics.find(epic => epic.id === selectedEpicId);
-      console.info('[QuickPromptDialog] found epic for selectedEpicId', { 
-        epicId: selectedEpicId,
-        exists: !!selectedEpicData, 
-        productId: selectedEpicData?.product_id 
-      });
+      
       if (selectedEpicData) {
+        // Epic found - set both epic and its parent product
         setSelectedEpic(selectedEpicId);
-        // Auto-select the parent product
         setSelectedProduct(selectedEpicData.product_id);
-        console.info('[QuickPromptDialog] set epic and product', {
-          epicId: selectedEpicId,
-          productId: selectedEpicData.product_id,
-        });
+        
+        // Validate epic belongs to a valid product
+        const parentProduct = products.find(p => p.id === selectedEpicData.product_id);
+        if (!parentProduct) {
+          console.warn('Epic found but parent product missing:', {
+            epicId: selectedEpicId,
+            missingProductId: selectedEpicData.product_id
+          });
+        }
       } else {
+        // Epic not found - fallback to product-only selection
+        console.warn('Selected epic not found in available epics:', {
+          selectedEpicId,
+          availableEpicIds: epics.map(e => e.id)
+        });
         setSelectedEpic(null);
         setSelectedProduct(selectedProductId || null);
-        console.info('[QuickPromptDialog] epic not found, using product only', {
-          productId: selectedProductId,
-        });
       }
     } else {
+      // No epic selected - use only product selection
       setSelectedEpic(null);
       setSelectedProduct(selectedProductId || null);
-      console.info('[QuickPromptDialog] no epic, using product only', {
-        productId: selectedProductId,
-      });
     }
     
+    // Reset other form state
     setSelectedPriority(2);
     setHasContent(false);
     setDraftRestored(false);
-    
-    // Reset knowledge selection but keep useKnowledge enabled
     setSelectedKnowledgeIds([]);
     
-    // Focus editor after a brief delay to ensure DOM is ready
+    // Focus editor - removed timeout delay for better performance
     if (editor && editor.view && editor.view.dom) {
-      setTimeout(() => {
-        editor.commands.focus();
-      }, 150);
+      editor.commands.focus();
     }
   };
   // Handle knowledge selection
@@ -254,29 +247,43 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     selectedKnowledgeIds.includes(item.id)
   );
 
-  // Create prompt data object from form state
+  /**
+   * Creates prompt data with proper product/epic assignment validation
+   * This ensures prompts are correctly associated with selected products/epics
+   */
   const createPromptData = (content: string): CreatePromptData => {
-    const inferredProductId = selectedProduct || (selectedEpic ? epics.find(e => e.id === selectedEpic)?.product_id || null : null);
+    // Validate epic-product relationship
+    let finalProductId = selectedProduct;
+    let finalEpicId = selectedEpic;
+    
+    if (selectedEpic) {
+      const epic = epics.find(e => e.id === selectedEpic);
+      if (epic) {
+        // Ensure epic's parent product matches selected product
+        finalProductId = epic.product_id;
+        if (selectedProduct && selectedProduct !== epic.product_id) {
+          console.warn('Epic-Product mismatch corrected:', {
+            selectedProduct,
+            epicProductId: epic.product_id
+          });
+        }
+      } else {
+        // Epic not found - remove invalid selection
+        console.warn('Invalid epic selection removed:', selectedEpic);
+        finalEpicId = null;
+      }
+    }
     
     // Include knowledge context if enabled and items selected
     const knowledgeContext = enableKnowledge && selectedKnowledgeIds.length > 0 
       ? selectedKnowledgeIds 
       : undefined;
     
-    console.log('Creating prompt with data:', {
-      epic_id: selectedEpic,
-      product_id: inferredProductId,
-      priority: selectedPriority,
-      knowledge_context: knowledgeContext,
-      ai_provider: providerConfig.provider,
-      ai_model: providerConfig.model,
-    });
-    
     return {
       title: generateTitleFromContent(content),
       description: content,
-      epic_id: selectedEpic || undefined,
-      product_id: inferredProductId || undefined,
+      epic_id: finalEpicId || undefined,
+      product_id: finalProductId || undefined,
       priority: selectedPriority,
       knowledge_context: knowledgeContext,
       ai_provider: providerConfig.provider,
@@ -307,8 +314,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         priority: selectedPriority,
         contentLength: content.length,
       });
-      
-      console.log(`Prompt creation completed in ${responseTime}ms`);
       
       // Clear draft and show success
       clearDraft();
@@ -367,30 +372,47 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     }
   };
 
-  // Handle product and epic selection
+  /**
+   * Handle product selection with validation
+   * When product changes, clear epic if it doesn't belong to the new product
+   */
   const handleProductChange = (productId: string | null) => {
     setSelectedProduct(productId);
-    console.log('Product selected:', productId ? products.find(p => p.id === productId)?.name : 'none');
+    
+    // Clear epic if it doesn't belong to the newly selected product
+    if (selectedEpic && productId) {
+      const epic = epics.find(e => e.id === selectedEpic);
+      if (epic && epic.product_id !== productId) {
+        setSelectedEpic(null);
+      }
+    }
   };
 
+  /**
+   * Handle epic selection with automatic parent product selection
+   * This ensures epic-product relationship consistency
+   */
   const handleEpicChange = (epicId: string | null) => {
     setSelectedEpic(epicId);
-    console.log('Epic selected:', epicId ? epics.find(e => e.id === epicId)?.name : 'none');
+    
+    // Auto-select parent product when epic is selected
+    if (epicId) {
+      const epic = epics.find(e => e.id === epicId);
+      if (epic) {
+        setSelectedProduct(epic.product_id);
+      }
+    }
   };
 
-  // Reset form when dialog opens - only trigger on dialog open/close and when props change
+  /**
+   * CRITICAL: Dialog lifecycle management
+   * This effect handles form reset when dialog opens or product/epic props change
+   * The resetForm function is the core of product/epic assignment functionality
+   */
   useEffect(() => {
-    console.info('[QuickPromptDialog] useEffect triggered', {
-      isOpen,
-      hasEditor: !!editor,
-      selectedProductId,
-      selectedEpicId
-    });
-    
     if (isOpen && editor) {
-      console.info('[QuickPromptDialog] Calling resetForm in 100ms');
-      // Small delay to ensure dialog is fully rendered
-      setTimeout(resetForm, 100);
+      // Immediate form reset for better UX - no delay needed
+      resetForm();
     }
   }, [isOpen, selectedProductId, selectedEpicId]);
 

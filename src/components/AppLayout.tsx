@@ -22,18 +22,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
   
+  // Product/Epic assignment state - core functionality for prompt association
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
-  
-  // Debug logging for state changes
-  useEffect(() => {
-    console.info('[AppLayout] State changed:', {
-      selectedProductId,
-      selectedEpicId,
-      quickPromptOpen
-    });
-  }, [selectedProductId, selectedEpicId, quickPromptOpen]);
   
   // Pages qui n'ont pas besoin du header - now only auth page 
   const noHeaderPages = ['/auth'];
@@ -58,10 +50,9 @@ export function AppLayout({ children }: AppLayoutProps) {
     setQuickPromptOpen(true);
   };
 
-  // Set up event listener for quick prompt
+  // Global keyboard shortcut handler for quick prompt creation
   useEffect(() => {
     const handler = () => {
-      console.log('[AppLayout] open-quick-prompt event received');
       setQuickPromptOpen(true);
     };
     // @ts-ignore - custom event name
