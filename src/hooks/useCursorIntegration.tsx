@@ -38,20 +38,31 @@ export function useCursorIntegration(): CursorIntegrationHook {
     setIsLoading(true);
     
     try {
-      // First update the prompt status to "sent_to_cursor"
+      // First update the prompt status to "sending" for immediate UI feedback
       await supabase
         .from('prompts')
         .update({
-          status: 'sent_to_cursor',
+          status: 'sending_to_cursor',
           workflow_metadata: {
             repository: config.repository,
             ref: config.ref,
             model: config.model,
             autoCreatePr: config.autoCreatePr,
-            sentAt: new Date().toISOString()
+            startedAt: new Date().toISOString()
           }
         })
         .eq('id', prompt.id);
+
+      toast({
+        title: 'Sending to Cursor...',
+        description: 'Creating background agent for autonomous code generation.',
+      });
+
+      // Generate webhook URL for real-time updates
+      const projectUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:54321'
+        : window.location.origin;
+      const webhookUrl = `${projectUrl}/functions/v1/cursor-webhook`;
 
       // Send to Cursor via edge function
       const { data, error } = await supabase.functions.invoke('send-to-cursor', {
@@ -61,7 +72,8 @@ export function useCursorIntegration(): CursorIntegrationHook {
           ref: config.ref,
           branchName: config.branchName,
           autoCreatePr: config.autoCreatePr,
-          model: config.model
+          model: config.model,
+          webhookUrl // Enable real-time updates
         }
       });
 
@@ -73,16 +85,22 @@ export function useCursorIntegration(): CursorIntegrationHook {
       await supabase
         .from('prompts')
         .update({
-          status: 'cursor_working',
+          status: 'sent_to_cursor',
           cursor_agent_id: data.agent.id,
           cursor_agent_status: data.agent.status,
           cursor_branch_name: data.agent.branch || config.branchName,
           cursor_logs: { 
             created: data.agent,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
+            webhookEnabled: true
           }
         })
         .eq('id', prompt.id);
+
+      toast({
+        title: 'Agent Created Successfully! 🤖',
+        description: `Cursor agent "${data.agent.id}" is now working on your repository.`,
+      });
 
       return data.agent;
     } catch (error) {
@@ -107,20 +125,73 @@ export function useCursorIntegration(): CursorIntegrationHook {
   }, [toast]);
 
   const updateAgentStatus = useCallback(async (agentId: string) => {
-    // TODO: Implement agent status polling
-    // This would call a Cursor API endpoint to get current status
-    console.log('Updating agent status for:', agentId);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-cursor-agent-status', {
+        body: { agentId }
+      });
+
+      if (error || data.error) {
+        console.error('Failed to update agent status:', error || data.error);
+        return;
+      }
+
+      // Update the prompt with latest agent status
+      const { error: updateError } = await supabase
+        .from('prompts')
+        .update({
+          cursor_agent_status: data.agent.status,
+          cursor_logs: {
+            lastUpdated: new Date().toISOString(),
+            statusCheck: data.agent
+          }
+        })
+        .eq('cursor_agent_id', agentId);
+
+      if (updateError) {
+        console.error('Failed to update prompt status:', updateError);
+      }
+
+      return data.agent;
+    } catch (error) {
+      console.error('Error updating agent status:', error);
+    }
   }, []);
 
   const cancelAgent = useCallback(async (agentId: string) => {
-    // TODO: Implement agent cancellation
-    // This would call a Cursor API endpoint to cancel the agent
-    console.log('Cancelling agent:', agentId);
-    
-    toast({
-      title: 'Agent cancelled',
-      description: 'The Cursor agent has been cancelled.',
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('cancel-cursor-agent', {
+        body: { agentId }
+      });
+
+      if (error || data.error) {
+        throw new Error(error?.message || data.error);
+      }
+
+      // Update prompt status back to todo
+      await supabase
+        .from('prompts')
+        .update({
+          status: 'todo',
+          cursor_agent_status: 'CANCELLED',
+          cursor_logs: {
+            cancelled: true,
+            cancelledAt: new Date().toISOString()
+          }
+        })
+        .eq('cursor_agent_id', agentId);
+      
+      toast({
+        title: 'Agent Cancelled',
+        description: 'The Cursor agent has been cancelled successfully.',
+      });
+    } catch (error) {
+      console.error('Error cancelling agent:', error);
+      toast({
+        title: 'Failed to Cancel Agent',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        variant: 'destructive'
+      });
+    }
   }, [toast]);
 
   const mergePullRequest = useCallback(async (prUrl: string) => {
