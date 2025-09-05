@@ -97,6 +97,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   onCreateProduct,
   onCreateEpic,
 }) => {
+  // Debug logging for props
+  console.info('[QuickPromptDialog] Component rendered with props:', {
+    isOpen,
+    selectedProductId,
+    selectedEpicId,
+    productsCount: products.length,
+    epicsCount: epics.length
+  });
   // Form state
   const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
@@ -372,7 +380,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
   // Reset form when dialog opens - only trigger on dialog open/close and when props change
   useEffect(() => {
+    console.info('[QuickPromptDialog] useEffect triggered', {
+      isOpen,
+      hasEditor: !!editor,
+      selectedProductId,
+      selectedEpicId
+    });
+    
     if (isOpen && editor) {
+      console.info('[QuickPromptDialog] Calling resetForm in 100ms');
       // Small delay to ensure dialog is fully rendered
       setTimeout(resetForm, 100);
     }

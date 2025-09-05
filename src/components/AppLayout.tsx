@@ -26,6 +26,15 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   
+  // Debug logging for state changes
+  useEffect(() => {
+    console.info('[AppLayout] State changed:', {
+      selectedProductId,
+      selectedEpicId,
+      quickPromptOpen
+    });
+  }, [selectedProductId, selectedEpicId, quickPromptOpen]);
+  
   // Pages qui n'ont pas besoin du header - now only auth page 
   const noHeaderPages = ['/auth'];
   const shouldShowHeader = !noHeaderPages.includes(location.pathname);
