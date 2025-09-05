@@ -341,7 +341,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-            Your Idea
+            Capture Your Next AI Move
             {draftRestored && (
               <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
                 <RotateCcw className="h-4 w-4" />
