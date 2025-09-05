@@ -333,7 +333,7 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <img src="/lovable-uploads/531f2ab5-a65a-4e09-a1cf-5a9bf9a5563e.png" alt="Cursor Multi-Agent Integration showing parallel prompt processing workflow" className="w-80 h-80 object-contain mx-auto" />
+            
           </div>
         </div>
       </section>
