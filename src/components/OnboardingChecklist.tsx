@@ -29,6 +29,14 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const { knowledgeItems } = useKnowledge(workspace.id);
   const { prompts } = usePrompts(workspace.id);
 
+  // Debug: Log current data state
+  console.log('OnboardingChecklist - Current data:', {
+    products: products?.length || 0,
+    epics: epics?.length || 0,
+    knowledgeItems: knowledgeItems?.length || 0,
+    prompts: prompts?.length || 0
+  });
+
   // Check if user has completed onboarding before
   const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${workspace.id}`) === 'true';
   
