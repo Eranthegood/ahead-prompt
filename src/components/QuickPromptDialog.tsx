@@ -14,6 +14,7 @@ import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
+import { KnowledgeBase } from '@/components/KnowledgeBase';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -109,6 +110,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Knowledge state
   const [enableKnowledge, setEnableKnowledge] = useState(true); // Default enabled
   const [selectedKnowledgeIds, setSelectedKnowledgeIds] = useState<string[]>([]);
+  
+  // Knowledge modal state
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   
   // Load knowledge items
   const productIdForKnowledge = selectedProduct || selectedProductId;
@@ -210,6 +214,15 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         ? prev.filter(id => id !== knowledgeId)
         : [...prev, knowledgeId]
     );
+  };
+
+  // Handle opening knowledge modal
+  const handleOpenKnowledge = () => {
+    setIsKnowledgeModalOpen(true);
+  };
+
+  const handleCloseKnowledge = () => {
+    setIsKnowledgeModalOpen(false);
   };
 
   // Get selected knowledge items
@@ -334,6 +347,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const filteredEpics = getFilteredEpics();
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col"
@@ -471,9 +485,12 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 )}
 
                 {enableKnowledge && knowledgeItems.length === 0 && (
-                  <div className="text-xs text-muted-foreground">
-                    No knowledge available for this product.
-                  </div>
+                  <button 
+                    onClick={handleOpenKnowledge}
+                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer"
+                  >
+                    No knowledge available for this product. Click to add some →
+                  </button>
                 )}
               </div>
             </div>
@@ -494,5 +511,23 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Knowledge Modal */}
+    <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            Knowledge for {products?.find(p => p.id === selectedProduct)?.name || 'Product'}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <KnowledgeBase 
+            workspace={workspace} 
+            product={products?.find(p => p.id === selectedProduct)} 
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
