@@ -128,9 +128,6 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              {/* Placeholder for future image */}
-            </div>
           </div>
         </div>
       </section>
