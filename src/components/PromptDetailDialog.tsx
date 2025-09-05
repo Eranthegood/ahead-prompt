@@ -82,10 +82,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     onBlurSave: handleBlurSave,
   });
 
-  // Reset form when prompt changes (but preserve draft if one exists)
+  // Reset form when prompt changes - always load original content first
   useEffect(() => {
-    if (prompt && editor && !draftRestored) {
-      // Load the original user content (description) into the editor
+    if (prompt && editor) {
+      // Always load the original user content (description) into the editor first
       const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
       
       console.log('PromptDetailDialog: Loading prompt content', {
@@ -109,7 +109,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       const cleanText = stripHtmlAndNormalize(originalContent);
       setTextLength(cleanText.length);
     }
-  }, [prompt, editor, draftRestored]);
+  }, [prompt, editor]);
 
   const handleRegeneratePrompt = async () => {
     if (!editor || !prompt) return;
