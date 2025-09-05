@@ -24,7 +24,8 @@ export default function Settings() {
   } = useTheme();
   const {
     preferences,
-    saveCompletedItemsPreference
+    saveCompletedItemsPreference,
+    saveAutoSavePreference
   } = useUserPreferences();
   const {
     hasUnlockedFeature
@@ -106,10 +107,13 @@ export default function Settings() {
                 <div className="space-y-0.5">
                   <Label>Auto-save</Label>
                   <p className="text-sm text-muted-foreground">
-                    Automatically save changes as you type
+                    Automatically save changes when you stop typing (disabled by default for better UX)
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch 
+                  checked={preferences.autoSaveEnabled} 
+                  onCheckedChange={saveAutoSavePreference} 
+                />
               </div>
 
               <div className="flex items-center justify-between">

@@ -7,6 +7,7 @@ interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   compactMode: boolean;
   gamificationEnabled: boolean;
+  autoSaveEnabled: boolean;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -18,6 +19,7 @@ const defaultPreferences: UserPreferences = {
   theme: 'light', // Default to light theme to avoid dark mode issues before unlock
   compactMode: false,
   gamificationEnabled: false, // Disabled by default
+  autoSaveEnabled: false, // Disabled by default for better UX
 };
 
 export const useUserPreferences = () => {
@@ -87,6 +89,13 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save auto-save preference
+  const saveAutoSavePreference = (enabled: boolean) => {
+    updatePreferences({
+      autoSaveEnabled: enabled,
+    });
+  };
+
   return {
     preferences,
     loading,
@@ -96,5 +105,6 @@ export const useUserPreferences = () => {
     saveThemePreference,
     saveCompactModePreference,
     saveGamificationPreference,
+    saveAutoSavePreference,
   };
 };
