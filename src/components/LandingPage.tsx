@@ -267,9 +267,7 @@ export default function LandingPage() {
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              <img src="/lovable-uploads/531f2ab5-a65a-4e09-a1cf-5a9bf9a5563e.png" alt="Cursor Multi-Agent Integration showing parallel prompt processing workflow" className="w-full h-full object-contain" />
-            </div>
+            <img src="/lovable-uploads/531f2ab5-a65a-4e09-a1cf-5a9bf9a5563e.png" alt="Cursor Multi-Agent Integration showing parallel prompt processing workflow" className="w-80 h-80 object-contain mx-auto" />
             
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
