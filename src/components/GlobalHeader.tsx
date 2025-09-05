@@ -83,22 +83,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 </div>
               </div>
             )}
-
-            {/* Desktop Navigation - only show if not showing sidebar */}
-            {!showSidebarTrigger && (
-              <nav className="hidden md:flex items-center gap-6">
-                {navItems.map((item) => (
-                  <Button
-                    key={item.path}
-                    variant="ghost"
-                    onClick={() => handleNavigate(item.path)}
-                    className={`text-sm ${isActivePage(item.path) ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-              </nav>
-            )}
           </div>
 
           {/* Center - Search Bar */}
@@ -119,19 +103,39 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             </div>
           )}
 
-          {/* Right side - User actions */}
+          {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
             {/* Sidebar Trigger for authenticated users (only when sidebar is available on mobile) */}
             {showSidebarTrigger && user && (
               <SidebarTrigger className="md:hidden" />
             )}
             
+            {/* Always show Features and Pricing CTAs */}
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="ghost" onClick={() => handleNavigate('/cursor-multi-agent')}>
+                Features
+              </Button>
+              <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
+                Pricing
+              </Button>
+            </div>
+
+            {/* Mobile menu toggle */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              </Button>
+            </div>
+            
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
-              // Authenticated user - sidebar contains profile access
+              // Authenticated user - show XP badge
               <>
-                {/* XP Badge for authenticated users */}
                 {stats && (
                   <Badge variant="secondary" className="hidden sm:flex">
                     <Trophy className="w-3 h-3 mr-1" />
@@ -140,38 +144,16 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 )}
               </>
             ) : (
-              // Non-authenticated user actions
-              <>
-                {/* Mobile menu for non-auth users */}
-                <div className="md:hidden">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  >
-                    {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-                  </Button>
-                </div>
-
-                {/* Desktop buttons for non-auth users */}
-                <div className="hidden md:flex items-center gap-2">
-                  <Button variant="ghost" onClick={() => handleNavigate('/cursor-multi-agent')}>
-                    Features
-                  </Button>
-                  <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
-                    Pricing
-                  </Button>
-                  <Button onClick={() => handleNavigate('/auth')}>
-                    Sign In
-                  </Button>
-                </div>
-              </>
+              // Non-authenticated user - show sign in
+              <Button onClick={() => handleNavigate('/auth')} className="hidden md:flex">
+                Sign In
+              </Button>
             )}
           </div>
         </div>
 
-        {/* Mobile menu for non-authenticated users */}
-        {!user && mobileMenuOpen && (
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
           <div className="md:hidden border-t border-border bg-background">
             <div className="container py-4 space-y-2">
               <Button
@@ -188,12 +170,14 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
               >
                 Pricing
               </Button>
-              <Button
-                className="w-full"
-                onClick={() => handleNavigate('/auth')}
-              >
-                Sign In
-              </Button>
+              {!user && (
+                <Button
+                  className="w-full"
+                  onClick={() => handleNavigate('/auth')}
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         )}
