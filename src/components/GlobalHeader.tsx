@@ -122,8 +122,8 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
           {/* Right side - User actions */}
           <div className="flex items-center gap-2">
-            {/* Sidebar Trigger for authenticated users */}
-            {user && (
+            {/* Sidebar Trigger for authenticated users (only when sidebar is available) */}
+            {showSidebarTrigger && user && (
               <SidebarTrigger />
             )}
             
