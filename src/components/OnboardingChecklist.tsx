@@ -84,98 +84,88 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const progressPercentage = (completedCount / totalCount) * 100;
 
   return (
-    <Card className="mb-6 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-foreground">
-              {isFullyCompleted ? '🎉 Félicitations !' : '👋 Bienvenue sur Ahead.love'}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              {isFullyCompleted 
-                ? 'Vous avez terminé la configuration initiale !' 
-                : `Complétez ces étapes pour bien démarrer (${completedCount}/${totalCount})`
-              }
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="ml-4"
-          >
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-          </Button>
+    <div className="border-b border-border/50 pb-4 mb-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-foreground">
+            {isFullyCompleted ? '🎉 Setup complet' : '👋 Setup'}
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            {completedCount}/{totalCount} étapes
+          </p>
         </div>
-        
-        {/* Progress bar */}
-        <div className="w-full bg-muted rounded-full h-2 mt-3">
-          <div 
-            className="bg-primary h-2 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
-      </CardHeader>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="h-6 w-6 p-0"
+        >
+          {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+        </Button>
+      </div>
+      
+      {/* Progress bar */}
+      <div className="w-full bg-muted rounded-full h-1.5">
+        <div 
+          className="bg-primary h-1.5 rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${progressPercentage}%` }}
+        />
+      </div>
 
       {!isCollapsed && (
-        <CardContent className="pt-0">
-          <div className="space-y-3">
-            {checklistItems.map((item) => (
+        <div className="space-y-2 mt-3">
+          {checklistItems.map((item) => (
+            <div
+              key={item.id}
+              className={cn(
+                "flex items-center space-x-2 p-2 rounded-md transition-all text-xs",
+                item.completed
+                  ? "bg-primary/5 border-primary/10"
+                  : "hover:bg-muted/30"
+              )}
+            >
               <div
-                key={item.id}
                 className={cn(
-                  "flex items-center space-x-3 p-3 rounded-lg border transition-all",
+                  "w-4 h-4 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
                   item.completed
-                    ? "bg-primary/10 border-primary/20"
-                    : "bg-background border-border hover:border-primary/30"
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-muted-foreground"
                 )}
               >
-                <div
-                  className={cn(
-                    "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                    item.completed
-                      ? "bg-primary border-primary text-primary-foreground"
-                      : "border-muted-foreground"
-                  )}
-                >
-                  {item.completed && <Check className="w-3 h-3" />}
-                </div>
-                
-                <div className="flex-1">
-                  <h4 className={cn(
-                    "font-medium text-sm",
-                    item.completed ? "text-foreground" : "text-foreground"
-                  )}>
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-
-                {!item.completed && item.action && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={item.action}
-                    className="shrink-0"
-                  >
-                    Créer
-                  </Button>
-                )}
+                {item.completed && <Check className="w-2.5 h-2.5" />}
               </div>
-            ))}
-          </div>
+              
+              <div className="flex-1 min-w-0">
+                <h4 className={cn(
+                  "font-medium text-xs truncate",
+                  item.completed ? "text-foreground" : "text-foreground"
+                )}>
+                  {item.title}
+                </h4>
+              </div>
+
+              {!item.completed && item.action && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={item.action}
+                  className="h-6 px-2 text-xs shrink-0"
+                >
+                  +
+                </Button>
+              )}
+            </div>
+          ))}
 
           {isFullyCompleted && (
-            <div className="mt-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-              <p className="text-sm text-foreground font-medium">
-                ✨ Parfait ! Vous êtes prêt à utiliser Ahead.love pour booster votre productivité !
+            <div className="mt-3 p-2 bg-primary/10 rounded-md">
+              <p className="text-xs text-foreground font-medium">
+                ✨ Setup terminé !
               </p>
             </div>
           )}
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </div>
   );
 };

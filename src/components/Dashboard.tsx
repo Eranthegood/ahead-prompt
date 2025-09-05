@@ -3,7 +3,6 @@ import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
-import { OnboardingChecklist } from '@/components/OnboardingChecklist';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -155,10 +154,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
-        {/* Onboarding Checklist for first-time users */}
-        <div className="px-6 pt-6">
-          <OnboardingChecklist workspace={workspace} />
-        </div>
         
         <MinimalPromptList
           workspace={workspace} 

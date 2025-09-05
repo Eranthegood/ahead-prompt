@@ -47,6 +47,7 @@ import { useNavigate } from 'react-router-dom';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
 import { UserAccountSection } from './UserAccountSection';
 import { ProcessedLogo } from './ProcessedLogo';
+import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 
 interface MinimalSidebarProps {
@@ -411,6 +412,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   <p>Ahead - Go Home</p>
                 </TooltipContent>
               </Tooltip>
+            </div>
+          )}
+
+          {/* Onboarding Checklist */}
+          {!isCollapsed && (
+            <div className="mb-4">
+              <OnboardingChecklist workspace={workspace} />
             </div>
           )}
 
