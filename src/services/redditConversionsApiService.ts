@@ -1,5 +1,6 @@
 // Reddit Conversions API service for server-side tracking
 import { supabase } from '@/integrations/supabase/client';
+import { BrowserDataCollector, UserData, EventMetadata, ProductData } from '@/utils/browserDataCollector';
 
 export interface ConversionEvent {
   eventType: 'Purchase' | 'SignUp' | 'ViewContent' | 'Custom';
@@ -13,6 +14,10 @@ export interface ConversionEvent {
   contentId?: string;
   promptId?: string;
   testMode?: boolean;
+  // Enhanced Reddit API parameters
+  click_id?: string;
+  user?: UserData;
+  event_metadata?: EventMetadata;
 }
 
 export class RedditConversionsApiService {
@@ -23,9 +28,26 @@ export class RedditConversionsApiService {
     return `${prefix}_${identifier}_${timestamp}_${random}`;
   }
 
-  private static async sendConversion(event: ConversionEvent): Promise<boolean> {
+  private static async sendConversion(event: ConversionEvent, enhanceWithBrowserData = true): Promise<boolean> {
     try {
-      console.log('[Reddit Conversions API] Sending conversion:', event);
+      // Enhance event with browser data if requested and not already provided
+      if (enhanceWithBrowserData && !event.user) {
+        event.user = await BrowserDataCollector.collectEnhancedUserData(event.userEmail, event.userId);
+      }
+
+      // Create event metadata if not provided
+      if (!event.event_metadata && event.conversionId) {
+        event.event_metadata = BrowserDataCollector.createEventMetadata(event.conversionId, {
+          currency: event.currency,
+          valueDecimal: event.value,
+          itemCount: 1,
+        });
+      }
+
+      console.log('[Reddit Conversions API] Sending enhanced conversion:', {
+        ...event,
+        user: event.user ? { ...event.user, ip_address: '[REDACTED]' } : undefined
+      });
       
       const { data, error } = await supabase.functions.invoke('send-reddit-conversion', {
         body: { event }
@@ -50,8 +72,24 @@ export class RedditConversionsApiService {
   }
 
   // Track when user creates their first prompt (main conversion event)
-  static async trackFirstPromptCreated(userId: string, testMode = false): Promise<boolean> {
+  static async trackFirstPromptCreated(
+    userId: string, 
+    promptData?: { promptId?: string; promptTitle?: string },
+    testMode = false
+  ): Promise<boolean> {
     const conversionId = this.generateConversionId('first_prompt', userId);
+    
+    // Create product data for the prompt
+    const products = promptData?.promptId ? [
+      BrowserDataCollector.createPromptProduct(promptData.promptId, promptData.promptTitle)
+    ] : undefined;
+
+    const eventMetadata = BrowserDataCollector.createEventMetadata(conversionId, {
+      currency: 'USD',
+      valueDecimal: 1.0,
+      itemCount: 1,
+      products
+    });
     
     return await this.sendConversion({
       eventType: 'Purchase',
@@ -60,13 +98,26 @@ export class RedditConversionsApiService {
       userId: userId,
       value: 1.0,
       currency: 'USD',
+      promptId: promptData?.promptId,
+      event_metadata: eventMetadata,
       testMode
     });
   }
 
-  // Track other engagement events
-  static async trackPromptCreated(promptId: string, userId: string, testMode = false): Promise<boolean> {
+  // Track other engagement events with enhanced data
+  static async trackPromptCreated(
+    promptId: string, 
+    userId: string, 
+    promptTitle?: string,
+    testMode = false
+  ): Promise<boolean> {
     const conversionId = this.generateConversionId('prompt', `${promptId}_${userId}`);
+    
+    const products = [BrowserDataCollector.createPromptProduct(promptId, promptTitle)];
+    const eventMetadata = BrowserDataCollector.createEventMetadata(conversionId, {
+      itemCount: 1,
+      products
+    });
     
     return await this.sendConversion({
       eventType: 'Custom',
@@ -74,6 +125,7 @@ export class RedditConversionsApiService {
       conversionId: conversionId,
       userId: userId,
       promptId: promptId,
+      event_metadata: eventMetadata,
       testMode
     });
   }

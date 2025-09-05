@@ -6,6 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface UserData {
+  ip_address?: string;
+  user_agent?: string;
+  screen_dimensions?: {
+    width: number;
+    height: number;
+  };
+  email?: string;
+  phone_number?: string;
+  external_id?: string;
+  idfa?: string;
+  aaid?: string;
+  uuid?: string;
+}
+
+interface ProductData {
+  id: string;
+  name: string;
+  category?: string;
+}
+
+interface EventMetadata {
+  item_count?: number;
+  currency?: string;
+  value_decimal?: number;
+  conversion_id: string;
+  products?: ProductData[];
+}
+
 interface ConversionEvent {
   eventType: 'Purchase' | 'SignUp' | 'ViewContent' | 'Custom';
   customEventName?: string;
@@ -18,6 +47,10 @@ interface ConversionEvent {
   contentId?: string;
   promptId?: string;
   testMode?: boolean;
+  // Enhanced Reddit API parameters
+  click_id?: string;
+  user?: UserData;
+  event_metadata?: EventMetadata;
 }
 
 serve(async (req) => {
@@ -45,31 +78,42 @@ serve(async (req) => {
     const redditAccountId = 'a2_hm56jybr1umg';
     const redditApiUrl = `https://ads-api.reddit.com/api/v2.0/conversions/events/${redditAccountId}`;
 
-    // Prepare event data for Reddit API
+    // Prepare event data for Reddit API with enhanced parameters
+    const eventPayload: any = {
+      event_at: new Date().toISOString(),
+      event_type: event.eventType === 'Custom' 
+        ? {
+            tracking_type: 'Custom',
+            custom_event_name: event.customEventName
+          }
+        : {
+            tracking_type: event.eventType
+          },
+      // Include additional conversion data
+      conversion_id: event.conversionId,
+      ...(event.userId && { user_id: event.userId }),
+      ...(event.userEmail && { email: event.userEmail }),
+      ...(event.value && { value: event.value }),
+      ...(event.currency && { currency: event.currency }),
+      ...(event.contentType && { content_type: event.contentType }),
+      ...(event.contentId && { content_id: event.contentId }),
+      ...(event.promptId && { prompt_id: event.promptId }),
+      ...(event.click_id && { click_id: event.click_id })
+    };
+
+    // Add user identification data if provided
+    if (event.user) {
+      eventPayload.user = event.user;
+    }
+
+    // Add event metadata if provided
+    if (event.event_metadata) {
+      eventPayload.event_metadata = event.event_metadata;
+    }
+
     const eventData = {
       test_mode: event.testMode || false,
-      events: [
-        {
-          event_at: new Date().toISOString(),
-          event_type: event.eventType === 'Custom' 
-            ? {
-                tracking_type: 'Custom',
-                custom_event_name: event.customEventName
-              }
-            : {
-                tracking_type: event.eventType
-              },
-          // Include additional conversion data
-          conversion_id: event.conversionId,
-          ...(event.userId && { user_id: event.userId }),
-          ...(event.userEmail && { email: event.userEmail }),
-          ...(event.value && { value: event.value }),
-          ...(event.currency && { currency: event.currency }),
-          ...(event.contentType && { content_type: event.contentType }),
-          ...(event.contentId && { content_id: event.contentId }),
-          ...(event.promptId && { prompt_id: event.promptId })
-        }
-      ]
+      events: [eventPayload]
     };
 
     console.log('[Reddit Conversions API] Sending event data:', JSON.stringify(eventData, null, 2));
