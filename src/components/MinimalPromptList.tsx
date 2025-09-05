@@ -108,11 +108,33 @@ export function MinimalPromptList({
           return scoreB - scoreA;
         }
       }
-      // First, sort by status - in_progress prompts always come first
-      if (a.status === 'in_progress' && b.status !== 'in_progress') {
+      // Define status priority order - Cursor workflows and in_progress come first
+      const cursorWorkflowStatuses = ['sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'pr_merged'];
+      const isACursorWorkflow = cursorWorkflowStatuses.includes(a.status);
+      const isBCursorWorkflow = cursorWorkflowStatuses.includes(b.status);
+      
+      // Cursor workflow prompts always come first
+      if (isACursorWorkflow && !isBCursorWorkflow) {
         return -1;
       }
-      if (b.status === 'in_progress' && a.status !== 'in_progress') {
+      if (isBCursorWorkflow && !isACursorWorkflow) {
+        return 1;
+      }
+      
+      // Within Cursor workflows, maintain their workflow order
+      if (isACursorWorkflow && isBCursorWorkflow) {
+        const aIndex = cursorWorkflowStatuses.indexOf(a.status);
+        const bIndex = cursorWorkflowStatuses.indexOf(b.status);
+        if (aIndex !== bIndex) {
+          return aIndex - bIndex;
+        }
+      }
+      
+      // Then in_progress prompts come next
+      if (a.status === 'in_progress' && b.status !== 'in_progress' && !isBCursorWorkflow) {
+        return -1;
+      }
+      if (b.status === 'in_progress' && a.status !== 'in_progress' && !isACursorWorkflow) {
         return 1;
       }
       
