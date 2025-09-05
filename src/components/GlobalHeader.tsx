@@ -104,10 +104,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
-            {/* Sidebar Trigger for authenticated users (only when sidebar is available on mobile) */}
-            {showSidebarTrigger && user && (
-              <SidebarTrigger className="md:hidden" />
-            )}
             
             {/* Always show Pricing CTA */}
             <div className="hidden md:flex items-center gap-2">
