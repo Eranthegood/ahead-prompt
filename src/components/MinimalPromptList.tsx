@@ -341,7 +341,7 @@ export function MinimalPromptList({
                 <h3 className="text-2xl font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                   {searchQuery ? 'No prompts found' : 'Start Building Something Amazing'}
                 </h3>
-                <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-md text-center mx-auto">
                   {searchQuery 
                     ? 'Try adjusting your search query to find what you\'re looking for'
                     : 'Create your first AI prompt and accelerate your development workflow by 4x'
