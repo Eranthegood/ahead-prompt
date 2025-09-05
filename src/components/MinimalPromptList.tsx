@@ -342,6 +342,9 @@ export function MinimalPromptList({
                   : 'Create your first AI prompt and accelerate your development workflow by 4x'
                 }
               </p>
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">T</kbd> for bugs
+              </p>
             </div>
           </div>
         </div>
