@@ -29,13 +29,14 @@ export function useCursorAgentPolling({
   const [lastPolled, setLastPolled] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout>();
+  const lastStatusRef = useRef<string | null>(null);
+  const failureCountRef = useRef<number>(0);
   const { toast } = useToast();
-
   const pollAgentStatus = async (currentAgentId: string) => {
     try {
       setError(null);
       console.log('Polling Cursor agent status:', currentAgentId);
-      
+
       const { data, error } = await supabase.functions.invoke('get-cursor-agent-status', {
         body: { agentId: currentAgentId }
       });
@@ -43,55 +44,87 @@ export function useCursorAgentPolling({
       if (error) {
         console.error('Polling error:', error);
         setError(error.message);
+        failureCountRef.current = Math.min(failureCountRef.current + 1, 5);
+        // Light retry backoff on error (does not interfere with main interval)
+        const delay = 1000 * Math.pow(2, failureCountRef.current - 1);
+        setTimeout(() => agentId && pollAgentStatus(agentId), delay);
         return;
       }
 
       if (data?.error) {
         console.error('Cursor API error:', data.error);
         setError(data.error);
+        failureCountRef.current = Math.min(failureCountRef.current + 1, 5);
         return;
       }
 
       if (data?.agent) {
         setLastPolled(new Date());
         onStatusUpdate?.(data.agent);
-        
-        // If agent is completed or failed, stop polling
-        if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(data.agent.status)) {
-          setIsPolling(false);
-          
-          if (data.agent.status === 'COMPLETED') {
-            toast({
-              title: 'Cursor Agent Completed! 🎉',
-              description: data.agent.pullRequestUrl 
-                ? 'A pull request has been created with your changes.'
-                : 'The code changes have been completed.',
-            });
-          } else if (data.agent.status === 'FAILED') {
-            toast({
-              title: 'Cursor Agent Failed',
-              description: data.agent.error || 'The agent encountered an error.',
-              variant: 'destructive'
-            });
+
+        // Reset failures on success
+        failureCountRef.current = 0;
+
+        const newStatus = (data.agent.status || '').toUpperCase();
+        const prevStatus = (lastStatusRef.current || '').toUpperCase();
+
+        if (newStatus && newStatus !== prevStatus) {
+          lastStatusRef.current = newStatus;
+
+          // Toasts for status changes
+          switch (newStatus) {
+            case 'QUEUED':
+            case 'PENDING':
+              toast({ title: 'Cursor Agent Queued', description: 'Your request is queued and will start soon.' });
+              break;
+            case 'RUNNING':
+              toast({ title: '🤖 Agent Working', description: 'Cursor agent is coding the changes.' });
+              break;
+            case 'CANCELLED':
+              toast({ title: 'Agent Cancelled', description: 'The agent has been cancelled.' });
+              break;
+            case 'COMPLETED':
+              toast({
+                title: 'Cursor Agent Completed! 🎉',
+                description: data.agent.pullRequestUrl
+                  ? 'A pull request has been created with your changes.'
+                  : 'The code changes have been completed.'
+              });
+              break;
+            case 'FAILED':
+              toast({ title: 'Cursor Agent Failed', description: data.agent.error || 'The agent encountered an error.', variant: 'destructive' });
+              break;
           }
+
+          // PR creation notification
+          if (data.agent.pullRequestUrl) {
+            toast({ title: 'Pull Request Created', description: 'View the PR to review and merge your changes.' });
+          }
+        }
+
+        // If agent is completed or failed, stop polling
+        if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(newStatus)) {
+          setIsPolling(false);
         }
       }
     } catch (err) {
       console.error('Polling request failed:', err);
       setError(err instanceof Error ? err.message : 'Polling failed');
+      failureCountRef.current = Math.min(failureCountRef.current + 1, 5);
     }
   };
 
   const startPolling = () => {
     if (!agentId || isPolling) return;
-    
     console.log('Starting Cursor agent polling for:', agentId);
     setIsPolling(true);
     setError(null);
-    
+    failureCountRef.current = 0;
+    lastStatusRef.current = null;
+
     // Poll immediately
     pollAgentStatus(agentId);
-    
+
     // Then poll at intervals
     intervalRef.current = setInterval(() => {
       pollAgentStatus(agentId);
@@ -105,6 +138,7 @@ export function useCursorAgentPolling({
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
     }
+    failureCountRef.current = 0;
   };
 
   // Effect to handle polling based on enabled state and agentId

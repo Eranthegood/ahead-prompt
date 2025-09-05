@@ -63,13 +63,13 @@ export function PromptCard({
   
   // Real-time agent polling for active Cursor agents
   const isAgentActive = ['sent_to_cursor', 'cursor_working'].includes(prompt.status);
-  const { isPolling } = useCursorAgentPolling({
+  const { isPolling, lastPolled } = useCursorAgentPolling({
     agentId: prompt.cursor_agent_id,
     enabled: isAgentActive,
     interval: 15000, // Poll every 15 seconds for active agents
     onStatusUpdate: (agent) => {
       console.log('Agent status update:', agent);
-      // The webhook will handle database updates, this is just for logging
+      if (agent?.id) updateAgentStatus(agent.id);
     }
   });
   const priority = prompt.priority || 3;
@@ -152,7 +152,7 @@ export function PromptCard({
                     )}
                     
                     {/* Cursor Agent Working Indicator */}
-                    {prompt.status === 'cursor_working' && (
+                    {['sent_to_cursor', 'cursor_working'].includes(prompt.status) && (
                       <AgentWorkingIndicator size="sm" className="ml-1" />
                     )}
                     
