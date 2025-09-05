@@ -263,6 +263,64 @@ export default function LandingPage() {
       </section>
 
 
+      {/* Cursor Multi-Agent Section */}
+      <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Queue Dozens of Prompts.<br />Run Them All at Once.
+              </h2>
+              
+              <h3 className="text-xl font-semibold text-primary">
+                Cursor Multi-Agent Integration
+              </h3>
+               
+              <p className="text-xl text-muted-foreground">
+                Stop waiting for AI one prompt at a time. Queue 10, 20, even 50 related prompts in Ahead, then push them all to Cursor Agent with one click.
+              </p>
+               
+              <div className="space-y-4">
+                <h4 className="font-semibold">The new workflow:</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Queue dozens of prompts</strong> while you think</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>One-click batch export</strong> to Cursor</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Multiple AI agents</strong> work simultaneously</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Ship features 4x faster</strong></span>
+                  </div>
+                </div>
+              </div>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                Try Multi-Agent Free
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
+              {/* Placeholder for future image */}
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <Layers className="w-16 h-16 mx-auto opacity-50" />
+                  <p className="text-sm">Multi-Agent Demo Image</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
       href: "/",
