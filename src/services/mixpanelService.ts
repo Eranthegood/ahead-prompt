@@ -11,6 +11,8 @@ class MixpanelService {
   constructor() {
     this.init();
     this.loadExcludedUsers();
+    // Auto refresh excluded users every 5 minutes
+    setInterval(() => this.loadExcludedUsers(), 5 * 60 * 1000);
   }
 
   private init() {

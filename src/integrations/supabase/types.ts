@@ -250,6 +250,78 @@ export type Database = {
           },
         ]
       }
+      kv_store_bd163058: {
+        Row: {
+          key: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      mixpanel_excluded_users: {
+        Row: {
+          created_at: string
+          excluded_by: string
+          id: string
+          reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          excluded_by: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          excluded_by?: string
+          id?: string
+          reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mixpanel_exclusion_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          mixpanel_response: string | null
+          performed_by: string
+          success: boolean | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          mixpanel_response?: string | null
+          performed_by: string
+          success?: boolean | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          mixpanel_response?: string | null
+          performed_by?: string
+          success?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           color: string | null
