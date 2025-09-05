@@ -12,7 +12,7 @@ export default function PromptEnhancerComingSoon() {
           <Badge variant="secondary" className="text-xs">Soon</Badge>
         </div>
         <p className="text-muted-foreground text-lg">
-          Nous travaillons sur quelque chose d'incroyable pour améliorer vos prompts AI
+          We're building something incredible to enhance your AI prompts
         </p>
       </div>
 
@@ -21,12 +21,12 @@ export default function PromptEnhancerComingSoon() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wand2 className="h-5 w-5 text-primary" />
-              Amélioration Intelligente
+              Intelligent Enhancement
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Transformez vos idées brutes en prompts optimisés grâce à notre IA avancée qui comprend le contexte et les meilleures pratiques.
+              Transform your raw ideas into optimized prompts with our advanced AI that understands context and best practices.
             </p>
           </CardContent>
         </Card>
@@ -35,12 +35,12 @@ export default function PromptEnhancerComingSoon() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Templates Spécialisés
+              Specialized Templates
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Accédez à une bibliothèque de templates pré-conçus pour différents cas d'usage : code, design, marketing, et plus encore.
+              Access a library of pre-built templates for different use cases: code, design, marketing, and more.
             </p>
           </CardContent>
         </Card>
@@ -49,12 +49,12 @@ export default function PromptEnhancerComingSoon() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-primary" />
-              Optimisation Continue
+              Continuous Optimization
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Analysez les performances de vos prompts et recevez des suggestions d'amélioration basées sur les résultats obtenus.
+              Analyze your prompt performance and receive improvement suggestions based on real results.
             </p>
           </CardContent>
         </Card>
@@ -63,12 +63,12 @@ export default function PromptEnhancerComingSoon() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Collaboration Équipe
+              Team Collaboration
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Partagez vos meilleurs prompts avec votre équipe et construisez ensemble une bibliothèque de prompts efficaces.
+              Share your best prompts with your team and build together a library of effective prompts.
             </p>
           </CardContent>
         </Card>
@@ -82,12 +82,12 @@ export default function PromptEnhancerComingSoon() {
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Bientôt Disponible</h3>
+            <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
             <p className="text-muted-foreground mb-4">
-              Prompt Enhancer est actuellement en développement intensif. Cette fonctionnalité révolutionnaire sera bientôt disponible pour tous nos utilisateurs.
+              Prompt Enhancer is currently in intensive development. This revolutionary feature will soon be available to all our users.
             </p>
             <p className="text-sm text-muted-foreground">
-              Restez connecté pour être parmi les premiers à l'essayer !
+              Stay tuned to be among the first to try it!
             </p>
           </CardContent>
         </Card>
