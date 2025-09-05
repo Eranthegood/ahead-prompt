@@ -34,6 +34,13 @@ const INTEGRATIONS_CONFIG = [
     configPath: '/integrations/github'
   },
   {
+    id: 'figma',
+    name: 'Figma Integration',
+    description: 'Connect your Figma projects to enrich your Knowledge Base with designs, specs, and components for enhanced prompt context.',
+    icon: Code, // We'll use a generic icon for now
+    configPath: '/integrations/figma'
+  },
+  {
     id: 'slack',
     name: 'Slack Notifications',
     description: 'Receive Slack notifications when your Cursor agents complete their tasks.',
@@ -202,11 +209,15 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
           <div className="space-y-3">
             <div>
               <label className="text-sm font-medium">
-                {integration.id === 'github' ? 'Personal Access Token' : 'API Token'}
+                {integration.id === 'github' ? 'Personal Access Token' : 
+                 integration.id === 'figma' ? 'Personal Access Token' :
+                 'API Token'}
               </label>
               <p className="text-xs text-muted-foreground">
                 {integration.id === 'github' 
                   ? 'Enter your GitHub Personal Access Token'
+                  : integration.id === 'figma'
+                  ? 'Enter your Figma Personal Access Token from Account Settings > Personal Access Tokens'
                   : 'Enter your API token'
                 }
               </p>
@@ -214,7 +225,11 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
             <div className="flex gap-2">
               <input
                 type="password"
-                placeholder={integration.id === 'github' ? 'ghp_xxxxxxxxxxxx' : 'Token...'}
+                placeholder={
+                  integration.id === 'github' ? 'ghp_xxxxxxxxxxxx' : 
+                  integration.id === 'figma' ? 'figd_xxxxxxxxxxxx' :
+                  'Token...'
+                }
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
@@ -315,6 +330,56 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                 Auto PR Creation
               </Badge>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Show configured Figma user info */}
+      {'metadata' in integrationData && integrationData.metadata && integration.id === 'figma' && integrationData.isConfigured && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold">F</span>
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">{integrationData.metadata.handle || 'Figma User'}</div>
+              {integrationData.metadata.email && (
+                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
+              )}
+            </div>
+            <div className="text-sm text-green-600 font-medium">
+              Token configured ✓
+            </div>
+          </div>
+          <div className="pt-3 border-t">
+            <div className="text-sm font-medium mb-2">Available resources:</div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Badge variant="secondary" className="text-xs">
+                Design Import
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                Component Specs
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                Knowledge Base
+              </Badge>
+            </div>
+            {integrationData.metadata.teams && integrationData.metadata.teams.length > 0 && (
+              <div>
+                <div className="text-sm font-medium mb-2">Teams ({integrationData.metadata.teams.length}):</div>
+                <div className="flex flex-wrap gap-2">
+                  {integrationData.metadata.teams.slice(0, 3).map((team: any) => (
+                    <Badge key={team.id} variant="outline" className="text-xs">
+                      {team.name}
+                    </Badge>
+                  ))}
+                  {integrationData.metadata.teams.length > 3 && (
+                    <span className="text-xs text-muted-foreground px-2 py-1">
+                      +{integrationData.metadata.teams.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

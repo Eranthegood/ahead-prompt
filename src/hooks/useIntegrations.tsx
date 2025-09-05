@@ -58,6 +58,14 @@ export function useIntegrations() {
           isEnabled: false,
           lastTestResult: null,
         },
+        {
+          id: 'figma',
+          name: 'Figma Integration',
+          description: 'Connect your Figma projects to enrich your Knowledge Base',
+          isConfigured: false,
+          isEnabled: false,
+          lastTestResult: null,
+        },
       ];
 
       // Merge with database data
@@ -195,6 +203,33 @@ export function useIntegrations() {
         });
 
         toast.success('Cursor intégré avec succès!');
+        await loadIntegrations(); // Reload from database
+        return true;
+        
+      } else if (id === 'figma') {
+        // Figma validation using the edge function
+        const { data, error } = await supabase.functions.invoke('validate-figma-token', {
+          body: { token: secretValue }
+        });
+
+        if (error || !data?.isValid) {
+          throw new Error(data?.error || 'Invalid Figma Personal Access Token');
+        }
+
+        updateIntegration(id, {
+          isConfigured: true,
+          isEnabled: true,
+          configuration: { token: 'configured' },
+          metadata: data.user ? {
+            handle: data.user.handle,
+            email: data.user.email,
+            img_url: data.user.img_url,
+            teams: data.teams || [],
+            recentFiles: data.recentFiles || []
+          } : null
+        });
+
+        toast.success('Figma intégré avec succès!');
         await loadIntegrations(); // Reload from database
         return true;
       }

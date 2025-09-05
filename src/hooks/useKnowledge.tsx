@@ -18,7 +18,7 @@ export interface UpdateKnowledgeData extends Partial<CreateKnowledgeData> {
 export const KNOWLEDGE_CATEGORIES = {
   general: { label: "General", icon: "📝", description: "General knowledge and notes" },
   technical: { label: "Technical Stack", icon: "🔧", description: "Technologies, frameworks, and technical details" },
-  design: { label: "Design Guidelines", icon: "🎨", description: "Design system, UI/UX guidelines" },
+  design: { label: "Design Guidelines", icon: "🎨", description: "Design system, UI/UX guidelines, and Figma assets" },
   business: { label: "Business Context", icon: "📊", description: "Business objectives, KPIs, and requirements" },
   api: { label: "API Documentation", icon: "📚", description: "API endpoints, schemas, and integration guides" },
   practices: { label: "Best Practices", icon: "✅", description: "Standards, conventions, and best practices" }
