@@ -38,7 +38,7 @@ export function UserAccountSection() {
     return email.split('@')[0];
   };
   if (isCollapsed) {
-    return <div className="p-2">
+    return <div className="p-2 flex justify-start">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
