@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw, BookOpen, X } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw, BookOpen, X, Keyboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -315,9 +315,21 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
   // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      handleSave();
+    if (e.key === 'Enter') {
+      // Check if focus is on an editable element (input, textarea, contenteditable)
+      const activeElement = document.activeElement as HTMLElement;
+      const isEditableElement = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.contentEditable === 'true' ||
+        activeElement.closest('[contenteditable="true"]')
+      );
+
+      // Save if Enter is pressed and no editable element is focused
+      if (!isEditableElement) {
+        e.preventDefault();
+        handleSave();
+      }
     } else if (e.key === 'Escape') {
       onClose();
     }
@@ -505,8 +517,19 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           <Button 
             onClick={handleSave} 
             disabled={!hasContent || isLoading}
+            className="flex items-center gap-2"
           >
-            {isLoading ? 'Saving...' : 'Save'}
+            {isLoading ? (
+              'Saving...'
+            ) : (
+              <>
+                Save
+                <div className="flex items-center gap-1 text-xs opacity-70">
+                  <Keyboard className="h-3 w-3" />
+                  <span>Enter</span>
+                </div>
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>
