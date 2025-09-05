@@ -7,8 +7,28 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
-import { Hash, Package, ChevronRight, BookOpen, Trash2, GripVertical } from 'lucide-react';
+import { Hash, Package, ChevronRight, BookOpen, Trash2, GripVertical, FileText, Plus, Settings, User, Trophy, Sparkles, TrendingUp, BarChart3, Github } from 'lucide-react';
 import type { Product } from '@/types';
+
+// Helper function to get the icon component from icon name
+const getIconComponent = (iconName?: string) => {
+  const iconMap = {
+    Package,
+    Hash,
+    FileText,
+    Plus,
+    Settings,
+    User,
+    Trophy,
+    BookOpen,
+    Sparkles,
+    TrendingUp,
+    BarChart3,
+    Github
+  };
+  
+  return iconMap[iconName as keyof typeof iconMap] || Package;
+};
 
 interface DraggableProductItemProps {
   product: Product & { 
@@ -82,9 +102,14 @@ export function DraggableProductItem({
                 >
                   <div className="relative">
                     <div 
-                      className="w-4 h-4 rounded" 
+                      className="w-8 h-8 rounded flex items-center justify-center" 
                       style={{ backgroundColor: product.color || '#6B7280' }}
-                    />
+                    >
+                      {(() => {
+                        const IconComponent = getIconComponent(product.icon);
+                        return <IconComponent className="w-4 h-4 text-white" />;
+                      })()}
+                    </div>
                     {product.promptCount > 0 && (
                       <Badge 
                         variant="secondary" 
@@ -193,15 +218,15 @@ export function DraggableProductItem({
                   onClick={onProductSelect}
                   isActive={isSelected && !selectedEpicId}
                 >
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0" 
-                      style={{ backgroundColor: product.color || '#6B7280' }}
-                    />
-                    <span className="truncate text-sm font-medium">
-                      {product.name}
-                    </span>
-                  </div>
+                   <div className="flex items-center gap-2 min-w-0 flex-1">
+                     {(() => {
+                       const IconComponent = getIconComponent(product.icon);
+                       return <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: product.color || '#6B7280' }} />;
+                     })()}
+                     <span className="truncate text-sm font-medium">
+                       {product.name}
+                     </span>
+                   </div>
                   <Badge variant="secondary" className="ml-2 text-xs flex-shrink-0">
                     {product.promptCount}
                   </Badge>

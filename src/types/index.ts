@@ -162,6 +162,7 @@ export interface Product {
   name: string;
   description: string | null;
   color: string;
+  icon?: string;
   github_repo_url?: string | null;
   default_branch?: string;
   cursor_enabled?: boolean;

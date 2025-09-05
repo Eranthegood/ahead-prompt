@@ -121,7 +121,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const [editProductData, setEditProductData] = useState({
     name: '',
     description: '',
-    color: '#3B82F6'
+    color: '#3B82F6',
+    icon: 'Package',
   });
   const [editEpicData, setEditEpicData] = useState({
     name: '',
@@ -236,6 +237,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         name: newProductData.name.trim(),
         description: newProductData.description.trim() || undefined,
         color: newProductData.color,
+        icon: newProductData.icon,
       });
 
       if (newProduct) {
@@ -288,7 +290,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     setEditProductData({
       name: product.name,
       description: product.description || '',
-      color: product.color || '#3B82F6'
+      color: product.color || '#3B82F6',
+      icon: product.icon || 'Package',
     });
     setIsEditProductOpen(true);
   };
@@ -311,11 +314,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       await updateProduct(editingProduct.id, {
         name: editProductData.name.trim(),
         description: editProductData.description.trim() || undefined,
-        color: editProductData.color
+        color: editProductData.color,
+        icon: editProductData.icon,
       });
 
       setIsEditProductOpen(false);
-      setEditProductData({ name: '', description: '', color: '#3B82F6' });
+      setEditProductData({ name: '', description: '', color: '#3B82F6', icon: 'Package' });
       setEditingProduct(null);
     } catch (error) {
       console.error('Error updating product:', error);
@@ -941,30 +945,82 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               />
             </div>
             <div>
-              <Label>Color</Label>
-              <div className="flex items-center gap-2 mt-2">
-                {PRODUCT_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setEditProductData(prev => ({ ...prev, color: color.value }))}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      editProductData.color === color.value 
-                        ? 'border-primary scale-110' 
-                        : 'border-muted hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.label}
-                  />
-                ))}
-                <div className="flex items-center gap-2 ml-2">
-                  <Palette className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="color"
-                    value={editProductData.color}
-                    onChange={(e) => setEditProductData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-8 h-8 rounded border cursor-pointer"
-                  />
+              <Label>Icon & Color</Label>
+              
+              {/* Icon Selector */}
+              <div className="mt-2 mb-4">
+                <Label className="text-sm text-muted-foreground">Choose an icon</Label>
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  {[
+                    { icon: Package, name: 'Package' },
+                    { icon: Hash, name: 'Hash' },
+                    { icon: FileText, name: 'Document' },
+                    { icon: Plus, name: 'Plus' },
+                    { icon: Settings, name: 'Settings' },
+                    { icon: User, name: 'User' },
+                    { icon: Trophy, name: 'Trophy' },
+                    { icon: BookOpen, name: 'Book' },
+                    { icon: Sparkles, name: 'Sparkles' },
+                    { icon: TrendingUp, name: 'Trending' },
+                    { icon: BarChart3, name: 'Chart' },
+                    { icon: Github, name: 'Github' }
+                  ].map(({ icon: IconComponent, name }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setEditProductData(prev => ({ ...prev, icon: name }))}
+                      className={`p-2 rounded-lg border transition-all hover:scale-105 ${
+                        editProductData.icon === name 
+                          ? 'border-primary bg-primary/10 text-primary' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                      title={name}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Selector */}
+              <div>
+                <Label className="text-sm text-muted-foreground">Choose a color</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  {/* Preset Colors */}
+                  <div className="flex items-center gap-2">
+                    {PRODUCT_COLORS.map((color) => (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => setEditProductData(prev => ({ ...prev, color: color.value }))}
+                        className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                          editProductData.color === color.value 
+                            ? 'border-primary scale-110 shadow-md' 
+                            : 'border-muted-foreground/20'
+                        }`}
+                        style={{ backgroundColor: color.value }}
+                        title={color.label}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Custom Color Picker */}
+                  <div className="flex items-center gap-2 pl-3 border-l border-border">
+                    <Palette className="w-4 h-4 text-muted-foreground" />
+                    <label className="cursor-pointer">
+                      <input
+                        type="color"
+                        value={editProductData.color}
+                        onChange={(e) => setEditProductData(prev => ({ ...prev, color: e.target.value }))}
+                        className="sr-only"
+                      />
+                      <div 
+                        className="w-8 h-8 rounded-full border-2 border-muted-foreground/20 hover:scale-110 transition-all cursor-pointer"
+                        style={{ backgroundColor: editProductData.color }}
+                        title="Custom color"
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
