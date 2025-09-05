@@ -414,6 +414,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_feedback: {
+        Row: {
+          created_at: string
+          email: string | null
+          feedback_type: string
+          id: string
+          ip_address: unknown | null
+          price_point: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          ip_address?: unknown | null
+          price_point: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          ip_address?: unknown | null
+          price_point?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           color: string | null

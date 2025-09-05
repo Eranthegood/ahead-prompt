@@ -2,10 +2,47 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Heart, Check, Zap, Sparkles, Gift } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState } from "react";
 export default function Pricing() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  
   const handleGetStarted = () => {
     navigate('/build');
+  };
+  
+  const handlePricingFeedback = async (pricePoint: string) => {
+    if (submitting) return;
+    
+    setSubmitting(true);
+    setSelectedPrice(pricePoint);
+    
+    try {
+      const { error } = await supabase
+        .from('pricing_feedback')
+        .insert({
+          user_id: user?.id || null,
+          email: user?.email || null,
+          price_point: pricePoint,
+          feedback_type: 'pricing_interest',
+          user_agent: navigator.userAgent,
+        });
+
+      if (error) throw error;
+
+      toast.success(`Thanks for your feedback! We've noted your interest in ${pricePoint}`);
+    } catch (error) {
+      console.error('Error submitting pricing feedback:', error);
+      toast.error('Failed to submit feedback. Please try again.');
+      setSelectedPrice(null);
+    } finally {
+      setSubmitting(false);
+    }
   };
   const features = ["Unlimited prompt storage", "Smart AI prompt generation", "One-click copy to any AI tool", "Kanban workflow organization", "Keyboard shortcuts for speed", "Multi-product organization", "Knowledge base integration", "GitHub & Cursor integration", "Dark/light theme support", "Export your data anytime"];
   return <div className="min-h-screen bg-background">
@@ -63,10 +100,38 @@ export default function Pricing() {
                   Give me some hint for the most fair pricing you&apos;re ready to buy
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-                  <Button variant="outline" className="h-12">$5/mo</Button>
-                  <Button variant="outline" className="h-12">$10/mo</Button>
-                  <Button variant="outline" className="h-12">$15/mo</Button>
-                  <Button variant="outline" className="h-12">$25/mo</Button>
+                  <Button 
+                    variant={selectedPrice === "$5/mo" ? "default" : "outline"} 
+                    className="h-12"
+                    onClick={() => handlePricingFeedback("$5/mo")}
+                    disabled={submitting}
+                  >
+                    $5/mo
+                  </Button>
+                  <Button 
+                    variant={selectedPrice === "$10/mo" ? "default" : "outline"} 
+                    className="h-12"
+                    onClick={() => handlePricingFeedback("$10/mo")}
+                    disabled={submitting}
+                  >
+                    $10/mo
+                  </Button>
+                  <Button 
+                    variant={selectedPrice === "$15/mo" ? "default" : "outline"} 
+                    className="h-12"
+                    onClick={() => handlePricingFeedback("$15/mo")}
+                    disabled={submitting}
+                  >
+                    $15/mo
+                  </Button>
+                  <Button 
+                    variant={selectedPrice === "$25/mo" ? "default" : "outline"} 
+                    className="h-12"
+                    onClick={() => handlePricingFeedback("$25/mo")}
+                    disabled={submitting}
+                  >
+                    $25/mo
+                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Your feedback helps us create fair pricing for premium features
