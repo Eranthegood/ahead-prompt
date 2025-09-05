@@ -36,6 +36,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [textLength, setTextLength] = useState(0);
   const [draftRestored, setDraftRestored] = useState(false);
+  const [descriptionSaving, setDescriptionSaving] = useState(false);
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
 
@@ -539,15 +540,35 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     className="text-sm"
                   />
                    <Textarea
-                    placeholder="Prompt description"
-                    value={prompt.description || ''}
-                    onChange={(e) => {
-                      if (prompt) {
-                        updatePrompt(prompt.id, { description: e.target.value });
-                      }
-                    }}
-                    className="text-sm min-h-[100px]"
-                  />
+                     placeholder="Prompt description"
+                     value={prompt.description || ''}
+                     onChange={async (e) => {
+                       if (prompt) {
+                         setDescriptionSaving(true);
+                         try {
+                           await updatePrompt(prompt.id, { description: e.target.value });
+                           if (e.target.value.trim()) {
+                             toast({
+                               title: 'Saved',
+                               description: 'Description updated successfully',
+                               duration: 2000
+                             });
+                           }
+                         } catch (error) {
+                           console.error('Error updating description:', error);
+                           toast({
+                             title: 'Error',
+                             description: 'Failed to save description',
+                             variant: 'destructive'
+                           });
+                         } finally {
+                           setDescriptionSaving(false);
+                         }
+                       }
+                     }}
+                     className="text-sm min-h-[100px]"
+                     disabled={descriptionSaving}
+                   />
                   <Button
                     variant="outline"
                     size="sm"
