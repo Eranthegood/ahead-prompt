@@ -285,9 +285,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               <Plus className="mr-2 h-4 w-4" />
               Create new prompt
             </CommandItem>
-            <CommandItem onSelect={() => onNavigate?.('knowledge')}>
-              <FileText className="mr-2 h-4 w-4" />
-              Open knowledge base
+            <CommandItem onSelect={() => {
+              // Dispatch event to open quick prompt dialog
+              const event = new CustomEvent('open-quick-prompt');
+              window.dispatchEvent(event);
+              onOpenChange(false);
+            }}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create new prompt
             </CommandItem>
             <CommandItem onSelect={() => window.open('/settings', '_self')}>
               <Settings className="mr-2 h-4 w-4" />
