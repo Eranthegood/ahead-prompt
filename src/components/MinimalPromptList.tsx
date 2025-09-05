@@ -348,11 +348,6 @@ export function MinimalPromptList({
                   }
                 </p>
               </div>
-
-              <div className="flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
-                <span className="text-sm font-medium text-primary">Click to get started</span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
             </div>
           </Button>
         </div>
