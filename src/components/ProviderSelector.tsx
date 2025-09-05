@@ -1,7 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import openaiLogoDark from "@/assets/openai-logo-dark.png";
-import openaiLogoLight from "@/assets/openai-logo-light.png";
+import openaiLogo from "@/assets/openai-logo.svg";
 
 export interface ProviderConfig {
   provider: 'openai' | 'claude';
@@ -43,18 +42,11 @@ export function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
           <SelectTrigger id="provider">
             <div className="flex items-center gap-2">
               {value.provider === 'openai' && (
-                <>
-                  <img 
-                    src={openaiLogoDark} 
-                    alt="OpenAI" 
-                    className="w-4 h-4 dark:hidden" 
-                  />
-                  <img 
-                    src={openaiLogoLight} 
-                    alt="OpenAI" 
-                    className="w-4 h-4 hidden dark:block" 
-                  />
-                </>
+                <img 
+                  src={openaiLogo} 
+                  alt="OpenAI" 
+                  className="w-4 h-4" 
+                />
               )}
               <SelectValue placeholder="Select a provider" />
             </div>
@@ -63,14 +55,9 @@ export function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
             <SelectItem value="openai">
               <div className="flex items-center gap-2">
                 <img 
-                  src={openaiLogoDark} 
+                  src={openaiLogo} 
                   alt="OpenAI" 
-                  className="w-4 h-4 dark:hidden" 
-                />
-                <img 
-                  src={openaiLogoLight} 
-                  alt="OpenAI" 
-                  className="w-4 h-4 hidden dark:block" 
+                  className="w-4 h-4" 
                 />
                 OpenAI
               </div>
