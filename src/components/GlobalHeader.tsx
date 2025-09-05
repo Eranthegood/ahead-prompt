@@ -52,7 +52,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
   // Navigation items for authenticated users
   const navItems = [
-    { label: 'Dashboard', path: '/build', icon: Home },
     { label: 'Features', path: '/cursor-multi-agent', icon: Zap },
     { label: 'Pricing', path: '/pricing', icon: Package },
   ];
