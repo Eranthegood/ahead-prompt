@@ -262,56 +262,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Smart Prompt Generation Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Smart Prompts That Know Your Code
-              </h2>
-               
-              <p className="text-xl text-muted-foreground">
-                Your AI gets smarter. Your prompts get better. Your results get faster.
-              </p>
-               
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Zero setup</strong> - Works with your existing docs</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Knowledge Box</strong> - Store docs, links, code snippets once</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Perfect context</strong> - Every time, automatically</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Better code</strong> - First try, every try</span>
-                </div>
-              </div>
-                
-              <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
-                <p className="text-sm font-medium">
-                  💡 "My prompts went from generic to genius. AI finally understands my codebase."
-                </p>
-              </div>
-                
-              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Get Smart Prompts Free
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-            
-            <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              <img src="/lovable-uploads/55ae261f-bec5-4f29-bb84-cd997afc58ec.png" alt="Smart Prompt Generation interface showing AI-powered prompt editing with rich formatting and context-aware generation" className="w-full h-full object-contain" />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
