@@ -5,66 +5,59 @@ import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 // Logo components
-const CursorLogo = ({ className }: { className?: string }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 2L13.09 8.26L19 7L13.09 8.26L12 2Z" fill="currentColor"/>
-    <path d="M12 2L10.91 8.26L5 7L10.91 8.26L12 2Z" fill="currentColor"/>
-    <path d="M12 22L13.09 15.74L19 17L13.09 15.74L12 22Z" fill="currentColor"/>
-    <path d="M12 22L10.91 15.74L5 17L10.91 15.74L12 22Z" fill="currentColor"/>
-    <path d="M2 12L8.26 10.91L7 5L8.26 10.91L2 12Z" fill="currentColor"/>
-    <path d="M2 12L8.26 13.09L7 19L8.26 13.09L2 12Z" fill="currentColor"/>
-    <path d="M22 12L15.74 10.91L17 5L15.74 10.91L22 12Z" fill="currentColor"/>
-    <path d="M22 12L15.74 13.09L17 19L15.74 13.09L22 12Z" fill="currentColor"/>
-    <circle cx="12" cy="12" r="3" fill="currentColor"/>
-  </svg>
-);
-
-const GitHubLogo = ({ className }: { className?: string }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12C0 17.31 3.435 21.795 8.205 23.385C8.805 23.49 9.03 23.13 9.03 22.815C9.03 22.53 9.015 21.585 9.015 20.55C6 21.135 5.22 19.845 4.98 19.17C4.845 18.825 4.26 17.76 3.75 17.475C3.33 17.25 2.73 16.665 3.735 16.65C4.68 16.635 5.355 17.55 5.58 17.91C6.66 19.725 8.385 19.215 9.075 18.9C9.18 18.12 9.495 17.595 9.84 17.295C7.17 16.995 4.38 15.96 4.38 11.37C4.38 10.065 4.845 8.985 5.61 8.145C5.49 7.845 5.07 6.615 5.73 4.965C5.73 4.965 6.735 4.65 9.03 6.195C9.99 5.925 11.01 5.79 12.03 5.79C13.05 5.79 14.07 5.925 15.03 6.195C17.325 4.635 18.33 4.965 18.33 4.965C18.99 6.615 18.57 7.845 18.45 8.145C19.215 8.985 19.68 10.05 19.68 11.37C19.68 15.975 16.875 16.995 14.205 17.295C14.64 17.67 15.015 18.39 15.015 19.515C15.015 21.12 15 22.41 15 22.815C15 23.13 15.225 23.505 15.825 23.385C18.2072 22.5807 20.2772 21.0497 21.7437 19.0074C23.2101 16.965 23.9993 14.5143 24 12C24 5.37 18.63 0 12 0Z" fill="currentColor"/>
-  </svg>
-);
-
+const CursorLogo = ({
+  className
+}: {
+  className?: string;
+}) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M12 2L13.09 8.26L19 7L13.09 8.26L12 2Z" fill="currentColor" />
+    <path d="M12 2L10.91 8.26L5 7L10.91 8.26L12 2Z" fill="currentColor" />
+    <path d="M12 22L13.09 15.74L19 17L13.09 15.74L12 22Z" fill="currentColor" />
+    <path d="M12 22L10.91 15.74L5 17L10.91 15.74L12 22Z" fill="currentColor" />
+    <path d="M2 12L8.26 10.91L7 5L8.26 10.91L2 12Z" fill="currentColor" />
+    <path d="M2 12L8.26 13.09L7 19L8.26 13.09L2 12Z" fill="currentColor" />
+    <path d="M22 12L15.74 10.91L17 5L15.74 10.91L22 12Z" fill="currentColor" />
+    <path d="M22 12L15.74 13.09L17 19L15.74 13.09L22 12Z" fill="currentColor" />
+    <circle cx="12" cy="12" r="3" fill="currentColor" />
+  </svg>;
+const GitHubLogo = ({
+  className
+}: {
+  className?: string;
+}) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 0C5.37 0 0 5.37 0 12C0 17.31 3.435 21.795 8.205 23.385C8.805 23.49 9.03 23.13 9.03 22.815C9.03 22.53 9.015 21.585 9.015 20.55C6 21.135 5.22 19.845 4.98 19.17C4.845 18.825 4.26 17.76 3.75 17.475C3.33 17.25 2.73 16.665 3.735 16.65C4.68 16.635 5.355 17.55 5.58 17.91C6.66 19.725 8.385 19.215 9.075 18.9C9.18 18.12 9.495 17.595 9.84 17.295C7.17 16.995 4.38 15.96 4.38 11.37C4.38 10.065 4.845 8.985 5.61 8.145C5.49 7.845 5.07 6.615 5.73 4.965C5.73 4.965 6.735 4.65 9.03 6.195C9.99 5.925 11.01 5.79 12.03 5.79C13.05 5.79 14.07 5.925 15.03 6.195C17.325 4.635 18.33 4.965 18.33 4.965C18.99 6.615 18.57 7.845 18.45 8.145C19.215 8.985 19.68 10.05 19.68 11.37C19.68 15.975 16.875 16.995 14.205 17.295C14.64 17.67 15.015 18.39 15.015 19.515C15.015 21.12 15 22.41 15 22.815C15 23.13 15.225 23.505 15.825 23.385C18.2072 22.5807 20.2772 21.0497 21.7437 19.0074C23.2101 16.965 23.9993 14.5143 24 12C24 5.37 18.63 0 12 0Z" fill="currentColor" />
+  </svg>;
 export default function LandingPage() {
   const navigate = useNavigate();
-  
   const handleSignIn = () => {
     navigate('/build');
   };
-
-  const testimonials = [
-    {
-      img: "https://randomuser.me/api/portraits/women/65.jpg",
-      quote: "After struggling with prompt chaos for months (copy-pasting from random docs, losing track of versions), I needed something that actually fits my workflow.",
-      name: "Sarah",
-      role: "Full-Stack Developer",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/men/32.jpg",
-      quote: "My prompt collection has gone from fun experiments to... a monster living in Google Docs, stickies, chat logs. I spend more time hunting prompts than coding.",
-      name: "Mike",
-      role: "Indie Hacker",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/men/78.jpg",
-      quote: "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle.",
-      name: "Jeremy",
-      role: "Indie Hacker",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/men/54.jpg",
-      quote: "Now I capture every brilliant idea the moment it hits. No more 'wait, what was that fix I thought of?' moments. My development flow is finally uninterrupted.",
-      name: "Alex",
-      role: "Late night SaaS builder",
-    },
-    {
-      img: "https://randomuser.me/api/portraits/women/88.jpg",
-      quote: "I went from frantically switching between 12 tabs to having my next 3 moves ready before Cursor even finishes. Game changer for shipping fast.",
-      name: "Sarah",
-      role: "Full-Stack Developer",
-    },
-  ];
-
+  const testimonials = [{
+    img: "https://randomuser.me/api/portraits/women/65.jpg",
+    quote: "After struggling with prompt chaos for months (copy-pasting from random docs, losing track of versions), I needed something that actually fits my workflow.",
+    name: "Sarah",
+    role: "Full-Stack Developer"
+  }, {
+    img: "https://randomuser.me/api/portraits/men/32.jpg",
+    quote: "My prompt collection has gone from fun experiments to... a monster living in Google Docs, stickies, chat logs. I spend more time hunting prompts than coding.",
+    name: "Mike",
+    role: "Indie Hacker"
+  }, {
+    img: "https://randomuser.me/api/portraits/men/78.jpg",
+    quote: "J'avais toujours 2-3 coups d'avance. Vitesse de construction complètement folle.",
+    name: "Jeremy",
+    role: "Indie Hacker"
+  }, {
+    img: "https://randomuser.me/api/portraits/men/54.jpg",
+    quote: "Now I capture every brilliant idea the moment it hits. No more 'wait, what was that fix I thought of?' moments. My development flow is finally uninterrupted.",
+    name: "Alex",
+    role: "Late night SaaS builder"
+  }, {
+    img: "https://randomuser.me/api/portraits/women/88.jpg",
+    quote: "I went from frantically switching between 12 tabs to having my next 3 moves ready before Cursor even finishes. Game changer for shipping fast.",
+    name: "Sarah",
+    role: "Full-Stack Developer"
+  }];
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
@@ -108,55 +101,19 @@ export default function LandingPage() {
           </div>
 
           <div className="flex justify-center mt-8">
-            <a href="https://peerpush.net/p/ahead"
-              target="_blank"
-              rel="noopener"
-              style={{height: '60px'}}
-            >
-              <img
-                src="https://peerpush.net/p/ahead/badge"
-                alt="Ahead badge"
-                style={{height: '60px'}}
-              />
+            <a href="https://peerpush.net/p/ahead" target="_blank" rel="noopener" style={{
+            height: '60px'
+          }}>
+              <img src="https://peerpush.net/p/ahead/badge" alt="Ahead badge" style={{
+              height: '60px'
+            }} />
             </a>
           </div>
         </div>
       </main>
 
       {/* Results Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-4xl mx-auto">
-          <blockquote className="text-xl md:text-2xl font-medium text-center mb-4 italic">
-            "I was always 2-3 moves ahead. Completely crazy building speed."
-          </blockquote>
-          <cite className="text-center block mb-12 text-muted-foreground">
-            - Jeremy, Indie Hacker
-          </cite>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold">Never lose creative momentum</h3>
-            </div>
-            
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <ArrowRight className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold">Transform AI wait time into strategic advantage</h3>
-            </div>
-            
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Layers className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold">Stay 3 moves ahead, always</h3>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Solution Section */}
       <section className="py-16 px-6 bg-muted/30">
@@ -203,15 +160,10 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="relative box-content max-h-[80vh] w-full py-10" style={{ aspectRatio: '2.0136' }}>
-            <iframe 
-              src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" 
-              loading="lazy" 
-              title="Ahead Demo" 
-              allow="clipboard-write" 
-              allowFullScreen
-              className="absolute inset-0 w-full h-full border-0 rounded-lg"
-            />
+          <div className="relative box-content max-h-[80vh] w-full py-10" style={{
+          aspectRatio: '2.0136'
+        }}>
+            <iframe src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" loading="lazy" title="Ahead Demo" allow="clipboard-write" allowFullScreen className="absolute inset-0 w-full h-full border-0 rounded-lg" />
           </div>
         </div>
       </section>
@@ -243,15 +195,21 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <div style={{ position: 'relative', boxSizing: 'content-box', maxHeight: '80vh', width: '100%', aspectRatio: '2.1068032187271397', padding: '40px 0 40px 0' }}>
-              <iframe 
-                src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
-                loading="lazy" 
-                title="Task creation demo" 
-                allow="clipboard-write" 
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                allowFullScreen
-              />
+            <div style={{
+            position: 'relative',
+            boxSizing: 'content-box',
+            maxHeight: '80vh',
+            width: '100%',
+            aspectRatio: '2.1068032187271397',
+            padding: '40px 0 40px 0'
+          }}>
+              <iframe src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" loading="lazy" title="Task creation demo" allow="clipboard-write" style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%'
+            }} allowFullScreen />
             </div>
           </div>
         </div>
@@ -298,11 +256,7 @@ export default function LandingPage() {
             </div>
             
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              <img 
-                src="/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png" 
-                alt="Ahead.love interface showing queued prompts and tasks, demonstrating how to stay 3 moves ahead while AI generates code"
-                className="w-full h-full object-contain"
-              />
+              <img src="/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png" alt="Ahead.love interface showing queued prompts and tasks, demonstrating how to stay 3 moves ahead while AI generates code" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>
@@ -353,35 +307,37 @@ export default function LandingPage() {
             </div>
             
             <div className="relative h-[600px] w-full bg-muted/30 rounded-lg overflow-hidden shadow-lg">
-              <img 
-                src="/lovable-uploads/55ae261f-bec5-4f29-bb84-cd997afc58ec.png" 
-                alt="Smart Prompt Generation interface showing AI-powered prompt editing with rich formatting and context-aware generation"
-                className="w-full h-full object-contain"
-              />
+              <img src="/lovable-uploads/55ae261f-bec5-4f29-bb84-cd997afc58ec.png" alt="Smart Prompt Generation interface showing AI-powered prompt editing with rich formatting and context-aware generation" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <Footer
-        logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />}
-        brandName="Ahead"
-        mainLinks={[
-          { href: "/", label: "Home" },
-          { href: "/cursor-multi-agent", label: "Features" },
-          { href: "/build", label: "Dashboard" },
-          { href: "/pricing", label: "Pricing" }
-        ]}
-        legalLinks={[
-          { href: "/privacy", label: "Privacy Policy" },
-          { href: "/terms", label: "Terms of Service" },
-          { href: "/cookies", label: "Cookie Policy" }
-        ]}
-        copyright={{
-          text: "© 2024 Ahead. All rights reserved.",
-          license: "Built with ❤️ for developers who stay ahead."
-        }}
-      />
+      <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
+      href: "/",
+      label: "Home"
+    }, {
+      href: "/cursor-multi-agent",
+      label: "Features"
+    }, {
+      href: "/build",
+      label: "Dashboard"
+    }, {
+      href: "/pricing",
+      label: "Pricing"
+    }]} legalLinks={[{
+      href: "/privacy",
+      label: "Privacy Policy"
+    }, {
+      href: "/terms",
+      label: "Terms of Service"
+    }, {
+      href: "/cookies",
+      label: "Cookie Policy"
+    }]} copyright={{
+      text: "© 2024 Ahead. All rights reserved.",
+      license: "Built with ❤️ for developers who stay ahead."
+    }} />
     </div>;
 }
