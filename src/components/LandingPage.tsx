@@ -5,6 +5,7 @@ import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import DisplayCards from "@/components/ui/display-cards";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
+import { IntegrationBanner } from "@/components/IntegrationBanner";
 // Logo components
 const CursorLogo = ({
   className
@@ -55,6 +56,9 @@ export default function LandingPage() {
     role: "Full-Stack Developer"
   }];
   return <div className="min-h-screen bg-background flex flex-col">
+      {/* Integration Banner */}
+      <IntegrationBanner />
+      
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
         <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
