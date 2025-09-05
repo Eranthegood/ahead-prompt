@@ -68,17 +68,26 @@ const Auth = () => {
   return <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-glow">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img 
-              src={chessKnightLogo} 
-              alt="Ahead Logo" 
-              className="w-8 h-8"
-            />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              Ahead
-            </h1>
+          <div className="flex flex-col items-center gap-4 mb-6">
+            <div className="flex items-center justify-center gap-3">
+              <img 
+                src={chessKnightLogo} 
+                alt="Ahead Logo" 
+                className="w-16 h-16"
+              />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+                Ahead
+              </h1>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold text-foreground">
+                Welcome to Ahead
+              </h2>
+              <p className="text-lg text-primary font-medium">
+                Sign up to start building 4x faster
+              </p>
+            </div>
           </div>
-          <CardDescription className="text-muted-foreground">Prompts management platform</CardDescription>
         </CardHeader>
 
         <CardContent>
