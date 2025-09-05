@@ -64,14 +64,14 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
       title: 'Create your first epic',
       description: 'Group related features and organize your development workflow',
       completed: (epics?.length || 0) > 0,
-      action: () => window.dispatchEvent(new CustomEvent('open-epic-dialog'))
+      action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-epic-dialog')) : undefined
     },
     {
       id: 'knowledge',
       title: 'Add your knowledge base',
       description: 'Store docs, links, and context to enhance your AI prompts',
       completed: (knowledgeItems?.length || 0) > 0,
-      action: () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog'))
+      action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')) : undefined
     },
     {
       id: 'prompt',
@@ -134,67 +134,87 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
 
       {!isCollapsed && (
         <div className="space-y-2 mt-3">
-          {checklistItems.map((item, index) => (
-            <div
-              key={item.id}
-              className={cn(
-                "flex items-center space-x-2 p-2 rounded-md transition-all duration-300 text-xs group hover:scale-[1.02]",
-                item.completed
-                  ? "bg-primary/10 border border-primary/20 shadow-sm"
-                  : "hover:bg-muted/50 border border-transparent hover:border-muted-foreground/10"
-              )}
-              style={{ 
-                animationDelay: `${index * 100}ms`,
-                animation: item.completed ? 'pulse 2s ease-in-out' : undefined
-              }}
-            >
+          {checklistItems.map((item, index) => {
+            const hasProducts = (products?.length || 0) > 0;
+            const isDisabled = (item.id === 'knowledge' || item.id === 'epic') && !hasProducts;
+            
+            return (
               <div
+                key={item.id}
                 className={cn(
-                  "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-500 flex-shrink-0 relative overflow-hidden",
+                  "flex items-center space-x-2 p-2 rounded-md transition-all duration-300 text-xs group hover:scale-[1.02]",
                   item.completed
-                    ? "bg-primary border-primary text-primary-foreground scale-110 shadow-sm"
-                    : "border-muted-foreground group-hover:border-primary/50 group-hover:scale-105"
+                    ? "bg-primary/10 border border-primary/20 shadow-sm"
+                    : isDisabled
+                    ? "opacity-50 cursor-not-allowed bg-muted/20"
+                    : "hover:bg-muted/50 border border-transparent hover:border-muted-foreground/10"
                 )}
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  animation: item.completed ? 'pulse 2s ease-in-out' : undefined
+                }}
               >
-                {item.completed ? (
-                  <Check className="w-2.5 h-2.5 animate-in zoom-in duration-300" />
-                ) : (
-                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary/30 transition-colors" />
+                <div
+                  className={cn(
+                    "w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-500 flex-shrink-0 relative overflow-hidden",
+                    item.completed
+                      ? "bg-primary border-primary text-primary-foreground scale-110 shadow-sm"
+                      : isDisabled
+                      ? "border-muted-foreground/30 bg-muted/10"
+                      : "border-muted-foreground group-hover:border-primary/50 group-hover:scale-105"
+                  )}
+                >
+                  {item.completed ? (
+                    <Check className="w-2.5 h-2.5 animate-in zoom-in duration-300" />
+                  ) : isDisabled ? (
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
+                  ) : (
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary/30 transition-colors" />
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className={cn(
+                    "font-medium text-xs line-clamp-2 transition-colors duration-200",
+                    item.completed 
+                      ? "text-foreground" 
+                      : isDisabled
+                      ? "text-muted-foreground"
+                      : "text-foreground group-hover:text-primary"
+                  )}>
+                    {item.title}
+                  </h4>
+                  {isDisabled && (
+                    <p className="text-xs text-muted-foreground/60 mt-0.5">
+                      {item.id === 'knowledge' ? 'Create a product first' : 'Create a product first'}
+                    </p>
+                  )}
+                </div>
+
+                {!item.completed && item.action && !isDisabled && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log(`Opening ${item.id} dialog`);
+                      item.action();
+                    }}
+                    className="h-6 px-2 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:scale-110"
+                    title={`Create ${item.title.toLowerCase()}`}
+                  >
+                    +
+                  </Button>
+                )}
+
+                {item.completed && (
+                  <div className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-all duration-200">
+                    ✓ Done
+                  </div>
                 )}
               </div>
-              
-              <div className="flex-1 min-w-0">
-                <h4 className={cn(
-                  "font-medium text-xs line-clamp-2 transition-colors duration-200",
-                  item.completed ? "text-foreground" : "text-foreground group-hover:text-primary"
-                )}>
-                  {item.title}
-                </h4>
-              </div>
-
-              {!item.completed && item.action && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    console.log(`Opening ${item.id} dialog`);
-                    item.action();
-                  }}
-                  className="h-6 px-2 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:scale-110"
-                  title={`Create ${item.title.toLowerCase()}`}
-                >
-                  +
-                </Button>
-              )}
-
-              {item.completed && (
-                <div className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-all duration-200">
-                  ✓ Done
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
 
           {isFullyCompleted && (
             <div className="mt-3 p-2 bg-gradient-to-r from-primary/10 to-primary/5 rounded-md border border-primary/20 animate-in slide-in-from-bottom duration-500">
