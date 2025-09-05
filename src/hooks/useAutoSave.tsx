@@ -6,6 +6,7 @@ interface AutoSaveConfig {
   editor: Editor | null;
   isOpen: boolean;
   onRestore?: (content: string) => void;
+  onBlurSave?: (content: string) => void;
 }
 
 interface DraftData {
@@ -18,7 +19,7 @@ interface DraftData {
 
 const DRAFT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-export const useAutoSave = ({ key, editor, isOpen, onRestore }: AutoSaveConfig) => {
+export const useAutoSave = ({ key, editor, isOpen, onRestore, onBlurSave }: AutoSaveConfig) => {
   const lastSavedContent = useRef<string>('');
   const hasRestoredRef = useRef(false);
 
@@ -103,6 +104,16 @@ export const useAutoSave = ({ key, editor, isOpen, onRestore }: AutoSaveConfig) 
     }
   }, [editor, isOpen, saveDraft]);
 
+  // Handle blur events for smart saving
+  const handleBlur = useCallback(() => {
+    if (editor && isOpen && onBlurSave) {
+      const content = editor.getHTML();
+      if (content && content !== '<p></p>') {
+        onBlurSave(content);
+      }
+    }
+  }, [editor, isOpen, onBlurSave]);
+
   // Auto-save on dialog open and restore if draft exists
   useEffect(() => {
     if (isOpen && editor && !hasRestoredRef.current) {
@@ -119,16 +130,20 @@ export const useAutoSave = ({ key, editor, isOpen, onRestore }: AutoSaveConfig) 
     }
   }, [isOpen, editor, loadDraft, cleanupOldDrafts, onRestore]);
 
-  // Set up visibility change listener
+  // Set up visibility change and blur listeners
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && editor && editor.view) {
+      const editorDOM = editor.view.dom;
+      
       document.addEventListener('visibilitychange', handleVisibilityChange);
+      editorDOM.addEventListener('blur', handleBlur);
       
       return () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
+        editorDOM.removeEventListener('blur', handleBlur);
       };
     }
-  }, [isOpen, handleVisibilityChange]);
+  }, [isOpen, editor, handleVisibilityChange, handleBlur]);
 
   // Manual save function
   const save = useCallback((additionalData?: Partial<DraftData>) => {

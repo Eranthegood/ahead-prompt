@@ -5,15 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -36,14 +35,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [textLength, setTextLength] = useState(0);
   const [draftRestored, setDraftRestored] = useState(false);
-  const [localDescription, setLocalDescription] = useState(prompt?.description || '');
-  const [localTitle, setLocalTitle] = useState(prompt?.title || '');
-  const [descriptionSaving, setDescriptionSaving] = useState(false);
-  const [titleSaving, setTitleSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const { toast } = useToast();
   const { updatePrompt, updatePromptSilently } = usePrompts();
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const titleSaveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const { preferences } = useUserPreferences();
 
   // Rich text editor
   const editor = useEditor({
@@ -58,57 +53,34 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       const htmlContent = editor.getHTML();
       const cleanText = stripHtmlAndNormalize(htmlContent);
       setTextLength(cleanText.length);
+      setHasUnsavedChanges(true);
     },
   });
 
-  // Auto-save hook
+  // Smart auto-save handler for blur events
+  const handleBlurSave = useCallback(async (content: string) => {
+    if (!prompt || !preferences.autoSaveEnabled) return;
+    
+    try {
+      await updatePromptSilently(prompt.id, { description: content });
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Error auto-saving on blur:', error);
+    }
+  }, [prompt, preferences.autoSaveEnabled, updatePromptSilently]);
+
+  // Auto-save hook with smart blur save
   const { clearDraft } = useAutoSave({
     key: prompt ? `prompt_${prompt.id}` : 'prompt_edit',
     editor,
     isOpen: open,
     onRestore: (content) => {
       setDraftRestored(true);
+      setHasUnsavedChanges(true);
       setTimeout(() => setDraftRestored(false), 3000); // Hide indicator after 3s
     },
+    onBlurSave: handleBlurSave,
   });
-
-  // Debounced save function for description
-  const debouncedSave = useCallback(async (description: string) => {
-    if (!prompt) return;
-    
-    setDescriptionSaving(true);
-    try {
-      await updatePromptSilently(prompt.id, { description });
-    } catch (error) {
-      console.error('Error saving description:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Échec de la sauvegarde de la description',
-        variant: 'destructive'
-      });
-    } finally {
-      setDescriptionSaving(false);
-    }
-  }, [prompt, updatePromptSilently, toast]);
-
-  // Debounced save function for title
-  const debouncedSaveTitle = useCallback(async (title: string) => {
-    if (!prompt) return;
-    
-    setTitleSaving(true);
-    try {
-      await updatePromptSilently(prompt.id, { title });
-    } catch (error) {
-      console.error('Error saving title:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Échec de la sauvegarde du titre',
-        variant: 'destructive'
-      });
-    } finally {
-      setTitleSaving(false);
-    }
-  }, [prompt, updatePromptSilently, toast]);
 
   // Reset form when prompt changes (but preserve draft if one exists)
   useEffect(() => {
@@ -126,10 +98,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       });
       
       editor.commands.setContent(originalContent);
-      setLocalDescription(prompt.description || '');
-      setLocalTitle(prompt.title || '');
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
+      setHasUnsavedChanges(false);
       
       // Load the AI-generated prompt separately for the preview panel
       setGeneratedPrompt(prompt.generated_prompt || '');
@@ -139,18 +110,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       setTextLength(cleanText.length);
     }
   }, [prompt, editor, draftRestored]);
-
-  // Cleanup timeouts when component unmounts or prompt changes
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-      if (titleSaveTimeoutRef.current) {
-        clearTimeout(titleSaveTimeoutRef.current);
-      }
-    };
-  }, [prompt?.id]);
 
   const handleRegeneratePrompt = async () => {
     if (!editor || !prompt) return;
@@ -262,12 +221,23 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         epic_id: epicId === 'none' ? null : epicId,
       });
 
-      // Clear draft after successful save
+      // Clear draft and unsaved changes after successful save
       clearDraft();
+      setHasUnsavedChanges(false);
+      
+      toast({
+        title: 'Sauvegardé',
+        description: 'Vos modifications ont été sauvegardées avec succès',
+      });
       
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating prompt:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Échec de la sauvegarde',
+        variant: 'destructive'
+      });
     } finally {
       setSaving(false);
     }
@@ -275,7 +245,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
   // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSave();
     } else if (e.key === 'Escape') {
@@ -283,12 +256,23 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     }
   };
 
+  // Save before closing if there are unsaved changes
+  const handleClose = () => {
+    if (hasUnsavedChanges && preferences.autoSaveEnabled && editor) {
+      const content = editor.getHTML();
+      if (content && content !== '<p></p>' && prompt) {
+        updatePromptSilently(prompt.id, { description: content }).catch(console.error);
+      }
+    }
+    onOpenChange(false);
+  };
+
   const filteredEpics = epics.filter(epic => productId === 'none' || !productId || epic.product_id === productId);
 
   if (!prompt || !editor) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent 
         className="w-[95vw] max-w-4xl h-[90vh] max-h-[600px] lg:max-h-[85vh] p-0 flex flex-col"
         onKeyDown={handleKeyDown}
@@ -302,9 +286,15 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <span>Draft restored</span>
               </div>
             )}
+            {hasUnsavedChanges && (
+              <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
+                <Save className="h-4 w-4" />
+                <span>Unsaved changes</span>
+              </div>
+            )}
           </DialogTitle>
           <DialogDescription>
-            Edit prompt details with rich text formatting, product and epic assignment.
+            Edit prompt details with rich text formatting, product and epic assignment. Press Ctrl+S to save.
           </DialogDescription>
         </DialogHeader>
 
@@ -581,88 +571,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </Button>
             </div>
 
-            {/* Original Text Edit */}
-            {prompt && (
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">Original Text</Label>
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Input
-                      placeholder="Prompt title"
-                      value={localTitle}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setLocalTitle(newValue);
-                        
-                        // Clear existing timeout
-                        if (titleSaveTimeoutRef.current) {
-                          clearTimeout(titleSaveTimeoutRef.current);
-                        }
-                        
-                        // Set new timeout for debounced save
-                        titleSaveTimeoutRef.current = setTimeout(() => {
-                          debouncedSaveTitle(newValue);
-                        }, 500);
-                      }}
-                      className="text-sm"
-                      disabled={titleSaving}
-                    />
-                    {titleSaving && (
-                      <div className="absolute top-2 right-2 text-xs text-muted-foreground">
-                        Sauvegarde...
-                      </div>
-                    )}
-                  </div>
-                   <div className="relative">
-                     <Textarea
-                       placeholder="Prompt description"
-                       value={localDescription}
-                       onChange={(e) => {
-                         const newValue = e.target.value;
-                         setLocalDescription(newValue);
-                         
-                         // Clear existing timeout
-                         if (saveTimeoutRef.current) {
-                           clearTimeout(saveTimeoutRef.current);
-                         }
-                         
-                         // Set new timeout for debounced save
-                         saveTimeoutRef.current = setTimeout(() => {
-                           debouncedSave(newValue);
-                         }, 500);
-                       }}
-                       className="text-sm min-h-[100px]"
-                       disabled={descriptionSaving}
-                     />
-                     {descriptionSaving && (
-                       <div className="absolute top-2 right-2 text-xs text-muted-foreground">
-                         Sauvegarde...
-                       </div>
-                     )}
-                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRegenerateFromOriginal}
-                    disabled={isRegenerating || !prompt.description?.trim()}
-                    className="w-full"
-                  >
-                    {isRegenerating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Regenerating...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Regenerate from original text
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* Rich text editor */}
             <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
               <EditorContent 
@@ -726,14 +634,25 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={saving || !editor.getHTML() || editor.getHTML() === '<p></p>'}
+                className={hasUnsavedChanges ? 'bg-blue-600 hover:bg-blue-700' : ''}
               >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save {hasUnsavedChanges && '(Ctrl+S)'}
+                  </>
+                )}
               </Button>
             </div>
           </div>
