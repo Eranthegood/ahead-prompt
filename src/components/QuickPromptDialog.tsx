@@ -383,38 +383,30 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             </div>
 
             {/* Form controls */}
-            <div className="space-y-6">
-              {/* Priority & Context */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Priority selector */}
-                <div className="space-y-2">
-                  <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Priority..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
-                      {PRIORITY_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value.toString()}>
-                          <div className="flex items-center gap-2">
-                            {option.value === 1 && <Flame className="h-3 w-3 text-red-500" />}
-                            <span>{option.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* AI Provider Selection - Simplified */}
-                <div className="space-y-2">
-                  <ProviderSelector
-                    value={providerConfig}
-                    onChange={setProviderConfig}
-                  />
-                </div>
+            <div className="space-y-4">
+              {/* Priority selector */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  Priority
+                </label>
+                <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Select a priority..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    {PRIORITY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        <div className="flex items-center gap-2">
+                          {option.value === 1 && <Flame className="h-3 w-3 text-red-500" />}
+                          <span>{option.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Project Organization */}
+              {/* Enhanced Product/Epic Selector */}
               <ProductEpicSelector
                 products={products}
                 epics={epics}
@@ -424,48 +416,83 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 onEpicChange={handleEpicChange}
               />
 
-              {/* Knowledge Integration - Minimalist */}
-              {enableKnowledge && (knowledgeItems.length > 0 || selectedProduct) && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4" />
-                      Knowledge context
-                    </div>
-                    <Switch 
-                      checked={enableKnowledge} 
-                      onCheckedChange={setEnableKnowledge}
-                    />
-                  </div>
+              {/* AI Provider Selection */}
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-muted-foreground">
+                  AI Provider
+                </div>
+                <ProviderSelector
+                  value={providerConfig}
+                  onChange={setProviderConfig}
+                />
+              </div>
 
-                  {knowledgeItems.length > 0 ? (
-                    <div className="max-h-24 overflow-y-auto">
-                      <div className="flex flex-wrap gap-1">
-                        {knowledgeItems.map(item => (
-                          <button
-                            key={item.id}
-                            className={`text-xs px-2 py-1 rounded-full border transition-all ${
-                              selectedKnowledgeIds.includes(item.id) 
-                                ? 'bg-primary text-primary-foreground border-primary' 
-                                : 'bg-background hover:bg-muted border-border'
-                            }`}
-                            onClick={() => handleKnowledgeToggle(item.id)}
+              {/* Knowledge Integration Section */}
+              <div className="space-y-3 p-3 border rounded-md bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-muted-foreground" />
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Use knowledge
+                    </label>
+                  </div>
+                  <Switch 
+                    checked={enableKnowledge} 
+                    onCheckedChange={setEnableKnowledge}
+                    aria-label="Toggle knowledge usage"
+                  />
+                </div>
+
+                {enableKnowledge && knowledgeItems.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      Select knowledge to include ({knowledgeItems.length} available)
+                    </div>
+                    <div className="max-h-32 overflow-y-auto space-y-1">
+                      {knowledgeItems.map(item => (
+                        <div 
+                          key={item.id}
+                          className={`text-xs p-2 rounded cursor-pointer transition-colors ${
+                            selectedKnowledgeIds.includes(item.id) 
+                              ? 'bg-primary/20 text-primary border border-primary/30' 
+                              : 'bg-background hover:bg-muted border border-border'
+                          }`}
+                          onClick={() => handleKnowledgeToggle(item.id)}
+                        >
+                          <div className="font-medium truncate">{item.title}</div>
+                          <div className="text-muted-foreground truncate">{item.category}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedKnowledgeIds.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {selectedKnowledgeItems.map(item => (
+                          <Badge 
+                            key={item.id} 
+                            variant="secondary" 
+                            className="text-xs flex items-center gap-1"
                           >
                             {item.title}
-                          </button>
+                            <X 
+                              className="h-3 w-3 cursor-pointer" 
+                              onClick={() => handleKnowledgeToggle(item.id)}
+                            />
+                          </Badge>
                         ))}
                       </div>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={handleOpenKnowledge}
-                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      Add knowledge items to enhance AI context →
-                    </button>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
+
+                {enableKnowledge && knowledgeItems.length === 0 && (
+                  <button 
+                    onClick={handleOpenKnowledge}
+                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer"
+                  >
+                    No knowledge available for this product. Click to add some →
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
