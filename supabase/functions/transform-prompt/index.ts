@@ -44,29 +44,29 @@ serve(async (req) => {
     }
 
     // Build context-aware system prompt
-    let systemPrompt = `Tu es un expert en création de prompts pour Lovable. Transforme l'idée brute en prompt structuré suivant le framework CLEAR :
+    let systemPrompt = `You are an expert in creating prompts for Lovable. Transform the raw idea into a structured prompt following the CLEAR framework:
 
-Concise (150 mots max), Logique (ordre d'implémentation), Explicite (technologies spécifiques), Adaptive (MVP suggéré), Reflective (critères mesurables).
+Concise (150 words max), Logical (implementation order), Explicit (specific technologies), Adaptive (suggested MVP), Reflective (measurable criteria).
 
-Structure obligatoire :
-# Titre
-→ Fonctionnalités principales
-→ Structure technique  
-→ Détails spécifiques
-→ Point de départ MVP
+Required structure:
+# Title
+→ Main features
+→ Technical structure  
+→ Specific details
+→ MVP starting point
 
-Format markdown prêt à copier-coller. Réponds UNIQUEMENT avec le prompt transformé, sans commentaires additionnels.`;
+Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, no additional comments.`;
 
     // Add knowledge context if provided
     if (knowledgeContext && Array.isArray(knowledgeContext) && knowledgeContext.length > 0) {
-      systemPrompt += `\n\nCONTEXTE PROJET DISPONIBLE (à intégrer dans la réponse si pertinent) :`;
+      systemPrompt += `\n\nAVAILABLE PROJECT CONTEXT (integrate in response if relevant):`;
       knowledgeContext.forEach((item, index) => {
         systemPrompt += `\n\n${index + 1}. ${item.title} (${item.category}):\n${item.content}`;
         if (item.tags && item.tags.length > 0) {
           systemPrompt += `\nTags: ${item.tags.join(', ')}`;
         }
       });
-      systemPrompt += `\n\nUtilise ces informations pour enrichir et personnaliser le prompt selon le contexte du projet.`;
+      systemPrompt += `\n\nUse this information to enrich and personalize the prompt according to the project context.`;
     }
 
     let transformedPrompt: string;

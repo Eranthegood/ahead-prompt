@@ -48,7 +48,7 @@ export class PromptTransformService {
         return {
           success: false,
           transformedPrompt: '',
-          error: 'Veuillez ajouter plus de contexte à votre idée pour une meilleure génération.'
+          error: 'Please add more context to your idea for better generation.'
         };
       }
 
@@ -73,7 +73,7 @@ export class PromptTransformService {
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw new Error(error.message || 'Erreur lors de la transformation du prompt');
+        throw new Error(error.message || 'Error during prompt transformation');
       }
 
       if (data?.error) {
@@ -81,7 +81,7 @@ export class PromptTransformService {
       }
 
       if (!data?.transformedPrompt) {
-        throw new Error('Aucun prompt transformé reçu');
+        throw new Error('No transformed prompt received');
       }
 
       // Save to history
@@ -96,7 +96,7 @@ export class PromptTransformService {
       return { 
         success: false,
         transformedPrompt: '',
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }
