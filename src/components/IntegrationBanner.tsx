@@ -11,17 +11,11 @@ const LovableLogo = ({ className }: { className?: string }) => (
 );
 
 const CursorLogo = ({ className }: { className?: string }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 2L13.09 8.26L19 7L13.09 8.26L12 2Z" fill="currentColor" />
-    <path d="M12 2L10.91 8.26L5 7L10.91 8.26L12 2Z" fill="currentColor" />
-    <path d="M12 22L13.09 15.74L19 17L13.09 15.74L12 22Z" fill="currentColor" />
-    <path d="M12 22L10.91 15.74L5 17L10.91 15.74L12 22Z" fill="currentColor" />
-    <path d="M2 12L8.26 10.91L7 5L8.26 10.91L2 12Z" fill="currentColor" />
-    <path d="M2 12L8.26 13.09L7 19L8.26 13.09L2 12Z" fill="currentColor" />
-    <path d="M22 12L15.74 10.91L17 5L15.74 10.91L22 12Z" fill="currentColor" />
-    <path d="M22 12L15.74 13.09L17 19L15.74 13.09L22 12Z" fill="currentColor" />
-    <circle cx="12" cy="12" r="3" fill="currentColor" />
-  </svg>
+  <img 
+    src="/lovable-uploads/b369a7a5-a645-450e-adb5-c24e9a3bb925.png" 
+    alt="Cursor Logo" 
+    className={className}
+  />
 );
 
 const BoltLogo = ({ className }: { className?: string }) => (
