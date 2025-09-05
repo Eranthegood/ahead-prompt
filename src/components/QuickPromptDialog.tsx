@@ -511,8 +511,12 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
         {/* Action buttons */}
         <div className="flex justify-end gap-3 pt-4 border-t mt-auto flex-shrink-0">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="flex items-center gap-2">
             Cancel
+            <div className="flex items-center gap-1 text-xs opacity-70">
+              <Keyboard className="h-3 w-3" />
+              <span>Esc</span>
+            </div>
           </Button>
           <Button 
             onClick={handleSave} 
