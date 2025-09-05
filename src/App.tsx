@@ -27,6 +27,7 @@ import PromptEnhancer from "./pages/PromptEnhancer";
 import PromptEnhancerComingSoon from "./pages/PromptEnhancerComingSoon";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
+import MixpanelAdmin from "./pages/MixpanelAdmin";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -116,6 +117,11 @@ function App() {
                      <Route path="/theme-demo" element={
                        <ProtectedRoute>
                          <ThemeDemo />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/admin/mixpanel" element={
+                       <ProtectedRoute>
+                         <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
                     <Route path="*" element={<NotFound />} />

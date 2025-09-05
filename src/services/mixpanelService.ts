@@ -1,13 +1,16 @@
 import mixpanel from 'mixpanel-browser';
+import { supabase } from '@/integrations/supabase/client';
 
 // Configuration Mixpanel
 const MIXPANEL_TOKEN = '403921a14a2085274aca10bf5a616324';
 
 class MixpanelService {
   private initialized = false;
+  private excludedUsers = new Set<string>();
 
   constructor() {
     this.init();
+    this.loadExcludedUsers();
   }
 
   private init() {
@@ -28,9 +31,43 @@ class MixpanelService {
     }
   }
 
+  private async loadExcludedUsers() {
+    try {
+      // Note: This will work once the tables are created after migration approval
+      const { data, error } = await supabase
+        .from('mixpanel_excluded_users' as any)
+        .select('user_id');
+
+      if (error) {
+        console.log('Excluded users table not yet available:', error.message);
+        return;
+      }
+
+      this.excludedUsers = new Set(data?.map((row: any) => row.user_id) || []);
+      console.log(`Loaded ${this.excludedUsers.size} excluded users`);
+    } catch (error) {
+      console.log('Error loading excluded users (expected during initial setup):', error);
+    }
+  }
+
+  private isUserExcluded(userId: string): boolean {
+    return this.excludedUsers.has(userId);
+  }
+
+  // Refresh excluded users list (call this after exclusion changes)
+  async refreshExcludedUsers() {
+    await this.loadExcludedUsers();
+  }
+
   // Identifier un utilisateur
   identify(userId: string) {
     if (!this.initialized) return;
+    
+    // Check if user is excluded from tracking
+    if (this.isUserExcluded(userId)) {
+      console.log('User excluded from Mixpanel tracking:', userId);
+      return;
+    }
     
     try {
       mixpanel.identify(userId);
@@ -53,6 +90,13 @@ class MixpanelService {
   // Suivre un événement
   track(eventName: string, properties?: Record<string, any>) {
     if (!this.initialized) return;
+    
+    // Check if current user is excluded from tracking
+    const currentUserId = mixpanel.get_distinct_id();
+    if (currentUserId && this.isUserExcluded(currentUserId)) {
+      console.log('Event tracking skipped for excluded user:', currentUserId);
+      return;
+    }
     
     try {
       mixpanel.track(eventName, {
