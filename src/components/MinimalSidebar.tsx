@@ -562,23 +562,15 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                         ) : (
                           <>
                             <p className="text-xs sm:text-sm text-muted-foreground mb-2">No products yet</p>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => setIsCreateProductOpen(true)}
-                                  className="text-xs sm:text-sm py-1 px-2 sm:px-3"
-                                >
-                                  <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-                                  Add Product
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Add Product</p>
-                                <p className="text-xs text-muted-foreground">Tip: Helps you ship faster and stay organized</p>
-                              </TooltipContent>
-                            </Tooltip>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => setIsCreateProductOpen(true)}
+                              className="text-xs sm:text-sm py-1 px-2 sm:px-3"
+                            >
+                              <Plus className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                              Add Product
+                            </Button>
                           </>
                         )}
                       </div>
