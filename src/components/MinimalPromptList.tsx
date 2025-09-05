@@ -322,7 +322,7 @@ export function MinimalPromptList({
         <div className="text-center max-w-lg mx-auto">
           <Button
             variant="ghost"
-            className="relative flex flex-col items-center gap-6 p-16 hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary-glow/5 transition-all duration-300 cursor-pointer w-full min-w-[500px] border-2 border-dashed border-muted-foreground/20 hover:border-primary/30 rounded-2xl group hover:shadow-lg hover:shadow-primary/10 animate-fade-in"
+            className="relative flex flex-col items-center gap-6 p-16 hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary-glow/5 transition-all duration-300 cursor-pointer w-full min-w-[500px] rounded-2xl group hover:shadow-lg hover:shadow-primary/10 animate-fade-in"
             onClick={() => {
               console.log('[MinimalPromptList] Dispatching open-quick-prompt event');
               const event = new CustomEvent('open-quick-prompt');
