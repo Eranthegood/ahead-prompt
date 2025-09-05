@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Motion Design - Repository Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0F172A;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .animation-wrapper {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            transform: scale(0.8);
+            transform-origin: center;
+        }
+
+        @media (max-width: 1920px) {
+            .animation-wrapper {
+                transform: scale(0.6);
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .animation-wrapper {
+                transform: scale(0.4);
+            }
+        }
+
+        .background-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            background-image: 
+                linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes gridFloat {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-10px, -10px); }
+        }
+
+        .repository {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .repo-circle {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.8) 0%, rgba(55, 48, 163, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: repoPulse 3s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.5);
+        }
+
+        @keyframes repoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(79, 70, 229, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(79, 70, 229, 0.8); }
+        }
+
+        .repo-icon {
+            color: white;
+            font-size: 48px;
+        }
+
+        .queue-section {
+            position: absolute;
+            top: -180px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(31, 41, 55, 0.9);
+            border: 2px solid #374151;
+            border-radius: 25px;
+            padding: 12px 32px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            animation: queueGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes queueGlow {
+            0% { box-shadow: 0 0 10px rgba(79, 70, 229, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.6); }
+        }
+
+        .prompt-indicators {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+        }
+
+        .prompt-dot {
+            width: 12px;
+            height: 8px;
+            border-radius: 2px;
+            animation: promptPulse 1s ease-in-out infinite;
+        }
+
+        .prompt-dot:nth-child(1) { background: #10B981; animation-delay: 0s; }
+        .prompt-dot:nth-child(2) { background: #F59E0B; animation-delay: 0.2s; }
+        .prompt-dot:nth-child(3) { background: #EF4444; animation-delay: 0.4s; }
+        .prompt-dot:nth-child(4) { background: #8B5CF6; animation-delay: 0.6s; }
+        .prompt-dot:nth-child(5) { background: #06B6D4; animation-delay: 0.8s; }
+        .prompt-dot:nth-child(6) { background: #84CC16; animation-delay: 1s; }
+
+        @keyframes promptPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .agent {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: agentFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+        }
+
+        @keyframes agentFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .agent1 {
+            top: 200px;
+            left: 400px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            animation-delay: 0s;
+        }
+
+        .agent2 {
+            top: 200px;
+            right: 400px;
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            animation-delay: 1s;
+        }
+
+        .agent3 {
+            bottom: 200px;
+            left: 400px;
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            animation-delay: 2s;
+        }
+
+        .agent4 {
+            bottom: 200px;
+            right: 400px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            animation-delay: 3s;
+        }
+
+        .agent-icon {
+            color: white;
+            font-size: 24px;
+        }
+
+        .agent-status {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .flow-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, #06B6D4 50%, transparent 100%);
+            opacity: 0.7;
+            animation: flowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        .flow1 {
+            top: 280px;
+            left: 480px;
+            width: 300px;
+            transform: rotate(25deg);
+            animation-delay: 0s;
+        }
+
+        .flow2 {
+            top: 280px;
+            right: 480px;
+            width: 300px;
+            transform: rotate(-25deg);
+            animation-delay: 0.5s;
+        }
+
+        .flow3 {
+            bottom: 280px;
+            left: 480px;
+            width: 300px;
+            transform: rotate(-25deg);
+            animation-delay: 1s;
+        }
+
+        .flow4 {
+            bottom: 280px;
+            right: 480px;
+            width: 300px;
+            transform: rotate(25deg);
+            animation-delay: 1.5s;
+        }
+
+        .data-packet {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: packetFlow 3s linear infinite;
+        }
+
+        @keyframes packetFlow {
+            0% { transform: translateX(0) scale(0); opacity: 0; }
+            10% { transform: translateX(0) scale(1); opacity: 1; }
+            90% { transform: translateX(280px) scale(1); opacity: 1; }
+            100% { transform: translateX(300px) scale(0); opacity: 0; }
+        }
+
+        .packet1 { background: #10B981; animation-delay: 0s; }
+        .packet2 { background: #F59E0B; animation-delay: 1s; }
+        .packet3 { background: #EF4444; animation-delay: 2s; }
+        .packet4 { background: #8B5CF6; animation-delay: 3s; }
+
+        .title {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+        }
+
+        .title h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+            100% { text-shadow: 0 0 20px rgba(255,255,255,0.6); }
+        }
+
+        .title p {
+            font-size: 18px;
+            color: #94A3B8;
+        }
+
+        .activity-indicator {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: activityPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes activityPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .activity1 {
+            top: 340px;
+            left: 860px;
+            background: #06B6D4;
+            animation-delay: 0s;
+        }
+
+        .activity2 {
+            top: 340px;
+            right: 860px;
+            background: #84CC16;
+            animation-delay: 0.7s;
+        }
+
+        .activity3 {
+            top: 640px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #F472B6;
+            animation-delay: 1.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="animation-wrapper">
+            <!-- Background Grid -->
+            <div class="background-grid"></div>
+            
+            <!-- Title -->
+            <div class="title">
+                <h1>Collaborative Repository Activity</h1>
+                <p>Multiple Agents Working Simultaneously</p>
+            </div>
+            
+            <!-- Central Repository -->
+            <div class="repository">
+                <div class="repo-circle">
+                    <div class="repo-icon">📁</div>
+                    <div class="queue-section">
+                        Queue Dozens of Prompts
+                        <div class="prompt-indicators">
+                            <div class="prompt-dot"></div>
+                            <div class="prompt-dot"></div>
+                            <div class="prompt-dot"></div>
+                            <div class="prompt-dot"></div>
+                            <div class="prompt-dot"></div>
+                            <div class="prompt-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agents -->
+            <div class="agent agent1">
+                <div class="agent-icon">🤖</div>
+                <div class="agent-status">GENERATING</div>
+            </div>
+            
+            <div class="agent agent2">
+                <div class="agent-icon">🤖</div>
+                <div class="agent-status">CODING</div>
+            </div>
+            
+            <div class="agent agent3">
+                <div class="agent-icon">🤖</div>
+                <div class="agent-status">PR READY</div>
+            </div>
+            
+            <div class="agent agent4">
+                <div class="agent-icon">🤖</div>
+                <div class="agent-status">MERGED</div>
+            </div>
+            
+            <!-- Flow Lines -->
+            <div class="flow-line flow1">
+                <div class="data-packet packet1"></div>
+            </div>
+            <div class="flow-line flow2">
+                <div class="data-packet packet2"></div>
+            </div>
+            <div class="flow-line flow3">
+                <div class="data-packet packet3"></div>
+            </div>
+            <div class="flow-line flow4">
+                <div class="data-packet packet4"></div>
+            </div>
+            
+            <!-- Activity Indicators -->
+            <div class="activity-indicator activity1"></div>
+            <div class="activity-indicator activity2"></div>
+            <div class="activity-indicator activity3"></div>
+        </div>
+    </div>
+</body>
+</html>
