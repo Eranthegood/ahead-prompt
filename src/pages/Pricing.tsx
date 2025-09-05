@@ -80,7 +80,6 @@ export default function Pricing() {
           <BlurFade delay={0.8} inView>
             <div className="max-w-2xl mx-auto mt-16 p-8 border border-border rounded-lg bg-card/50">
               <div className="text-center space-y-6">
-                <Sparkles className="w-10 h-10 mx-auto text-primary" />
                 <h3 className="text-xl font-semibold">Ready to buy to support?</h3>
                 <p className="text-muted-foreground">
                   Give us some hint for the most fair pricing you&apos;re ready to buy
