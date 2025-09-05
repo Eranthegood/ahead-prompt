@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Edit, Trash2, Copy, Tag, Filter, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { KnowledgeModal } from "./KnowledgeModal";
+import { QuickKnowledgeForm } from "./QuickKnowledgeForm";
 import { format } from "date-fns";
 import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/useKnowledge";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
@@ -267,30 +268,36 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">
-            {searchQuery || selectedTags.length > 0 || (selectedCategory && selectedCategory !== "all")
-              ? "No results found" 
-              : product
-              ? `No knowledge items for ${product.name}`
-              : "No knowledge items yet"
-            }
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            {searchQuery || selectedTags.length > 0 || (selectedCategory && selectedCategory !== "all")
-              ? "Try adjusting your search or filters"
-              : product
-              ? `Start building ${product.name}'s knowledge base with technical context, guidelines, and best practices.`
-              : "Start building your knowledge base with reusable content for better prompts"
-            }
-          </p>
-          {(!searchQuery && selectedTags.length === 0 && (selectedCategory === "all" || !selectedCategory)) && (
-            <Button onClick={handleCreate}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Knowledge
-            </Button>
-          )}
+        <div className="text-center py-12 max-w-2xl mx-auto">
+          {/* Empty state with catchline */}
+          <div className="mb-8">
+            <BookOpen className="h-16 w-16 text-primary mx-auto mb-6" />
+            <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+              {product ? `Supercharge ${product.name} with AI Context` : "Build Your AI Knowledge Arsenal"}
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+              {product
+                ? `Transform your prompts with ${product.name}-specific context. Add code snippets, design guidelines, APIs, and best practices to make every AI interaction smarter.`
+                : "Store reusable context, code snippets, and guidelines that will make your AI prompts 10x more effective across all projects."
+              }
+            </p>
+          </div>
+
+          {/* Quick add knowledge form */}
+          <div className="bg-gradient-to-br from-primary/5 to-primary-glow/5 border border-primary/10 rounded-2xl p-8 mb-6">
+            <h4 className="text-lg font-semibold mb-4 text-left">✨ Add your first knowledge item</h4>
+            <QuickKnowledgeForm 
+              workspace={workspace}
+              product={product}
+              onSuccess={() => {
+                toast.success("Knowledge item created successfully!");
+              }}
+            />
+          </div>
+
+          <div className="text-sm text-muted-foreground">
+            💡 Pro tip: Knowledge items are automatically included in your prompt context to give AI better understanding of your project
+          </div>
         </div>
       )}
 
