@@ -87,20 +87,22 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
               <SidebarTrigger className="md:hidden" />
             )}
             
-            {/* Logo */}
-            <div 
-              className="flex items-center gap-2 cursor-pointer" 
-              onClick={() => navigate('/')}
-            >
-              <img 
-                src={chessKnightLogo} 
-                alt="Ahead Logo" 
-                className="w-8 h-8"
-              />
-              <div className="font-mono text-lg font-bold text-primary">
-                Ahead
+            {/* Logo - Hidden on /build route */}
+            {location.pathname !== '/build' && (
+              <div 
+                className="flex items-center gap-2 cursor-pointer" 
+                onClick={() => navigate('/')}
+              >
+                <img 
+                  src={chessKnightLogo} 
+                  alt="Ahead Logo" 
+                  className="w-8 h-8"
+                />
+                <div className="font-mono text-lg font-bold text-primary">
+                  Ahead
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Desktop Navigation - only show if not showing sidebar */}
             {!showSidebarTrigger && (
