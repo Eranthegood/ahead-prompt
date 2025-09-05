@@ -24,6 +24,7 @@ interface ChecklistItem {
 
 export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingChecklistProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { knowledgeItems } = useKnowledge(workspace.id);
@@ -34,8 +35,14 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
     products: products?.length || 0,
     epics: epics?.length || 0,
     knowledgeItems: knowledgeItems?.length || 0,
-    prompts: prompts?.length || 0
+    prompts: prompts?.length || 0,
+    forceUpdate
   });
+
+  // Force re-render when data changes
+  useEffect(() => {
+    setForceUpdate(prev => prev + 1);
+  }, [products?.length, epics?.length, knowledgeItems?.length, prompts?.length]);
 
   // Check if user has completed onboarding before
   const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${workspace.id}`) === 'true';
@@ -74,6 +81,11 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
       action: () => window.dispatchEvent(new CustomEvent('open-quick-prompt'))
     }
   ];
+
+  console.log('OnboardingChecklist - Checklist items completion:', checklistItems.map(item => ({
+    id: item.id,
+    completed: item.completed
+  })));
 
   const completedCount = checklistItems.filter(item => item.completed).length;
   const totalCount = checklistItems.length;
