@@ -4,22 +4,43 @@ import { useWorkspace } from '@/hooks/useWorkspace';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useCursorIntegration } from '@/hooks/useCursorIntegration';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
+import { PromptCard } from '@/components/PromptCard';
+import { PromptDetailDialog } from '@/components/PromptDetailDialog';
+import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { Loader2, Package, Link2, BookOpen, Hash, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Prompt, PromptStatus, Product, Epic } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const { workspace, loading: workspaceLoading } = useWorkspace();
   const { products, loading: productsLoading } = useProducts(workspace?.id);
   const { epics, loading: epicsLoading } = useEpics(workspace?.id, productId);
-  const { prompts, loading: promptsLoading } = usePrompts(workspace?.id, productId);
+  const { 
+    prompts, 
+    loading: promptsLoading,
+    updatePromptStatus,
+    updatePromptPriority,
+    duplicatePrompt,
+    deletePrompt,
+    updatePrompt
+  } = usePrompts(workspace?.id, productId);
+  const { sendToCursor, isLoading: cursorLoading } = useCursorIntegration();
+  const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [showPromptDetail, setShowPromptDetail] = useState(false);
+  const [showCursorConfig, setShowCursorConfig] = useState(false);
+  const [cursorPrompt, setCursorPrompt] = useState<Prompt | null>(null);
+  const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
 
   if (workspaceLoading || productsLoading) {
     return (
@@ -58,6 +79,124 @@ const ProductPage = () => {
   const epicPrompts = prompts.filter(prompt => prompt.epic_id && productEpics.some(epic => epic.id === prompt.epic_id));
   
   const totalPrompts = directPrompts.length + epicPrompts.length;
+
+  // Enhance prompts with product and epic data for PromptCard
+  const enhancePrompt = (prompt: Prompt): Prompt & { product?: Product; epic?: Epic } => ({
+    ...prompt,
+    product: products.find(p => p.id === prompt.product_id),
+    epic: epics.find(e => e.id === prompt.epic_id)
+  });
+
+  // Callback handlers for PromptCard interactions
+  const handlePromptClick = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setShowPromptDetail(true);
+  };
+
+  const handleEdit = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setShowPromptDetail(true);
+  };
+
+  const handleStatusChange = async (prompt: Prompt, status: PromptStatus) => {
+    try {
+      await updatePromptStatus(prompt.id, status);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update prompt status',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handlePriorityChange = async (prompt: Prompt, priority: number) => {
+    try {
+      await updatePromptPriority(prompt.id, priority);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update prompt priority',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDuplicate = async (prompt: Prompt) => {
+    try {
+      await duplicatePrompt(prompt);
+      toast({
+        title: 'Success',
+        description: 'Prompt duplicated successfully'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to duplicate prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDelete = async (prompt: Prompt) => {
+    try {
+      await deletePrompt(prompt.id);
+      toast({
+        title: 'Success',
+        description: 'Prompt deleted successfully'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete prompt',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCopy = async (prompt: Prompt) => {
+    try {
+      await navigator.clipboard.writeText(prompt.description || '');
+      toast({
+        title: 'Copied',
+        description: 'Prompt content copied to clipboard'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy to clipboard',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCopyGenerated = async (prompt: Prompt) => {
+    try {
+      const textToCopy = prompt.generated_prompt || prompt.description || '';
+      await navigator.clipboard.writeText(textToCopy);
+      
+      // Update status to in_progress if copying generated prompt
+      if (prompt.status === 'todo') {
+        await updatePromptStatus(prompt.id, 'in_progress');
+      }
+      
+      toast({
+        title: 'Copied',
+        description: 'Generated prompt copied to clipboard'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy to clipboard',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleSendToCursor = (prompt: Prompt) => {
+    setCursorPrompt(prompt);
+    setShowCursorConfig(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -135,21 +274,26 @@ const ProductPage = () => {
                         <Loader2 className="h-4 w-4 animate-spin" />
                       </div>
                     ) : directPrompts.length > 0 ? (
-                      <div className="space-y-2">
-                        {directPrompts.slice(0, 5).map((prompt) => (
-                          <div key={prompt.id} className="flex items-center justify-between p-2 rounded-lg border">
-                            <span className="text-sm font-medium">{prompt.title}</span>
-                            <Badge variant={
-                              prompt.status === 'done' ? 'default' : 
-                              prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                            }>
-                              {prompt.status}
-                            </Badge>
-                          </div>
+                      <div className="space-y-3">
+                        {directPrompts.slice(0, 3).map((prompt) => (
+                          <PromptCard
+                            key={prompt.id}
+                            prompt={enhancePrompt(prompt)}
+                            onPromptClick={handlePromptClick}
+                            onEdit={handleEdit}
+                            onStatusChange={handleStatusChange}
+                            onPriorityChange={handlePriorityChange}
+                            onDuplicate={handleDuplicate}
+                            onDelete={handleDelete}
+                            onCopy={handleCopy}
+                            onCopyGenerated={handleCopyGenerated}
+                            isHovered={hoveredPromptId === prompt.id}
+                            onHover={setHoveredPromptId}
+                          />
                         ))}
-                        {directPrompts.length > 5 && (
-                          <p className="text-xs text-muted-foreground">
-                            +{directPrompts.length - 5} more prompts
+                        {directPrompts.length > 3 && (
+                          <p className="text-xs text-muted-foreground text-center py-2">
+                            +{directPrompts.length - 3} more prompts
                           </p>
                         )}
                       </div>
@@ -173,35 +317,26 @@ const ProductPage = () => {
                         <Loader2 className="h-4 w-4 animate-spin" />
                       </div>
                     ) : epicPrompts.length > 0 ? (
-                      <div className="space-y-2">
-                        {epicPrompts.slice(0, 5).map((prompt) => {
-                          const epic = productEpics.find(e => e.id === prompt.epic_id);
-                          return (
-                            <div key={prompt.id} className="flex items-center justify-between p-2 rounded-lg border">
-                              <div>
-                                <span className="text-sm font-medium">{prompt.title}</span>
-                                {epic && (
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <div 
-                                      className="w-2 h-2 rounded-full" 
-                                      style={{ backgroundColor: epic.color || '#8B5CF6' }}
-                                    />
-                                    <span className="text-xs text-muted-foreground">{epic.name}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <Badge variant={
-                                prompt.status === 'done' ? 'default' : 
-                                prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                              }>
-                                {prompt.status}
-                              </Badge>
-                            </div>
-                          );
-                        })}
-                        {epicPrompts.length > 5 && (
-                          <p className="text-xs text-muted-foreground">
-                            +{epicPrompts.length - 5} more prompts
+                      <div className="space-y-3">
+                        {epicPrompts.slice(0, 3).map((prompt) => (
+                          <PromptCard
+                            key={prompt.id}
+                            prompt={enhancePrompt(prompt)}
+                            onPromptClick={handlePromptClick}
+                            onEdit={handleEdit}
+                            onStatusChange={handleStatusChange}
+                            onPriorityChange={handlePriorityChange}
+                            onDuplicate={handleDuplicate}
+                            onDelete={handleDelete}
+                            onCopy={handleCopy}
+                            onCopyGenerated={handleCopyGenerated}
+                            isHovered={hoveredPromptId === prompt.id}
+                            onHover={setHoveredPromptId}
+                          />
+                        ))}
+                        {epicPrompts.length > 3 && (
+                          <p className="text-xs text-muted-foreground text-center py-2">
+                            +{epicPrompts.length - 3} more prompts
                           </p>
                         )}
                       </div>
@@ -241,21 +376,26 @@ const ProductPage = () => {
                         </CardHeader>
                         <CardContent>
                           {epicPromptsList.length > 0 ? (
-                            <div className="space-y-2">
-                              {epicPromptsList.slice(0, 3).map((prompt) => (
-                                <div key={prompt.id} className="flex items-center justify-between p-2 rounded-lg border">
-                                  <span className="text-sm font-medium">{prompt.title}</span>
-                                  <Badge variant={
-                                    prompt.status === 'done' ? 'default' : 
-                                    prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                                  }>
-                                    {prompt.status}
-                                  </Badge>
-                                </div>
+                            <div className="space-y-3">
+                              {epicPromptsList.slice(0, 2).map((prompt) => (
+                                <PromptCard
+                                  key={prompt.id}
+                                  prompt={enhancePrompt(prompt)}
+                                  onPromptClick={handlePromptClick}
+                                  onEdit={handleEdit}
+                                  onStatusChange={handleStatusChange}
+                                  onPriorityChange={handlePriorityChange}
+                                  onDuplicate={handleDuplicate}
+                                  onDelete={handleDelete}
+                                  onCopy={handleCopy}
+                                  onCopyGenerated={handleCopyGenerated}
+                                  isHovered={hoveredPromptId === prompt.id}
+                                  onHover={setHoveredPromptId}
+                                />
                               ))}
-                              {epicPromptsList.length > 3 && (
-                                <p className="text-xs text-muted-foreground">
-                                  +{epicPromptsList.length - 3} more prompts
+                              {epicPromptsList.length > 2 && (
+                                <p className="text-xs text-muted-foreground text-center py-2">
+                                  +{epicPromptsList.length - 2} more prompts
                                 </p>
                               )}
                             </div>
@@ -284,6 +424,29 @@ const ProductPage = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Modals */}
+      {selectedPrompt && (
+        <PromptDetailDialog
+          prompt={selectedPrompt}
+          open={showPromptDetail}
+          onOpenChange={setShowPromptDetail}
+          products={products}
+          epics={epics}
+        />
+      )}
+
+      {cursorPrompt && (
+        <CursorConfigDialog
+          prompt={cursorPrompt}
+          isOpen={showCursorConfig}
+          onClose={() => {
+            setShowCursorConfig(false);
+            setCursorPrompt(null);
+          }}
+          onPromptUpdate={(promptId, updates) => updatePrompt(promptId, updates)}
+        />
+      )}
     </div>
   );
 };
