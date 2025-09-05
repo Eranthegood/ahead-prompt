@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import openaiLogoDark from "@/assets/openai-logo-dark.svg";
-import openaiLogoLight from "@/assets/openai-logo-light.svg";
+import openaiLogoDark from "@/assets/openai-logo-dark.png";
+import openaiLogoLight from "@/assets/openai-logo-light.png";
 
 export interface ProviderConfig {
   provider: 'openai' | 'claude';
