@@ -37,7 +37,8 @@ const INTEGRATIONS_CONFIG = [
     id: 'figma',
     name: 'Figma Integration',
     description: 'Connect your Figma projects to enrich your Knowledge Base with designs, specs, and components for enhanced prompt context.',
-    icon: Code, // We'll use a generic icon for now
+    icon: Code,
+    logo: '/lovable-uploads/ee087f3f-2f51-434e-97bc-91d8c2586b10.png',
     configPath: '/integrations/figma'
   },
   {
