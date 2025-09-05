@@ -9,6 +9,9 @@ import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
+import { useToast } from '@/hooks/use-toast';
+import { CursorWorkflowProgress } from '@/components/CursorWorkflowProgress';
+import { CursorAgentModal } from '@/components/CursorAgentModal';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 
@@ -51,6 +54,8 @@ export function PromptCard({
   const [justCopied, setJustCopied] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
   const [showCursorDialog, setShowCursorDialog] = useState(false);
+  const [showAgentModal, setShowAgentModal] = useState(false);
+  const { toast } = useToast();
   const priority = prompt.priority || 3;
   
   const playSlideSound = () => {
@@ -166,6 +171,31 @@ export function PromptCard({
                     <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
                   </div>
                 </div>
+
+                {/* Cursor Workflow Progress */}
+                <CursorWorkflowProgress
+                  status={prompt.status}
+                  cursorAgentId={prompt.cursor_agent_id}
+                  githubPrUrl={prompt.github_pr_url}
+                  githubPrNumber={prompt.github_pr_number}
+                  cursorBranchName={prompt.cursor_branch_name}
+                  onViewAgent={() => setShowAgentModal(true)}
+                  onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
+                  onMergePR={() => {
+                    // TODO: Implement merge PR functionality
+                    toast({
+                      title: 'Merge PR',
+                      description: 'PR merge functionality coming soon!',
+                    });
+                  }}
+                  onCancel={() => {
+                    // TODO: Implement cancel agent functionality
+                    toast({
+                      title: 'Cancel Agent',
+                      description: 'Agent cancellation functionality coming soon!',
+                    });
+                  }}
+                />
               </div>
                   
                   <div className="flex items-center gap-2 ml-4">
@@ -403,11 +433,21 @@ export function PromptCard({
         </Card>
       </PromptContextMenu>
       
-      {/* Cursor Configuration Dialog */}
-      <CursorConfigDialog
-        isOpen={showCursorDialog}
-        onClose={() => setShowCursorDialog(false)}
-        prompt={prompt}
+      {/* Cursor Agent Modal */}
+      <CursorAgentModal
+        isOpen={showAgentModal}
+        onClose={() => setShowAgentModal(false)}
+        agentId={prompt.cursor_agent_id || ''}
+        agentStatus={prompt.cursor_agent_status}
+        branchName={prompt.cursor_branch_name}
+        logs={prompt.cursor_logs || {}}
+        onCancel={() => {
+          // TODO: Implement cancel agent functionality
+          setShowAgentModal(false);
+        }}
+        onRefresh={() => {
+          // TODO: Implement refresh agent status
+        }}
       />
     </>
   );

@@ -64,12 +64,20 @@ export interface Database {
           product_id: string | null;
           title: string;
           description: string | null;
-          status: 'todo' | 'generating' | 'in_progress' | 'done';
+          status: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
           priority: number;
           order_index: number;
           generated_prompt: string | null;
           generated_at: string | null;
           is_debug_session: boolean | null;
+          cursor_agent_id: string | null;
+          cursor_agent_status: string | null;
+          github_pr_number: number | null;
+          github_pr_url: string | null;
+          github_pr_status: string | null;
+          cursor_branch_name: string | null;
+          cursor_logs: any;
+          workflow_metadata: any;
           created_at: string;
           updated_at: string;
         };
@@ -80,12 +88,20 @@ export interface Database {
           product_id?: string | null;
           title: string;
           description?: string | null;
-          status?: 'todo' | 'generating' | 'in_progress' | 'done';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
           generated_at?: string | null;
           is_debug_session?: boolean | null;
+          cursor_agent_id?: string | null;
+          cursor_agent_status?: string | null;
+          github_pr_number?: number | null;
+          github_pr_url?: string | null;
+          github_pr_status?: string | null;
+          cursor_branch_name?: string | null;
+          cursor_logs?: any;
+          workflow_metadata?: any;
           created_at?: string;
           updated_at?: string;
         };
@@ -96,12 +112,20 @@ export interface Database {
           product_id?: string | null;
           title?: string;
           description?: string | null;
-          status?: 'todo' | 'generating' | 'in_progress' | 'done';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
           generated_at?: string | null;
           is_debug_session?: boolean | null;
+          cursor_agent_id?: string | null;
+          cursor_agent_status?: string | null;
+          github_pr_number?: number | null;
+          github_pr_url?: string | null;
+          github_pr_status?: string | null;
+          cursor_branch_name?: string | null;
+          cursor_logs?: any;
+          workflow_metadata?: any;
           created_at?: string;
           updated_at?: string;
         };
@@ -169,7 +193,7 @@ export interface Product {
   updated_at: string;
 }
 
-export type PromptStatus = 'todo' | 'generating' | 'in_progress' | 'done';
+export type PromptStatus = 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
 export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';
 
 // Priority levels: 1 = High, 2 = Normal, 3 = Low

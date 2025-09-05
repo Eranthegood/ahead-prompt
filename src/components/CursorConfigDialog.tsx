@@ -17,6 +17,7 @@ interface CursorConfigDialogProps {
     product?: Product;
     epic?: Epic;
   };
+  onPromptUpdate?: (promptId: string, updates: Partial<Prompt>) => void;
 }
 
 interface CursorAgentResponse {
@@ -35,7 +36,7 @@ const CURSOR_MODELS = [
   { value: 'gpt-4o-mini', label: 'GPT-4o Mini' }
 ];
 
-export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDialogProps) {
+export function CursorConfigDialog({ isOpen, onClose, prompt, onPromptUpdate }: CursorConfigDialogProps) {
   // Auto-populate from mapping data
   const defaultRepository = prompt.product?.github_repo_url || '';
   const defaultBranch = prompt.product?.default_branch || 'main';
@@ -126,8 +127,26 @@ export function CursorConfigDialog({ isOpen, onClose, prompt }: CursorConfigDial
         throw new Error(data.details || data.error);
       }
 
-      // Success!
+      // Success! Update the prompt status to reflect Cursor workflow
       setResult(data.agent);
+      
+      // Update the prompt in the database with Cursor workflow data
+      if (onPromptUpdate) {
+        onPromptUpdate(prompt.id, {
+          status: 'sent_to_cursor' as const,
+          cursor_agent_id: data.agent.id,
+          cursor_agent_status: data.agent.status,
+          cursor_branch_name: data.agent.branch || branchName,
+          workflow_metadata: {
+            repository: cleanRepo,
+            ref: ref || 'main',
+            model,
+            autoCreatePr,
+            sentAt: new Date().toISOString()
+          }
+        });
+      }
+      
       toast({
         title: 'Agent created successfully!',
         description: `Cursor agent "${data.agent.name}" is now working on your repository.`,

@@ -684,10 +684,17 @@ export type Database = {
       prompts: {
         Row: {
           created_at: string
+          cursor_agent_id: string | null
+          cursor_agent_status: string | null
+          cursor_branch_name: string | null
+          cursor_logs: Json | null
           description: string | null
           epic_id: string | null
           generated_at: string | null
           generated_prompt: string | null
+          github_pr_number: number | null
+          github_pr_status: string | null
+          github_pr_url: string | null
           id: string
           is_debug_session: boolean | null
           order_index: number
@@ -696,14 +703,22 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          workflow_metadata: Json | null
           workspace_id: string
         }
         Insert: {
           created_at?: string
+          cursor_agent_id?: string | null
+          cursor_agent_status?: string | null
+          cursor_branch_name?: string | null
+          cursor_logs?: Json | null
           description?: string | null
           epic_id?: string | null
           generated_at?: string | null
           generated_prompt?: string | null
+          github_pr_number?: number | null
+          github_pr_status?: string | null
+          github_pr_url?: string | null
           id?: string
           is_debug_session?: boolean | null
           order_index?: number
@@ -712,14 +727,22 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          workflow_metadata?: Json | null
           workspace_id: string
         }
         Update: {
           created_at?: string
+          cursor_agent_id?: string | null
+          cursor_agent_status?: string | null
+          cursor_branch_name?: string | null
+          cursor_logs?: Json | null
           description?: string | null
           epic_id?: string | null
           generated_at?: string | null
           generated_prompt?: string | null
+          github_pr_number?: number | null
+          github_pr_status?: string | null
+          github_pr_url?: string | null
           id?: string
           is_debug_session?: boolean | null
           order_index?: number
@@ -728,6 +751,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          workflow_metadata?: Json | null
           workspace_id?: string
         }
         Relationships: [
