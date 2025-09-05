@@ -34,8 +34,8 @@ export function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className="flex gap-4">
+      <div className="flex-1 space-y-2">
         <Label htmlFor="provider">Provider</Label>
         <Select value={value.provider} onValueChange={handleProviderChange}>
           <SelectTrigger id="provider">
@@ -48,7 +48,7 @@ export function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
         </Select>
       </div>
 
-      <div className="space-y-2">
+      <div className="flex-1 space-y-2">
         <Label htmlFor="model">Model</Label>
         <Select value={value.model} onValueChange={handleModelChange}>
           <SelectTrigger id="model">
