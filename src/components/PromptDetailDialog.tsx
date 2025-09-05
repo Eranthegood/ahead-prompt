@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,9 +36,14 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [textLength, setTextLength] = useState(0);
   const [draftRestored, setDraftRestored] = useState(false);
+  const [localDescription, setLocalDescription] = useState(prompt?.description || '');
+  const [localTitle, setLocalTitle] = useState(prompt?.title || '');
   const [descriptionSaving, setDescriptionSaving] = useState(false);
+  const [titleSaving, setTitleSaving] = useState(false);
   const { toast } = useToast();
-  const { updatePrompt } = usePrompts();
+  const { updatePrompt, updatePromptSilently } = usePrompts();
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const titleSaveTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Rich text editor
   const editor = useEditor({
@@ -67,6 +72,44 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     },
   });
 
+  // Debounced save function for description
+  const debouncedSave = useCallback(async (description: string) => {
+    if (!prompt) return;
+    
+    setDescriptionSaving(true);
+    try {
+      await updatePromptSilently(prompt.id, { description });
+    } catch (error) {
+      console.error('Error saving description:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Échec de la sauvegarde de la description',
+        variant: 'destructive'
+      });
+    } finally {
+      setDescriptionSaving(false);
+    }
+  }, [prompt, updatePromptSilently, toast]);
+
+  // Debounced save function for title
+  const debouncedSaveTitle = useCallback(async (title: string) => {
+    if (!prompt) return;
+    
+    setTitleSaving(true);
+    try {
+      await updatePromptSilently(prompt.id, { title });
+    } catch (error) {
+      console.error('Error saving title:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Échec de la sauvegarde du titre',
+        variant: 'destructive'
+      });
+    } finally {
+      setTitleSaving(false);
+    }
+  }, [prompt, updatePromptSilently, toast]);
+
   // Reset form when prompt changes (but preserve draft if one exists)
   useEffect(() => {
     if (prompt && editor && !draftRestored) {
@@ -83,6 +126,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       });
       
       editor.commands.setContent(originalContent);
+      setLocalDescription(prompt.description || '');
+      setLocalTitle(prompt.title || '');
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
       
@@ -94,6 +139,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       setTextLength(cleanText.length);
     }
   }, [prompt, editor, draftRestored]);
+
+  // Cleanup timeouts when component unmounts or prompt changes
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      if (titleSaveTimeoutRef.current) {
+        clearTimeout(titleSaveTimeoutRef.current);
+      }
+    };
+  }, [prompt?.id]);
 
   const handleRegeneratePrompt = async () => {
     if (!editor || !prompt) return;
@@ -529,46 +586,60 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Original Text</Label>
                 <div className="space-y-2">
-                  <Input
-                    placeholder="Prompt title"
-                    value={prompt.title || ''}
-                    onChange={(e) => {
-                      if (prompt) {
-                        updatePrompt(prompt.id, { title: e.target.value });
-                      }
-                    }}
-                    className="text-sm"
-                  />
-                   <Textarea
-                     placeholder="Prompt description"
-                     value={prompt.description || ''}
-                     onChange={async (e) => {
-                       if (prompt) {
-                         setDescriptionSaving(true);
-                         try {
-                           await updatePrompt(prompt.id, { description: e.target.value });
-                           if (e.target.value.trim()) {
-                             toast({
-                               title: 'Saved',
-                               description: 'Description updated successfully',
-                               duration: 2000
-                             });
-                           }
-                         } catch (error) {
-                           console.error('Error updating description:', error);
-                           toast({
-                             title: 'Error',
-                             description: 'Failed to save description',
-                             variant: 'destructive'
-                           });
-                         } finally {
-                           setDescriptionSaving(false);
+                  <div className="relative">
+                    <Input
+                      placeholder="Prompt title"
+                      value={localTitle}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setLocalTitle(newValue);
+                        
+                        // Clear existing timeout
+                        if (titleSaveTimeoutRef.current) {
+                          clearTimeout(titleSaveTimeoutRef.current);
+                        }
+                        
+                        // Set new timeout for debounced save
+                        titleSaveTimeoutRef.current = setTimeout(() => {
+                          debouncedSaveTitle(newValue);
+                        }, 500);
+                      }}
+                      className="text-sm"
+                      disabled={titleSaving}
+                    />
+                    {titleSaving && (
+                      <div className="absolute top-2 right-2 text-xs text-muted-foreground">
+                        Sauvegarde...
+                      </div>
+                    )}
+                  </div>
+                   <div className="relative">
+                     <Textarea
+                       placeholder="Prompt description"
+                       value={localDescription}
+                       onChange={(e) => {
+                         const newValue = e.target.value;
+                         setLocalDescription(newValue);
+                         
+                         // Clear existing timeout
+                         if (saveTimeoutRef.current) {
+                           clearTimeout(saveTimeoutRef.current);
                          }
-                       }
-                     }}
-                     className="text-sm min-h-[100px]"
-                     disabled={descriptionSaving}
-                   />
+                         
+                         // Set new timeout for debounced save
+                         saveTimeoutRef.current = setTimeout(() => {
+                           debouncedSave(newValue);
+                         }, 500);
+                       }}
+                       className="text-sm min-h-[100px]"
+                       disabled={descriptionSaving}
+                     />
+                     {descriptionSaving && (
+                       <div className="absolute top-2 right-2 text-xs text-muted-foreground">
+                         Sauvegarde...
+                       </div>
+                     )}
+                   </div>
                   <Button
                     variant="outline"
                     size="sm"

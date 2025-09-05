@@ -646,6 +646,31 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
+  // Update prompt silently without toast notifications
+  const updatePromptSilently = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
+    const updateData = { ...updates, updated_at: new Date().toISOString() };
+
+    try {
+      await withOptimisticUpdate(
+        // Optimistic update
+        prev => prev.map(p => p.id === promptId ? { ...p, ...updateData } : p),
+        // Database operation
+        async () => {
+          const { error } = await supabase
+            .from('prompts')
+            .update(updateData)
+            .eq('id', promptId);
+          if (error) throw error;
+        },
+        // Rollback - refetch all data
+        () => { fetchPrompts(); return []; }
+      );
+    } catch (error) {
+      console.error('Error updating prompt silently:', error);
+      throw error; // Let caller handle the error
+    }
+  };
+
   // Update prompt with optimistic update and auto-generation
   const updatePrompt = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
     const updateData = { ...updates, updated_at: new Date().toISOString() };
@@ -767,6 +792,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     duplicatePrompt,
     deletePrompt,
     updatePrompt,
+    updatePromptSilently,
     refetch: fetchPrompts,
     cleanupStuckGeneratingPrompts: () => cleanupStuckGeneratingPrompts(prompts),
   };
