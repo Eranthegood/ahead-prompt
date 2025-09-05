@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { RedditPixelService } from '@/services/redditPixelService';
 import { UserStats, UserAchievement, XP_REWARDS, ACHIEVEMENTS } from '@/types/gamification';
 
 // Create a global event emitter for XP animations
@@ -154,6 +155,12 @@ export const useGamification = () => {
         title: `🏆 Succès débloqué !`,
         description: `${achievement.icon} ${achievement.title}`,
       });
+
+      // Track Reddit conversion for first prompt achievement
+      if (achievement.name === 'first_prompt') {
+        console.log('[Reddit Pixel] First prompt achievement unlocked, tracking conversion');
+        RedditPixelService.trackFirstPromptCreated(user.id);
+      }
 
     } catch (error) {
       console.error('Error unlocking achievement:', error);

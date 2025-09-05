@@ -15,6 +15,7 @@ import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
+import { RedditPixelService } from '@/services/redditPixelService';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -308,6 +309,14 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         description: 'Your prompt will be generated automatically.',
         variant: 'default'
       });
+      
+      // Track general prompt creation with Reddit Pixel
+      if (workspace.owner_id) {
+        RedditPixelService.trackPromptCreated(
+          Math.random().toString(36).substr(2, 9), // temporary ID
+          workspace.owner_id
+        );
+      }
       
       onClose();
       
