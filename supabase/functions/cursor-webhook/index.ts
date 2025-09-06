@@ -1,3 +1,58 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface CursorEvent {
+  id: string;
+  status: string;
+  stage?: string;
+  progress?: number;
+  metadata?: Record<string, unknown>;
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const body: CursorEvent = await req.json();
+
+    const serviceUrl = Deno.env.get('AGENT_STATUS_SERVICE_URL');
+    const cursorToken = Deno.env.get('CURSOR_TOKEN');
+    if (!serviceUrl || !cursorToken) {
+      return new Response(JSON.stringify({ error: 'Service not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const resp = await fetch(`${serviceUrl}/api/jobs/${body.id}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cursorToken}`
+      },
+      body: JSON.stringify({
+        status: body.status?.toLowerCase?.() || 'running',
+        stage: body.stage,
+        progress: typeof body.progress === 'number' ? Math.max(0, Math.min(100, Math.floor(body.progress))) : undefined,
+        payload: body.metadata || {}
+      })
+    });
+
+    if (!resp.ok) {
+      const txt = await resp.text();
+      return new Response(JSON.stringify({ error: 'Forward failed', details: txt }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    return new Response(JSON.stringify({ ok: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Invalid payload', details: e instanceof Error ? e.message : String(e) }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+});
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.1';
 

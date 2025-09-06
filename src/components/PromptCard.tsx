@@ -13,6 +13,7 @@ import { AIAgentManager } from '@/services/aiAgentManager';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCursorIntegration } from '@/hooks/useCursorIntegration';
 import { useCursorAgentPolling } from '@/hooks/useCursorAgentPolling';
+import { useAgentStatusStream } from '@/hooks/useAgentStatusStream';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { CursorWorkflowProgress } from '@/components/CursorWorkflowProgress';
 import { CursorAgentModal } from '@/components/CursorAgentModal';
@@ -88,9 +89,15 @@ export function PromptCard({
       if (agent?.id) updateAgentStatus(agent.id);
     }
   });
+
+  // Live status stream from Agent Status Service keyed by Cursor agent id
+  const { latest: liveStatus } = useAgentStatusStream(prompt.cursor_agent_id || undefined);
   
   const priority = prompt.priority || 3;
-  const statusDisplay = getCursorStatusDisplay(prompt.status, prompt.cursor_agent_status || undefined);
+  const statusDisplay = getCursorStatusDisplay(
+    prompt.status,
+    (liveStatus?.status?.toLowerCase?.() as any) || (prompt.cursor_agent_status || undefined)
+  );
   
   const playSlideSound = () => {
     try {
@@ -250,7 +257,7 @@ export function PromptCard({
                     }}
                   >
                     {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status)
-                      ? statusDisplay.label
+                      ? `${statusDisplay.label}${liveStatus?.progress != null ? ` • ${liveStatus.progress}%` : ''}`
                       : (prompt.status === 'in_progress' ? 'In Progress' : 
                          prompt.status === 'done' ? 'Done' : 'Todo')}
                   </Badge>
