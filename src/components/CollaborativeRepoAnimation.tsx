@@ -75,12 +75,7 @@ const CollaborativeRepoAnimation = () => {
             <motion.div
               className="relative"
               animate={{
-                scale: [1, 1.05, 1],
-                boxShadow: [
-                  "0 0 20px hsl(var(--primary) / 0.2)",
-                  "0 0 40px hsl(var(--primary) / 0.4)",
-                  "0 0 20px hsl(var(--primary) / 0.2)"
-                ]
+                scale: [1, 1.05, 1]
               }}
               transition={{
                 duration: 3,
