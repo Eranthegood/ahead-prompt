@@ -118,7 +118,9 @@ const CollaborativeRepoAnimation = () => {
             { position: "top-left", color: "hsl(var(--chart-1))", status: "Generating", icon: Zap, x: "25%", y: "35%" },
             { position: "top-right", color: "hsl(var(--chart-2))", status: "Coding", icon: Code, x: "75%", y: "35%" },
             { position: "bottom-left", color: "hsl(var(--chart-3))", status: "Testing", icon: GitBranch, x: "25%", y: "75%" },
-            { position: "bottom-right", color: "hsl(var(--chart-4))", status: "Deploying", icon: CheckCircle, x: "75%", y: "75%" }
+            { position: "bottom-right", color: "hsl(var(--chart-4))", status: "Deploying", icon: CheckCircle, x: "75%", y: "75%" },
+            { position: "lower-left", color: "hsl(var(--chart-1))", status: "Reviewing", icon: Code, x: "35%", y: "90%" },
+            { position: "lower-right", color: "hsl(var(--chart-2))", status: "Monitoring", icon: Zap, x: "65%", y: "90%" }
           ].map((agent, index) => (
             <div key={agent.position} className="absolute" style={{ left: agent.x, top: agent.y, transform: "translate(-50%, -50%)" }}>
               <motion.div
