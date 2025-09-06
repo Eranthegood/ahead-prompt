@@ -129,53 +129,6 @@ export default function LandingPage() {
       {/* Results Section */}
       
 
-      {/* Solution Section */}
-      <section className="py-16 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Turn Wait Time Into Win Time
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <Code className="w-8 h-8 text-primary" />
-              </div>
-              <div className="text-sm text-primary font-medium">STEP 1</div>
-              <h3 className="font-semibold">Launch prompt in Cursor/Claude</h3>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <ToggleLeft className="w-8 h-8 text-primary" />
-              </div>
-              <div className="text-sm text-primary font-medium">STEP 2</div>
-              <h3 className="font-semibold">Switch to Ahead</h3>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <div className="flex space-x-1">
-                  <Circle className="w-2 h-2 text-primary fill-current" />
-                  <Circle className="w-2 h-2 text-primary fill-current" />
-                  <Circle className="w-2 h-2 text-primary fill-current" />
-                </div>
-              </div>
-              <div className="text-sm text-primary font-medium">STEP 3</div>
-              <h3 className="font-semibold">Prepare your next 3 moves</h3>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <Clipboard className="w-8 h-8 text-primary" />
-              </div>
-              <div className="text-sm text-primary font-medium">STEP 4</div>
-              <h3 className="font-semibold">Copy-paste instantly</h3>
-            </div>
-          </div>
-          
-        </div>
-      </section>
 
       {/* Feature Demo Section */}
       <section className="py-16 px-6 bg-muted/30">
