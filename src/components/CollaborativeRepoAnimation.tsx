@@ -73,7 +73,7 @@ const CollaborativeRepoAnimation = () => {
           {/* Central Repository */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
             <motion.div
-              className="relative opacity-0"
+              className="relative"
               animate={{
                 scale: [1, 1.05, 1],
                 boxShadow: [
@@ -88,7 +88,7 @@ const CollaborativeRepoAnimation = () => {
                 repeat: Infinity
               }}
             >
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm">
                 <Folder className="w-10 h-10 text-primary" />
               </div>
             </motion.div>
