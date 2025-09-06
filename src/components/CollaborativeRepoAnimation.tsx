@@ -77,9 +77,6 @@ const CollaborativeRepoAnimation = () => {
                         {prompt.badgeStatus === 'done' ? 'Done' : 
                          prompt.badgeStatus === 'in_progress' ? 'In Progress' : 'Todo'}
                       </Badge>
-                      {prompt.status === "completed" && (
-                        <CheckCircle className="w-4 h-4 text-success" />
-                      )}
                     </div>
                   </motion.div>
                 ))}
