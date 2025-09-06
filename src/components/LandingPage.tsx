@@ -186,9 +186,9 @@ export default function LandingPage() {
                 Tired of 5 open tabs and half-written Notion blocks?
               </h2>
                
-              <p className="text-xl text-muted-foreground">
-                While AI works, your brain races ahead. Capture those brilliant ideas instantly instead of losing them.
-              </p>
+               <p className="text-xl text-muted-foreground">
+                 Centralize the chaos. Your ready to develop prompts workspace that moves at brain speed.
+               </p>
                
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
