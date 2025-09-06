@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bot, Folder, Zap, Code, GitBranch, CheckCircle } from "lucide-react";
+import { Bot, Github, Zap, Code, GitBranch, CheckCircle } from "lucide-react";
 
 const CollaborativeRepoAnimation = () => {
   return (
@@ -89,7 +89,7 @@ const CollaborativeRepoAnimation = () => {
               }}
             >
               <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm">
-                <Folder className="w-10 h-10 text-primary" />
+                <Github className="w-10 h-10 text-primary" />
               </div>
             </motion.div>
 
