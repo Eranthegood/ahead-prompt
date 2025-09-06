@@ -253,7 +253,7 @@ export function InteractivePromptCards() {
 
       {/* Interactive Cards */}
       <motion.div
-        className="flex flex-row gap-4 overflow-x-auto relative z-10 min-w-0"
+        className="flex flex-col gap-6 relative z-10 max-w-md mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -270,7 +270,7 @@ export function InteractivePromptCards() {
                 key={prompt.id}
                 variants={cardVariants}
                 layout
-                className={`relative flex-shrink-0 w-80 ${isSliding ? 'animate-slide-out-right' : ''}`}
+                className={`relative w-full ${isSliding ? 'animate-slide-out-right' : ''}`}
               >
                 <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group relative overflow-hidden">
                   {/* Hover Glow Effect */}
