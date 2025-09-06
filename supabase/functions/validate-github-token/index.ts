@@ -142,8 +142,24 @@ serve(async (req) => {
       throw new Error('Failed to save integration');
     }
 
-    // Store token in secrets (this would be handled differently in production)
-    // For now, we'll return success with user info
+    // Store token in secrets for PR operations
+    const { error: secretError } = await supabase
+      .from('user_secrets')
+      .upsert({
+        user_id: user.id,
+        key: 'github_token',
+        encrypted_value: token, // In production, this should be encrypted
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,key'
+      });
+
+    if (secretError) {
+      console.error('Error storing GitHub token:', secretError);
+      throw new Error('Failed to store GitHub token securely');
+    }
+
+    console.log('GitHub token validated and stored successfully');
     
     return new Response(JSON.stringify({
       success: true,
