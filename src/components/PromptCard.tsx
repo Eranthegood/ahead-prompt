@@ -343,6 +343,9 @@ export function PromptCard({
                       className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={(e) => {
                         e.stopPropagation();
+                        const isCursorFlow = ['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status);
+                        if (isCursorFlow) return; // Don't cycle manual status while Cursor workflow is active
+
                         const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
                         const nextIndex = (currentIndex + 1) % statusOptions.length;
                         const nextStatus = statusOptions[nextIndex].value as PromptStatus;
@@ -358,8 +361,10 @@ export function PromptCard({
                         }
                       }}
                     >
-                      {prompt.status === 'in_progress' ? 'In Progress' : 
-                       prompt.status === 'done' ? 'Done' : 'Todo'}
+                      {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status)
+                        ? statusDisplay.label
+                        : (prompt.status === 'in_progress' ? 'In Progress' : 
+                           prompt.status === 'done' ? 'Done' : 'Todo')}
                     </Badge>
                     
                     {/* Actions Dropdown */}
