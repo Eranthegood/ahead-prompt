@@ -88,7 +88,7 @@ const CollaborativeRepoAnimation = () => {
                 repeat: Infinity
               }}
             >
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm opacity-0">
                 <Folder className="w-10 h-10 text-primary" />
               </div>
             </motion.div>
