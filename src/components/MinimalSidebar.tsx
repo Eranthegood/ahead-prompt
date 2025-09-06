@@ -536,7 +536,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 variant="ghost" 
                 className="w-full justify-start text-left font-normal text-sm sm:text-base py-2"
                 onClick={() => {
-                  navigate('/');
+                  navigate('/build');
                   onProductSelect('all');
                   onEpicSelect(undefined);
                 }}
