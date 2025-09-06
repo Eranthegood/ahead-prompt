@@ -306,7 +306,7 @@ export default function LandingPage() {
 
 
       {/* Cursor Multi-Agent Section */}
-      <section className="py-16 px-6 bg-muted/30">
+      <section className="py-16 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             <div className="space-y-6 lg:col-span-2">
