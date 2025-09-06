@@ -136,6 +136,26 @@ serve(async (req) => {
 
     console.log(`Prompt ${prompt.id} updated with Cursor status: ${payload.status} -> ${promptStatus}`);
 
+    // Trigger task automation for status transitions
+    try {
+      const automationResult = await supabase.functions.invoke('workflow-automation', {
+        body: {
+          workspaceId: prompt.workspace_id,
+          action: 'task_automation',
+          entityId: prompt.id,
+          entityType: 'prompt'
+        }
+      });
+      
+      if (automationResult.error) {
+        console.error('Task automation failed:', automationResult.error);
+      } else {
+        console.log('Task automation triggered successfully:', automationResult.data);
+      }
+    } catch (automationError) {
+      console.error('Error triggering task automation:', automationError);
+    }
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

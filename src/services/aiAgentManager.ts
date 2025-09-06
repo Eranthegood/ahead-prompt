@@ -279,6 +279,26 @@ export class AIAgentManager {
     }
   }
 
+  // Task Automation Methods
+  static async executeTaskAutomation(workspaceId: string, entityId?: string, entityType?: string): Promise<any> {
+    try {
+      const { data, error } = await supabase.functions.invoke('workflow-automation', {
+        body: {
+          workspaceId,
+          action: 'task_automation',
+          entityId,
+          entityType
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Task automation failed:', error);
+      throw error;
+    }
+  }
+
   // Workflow Automation Agent
   static async executeWorkflowAutomation(entityId: string, entityType: string, workspaceId: string, action: string): Promise<void> {
     try {

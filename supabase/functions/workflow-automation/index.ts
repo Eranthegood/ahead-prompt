@@ -61,6 +61,8 @@ serve(async (req) => {
     switch (action) {
       case 'auto_status_update':
         return await autoStatusUpdate(workspaceId, entityId, entityType, agent.id, startTime);
+      case 'task_automation':
+        return await automateTaskTransitions(workspaceId, entityId, entityType, agent.id, startTime);
       case 'priority_adjustment':
         return await priorityAdjustment(workspaceId, agent.id, startTime);
       case 'epic_organization':
@@ -200,6 +202,156 @@ async function autoStatusUpdate(workspaceId: string, entityId: string, entityTyp
       processing_time_ms: Date.now() - startTime
     });
     throw error;
+  }
+}
+
+// Task automation for MVP - handles automatic transitions
+async function automateTaskTransitions(workspaceId: string, entityId: string, entityType: string, agentId: string, startTime: number) {
+  try {
+    if (entityType === 'prompt' && entityId) {
+      // Get the specific prompt
+      const { data: prompt, error: promptError } = await supabase
+        .from('prompts')
+        .select('*')
+        .eq('id', entityId)
+        .single();
+
+      if (promptError || !prompt) {
+        console.error('Error fetching prompt:', promptError);
+        throw new Error('Prompt not found');
+      }
+
+      const updates: any = {};
+      let statusChanged = false;
+      let reason = '';
+
+      // Rule 1: "To Do" → "In Progress" when Cursor agent starts
+      if (prompt.status === 'todo' && prompt.cursor_agent_id && 
+          (prompt.cursor_agent_status === 'RUNNING' || prompt.cursor_agent_status === 'CREATING')) {
+        updates.status = 'in_progress';
+        statusChanged = true;
+        reason = 'Cursor agent started working on task';
+      }
+
+      // Rule 2: "In Progress" → "Done" when PR is merged
+      if ((prompt.status === 'in_progress' || prompt.status === 'pr_created') && 
+          prompt.github_pr_url && prompt.github_pr_status === 'merged') {
+        updates.status = 'done';
+        statusChanged = true;
+        reason = 'Pull request merged successfully';
+      }
+
+      // Rule 3: Handle Cursor completion
+      if (prompt.status === 'cursor_working' && prompt.cursor_agent_status === 'COMPLETED') {
+        if (prompt.github_pr_url) {
+          updates.status = 'pr_created';
+          reason = 'Cursor completed - PR created';
+        } else {
+          updates.status = 'done';
+          reason = 'Cursor completed - Task finished';
+        }
+        statusChanged = true;
+      }
+
+      // Rule 4: Handle failures - reset to todo
+      if ((prompt.status === 'cursor_working' || prompt.status === 'sending_to_cursor') && 
+          (prompt.cursor_agent_status === 'FAILED' || prompt.cursor_agent_status === 'CANCELLED')) {
+        updates.status = 'todo';
+        statusChanged = true;
+        reason = `Cursor ${prompt.cursor_agent_status.toLowerCase()} - Reset to todo`;
+      }
+
+      if (statusChanged) {
+        // Add automation metadata
+        updates.workflow_metadata = {
+          ...prompt.workflow_metadata,
+          automated_at: new Date().toISOString(),
+          automation_reason: reason,
+          previous_status: prompt.status
+        };
+
+        // Update the prompt
+        const { error: updateError } = await supabase
+          .from('prompts')
+          .update(updates)
+          .eq('id', entityId);
+
+        if (updateError) {
+          console.error('Error updating prompt status:', updateError);
+          throw new Error('Failed to update prompt');
+        }
+
+        // Log success activity
+        await supabase.from('agent_activities').insert({
+          agent_id: agentId,
+          workspace_id: workspaceId,
+          activity_type: 'task_automation',
+          entity_type: 'prompt',
+          entity_id: entityId,
+          action_taken: `status_transition_${prompt.status}_to_${updates.status}`,
+          metadata: {
+            previous_status: prompt.status,
+            new_status: updates.status,
+            reason: reason,
+            cursor_agent_id: prompt.cursor_agent_id,
+            pr_url: prompt.github_pr_url
+          },
+          success: true,
+          processing_time_ms: Date.now() - startTime
+        });
+
+        console.log(`Task automation: ${prompt.title} (${entityId}) - ${prompt.status} → ${updates.status}: ${reason}`);
+        
+        return new Response(JSON.stringify({
+          success: true,
+          action: 'status_updated',
+          previous_status: prompt.status,
+          new_status: updates.status,
+          reason: reason
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // Log no automation needed
+    await supabase.from('agent_activities').insert({
+      agent_id: agentId,
+      workspace_id: workspaceId,
+      activity_type: 'task_automation',
+      entity_type: entityType || 'prompt',
+      entity_id: entityId,
+      action_taken: 'no_automation_needed',
+      metadata: { checked_at: new Date().toISOString() },
+      success: true,
+      processing_time_ms: Date.now() - startTime
+    });
+
+    return new Response(JSON.stringify({ success: true, action: 'no_automation_needed' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Task automation failed:', error);
+    
+    // Log failed activity
+    await supabase.from('agent_activities').insert({
+      agent_id: agentId,
+      workspace_id: workspaceId,
+      activity_type: 'task_automation',
+      entity_type: entityType || 'prompt',
+      entity_id: entityId || null,
+      action_taken: 'task_automation_failed',
+      metadata: {},
+      success: false,
+      error_message: error.message,
+      processing_time_ms: Date.now() - startTime
+    });
+
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 }
 

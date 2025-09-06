@@ -27,6 +27,27 @@ export function useAgentAutomation() {
     }
   }, [workspace?.id, user]);
 
+  // Task automation triggers (MVP)
+  const triggerTaskAutomation = useCallback(async (entityId?: string, entityType?: string) => {
+    if (!workspace?.id || !user) return;
+
+    try {
+      const result = await AIAgentManager.executeTaskAutomation(workspace.id, entityId, entityType);
+      
+      if (result.success && result.action === 'status_updated') {
+        toast({
+          title: "Automatisation des tâches",
+          description: `${result.reason}`,
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Task automation failed:', error);
+      return { success: false, error: error.message };
+    }
+  }, [workspace?.id, user, toast]);
+
   // Workflow automation triggers
   const triggerWorkflowAutomation = useCallback(async (entityId: string, entityType: string, event: string) => {
     if (!workspace?.id || !user) return;
@@ -37,6 +58,8 @@ export function useAgentAutomation() {
         case 'prompt_created':
         case 'prompt_updated':
           await AIAgentManager.autoStatusUpdate(entityId, 'prompt', workspace.id);
+          // Also trigger task automation to check for transitions
+          await triggerTaskAutomation(entityId, 'prompt');
           break;
         case 'epic_updated':
           await AIAgentManager.autoStatusUpdate(entityId, 'epic', workspace.id);
@@ -47,7 +70,7 @@ export function useAgentAutomation() {
     } catch (error) {
       console.error('Workflow automation failed:', error);
     }
-  }, [workspace?.id, user]);
+  }, [workspace?.id, user, triggerTaskAutomation]);
 
   // Periodic automation tasks
   const runPeriodicTasks = useCallback(async () => {
@@ -77,6 +100,10 @@ export function useAgentAutomation() {
         if (now.getDay() === 1 && now.getHours() === 10 && now.getMinutes() === 0) { // Monday at 10 AM
           await AIAgentManager.analyzePromptPatterns(workspace.id);
         }
+
+        // Task automation (every 30 minutes during working hours)
+        await triggerTaskAutomation();
+        
       }
     } catch (error) {
       console.error('Periodic automation tasks failed:', error);
@@ -152,6 +179,7 @@ export function useAgentAutomation() {
   return {
     triggerKnowledgeAnalysis,
     triggerWorkflowAutomation,
+    triggerTaskAutomation,
     triggerKnowledgeCuration,
     triggerWorkflowOptimization,
     runPeriodicTasks
