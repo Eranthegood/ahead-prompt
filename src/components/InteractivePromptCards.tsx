@@ -180,11 +180,11 @@ export function InteractivePromptCards() {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
-      {/* Background Effects */}
-      <div className="absolute inset-0 -m-8">
-        {/* Animated Background Grid */}
-        <div className="absolute inset-0 opacity-20">
+    <div className="relative w-full max-w-none sm:max-w-2xl lg:max-w-4xl mx-auto px-4 sm:px-6">
+      {/* Simplified Background Effects - Hidden on mobile for better performance */}
+      <div className="absolute inset-0 -m-4 sm:-m-8 hidden sm:block">
+        {/* Simplified Background Grid */}
+        <div className="absolute inset-0 opacity-10 sm:opacity-20">
           <div 
             className="w-full h-full"
             style={{
@@ -192,51 +192,29 @@ export function InteractivePromptCards() {
                 linear-gradient(hsl(var(--border)) 1px, transparent 1px),
                 linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)
               `,
-              backgroundSize: '40px 40px',
-              animation: 'gridFloat 20s ease-in-out infinite'
+              backgroundSize: '60px 60px'
             }}
           />
         </div>
 
-        {/* Floating Activity Indicators */}
-        {[1, 2, 3, 4].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-primary/40"
-            style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + (i % 2) * 40}%`
-            }}
-            animate={{
-              opacity: [0.4, 1, 0.4],
-              scale: [1, 1.5, 1]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.5
-            }}
-          />
-        ))}
-
-        {/* Flow Lines */}
+        {/* Reduced Floating Indicators - Only on larger screens */}
         {[1, 2].map((i) => (
           <motion.div
-            key={`flow-${i}`}
-            className="absolute h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+            key={i}
+            className="absolute w-1.5 h-1.5 rounded-full bg-primary/30"
             style={{
-              width: '200px',
-              left: `${25 + i * 30}%`,
-              top: `${40 + i * 20}%`,
-              transform: `rotate(${i % 2 ? 25 : -25}deg)`
+              left: `${30 + i * 20}%`,
+              top: `${40 + (i % 2) * 20}%`
             }}
             animate={{
-              opacity: [0.3, 0.8, 0.3]
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.2, 1]
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
-              delay: i * 1.5
+              delay: i * 1.5,
+              ease: "easeInOut"
             }}
           />
         ))}
@@ -244,23 +222,23 @@ export function InteractivePromptCards() {
 
       {/* Title */}
       <motion.div 
-        className="text-center mb-8"
+        className="text-center mb-6 sm:mb-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h3 className="text-xl font-semibold mb-2 flex items-center justify-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
+        <h3 className="text-lg sm:text-xl font-semibold mb-2 flex items-center justify-center gap-2">
+          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           Try the Core Workflow
         </h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-xs sm:text-sm px-4">
           Click the buttons to see how prompts flow through your development process
         </p>
       </motion.div>
 
       {/* Interactive Cards */}
       <motion.div
-        className="flex flex-col gap-6 relative z-10 max-w-md mx-auto"
+        className="flex flex-col gap-4 sm:gap-6 relative z-10 w-full max-w-none sm:max-w-lg lg:max-w-md mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -283,37 +261,39 @@ export function InteractivePromptCards() {
                   {/* Hover Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  <CardContent className="p-5 relative z-10">
+                  <CardContent className="p-4 sm:p-5 relative z-10">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground mb-1 truncate">
+                        <h4 className="font-medium text-foreground mb-1 text-sm sm:text-base line-clamp-2">
                           {prompt.title}
                         </h4>
                         
                         {/* Badges */}
-                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-2">
                           {prompt.priority === 1 && (
                             <Badge variant="destructive" className="text-xs flex items-center gap-1">
                               <Flame className="h-3 w-3" />
-                              {priorityInfo.label}
+                              <span className="hidden sm:inline">{priorityInfo.label}</span>
                             </Badge>
                           )}
                           {prompt.priority === 2 && (
                             <Badge variant="secondary" className="text-xs">
-                              {priorityInfo.label}
+                              <span className="hidden sm:inline">{priorityInfo.label}</span>
+                              <span className="sm:hidden">Med</span>
                             </Badge>
                           )}
                           {prompt.priority === 3 && (
                             <Badge variant="outline" className="text-xs opacity-60">
-                              {priorityInfo.label}
+                              <span className="hidden sm:inline">{priorityInfo.label}</span>
+                              <span className="sm:hidden">Low</span>
                             </Badge>
                           )}
                           
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                             {prompt.product}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                             {prompt.epic}
                           </Badge>
                         </div>
@@ -321,12 +301,12 @@ export function InteractivePromptCards() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 leading-relaxed line-clamp-3">
                       {prompt.description}
                     </p>
 
-                    {/* Meta Info */}
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+                    {/* Meta Info - Hidden on mobile for cleaner look */}
+                    <div className="hidden sm:flex items-center gap-3 text-xs text-muted-foreground mb-4">
                       <div className="flex items-center gap-1">
                         <Package className="h-3 w-3" />
                         <span>{prompt.product}</span>
@@ -343,7 +323,7 @@ export function InteractivePromptCards() {
 
                     {/* Action Buttons */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         {/* Send to Cursor Button */}
                         <TooltipProvider>
                           <Tooltip>
@@ -353,12 +333,12 @@ export function InteractivePromptCards() {
                                 size="sm"
                                 onClick={() => handleSendToCursor(prompt)}
                                 disabled={isSending || prompt.status !== 'todo'}
-                                className="h-8 w-8 p-0 text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950"
                               >
                                 {isSending ? (
-                                  <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
                                 ) : (
-                                  <ExternalLink className="h-4 w-4" />
+                                  <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
                                 )}
                               </Button>
                             </TooltipTrigger>
@@ -376,12 +356,12 @@ export function InteractivePromptCards() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleCopy(prompt)}
-                                className="h-8 w-8 p-0 hover:bg-muted"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-muted"
                               >
                                 {isCopied ? (
-                                  <Check className="h-4 w-4 text-green-600" />
+                                  <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                                 ) : (
-                                  <Copy className="h-4 w-4" />
+                                  <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                                 )}
                               </Button>
                             </TooltipTrigger>
@@ -405,8 +385,14 @@ export function InteractivePromptCards() {
                         }`}
                         onClick={() => handleStatusClick(prompt)}
                       >
-                        {prompt.status === 'in_progress' ? 'Agent is working' : 
-                         prompt.status === 'done' ? 'PR ready to be merge' : 'Todo'}
+                        <span className="hidden sm:inline">
+                          {prompt.status === 'in_progress' ? 'Agent is working' : 
+                           prompt.status === 'done' ? 'PR ready to be merge' : 'Todo'}
+                        </span>
+                        <span className="sm:hidden">
+                          {prompt.status === 'in_progress' ? 'Working' : 
+                           prompt.status === 'done' ? 'Ready' : 'Todo'}
+                        </span>
                       </Badge>
                     </div>
 
@@ -434,24 +420,29 @@ export function InteractivePromptCards() {
 
       {/* Instructions */}
       <motion.div 
-        className="text-center mt-8 space-y-2"
+        className="text-center mt-6 sm:mt-8 space-y-1.5 sm:space-y-2 px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.6 }}
       >
-        <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 text-xs sm:text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <ExternalLink className="h-3 w-3 text-purple-600" />
-            Send to Cursor
+            <span className="hidden sm:inline">Send to Cursor</span>
+            <span className="sm:hidden">Send</span>
           </span>
-          {" • "}
+          <span className="hidden sm:inline">{" • "}</span>
           <span className="inline-flex items-center gap-1">
             <Copy className="h-3 w-3" />
-            Copy prompt
+            <span className="hidden sm:inline">Copy prompt</span>
+            <span className="sm:hidden">Copy</span>
           </span>
-          {" • "}
-          <span>Click status to advance</span>
-        </p>
+          <span className="hidden sm:inline">{" • "}</span>
+          <span className="text-center sm:inline">
+            <span className="hidden sm:inline">Click status to advance</span>
+            <span className="sm:hidden">Tap status</span>
+          </span>
+        </div>
         <p className="text-xs text-muted-foreground/70">
           Demo resets every 10 seconds
         </p>
