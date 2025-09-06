@@ -185,6 +185,110 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Prompt Enhancement & CLEAR Principle Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Professional Prompts.<br />
+                <span className="text-primary">Ready for Any Platform.</span>
+              </h2>
+              
+              <h3 className="text-xl font-semibold text-primary">
+                CLEAR Principle Framework
+              </h3>
+               
+              <p className="text-xl text-muted-foreground">
+                Every prompt is automatically enhanced using our CLEAR framework, delivering professional-quality results across Cursor, Claude, ChatGPT, and any AI platform.
+              </p>
+               
+              <div className="space-y-4">
+                <h4 className="font-semibold">The CLEAR Framework:</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <strong>Clear</strong> - Unambiguous instructions and context
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <strong>Logical</strong> - Structured approach with clear reasoning
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <strong>Engaging</strong> - Compelling and contextual prompts
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <strong>Actionable</strong> - Specific, executable instructions
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <strong>Relevant</strong> - Targeted to your specific context
+                    </div>
+                  </div>
+                </div>
+              </div>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                {user ? "Build" : "Enhance Your Prompts"}
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="bg-muted/30 rounded-2xl p-8 space-y-6">
+              <div className="space-y-4">
+                <h4 className="font-semibold text-lg">Universal Compatibility</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2 p-3 bg-background rounded-lg">
+                    <Code className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">Cursor</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-background rounded-lg">
+                    <Zap className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">Claude</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-background rounded-lg">
+                    <Layers className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">ChatGPT</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-background rounded-lg">
+                    <ToggleLeft className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">Any AI</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t border-border pt-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Clipboard className="h-5 w-5 text-primary" />
+                    <span className="text-sm">One-click copy to any platform</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Circle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Consistent results across AIs</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Zap className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Professional-quality outputs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section aria-labelledby="testimonials-heading" className="py-16 bg-background/50">
         <h3 id="testimonials-heading" className="sr-only">Testimonials</h3>
