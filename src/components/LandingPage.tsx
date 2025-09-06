@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
-import DisplayCards from "@/components/ui/display-cards";
+import { InteractivePromptCards } from "@/components/InteractivePromptCards";
 import chessKnightLogo from "@/assets/chess-knight-logo.png";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
@@ -143,37 +143,9 @@ export default function LandingPage() {
                </Button>
              </div>
              
-             <div className="flex items-center justify-center min-h-[600px]">
-               <DisplayCards cards={[
-                 {
-                   icon: <Code className="size-4 text-primary-foreground" />,
-                   title: "Bug Fix",
-                   description: "Fix authentication redirect issue",
-                   date: "Queued",
-                   iconClassName: "text-primary",
-                   titleClassName: "text-primary",
-                   className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-                 },
-                 {
-                   icon: <Zap className="size-4 text-primary-foreground" />,
-                   title: "Feature",
-                   description: "Add dark mode toggle component",
-                   date: "Ready",
-                   iconClassName: "text-primary",
-                   titleClassName: "text-primary",
-                   className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-                 },
-                 {
-                   icon: <Layers className="size-4 text-primary-foreground" />,
-                   title: "Refactor",
-                   description: "Split user service into modules",
-                   date: "Next",
-                   iconClassName: "text-primary",
-                   titleClassName: "text-primary",
-                   className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
-                 },
-               ]} />
-             </div>
+              <div className="flex items-center justify-center min-h-[600px]">
+                <InteractivePromptCards />
+              </div>
            </div>
          </div>
        </section>
