@@ -103,6 +103,81 @@ export default function LandingPage() {
         </div>
       </main>
 
+      {/* Stay 3 Moves Ahead Feature Section */}
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Tired of 5 open tabs and half-written Notion blocks?
+              </h2>
+               
+               <p className="text-xl text-muted-foreground">
+                 Centralize the chaos. Your ready to develop prompts workspace that moves at brain speed.
+               </p>
+                
+               <div className="space-y-3">
+                 <div className="flex items-center gap-3">
+                   <span className="w-2 h-2 rounded-full bg-primary"></span>
+                   <span><strong>Queue tasks in seconds</strong> - Never wait idle again</span>
+                 </div>
+                 <div className="flex items-center gap-3">
+                   <span className="w-2 h-2 rounded-full bg-primary"></span>
+                   <span><strong>Maintain creative flow</strong> - Zero momentum loss</span>
+                 </div>
+                 <div className="flex items-center gap-3">
+                   <span className="w-2 h-2 rounded-full bg-primary"></span>
+                   <span><strong>Always ready</strong> - Next prompt waits for you</span>
+                 </div>
+               </div>
+                 
+               <div className="bg-muted/50 p-4 rounded-lg">
+                 <p className="text-sm text-muted-foreground italic">
+                   "Send login component to Claude → Queue error handling, responsive design, tests → When Claude finishes, boom - next prompt ready."
+                 </p>
+               </div>
+                 
+               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                 {user ? "Build" : "Try Free Now"}
+                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+               </Button>
+             </div>
+             
+             <div className="flex items-center justify-center min-h-[600px]">
+               <DisplayCards cards={[
+                 {
+                   icon: <Code className="size-4 text-primary-foreground" />,
+                   title: "Bug Fix",
+                   description: "Fix authentication redirect issue",
+                   date: "Queued",
+                   iconClassName: "text-primary",
+                   titleClassName: "text-primary",
+                   className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+                 },
+                 {
+                   icon: <Zap className="size-4 text-primary-foreground" />,
+                   title: "Feature",
+                   description: "Add dark mode toggle component",
+                   date: "Ready",
+                   iconClassName: "text-primary",
+                   titleClassName: "text-primary",
+                   className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+                 },
+                 {
+                   icon: <Layers className="size-4 text-primary-foreground" />,
+                   title: "Refactor",
+                   description: "Split user service into modules",
+                   date: "Next",
+                   iconClassName: "text-primary",
+                   titleClassName: "text-primary",
+                   className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+                 },
+               ]} />
+             </div>
+           </div>
+         </div>
+       </section>
+
       {/* Chaos Centralization Section */}
       <section className="py-16 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
@@ -176,82 +251,6 @@ export default function LandingPage() {
           <TestimonialSlider testimonials={testimonials} />
         </div>
       </section>
-
-      {/* Stay 3 Moves Ahead Feature Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Tired of 5 open tabs and half-written Notion blocks?
-              </h2>
-               
-               <p className="text-xl text-muted-foreground">
-                 Centralize the chaos. Your ready to develop prompts workspace that moves at brain speed.
-               </p>
-               
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Queue tasks in seconds</strong> - Never wait idle again</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Maintain creative flow</strong> - Zero momentum loss</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary"></span>
-                  <span><strong>Always ready</strong> - Next prompt waits for you</span>
-                </div>
-              </div>
-                
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground italic">
-                  "Send login component to Claude → Queue error handling, responsive design, tests → When Claude finishes, boom - next prompt ready."
-                </p>
-              </div>
-                
-              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                {user ? "Build" : "Try Free Now"}
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-            
-            <div className="flex items-center justify-center min-h-[600px]">
-              <DisplayCards cards={[
-                {
-                  icon: <Code className="size-4 text-primary-foreground" />,
-                  title: "Bug Fix",
-                  description: "Fix authentication redirect issue",
-                  date: "Queued",
-                  iconClassName: "text-primary",
-                  titleClassName: "text-primary",
-                  className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-                },
-                {
-                  icon: <Zap className="size-4 text-primary-foreground" />,
-                  title: "Feature",
-                  description: "Add dark mode toggle component",
-                  date: "Ready",
-                  iconClassName: "text-primary",
-                  titleClassName: "text-primary",
-                  className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-                },
-                {
-                  icon: <Layers className="size-4 text-primary-foreground" />,
-                  title: "Refactor",
-                  description: "Split user service into modules",
-                  date: "Next",
-                  iconClassName: "text-primary",
-                  titleClassName: "text-primary",
-                  className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
-                },
-              ]} />
-            </div>
-          </div>
-        </div>
-      </section>
-
 
       {/* Cursor Multi-Agent Section */}
       <section className="py-16 px-6 bg-background">
