@@ -29,6 +29,7 @@ import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
+import PromptManagement from "./pages/PromptManagement";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -49,6 +50,7 @@ function App() {
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/prompt-management" element={<PromptManagement />} />
                     <Route path="/cursor-multi-agent" element={<CursorMultiAgentLanding />} />
                     <Route path="/build" element={
                       <ProtectedRoute>
