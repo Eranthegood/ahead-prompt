@@ -25,7 +25,7 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/', {
+      navigate('/build', {
         replace: true
       });
     }
@@ -49,7 +49,7 @@ const Auth = () => {
         error
       } = await signIn(email, password);
       if (!error) {
-        navigate('/', {
+        navigate('/build', {
           replace: true
         });
       }
