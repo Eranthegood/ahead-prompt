@@ -127,11 +127,7 @@ function App() {
                           <PromptEnhancer />
                         </ProtectedRoute>
                       } />
-                      <Route path="/prompt-enhancer-coming-soon" element={
-                        <ProtectedRoute>
-                          <PromptEnhancerComingSoon />
-                        </ProtectedRoute>
-                      } />
+                       <Route path="/prompt-enhancer-coming-soon" element={<PromptEnhancerComingSoon />} />
                      <Route path="/theme-demo" element={
                        <ProtectedRoute>
                          <ThemeDemo />

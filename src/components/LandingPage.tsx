@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
+import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail, Sparkles, Wand2, Target } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { InteractivePromptCards } from "@/components/InteractivePromptCards";
+import { hasPromptEnhancerAccess } from "@/utils/accessControl";
 
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
@@ -242,6 +243,58 @@ export default function LandingPage() {
             <div className="flex justify-center items-center">
               <CollaborativeRepoAnimation />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Prompt Enhancer Section */}
+      <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto space-y-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Sparkles className="h-8 w-8 text-primary" />
+                <h2 className="text-3xl md:text-4xl font-bold">Prompt Enhancer</h2>
+              </div>
+              <p className="text-xl text-muted-foreground">
+                Transform your raw ideas into powerful, optimized AI prompts with our intelligent enhancement system
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="space-y-3">
+                <Wand2 className="h-6 w-6 text-primary mx-auto" />
+                <h3 className="font-semibold">Smart Enhancement</h3>
+                <p className="text-sm text-muted-foreground">
+                  AI-powered optimization that understands context and best practices
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <Target className="h-6 w-6 text-primary mx-auto" />
+                <h3 className="font-semibold">Template Library</h3>
+                <p className="text-sm text-muted-foreground">
+                  Pre-built templates for code, design, marketing, and more
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <Zap className="h-6 w-6 text-primary mx-auto" />
+                <h3 className="font-semibold">Performance Analysis</h3>
+                <p className="text-sm text-muted-foreground">
+                  Real-time optimization suggestions based on results
+                </p>
+              </div>
+            </div>
+
+            <Button 
+              size="lg" 
+              onClick={() => navigate(hasPromptEnhancerAccess(user?.id) ? '/prompt-enhancer' : '/prompt-enhancer-coming-soon')}
+              className="px-8 py-6 text-lg font-medium group"
+            >
+              {hasPromptEnhancerAccess(user?.id) ? 'Try Enhancer' : 'Coming Soon'}
+              <Sparkles className="ml-2 h-5 w-5 transition-transform group-hover:scale-110" />
+            </Button>
           </div>
         </div>
       </section>
