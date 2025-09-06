@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +16,8 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { AIAgentManager } from '@/services/aiAgentManager';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { Prompt, Product, Epic } from '@/types';
 
 interface PromptDetailDialogProps {
@@ -36,9 +38,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [textLength, setTextLength] = useState(0);
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const { toast } = useToast();
   const { updatePrompt, updatePromptSilently } = usePrompts();
   const { preferences } = useUserPreferences();
+  const { workspace } = useWorkspace();
 
   // Rich text editor
   const editor = useEditor({
@@ -186,6 +190,52 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     }
   };
 
+  const handleOptimizePrompt = async () => {
+    if (!workspace || !prompt || !editor) {
+      toast({
+        title: 'Impossible d\'optimiser',
+        description: 'Une erreur est survenue',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const content = editor.getHTML();
+    const cleanText = stripHtmlAndNormalize(content);
+    
+    if (!cleanText.trim()) {
+      toast({
+        title: 'Impossible d\'optimiser',
+        description: 'Le prompt doit avoir du contenu pour être optimisé',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsOptimizing(true);
+    try {
+      // Save current content first
+      await updatePromptSilently(prompt.id, { description: content });
+      
+      // Then optimize
+      await AIAgentManager.executePromptOptimization(prompt.id, workspace.id);
+      
+      toast({
+        title: 'Prompt optimisé',
+        description: 'Votre prompt a été amélioré par l\'IA. Rechargez pour voir les modifications.',
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'optimisation:', error);
+      toast({
+        title: 'Erreur d\'optimisation',
+        description: 'Impossible d\'optimiser le prompt pour le moment',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
   const handleCopyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(generatedPrompt);
@@ -287,11 +337,30 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </div>
             )}
             {hasUnsavedChanges && (
-              <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
-                <Save className="h-4 w-4" />
-                <span>Unsaved changes</span>
-              </div>
-            )}
+                    <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
+                      <Save className="h-4 w-4" />
+                      <span>Unsaved changes</span>
+                    </div>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleOptimizePrompt}
+                    disabled={isOptimizing || textLength === 0}
+                    className="ml-auto"
+                  >
+                    {isOptimizing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Optimisation...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-4 w-4 mr-2" />
+                        Optimiser avec IA
+                      </>
+                    )}
+                  </Button>
           </DialogTitle>
           <DialogDescription>
             Edit prompt details with rich text formatting, product and epic assignment. Press Ctrl+S to save.
@@ -439,6 +508,15 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Generated Prompt</h3>
                   <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleOptimizePrompt}
+                      disabled={isOptimizing || textLength === 0}
+                      title="Optimiser avec IA"
+                    >
+                      {isOptimizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

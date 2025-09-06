@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink, Clock } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink, Clock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+import { AIAgentManager } from '@/services/aiAgentManager';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCursorIntegration } from '@/hooks/useCursorIntegration';
 import { useCursorAgentPolling } from '@/hooks/useCursorAgentPolling';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
@@ -70,7 +72,9 @@ export function PromptCard({
   const [isSliding, setIsSliding] = useState(false);
   const [showCursorDialog, setShowCursorDialog] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const { toast } = useToast();
+  const { workspace } = useWorkspace();
   const { sendToCursor, isLoading: cursorLoading, cancelAgent, mergePullRequest, updateAgentStatus } = useCursorIntegration();
   
   // Real-time agent polling for active Cursor agents
@@ -137,6 +141,35 @@ export function PromptCard({
     setJustCopied(true);
     setTimeout(() => setJustCopied(false), 1200);
     onCopyGenerated(prompt);
+  };
+
+  const handleOptimizePrompt = async () => {
+    if (!workspace || !prompt.description?.trim()) {
+      toast({
+        title: 'Impossible d\'optimiser',
+        description: 'Le prompt doit avoir du contenu pour être optimisé',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsOptimizing(true);
+    try {
+      await AIAgentManager.executePromptOptimization(prompt.id, workspace.id);
+      toast({
+        title: 'Prompt optimisé',
+        description: 'Votre prompt a été amélioré par l\'IA',
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'optimisation:', error);
+      toast({
+        title: 'Erreur d\'optimisation',
+        description: 'Impossible d\'optimiser le prompt pour le moment',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsOptimizing(false);
+    }
   };
 
   // Get priority display
@@ -338,6 +371,15 @@ export function PromptCard({
                       }} className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4" />
                         Copy generated prompt
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleOptimizePrompt();
+                      }} className="flex items-center gap-2" disabled={isOptimizing || !prompt.description?.trim()}>
+                        <Zap className="h-4 w-4" />
+                        {isOptimizing ? 'Optimisation...' : 'Optimiser avec IA'}
                       </DropdownMenuItem>
                       
                       <DropdownMenuItem onClick={(e) => {
