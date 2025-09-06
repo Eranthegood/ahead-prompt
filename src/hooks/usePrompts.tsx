@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { RedditPixelService } from '@/services/redditPixelService';
+import { useAgentAutomation } from '@/hooks/useAgentAutomation';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface CreatePromptData {
@@ -31,6 +32,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
   const { trackPromptCreated, trackPromptCompleted } = useMixpanelContext();
   const { user } = useAuth();
+  const { triggerWorkflowAutomation } = useAgentAutomation();
 
   // Helper function to handle optimistic updates with rollback capability
   const withOptimisticUpdate = async <T,>(

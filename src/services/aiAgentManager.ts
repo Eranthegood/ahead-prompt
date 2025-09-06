@@ -208,4 +208,93 @@ export class AIAgentManager {
       throw error;
     }
   }
+
+  // Knowledge Curator Agent
+  static async executeKnowledgeAnalysis(knowledgeItemId: string, workspaceId: string): Promise<void> {
+    try {
+      const { data, error } = await supabase.functions.invoke('knowledge-curator', {
+        body: { 
+          workspaceId, 
+          knowledgeItemId, 
+          action: 'analyze_knowledge' 
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Knowledge analysis failed:', error);
+      throw error;
+    }
+  }
+
+  static async findKnowledgeDuplicates(workspaceId: string): Promise<void> {
+    try {
+      const { data, error } = await supabase.functions.invoke('knowledge-curator', {
+        body: { 
+          workspaceId, 
+          action: 'find_duplicates' 
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Duplicate detection failed:', error);
+      throw error;
+    }
+  }
+
+  static async suggestKnowledgeCategories(workspaceId: string): Promise<void> {
+    try {
+      const { data, error } = await supabase.functions.invoke('knowledge-curator', {
+        body: { 
+          workspaceId, 
+          action: 'suggest_categories' 
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Category suggestion failed:', error);
+      throw error;
+    }
+  }
+
+  // Workflow Automation Agent
+  static async executeWorkflowAutomation(entityId: string, entityType: string, workspaceId: string, action: string): Promise<void> {
+    try {
+      const { data, error } = await supabase.functions.invoke('workflow-automation', {
+        body: { 
+          workspaceId, 
+          entityId,
+          entityType,
+          action 
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Workflow automation failed:', error);
+      throw error;
+    }
+  }
+
+  static async autoStatusUpdate(entityId: string, entityType: string, workspaceId: string): Promise<void> {
+    return this.executeWorkflowAutomation(entityId, entityType, workspaceId, 'auto_status_update');
+  }
+
+  static async adjustPriorities(workspaceId: string): Promise<void> {
+    return this.executeWorkflowAutomation('', '', workspaceId, 'priority_adjustment');
+  }
+
+  static async organizeEpics(workspaceId: string): Promise<void> {
+    return this.executeWorkflowAutomation('', '', workspaceId, 'epic_organization');
+  }
+
+  static async analyzePromptPatterns(workspaceId: string): Promise<void> {
+    return this.executeWorkflowAutomation('', '', workspaceId, 'analyze_prompt_patterns');
+  }
 }
