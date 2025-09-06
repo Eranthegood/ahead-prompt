@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -113,8 +113,45 @@ export function PromptCard({
       // Silently fail if Web Audio API is not supported
     }
   };
+
   const priorityOption = PRIORITY_OPTIONS.find(p => p.value === priority);
   const isUsable = isPromptUsable(prompt);
+
+  const handleStatusChange = (newStatus: PromptStatus) => {
+    const isCursorFlow = ['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status);
+    if (isCursorFlow) return; // Don't cycle manual status while Cursor workflow is active
+
+    if (newStatus === 'done') {
+      playSlideSound();
+      setIsSliding(true);
+      setTimeout(() => {
+        onStatusChange(prompt, newStatus);
+      }, 300);
+    } else {
+      onStatusChange(prompt, newStatus);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!isUsable) return;
+    setJustCopied(true);
+    setTimeout(() => setJustCopied(false), 1200);
+    onCopyGenerated(prompt);
+  };
+
+  // Get priority display
+  const getPriorityDisplay = () => {
+    if (priority === 1) {
+      return { icon: Flame, color: 'text-destructive', bgColor: 'bg-destructive/10' };
+    }
+    if (priority === 2) {
+      return { icon: ArrowRight, color: 'text-orange-500', bgColor: 'bg-orange-500/10' };
+    }
+    return { icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted/50' };
+  };
+
+  const priorityDisplay = getPriorityDisplay();
+  const PriorityIcon = priorityDisplay.icon;
 
   return (
     <>
@@ -124,385 +161,297 @@ export function PromptCard({
         onUpdate={() => {}}
       >
         <Card 
-          className={`hover:shadow-sm transition-all cursor-pointer ${
-            isHovered ? 'ring-2 ring-primary/50 shadow-lg' : ''
+          className={`group hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 ${
+            priority === 1 ? 'border-l-destructive' : 
+            priority === 2 ? 'border-l-orange-500' : 
+            'border-l-muted'
+          } ${
+            isHovered ? 'ring-2 ring-primary/30 shadow-lg' : ''
           } ${!isUsable ? 'opacity-60' : ''} ${isSliding ? 'animate-slide-out-right' : ''}`}
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
         >
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
+            {/* Main Click Area */}
             <div 
-              className="flex items-start justify-between"
+              className="space-y-3"
               onClick={() => onPromptClick(prompt)}
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
                   <TruncatedTitle 
                     title={prompt.title}
-                    maxLength={60}
-                    className="font-medium text-foreground group"
+                    maxLength={45}
+                    className="font-medium text-foreground text-sm leading-tight"
                     showCopyButton={false}
                     variant="inline"
                   />
-                  
-                  {/* Priority Badge and Status Indicators */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {/* Priority Badge */}
-                    {priority === 1 && (
-                      <Badge variant="destructive" className="text-xs flex items-center gap-1">
-                        <Flame className="h-3 w-3" />
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                    {priority === 2 && (
-                      <Badge variant="secondary" className="text-xs">
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                    {priority === 3 && (
-                      <Badge variant="outline" className="text-xs opacity-60">
-                        {PRIORITY_LABELS[priority]}
-                      </Badge>
-                    )}
-                    
-                    {/* Cursor Agent Working Indicator */}
-                    {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
-                      <AgentWorkingIndicator size="sm" className="ml-1" />
-                    )}
-                    
-                    {/* Enhanced Cursor Status Badge */}
-                    {['sending_to_cursor', 'sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'error'].includes(prompt.status) && (
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs border-0 text-white ${statusDisplay.color}`}
-                      >
-                        {statusDisplay.label}
-                      </Badge>
-                    )}
-                    
-                    {/* Sending to Cursor Indicator */}
-                    {cursorLoading && (
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                        <span className="text-xs text-blue-600 dark:text-blue-400">Sending...</span>
-                      </div>
-                    )}
-                    
-                    {/* Error Status Display */}
-                    {prompt.status === 'error' && prompt.cursor_agent_status && (
-                      <Badge variant="destructive" className="text-xs">
-                        Failed: {prompt.cursor_agent_status}
-                      </Badge>
-                    )}
-                    
-                    {prompt.product && (
-                      <Badge variant="outline" className="text-xs">
-                        {prompt.product.name}
-                      </Badge>
-                    )}
-                    {prompt.epic && (
-                      <Badge variant="outline" className="text-xs">
-                        {prompt.epic.name}
-                      </Badge>
-                    )}
-                  </div>
                 </div>
                 
-                {prompt.description ? (
-                  <div 
-                    className="text-sm text-muted-foreground mb-3 overflow-hidden"
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      maxHeight: '2.5rem'
+                {/* Priority & Status Indicators */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Priority Indicator */}
+                  <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor}`}>
+                    <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
+                  </div>
+                  
+                  {/* Working Indicator */}
+                  {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
+                    <AgentWorkingIndicator size="sm" />
+                  )}
+                  
+                  {/* Status Badge */}
+                  <Badge 
+                    variant={
+                      prompt.status === 'done' ? 'success' : 
+                      prompt.status === 'in_progress' ? 'secondary' : 'outline'
+                    }
+                    className="text-xs px-2 py-1 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
+                      const nextIndex = (currentIndex + 1) % statusOptions.length;
+                      const nextStatus = statusOptions[nextIndex].value as PromptStatus;
+                      handleStatusChange(nextStatus);
                     }}
-                    dangerouslySetInnerHTML={{ __html: prompt.description }}
-                  />
-                ) : (
-                  <div className="text-sm text-muted-foreground mb-3 italic opacity-60">
-                    Aucun contexte
-                  </div>
-                )}
-                
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  {prompt.product && (
-                    <div className="flex items-center gap-1">
-                      <Package className="h-3 w-3" />
-                      <span>{prompt.product.name}</span>
-                    </div>
-                  )}
-                  
-                  {prompt.epic && (
-                    <div className="flex items-center gap-1">
-                      <Hash className="h-3 w-3" />
-                      <span>{prompt.epic.name}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>{format(new Date(prompt.created_at), 'MMM d')}</span>
-                  </div>
+                  >
+                    {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status)
+                      ? statusDisplay.label
+                      : (prompt.status === 'in_progress' ? 'In Progress' : 
+                         prompt.status === 'done' ? 'Done' : 'Todo')}
+                  </Badge>
                 </div>
-
-                <CursorWorkflowProgress
-                  status={prompt.status}
-                  cursorAgentId={prompt.cursor_agent_id}
-                  cursorAgentStatus={prompt.cursor_agent_status}
-                  githubPrUrl={prompt.github_pr_url}
-                  githubPrNumber={prompt.github_pr_number}
-                  cursorBranchName={prompt.cursor_branch_name}
-                  error={prompt.status === 'error' ? (prompt.cursor_logs as any)?.error || 'Unknown error' : undefined}
-                  onViewAgent={() => setShowAgentModal(true)}
-                  onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
-                  onMergePR={() => {
-                    // TODO: Implement merge PR functionality
-                    toast({
-                      title: 'Merge PR',
-                      description: 'PR merge functionality coming soon!',
-                    });
-                  }}
-                  onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
-                />
               </div>
-                  
-                  <div className="flex items-center gap-2 ml-4">
-                    {/* Send to Cursor Button - Show if product has GitHub repo */}
-                    {prompt.product?.github_repo_url && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isUsable) return;
-                                setShowCursorDialog(true);
-                              }}
-                              disabled={!isUsable}
-                              className={`h-8 w-8 p-0 transition-opacity ${
-                                !isUsable 
-                                  ? 'opacity-30 cursor-not-allowed' 
-                                  : 'opacity-60 hover:opacity-100 text-purple-600 hover:text-purple-700'
-                              }`}
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {!isUsable ? 'Description trop courte pour être exploitable' : 'Send to Cursor'}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+              
+              {/* Content Preview */}
+              {prompt.description ? (
+                <div 
+                  className="text-sm text-muted-foreground leading-relaxed overflow-hidden"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    maxHeight: '2.5rem'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: prompt.description }}
+                />
+              ) : (
+                <div className="text-sm text-muted-foreground italic opacity-60">
+                  No description
+                </div>
+              )}
+              
+              {/* Context Tags - Mobile Optimized */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {(prompt.product || prompt.epic) ? (
+                    <div className="flex items-center gap-2">
+                      {prompt.product && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                          {prompt.product.name}
+                        </Badge>
+                      )}
+                      {prompt.epic && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                          #{prompt.epic.name}
+                        </Badge>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {format(new Date(prompt.created_at), 'MMM d')}
+                    </span>
+                  )}
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="flex items-center gap-1">
+                  {/* Quick Copy */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopy();
+                    }}
+                    disabled={!isUsable}
+                    className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Copy prompt"
+                  >
+                    {justCopied ? (
+                      <Check className="h-3.5 w-3.5 text-green-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
                     )}
-
-                    {/* Quick Copy Button */}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!isUsable) return;
-                              setJustCopied(true);
-                              setTimeout(() => setJustCopied(false), 1200);
-                              onCopyGenerated(prompt);
-                            }}
-                            disabled={!isUsable}
-                            className={`h-8 w-8 p-0 transition-opacity ${
-                              !isUsable 
-                                ? 'opacity-30 cursor-not-allowed' 
-                                : 'opacity-60 hover:opacity-100'
-                            }`}
-                          >
-                            {justCopied ? (
-                              <Check className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        {!isUsable && (
-                          <TooltipContent>
-                            Description trop courte pour être exploitable
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </TooltipProvider>
-                    
-                    {/* Status Badge - Click to cycle through statuses */}
-                    <Badge 
-                      variant={
-                        prompt.status === 'done' ? 'success' : 
-                        prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                      }
-                      className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                  </Button>
+                  
+                  {/* Send to Cursor */}
+                  {prompt.product?.github_repo_url && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        const isCursorFlow = ['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status);
-                        if (isCursorFlow) return; // Don't cycle manual status while Cursor workflow is active
-
-                        const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
-                        const nextIndex = (currentIndex + 1) % statusOptions.length;
-                        const nextStatus = statusOptions[nextIndex].value as PromptStatus;
-                        
-                        if (nextStatus === 'done') {
-                          playSlideSound();
-                          setIsSliding(true);
-                          setTimeout(() => {
-                            onStatusChange(prompt, nextStatus);
-                          }, 300);
-                        } else {
-                          onStatusChange(prompt, nextStatus);
-                        }
+                        if (!isUsable) return;
+                        setShowCursorDialog(true);
                       }}
+                      disabled={!isUsable}
+                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-purple-600 hover:text-purple-700"
+                      aria-label="Send to Cursor"
                     >
-                      {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status)
-                        ? statusDisplay.label
-                        : (prompt.status === 'in_progress' ? 'In Progress' : 
-                           prompt.status === 'done' ? 'Done' : 'Todo')}
-                    </Badge>
-                    
-                    {/* Actions Dropdown */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuItem onClick={(e) => {
-                          e.preventDefault();
-                          onEdit(prompt);
-                        }} className="flex items-center gap-2">
-                          <Edit className="h-4 w-4" />
-                          Edit prompt
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem onClick={() => onCopy(prompt)} className="flex items-center gap-2">
-                          <Copy className="h-4 w-4" />
-                          Copy content
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem onClick={(e) => {
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  
+                  {/* More Actions */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="More actions"
+                      >
+                        <MoreHorizontal className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        onEdit(prompt);
+                      }} className="flex items-center gap-2">
+                        <Edit className="h-4 w-4" />
+                        Edit prompt
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => onCopy(prompt)} className="flex items-center gap-2">
+                        <Copy className="h-4 w-4" />
+                        Copy content
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onCopyGenerated(prompt);
+                      }} className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        Copy generated prompt
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        onDuplicate(prompt);
+                      }} className="flex items-center gap-2">
+                        <Copy className="h-4 w-4" />
+                        Duplicate
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuSeparator />
+                      
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="flex items-center gap-2">
+                          <ArrowRight className="h-4 w-4" />
+                          Change status
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="w-48">
+                          {statusOptions.map((option) => (
+                            <DropdownMenuItem
+                              key={option.value}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleStatusChange(option.value as PromptStatus);
+                              }}
+                              disabled={option.value === prompt.status}
+                              className="flex items-center justify-between"
+                            >
+                              <span>{option.label}</span>
+                              <Badge variant={option.variant} className="text-xs">
+                                {option.value === prompt.status ? 'Current' : ''}
+                              </Badge>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="flex items-center gap-2">
+                          <Flame className="h-4 w-4" />
+                          Change priority
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="w-48">
+                          {PRIORITY_OPTIONS.map((option) => (
+                            <DropdownMenuItem
+                              key={option.value}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                onPriorityChange(prompt, option.value);
+                              }}
+                              disabled={option.value === priority}
+                              className="flex items-center justify-between"
+                            >
+                              <span>{option.label}</span>
+                              <Badge variant={option.variant} className="text-xs">
+                                {option.value === priority ? 'Current' : ''}
+                              </Badge>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      
+                      <DropdownMenuSeparator />
+                      
+                      <DropdownMenuItem 
+                        onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          onCopyGenerated(prompt);
-                        }} className="flex items-center gap-2">
-                          <Sparkles className="h-4 w-4" />
-                          Copy generated prompt
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuItem onClick={(e) => {
+                          setShowCursorDialog(true);
+                        }}
+                        disabled={!prompt.description && !prompt.generated_prompt}
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Send to Cursor
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuSeparator />
+                      
+                      <DropdownMenuItem 
+                        onClick={(e) => {
                           e.preventDefault();
-                          onDuplicate(prompt);
-                        }} className="flex items-center gap-2">
-                          <Copy className="h-4 w-4" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuSeparator />
-                        
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger className="flex items-center gap-2">
-                            <ArrowRight className="h-4 w-4" />
-                            Change status
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-48">
-                            {statusOptions.map((option) => (
-                              <DropdownMenuItem
-                                key={option.value}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  const status = option.value as PromptStatus;
-                                  
-                                  if (status === 'done') {
-                                    playSlideSound();
-                                    setIsSliding(true);
-                                    setTimeout(() => {
-                                      onStatusChange(prompt, status);
-                                    }, 300);
-                                  } else {
-                                    onStatusChange(prompt, status);
-                                  }
-                                }}
-                                disabled={option.value === prompt.status}
-                                className="flex items-center justify-between"
-                              >
-                                <span>{option.label}</span>
-                                <Badge variant={option.variant} className="text-xs">
-                                  {option.value === prompt.status ? 'Current' : ''}
-                                </Badge>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger className="flex items-center gap-2">
-                            <Flame className="h-4 w-4" />
-                            Change priority
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-48">
-                            {PRIORITY_OPTIONS.map((option) => (
-                              <DropdownMenuItem
-                                key={option.value}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  onPriorityChange(prompt, option.value);
-                                }}
-                                disabled={option.value === priority}
-                                className="flex items-center justify-between"
-                              >
-                                <span>{option.label}</span>
-                                <Badge variant={option.variant} className="text-xs">
-                                  {option.value === priority ? 'Current' : ''}
-                                </Badge>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                        
-                        <DropdownMenuSeparator />
-                        
-                        <DropdownMenuItem 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowCursorDialog(true);
-                          }}
-                          disabled={!prompt.description && !prompt.generated_prompt}
-                          className="flex items-center gap-2"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Send to Cursor
-                        </DropdownMenuItem>
-                        
-                        <DropdownMenuSeparator />
-                        
-                        <DropdownMenuItem 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onDelete(prompt);
-                          }}
-                          className="flex items-center gap-2 text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete prompt
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                          onDelete(prompt);
+                        }}
+                        className="flex items-center gap-2 text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete prompt
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+              </div>
+            </div>
+
+            {/* Cursor Workflow Progress - Always visible when active */}
+            <CursorWorkflowProgress
+              status={prompt.status}
+              cursorAgentId={prompt.cursor_agent_id}
+              cursorAgentStatus={prompt.cursor_agent_status}
+              githubPrUrl={prompt.github_pr_url}
+              githubPrNumber={prompt.github_pr_number}
+              cursorBranchName={prompt.cursor_branch_name}
+              error={prompt.status === 'error' ? (prompt.cursor_logs as any)?.error || 'Unknown error' : undefined}
+              onViewAgent={() => setShowAgentModal(true)}
+              onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
+              onMergePR={() => {
+                toast({
+                  title: 'Merge PR',
+                  description: 'PR merge functionality coming soon!',
+                });
+              }}
+              onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
+            />
           </CardContent>
         </Card>
       </PromptContextMenu>
@@ -513,7 +462,6 @@ export function PromptCard({
         onClose={() => setShowCursorDialog(false)}
         prompt={prompt}
         onPromptUpdate={(promptId, updates) => {
-          // Update the prompt status when sent to Cursor
           onStatusChange({ ...prompt, ...updates } as Prompt, updates.status as PromptStatus);
         }}
       />
