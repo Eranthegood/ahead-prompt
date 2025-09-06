@@ -29,8 +29,6 @@ export const useContrastMonitor = (enableLogging: boolean = false) => {
           failedTests.join(', ')
         );
       }
-
-      return results;
     }
   }, [resolvedTheme, enableLogging]);
 
