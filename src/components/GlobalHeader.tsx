@@ -141,6 +141,13 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 Sign In
               </Button>
             )}
+            
+            {/* Build button for authenticated users */}
+            {user && (
+              <Button onClick={() => handleNavigate('/build')} className="hidden md:flex">
+                Build
+              </Button>
+            )}
           </div>
         </div>
 
@@ -155,12 +162,19 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
               >
                 Pricing
               </Button>
-              {!user && (
+              {!user ? (
                 <Button
                   className="w-full"
                   onClick={() => handleNavigate('/auth')}
                 >
                   Sign In
+                </Button>
+              ) : (
+                <Button
+                  className="w-full"
+                  onClick={() => handleNavigate('/build')}
+                >
+                  Build
                 </Button>
               )}
             </div>

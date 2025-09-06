@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
@@ -32,6 +33,7 @@ const GitHubLogo = ({
   </svg>;
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const handleSignIn = () => {
     navigate('/build');
   };
@@ -73,7 +75,7 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
-              Get Ahead - Free
+              {user ? "Build" : "Get Ahead - Free"}
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
@@ -124,7 +126,7 @@ export default function LandingPage() {
               </p>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                End the Chaos Free
+                {user ? "Build" : "End the Chaos Free"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
@@ -203,7 +205,7 @@ export default function LandingPage() {
               </p>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Try it now
+                {user ? "Build" : "Try it now"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
@@ -271,7 +273,7 @@ export default function LandingPage() {
               </div>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Try Free Now
+                {user ? "Build" : "Try Free Now"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
@@ -352,7 +354,7 @@ export default function LandingPage() {
               </div>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                Try Multi-Agent Free
+                {user ? "Build" : "Try Multi-Agent Free"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>

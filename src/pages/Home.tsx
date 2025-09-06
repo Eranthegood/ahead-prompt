@@ -7,11 +7,7 @@ const Home = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading && user) {
-      navigate('/build', { replace: true });
-    }
-  }, [user, loading, navigate]);
+  // Allow both authenticated and non-authenticated users to see homepage
 
   if (loading) {
     return (
