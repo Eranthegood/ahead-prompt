@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
-import { KanbanPromptBoard } from '@/components/KanbanPromptBoard';
-import { DashboardViewToggle } from '@/components/DashboardViewToggle';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
@@ -13,7 +11,6 @@ import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
-import { useViewPreference } from '@/hooks/useViewPreference';
 import { Loader2 } from 'lucide-react';
 
 // Declare Supademo global function
@@ -33,12 +30,11 @@ void QPD_Keep;
 
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
-  
-  const { viewMode, setViewMode } = useViewPreference();
   const {
     workspace,
     loading
@@ -154,39 +150,20 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   return (
     <>
       <div className="flex-1 flex flex-col min-w-0">
-        {/* View Toggle */}
-        <div className="absolute top-20 right-4 z-20">
-          <DashboardViewToggle 
-            viewMode={viewMode} 
-            onViewModeChange={setViewMode} 
-          />
-        </div>
         
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
-        {/* Conditional View Rendering */}
-        {viewMode === 'kanban' ? (
-          <KanbanPromptBoard
-            workspace={workspace}
-            selectedProductId={selectedProductId}
-            selectedEpicId={selectedEpicId}
-            searchQuery={searchQuery}
-            hoveredPromptId={hoveredPromptId}
-            onPromptHover={setHoveredPromptId}
-            onCopy={handleCopyPrompt}
-          />
-        ) : (
-          <MinimalPromptList
-            workspace={workspace} 
-            selectedProductId={selectedProductId} 
-            selectedEpicId={selectedEpicId} 
-            searchQuery={searchQuery} 
-            hoveredPromptId={hoveredPromptId} 
-            onPromptHover={setHoveredPromptId} 
-            onCopy={handleCopyPrompt} 
-          />
-        )}
+        
+        <MinimalPromptList
+          workspace={workspace} 
+          selectedProductId={selectedProductId} 
+          selectedEpicId={selectedEpicId} 
+          searchQuery={searchQuery} 
+          hoveredPromptId={hoveredPromptId} 
+          onPromptHover={setHoveredPromptId} 
+          onCopy={handleCopyPrompt} 
+        />
       </div>
 
       <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
