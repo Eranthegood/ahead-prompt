@@ -5,7 +5,6 @@ import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, T
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { InteractivePromptCards } from "@/components/InteractivePromptCards";
-
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
 // Logo components
@@ -33,7 +32,9 @@ const GitHubLogo = ({
   </svg>;
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const handleSignIn = () => {
     navigate('/build');
   };
@@ -199,9 +200,7 @@ export default function LandingPage() {
                 CLEAR Principle Framework
               </h3>
                
-              <p className="text-xl text-muted-foreground">
-                Every prompt is automatically enhanced using our CLEAR framework, delivering professional-quality results across Cursor, Claude, ChatGPT, and any AI platform.
-              </p>
+              <p className="text-xl text-muted-foreground">Every idea is automatically enhanced using our CLEAR framework, delivering professional-quality results across Cursor, Claude, ChatGPT, and any AI platform.</p>
                
               <div className="space-y-4">
                 <h4 className="font-semibold">The CLEAR Framework:</h4>
