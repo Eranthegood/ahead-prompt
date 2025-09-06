@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Prompt } from '@/types';
 import { CursorAgent, CursorIntegrationConfig, mapCursorStatusToInternal } from '@/types/cursor';
+import { createJob } from '@/services/agentStatusService';
 
 // Interface moved to src/types/cursor.ts for centralized management
 
@@ -80,6 +81,21 @@ export function useCursorIntegration(): CursorIntegrationHook {
           }
         })
         .eq('id', prompt.id);
+
+      // Create status job for Ahead build card linkage
+      const job = await createJob({
+        jobId: data.agent.id,
+        title: prompt.title,
+        metadata: {
+          promptId: prompt.id,
+          branch: data.agent.branch || config.branchName,
+          repository: config.repository
+        }
+      });
+
+      if (!job) {
+        console.warn('Agent status service job creation failed');
+      }
 
       toast({
         title: 'Agent Created Successfully! 🤖',
