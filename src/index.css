@@ -81,13 +81,13 @@
 
   .dark {
     --background: 0 0% 8%;
-    --foreground: 0 0% 95%;
+    --foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
     --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
+    --card-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
     --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
     /* Couleurs adaptées pour le mode sombre */
     --primary: 344 85% 58%;         /* Rose plus sombre */
@@ -97,7 +97,7 @@
     --secondary-foreground: 0 0% 95%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted-foreground: 0 0% 70%; /* Improved from 65% for better contrast */
 
     --accent: 41 90% 55%;           /* Orange plus sombre */
     --accent-foreground: 0 0% 95%;
@@ -170,25 +170,47 @@
     background: hsl(var(--muted-foreground) / 0.5);
   }
   
-  /* Typography Styles for TipTap Editor */
+  /* Typography Styles for TipTap Editor - Enhanced Dark Mode Support */
   .ProseMirror {
     @apply prose prose-sm max-w-none dark:prose-invert;
     @apply focus:outline-none;
+    /* Enhanced dark mode text color for better contrast */
+    color: hsl(var(--card-foreground));
+  }
+  
+  /* Dark mode specific enhancements for better contrast */
+  .dark .ProseMirror {
+    color: hsl(0 0% 95%); /* High contrast white text in dark mode */
   }
   
   .ProseMirror h1 {
-    @apply text-2xl font-bold mb-4 text-foreground;
+    @apply text-2xl font-bold mb-4;
     line-height: 1.2;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror h1 {
+    color: hsl(0 0% 98%); /* Even higher contrast for headings */
   }
   
   .ProseMirror h2 {
-    @apply text-xl font-semibold mb-3 text-foreground;
+    @apply text-xl font-semibold mb-3;
     line-height: 1.3;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror h2 {
+    color: hsl(0 0% 96%);
   }
   
   .ProseMirror h3 {
-    @apply text-lg font-medium mb-2 text-foreground;
+    @apply text-lg font-medium mb-2;
     line-height: 1.4;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror h3 {
+    color: hsl(0 0% 94%);
   }
   
   .ProseMirror ul {
@@ -200,20 +222,85 @@
   }
   
   .ProseMirror li {
-    @apply text-foreground;
     line-height: 1.6;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror li {
+    color: hsl(0 0% 92%);
   }
   
   .ProseMirror p {
-    @apply mb-3 text-foreground leading-relaxed;
+    @apply mb-3 leading-relaxed;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror p {
+    color: hsl(0 0% 90%); /* Slightly softer for body text while maintaining contrast */
   }
   
   .ProseMirror strong {
-    @apply font-semibold text-foreground;
+    @apply font-semibold;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror strong {
+    color: hsl(0 0% 98%); /* High contrast for emphasis */
   }
   
   .ProseMirror em {
-    @apply italic text-foreground;
+    @apply italic;
+    color: hsl(var(--card-foreground));
+  }
+  
+  .dark .ProseMirror em {
+    color: hsl(0 0% 93%);
+  }
+  
+  /* Placeholder text enhancement for dark mode */
+  .ProseMirror p.is-editor-empty:first-child::before {
+    color: hsl(var(--muted-foreground));
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+  
+  .dark .ProseMirror p.is-editor-empty:first-child::before {
+    color: hsl(0 0% 60%); /* Better contrast for placeholder in dark mode */
+  }
+
+  /* High contrast mode support for enhanced accessibility */
+  .high-contrast .ProseMirror {
+    color: hsl(0 0% 100%) !important;
+  }
+
+  .high-contrast.dark .ProseMirror {
+    color: hsl(0 0% 100%) !important;
+    background-color: hsl(0 0% 0%) !important;
+  }
+
+  .high-contrast.dark .ProseMirror h1,
+  .high-contrast.dark .ProseMirror h2,
+  .high-contrast.dark .ProseMirror h3,
+  .high-contrast.dark .ProseMirror p,
+  .high-contrast.dark .ProseMirror li,
+  .high-contrast.dark .ProseMirror strong,
+  .high-contrast.dark .ProseMirror em {
+    color: hsl(0 0% 100%) !important;
+  }
+
+  /* Enhanced QuickPrompt dialog contrast for dark mode */
+  .dark .quickprompt-enhanced {
+    --dialog-background: 0 0% 6%; /* Darker background for better contrast */
+    --dialog-foreground: 0 0% 98%; /* Higher contrast text */
+    --dialog-border: 0 0% 20%; /* More visible borders */
+  }
+
+  /* Apply enhanced contrast to QuickPrompt dialog elements */
+  .dark [data-dialog-content] {
+    background-color: hsl(var(--dialog-background, var(--card)));
+    color: hsl(var(--dialog-foreground, var(--card-foreground)));
+    border-color: hsl(var(--dialog-border, var(--border)));
   }
   
   /* Generated content display styles */

@@ -28,7 +28,7 @@ export const useTheme = () => {
   const effectiveTheme = getEffectiveTheme();
   const isLoading = prefsLoading || gamificationLoading;
 
-  // Update theme class on document
+  // Update theme class on document with enhanced contrast detection
   useEffect(() => {
     const root = window.document.documentElement;
     
@@ -36,7 +36,16 @@ export const useTheme = () => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
-      console.log(`Theme applied: ${theme}, loading: ${isLoading}, unlocked: ${isDarkModeUnlocked}`);
+      
+      // Enhanced accessibility: Apply high contrast class if needed
+      const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
+      if (prefersHighContrast) {
+        root.classList.add('high-contrast');
+      } else {
+        root.classList.remove('high-contrast');
+      }
+      
+      console.log(`Theme applied: ${theme}, loading: ${isLoading}, unlocked: ${isDarkModeUnlocked}, high-contrast: ${prefersHighContrast}`);
     };
 
     // Always start with light theme during loading
@@ -47,6 +56,7 @@ export const useTheme = () => {
 
     if (effectiveTheme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const contrastQuery = window.matchMedia('(prefers-contrast: high)');
       
       const handleChange = () => {
         const systemTheme = mediaQuery.matches ? 'dark' : 'light';
@@ -56,8 +66,12 @@ export const useTheme = () => {
 
       handleChange();
       mediaQuery.addEventListener('change', handleChange);
+      contrastQuery.addEventListener('change', handleChange);
       
-      return () => mediaQuery.removeEventListener('change', handleChange);
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange);
+        contrastQuery.removeEventListener('change', handleChange);
+      };
     } else {
       applyTheme(effectiveTheme);
     }
