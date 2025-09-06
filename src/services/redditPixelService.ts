@@ -34,7 +34,7 @@ export class RedditPixelService {
         window.rdt('init', REDDIT_PIXEL_ID, {
           optOut: false,
           useDecimalCurrencyValues: true,
-          debug: false
+          debug: process.env.NODE_ENV === 'development'
         });
         
         // Track initial page visit

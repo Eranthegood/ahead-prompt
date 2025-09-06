@@ -154,39 +154,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
-        {/* Prompt Enhancer Feature Section */}
-        <div className="mb-6 p-6 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">✨ Prompt Enhancer</h2>
-              <p className="text-muted-foreground">
-                Transform your prompts with AI-powered enhancements. Create, test, and optimize your prompts for better results.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => window.location.href = '/prompt-enhancer'}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-              >
-                Try Enhancer
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>AI-Powered Enhancement</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>Version Control</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span>Performance Testing</span>
-            </div>
-          </div>
-        </div>
         
         <MinimalPromptList
           workspace={workspace} 
