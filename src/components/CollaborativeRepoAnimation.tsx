@@ -84,8 +84,8 @@ const CollaborativeRepoAnimation = () => {
                 repeat: Infinity
               }}
             >
-              <div className="w-20 h-20 flex items-center justify-center bg-primary/5 rounded-full">
-                <Github className="w-10 h-10 text-primary" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center bg-primary/5 rounded-full">
+                <Github className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-primary" />
               </div>
             </motion.div>
 
