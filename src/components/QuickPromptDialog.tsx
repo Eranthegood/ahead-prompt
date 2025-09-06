@@ -13,6 +13,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
+import { useDevContrastMonitor } from '@/hooks/useContrastMonitor';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
@@ -128,6 +129,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Performance tracking
   const [startTime] = useState(Date.now());
   const { trackPromptCreation, trackError } = usePromptMetrics();
+  
+  // Dark mode contrast monitoring (development only)
+  useDevContrastMonitor();
   
   // UI state
   const [isLoading, setIsLoading] = useState(false);
@@ -460,8 +464,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col"
+        className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col quickprompt-enhanced"
         onKeyDown={handleKeyDown}
+        data-dialog-content
       >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
@@ -647,7 +652,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
     {/* Knowledge Modal */}
     <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto bg-background text-foreground border-border">
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto bg-background text-foreground border-border quickprompt-enhanced" data-dialog-content>
         <DialogHeader>
           <DialogTitle className="text-foreground">
             Knowledge for {products?.find(p => p.id === selectedProduct)?.name || 'Product'}
