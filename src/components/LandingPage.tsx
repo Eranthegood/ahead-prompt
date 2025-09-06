@@ -174,11 +174,6 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="relative box-content max-h-[80vh] w-full py-10" style={{
-          aspectRatio: '2.0136'
-        }}>
-            <iframe src="https://app.supademo.com/embed/cmf1njhj6adejv9kqczgddst5?embed_v=2&utm_source=embed" loading="lazy" title="Ahead Demo" allow="clipboard-write" allowFullScreen className="absolute inset-0 w-full h-full border-0 rounded-lg" />
-          </div>
         </div>
       </section>
 
