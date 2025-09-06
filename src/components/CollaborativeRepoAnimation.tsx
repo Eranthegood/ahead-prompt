@@ -49,21 +49,8 @@ const CollaborativeRepoAnimation = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.3, duration: 0.5 }}
                   >
-                    {prompt.priority === "high" ? (
+                    {prompt.priority === "high" && (
                       <span className="text-xs">🔥</span>
-                    ) : (
-                      <motion.div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: prompt.color }}
-                        animate={prompt.status === "processing" ? {
-                          opacity: [0.3, 1, 0.3],
-                          scale: [1, 1.3, 1]
-                        } : {}}
-                        transition={{
-                          duration: 1.5,
-                          repeat: prompt.status === "processing" ? Infinity : 0
-                        }}
-                      />
                     )}
                     <span className="text-sm text-foreground/80 flex-1">{prompt.text}</span>
                     <div className="flex items-center gap-2">
