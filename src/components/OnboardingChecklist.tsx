@@ -44,7 +44,52 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
     setForceUpdate(prev => prev + 1);
   }, [products?.length, epics?.length, knowledgeItems?.length, prompts?.length]);
 
-  // Check if user has completed onboarding before
+  // Auto-complete onboarding when all items are done
+  useEffect(() => {
+    const checklistItems: ChecklistItem[] = [
+      {
+        id: 'product',
+        title: 'Create your first product',
+        description: 'Organize your projects and prompts by creating a product workspace',
+        completed: (products?.length || 0) > 0,
+        action: () => window.dispatchEvent(new CustomEvent('open-product-dialog'))
+      },
+      {
+        id: 'epic',
+        title: 'Create your first epic',
+        description: 'Group related features and organize your development workflow',
+        completed: (epics?.length || 0) > 0,
+        action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-epic-dialog')) : undefined
+      },
+      {
+        id: 'knowledge',
+        title: 'Add your knowledge base',
+        description: 'Store docs, links, and context to enhance your AI prompts',
+        completed: (knowledgeItems?.length || 0) > 0,
+        action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')) : undefined
+      },
+      {
+        id: 'prompt',
+        title: 'Create your first prompt',
+        description: 'Start capturing your development ideas and next moves',
+        completed: (prompts?.length || 0) > 0,
+        action: () => window.dispatchEvent(new CustomEvent('open-quick-prompt'))
+      }
+    ];
+
+    const completedCount = checklistItems.filter(item => item.completed).length;
+    const totalCount = checklistItems.length;
+    const isFullyCompleted = completedCount === totalCount;
+
+    if (isFullyCompleted && completedCount > 0) {
+      setTimeout(() => {
+        localStorage.setItem(`onboarding_completed_${workspace.id}`, 'true');
+        onComplete?.();
+      }, 2000); // Small delay to show completion state
+    }
+  }, [products?.length, epics?.length, knowledgeItems?.length, prompts?.length, workspace.id, onComplete]);
+
+  // Check if user has completed onboarding before - AFTER all hooks
   const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${workspace.id}`) === 'true';
   
   if (hasCompletedOnboarding) {
@@ -91,16 +136,6 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const totalCount = checklistItems.length;
   const isFullyCompleted = completedCount === totalCount;
   const progressPercentage = (completedCount / totalCount) * 100;
-
-  // Auto-complete onboarding when all items are done
-  useEffect(() => {
-    if (isFullyCompleted && completedCount > 0) {
-      setTimeout(() => {
-        localStorage.setItem(`onboarding_completed_${workspace.id}`, 'true');
-        onComplete?.();
-      }, 2000); // Small delay to show completion state
-    }
-  }, [isFullyCompleted, completedCount, workspace.id, onComplete]);
 
 
   return (
