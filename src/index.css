@@ -291,6 +291,15 @@
     50% { transform: translate(-10px, -10px); }
   }
 
+  /* Shadows */
+  .shadow-glow {
+    box-shadow: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+  }
+
+  .shadow-elegant {
+    box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+  }
+
   /* Line clamp utilities for text truncation */
   .line-clamp-1 {
     overflow: hidden;
