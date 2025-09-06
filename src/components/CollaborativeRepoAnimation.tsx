@@ -37,9 +37,9 @@ const CollaborativeRepoAnimation = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending", priority: "high", badgeStatus: "todo" },
+                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending", priority: "high", badgeStatus: "in_progress" },
                   { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing", priority: "high", badgeStatus: "in_progress" },
-                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready", priority: "normal", badgeStatus: "todo" },
+                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready", priority: "normal", badgeStatus: "in_progress" },
                   { text: "Update unit tests", color: "hsl(var(--success))", status: "completed", priority: "normal", badgeStatus: "done" }
                 ].map((prompt, index) => (
                   <motion.div
