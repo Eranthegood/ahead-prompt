@@ -152,57 +152,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
-                AI-Enhanced Prompts Ready for Any Platform
+                Capture Ideas While AI Works
               </h2>
               
               <p className="text-muted-foreground text-lg">
-                Don't lose brilliant ideas during AI wait times. Our CLEAR Principle transforms raw thoughts into structured, platform-ready prompts.
+                Don't lose brilliant ideas during AI wait times. Capture, organize, and queue your next moves instantly.
               </p>
-
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-primary">
-                  CLEAR Prompt Enhancement Framework
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
-                    <div>
-                      <span className="font-semibold">Context-Rich:</span>
-                      <span className="text-muted-foreground ml-1">Auto-inject project knowledge</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
-                    <div>
-                      <span className="font-semibold">Logic-Structured:</span>
-                      <span className="text-muted-foreground ml-1">Clear reasoning paths</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
-                    <div>
-                      <span className="font-semibold">Execution-Ready:</span>
-                      <span className="text-muted-foreground ml-1">Actionable instructions</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
-                    <div>
-                      <span className="font-semibold">AI-Optimized:</span>
-                      <span className="text-muted-foreground ml-1">Works on any platform</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
-                  <p className="text-sm font-medium">
-                    ✨ Your prompts are automatically enhanced and ready to push to Cursor, Claude, ChatGPT, or any AI platform
-                  </p>
-                </div>
-              </div>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                {user ? "Build" : "Try Enhanced Prompts"}
+                {user ? "Build" : "Try it now"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
