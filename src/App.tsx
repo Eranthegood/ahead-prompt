@@ -31,6 +31,7 @@ import PromptEnhancerComingSoon from "./pages/PromptEnhancerComingSoon";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
+import MotionDesignDemo from "./pages/MotionDesignDemo";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -142,6 +143,7 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
+                     <Route path="/motion-design-demo" element={<MotionDesignDemo />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>

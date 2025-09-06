@@ -44,6 +44,84 @@ export type Database = {
         }
         Relationships: []
       }
+      cursor_audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          error_details: string | null
+          id: string
+          metadata: Json | null
+          prompt_id: string
+          status: string
+          success: boolean
+          timestamp: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error_details?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_id: string
+          status: string
+          success?: boolean
+          timestamp?: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error_details?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_id?: string
+          status?: string
+          success?: boolean
+          timestamp?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cursor_tracking_events: {
+        Row: {
+          created_at: string
+          data: Json
+          duration_ms: number | null
+          event_type: string
+          id: string
+          performance_metrics: Json | null
+          prompt_id: string
+          timestamp: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          duration_ms?: number | null
+          event_type: string
+          id?: string
+          performance_metrics?: Json | null
+          prompt_id: string
+          timestamp?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          duration_ms?: number | null
+          event_type?: string
+          id?: string
+          performance_metrics?: Json | null
+          prompt_id?: string
+          timestamp?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_activity: {
         Row: {
           activity_date: string

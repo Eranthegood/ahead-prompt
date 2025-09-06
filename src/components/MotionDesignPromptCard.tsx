@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCursorIntegration } from '@/hooks/useCursorIntegration';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { CursorWorkflowProgress } from '@/components/CursorWorkflowProgress';
+import { TrackingDashboardModal } from '@/components/TrackingDashboardModal';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { cursorTrackingService } from '@/services/cursorTrackingService';
 import { isPromptUsable } from '@/lib/utils';
@@ -36,6 +37,7 @@ export function MotionDesignPromptCard({
 }: MotionDesignPromptCardProps) {
   const [justCopied, setJustCopied] = useState(false);
   const [showCursorDialog, setShowCursorDialog] = useState(false);
+  const [showTrackingDashboard, setShowTrackingDashboard] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
   const [trackingData, setTrackingData] = useState<any>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -199,11 +201,15 @@ export function MotionDesignPromptCard({
                     </Badge>
                   )}
                   
-                  {/* Enhanced Tracking Badge */}
+                    {/* Enhanced Tracking Badge */}
                   {trackingData && (
                     <Badge 
                       variant={trackingData.isValid ? "default" : "destructive"} 
-                      className="text-xs flex items-center gap-1"
+                      className="text-xs flex items-center gap-1 cursor-pointer hover:opacity-80"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowTrackingDashboard(true);
+                      }}
                     >
                       <Zap className="h-3 w-3" />
                       Tracked
@@ -351,15 +357,14 @@ export function MotionDesignPromptCard({
       <CursorConfigDialog
         isOpen={showCursorDialog}
         onClose={() => setShowCursorDialog(false)}
-        onSend={handleSendToCursor}
         prompt={prompt}
-        defaultConfig={isMotionDesign ? {
-          repository: prompt.product?.github_repo_url || '',
-          ref: prompt.product?.default_branch || 'main',
-          branchName: `motion-design-${prompt.id.slice(0, 8)}`,
-          autoCreatePr: true,
-          model: 'claude-4-sonnet' // Best model for complex motion design
-        } : undefined}
+      />
+
+      {/* Tracking Dashboard Modal */}
+      <TrackingDashboardModal
+        isOpen={showTrackingDashboard}
+        onClose={() => setShowTrackingDashboard(false)}
+        promptId={prompt.id}
       />
     </>
   );
