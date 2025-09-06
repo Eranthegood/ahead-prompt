@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
 import { CommandPalette } from '@/components/CommandPalette';
-import chessKnightLogo from "@/assets/chess-knight-logo.png";
+
 
 interface GlobalHeaderProps {
   showSearch?: boolean;
@@ -72,11 +72,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 className="flex items-center gap-2 cursor-pointer" 
                 onClick={() => navigate('/')}
               >
-                <img 
-                  src={chessKnightLogo} 
-                  alt="Ahead Logo" 
-                  className="w-8 h-8"
-                />
+                <Zap className="w-8 h-8 text-primary" />
                 <div className="font-mono text-lg font-bold text-primary">
                   Ahead
                 </div>

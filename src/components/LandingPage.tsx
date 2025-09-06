@@ -5,7 +5,7 @@ import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, T
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { InteractivePromptCards } from "@/components/InteractivePromptCards";
-import chessKnightLogo from "@/assets/chess-knight-logo.png";
+
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
 // Logo components
@@ -256,7 +256,7 @@ export default function LandingPage() {
 
 
       {/* Footer */}
-      <Footer logo={<img src={chessKnightLogo} alt="Ahead Logo" className="w-8 h-8" />} brandName="Ahead" mainLinks={[{
+      <Footer logo={<Zap className="w-8 h-8 text-primary" />} brandName="Ahead" mainLinks={[{
       href: "/",
       label: "Home"
     }, {

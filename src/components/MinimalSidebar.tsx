@@ -38,15 +38,15 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap } from 'lucide-react';
 import { Workspace, Product } from '@/types';
-import chessKnightLogo from "@/assets/chess-knight-logo.png";
+
 
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
 import { UserAccountSection } from './UserAccountSection';
-import { ProcessedLogo } from './ProcessedLogo';
+
 import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 
@@ -425,7 +425,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   onClick={() => navigate('/')}
                 >
                   <div className="flex items-center gap-2">
-                    <ProcessedLogo className="w-6 h-6" />
+                    <Zap className="w-6 h-6 text-primary" />
                     <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
                       <span>Ahead</span>
                     </h2>
@@ -446,7 +446,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                     onClick={() => navigate('/')}
                     aria-label="Home"
                   >
-                    <ProcessedLogo className="w-4 h-4" />
+                    <Zap className="w-4 h-4 text-primary" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">

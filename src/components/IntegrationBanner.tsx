@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProcessedLovableLogo } from './ProcessedLovableLogo';
+import { Zap } from 'lucide-react';
 
 // Logo components as SVGs for scalability
 const LovableLogo = ({ className }: { className?: string }) => (
-  <ProcessedLovableLogo 
-    originalSrc="/lovable-uploads/62d647f9-b070-4b25-b438-cdcc2582220a.png"
+  <img 
+    src="/lovable-uploads/62d647f9-b070-4b25-b438-cdcc2582220a.png" 
+    alt="Lovable Logo" 
     className={className}
   />
 );

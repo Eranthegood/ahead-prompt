@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
-import chessKnightLogo from '@/assets/chess-knight-logo.png';
+import { Zap } from 'lucide-react';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,11 +70,7 @@ const Auth = () => {
         <CardHeader className="text-center">
           <div className="flex flex-col items-center gap-4 mb-6">
             <div className="flex items-center justify-center gap-3">
-              <img 
-                src={chessKnightLogo} 
-                alt="Ahead Logo" 
-                className="w-16 h-16"
-              />
+              <Zap className="w-16 h-16 text-primary" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                 Ahead
               </h1>
