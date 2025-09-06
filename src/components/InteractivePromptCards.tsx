@@ -107,6 +107,13 @@ export function InteractivePromptCards() {
       setPrompts(prev => prev.map(p => 
         p.id === prompt.id ? { ...p, status: 'in_progress' as const } : p
       ));
+      
+      // After 3 more seconds, change to "PR ready to be merge"
+      setTimeout(() => {
+        setPrompts(prev => prev.map(p => 
+          p.id === prompt.id ? { ...p, status: 'done' as const } : p
+        ));
+      }, 3000);
     }, 2000);
   };
 
@@ -399,7 +406,7 @@ export function InteractivePromptCards() {
                         onClick={() => handleStatusClick(prompt)}
                       >
                         {prompt.status === 'in_progress' ? 'Agent is working' : 
-                         prompt.status === 'done' ? 'Done' : 'Todo'}
+                         prompt.status === 'done' ? 'PR ready to be merge' : 'Todo'}
                       </Badge>
                     </div>
 
