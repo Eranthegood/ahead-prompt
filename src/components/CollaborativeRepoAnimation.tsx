@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Bot, Github, Zap, Code, GitBranch, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const CollaborativeRepoAnimation = () => {
   return (
@@ -36,10 +37,10 @@ const CollaborativeRepoAnimation = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending", priority: "high" },
-                  { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing", priority: "high" },
-                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready", priority: "normal" },
-                  { text: "Update unit tests", color: "hsl(var(--success))", status: "completed", priority: "normal" }
+                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending", priority: "high", badgeStatus: "todo" },
+                  { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing", priority: "high", badgeStatus: "in_progress" },
+                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready", priority: "normal", badgeStatus: "todo" },
+                  { text: "Update unit tests", color: "hsl(var(--success))", status: "completed", priority: "normal", badgeStatus: "done" }
                 ].map((prompt, index) => (
                   <motion.div
                     key={prompt.text}
@@ -65,9 +66,21 @@ const CollaborativeRepoAnimation = () => {
                       />
                     )}
                     <span className="text-sm text-foreground/80 flex-1">{prompt.text}</span>
-                    {prompt.status === "completed" && (
-                      <CheckCircle className="w-4 h-4 text-success" />
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={
+                          prompt.badgeStatus === 'done' ? 'success' : 
+                          prompt.badgeStatus === 'in_progress' ? 'secondary' : 'outline'
+                        }
+                        className="text-xs"
+                      >
+                        {prompt.badgeStatus === 'done' ? 'Done' : 
+                         prompt.badgeStatus === 'in_progress' ? 'In Progress' : 'Todo'}
+                      </Badge>
+                      {prompt.status === "completed" && (
+                        <CheckCircle className="w-4 h-4 text-success" />
+                      )}
+                    </div>
                   </motion.div>
                 ))}
               </div>
