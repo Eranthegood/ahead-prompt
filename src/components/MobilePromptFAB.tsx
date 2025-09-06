@@ -55,18 +55,21 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
       <Button
         size="icon"
         className={cn(
-          "h-14 w-14 rounded-full shadow-lg shadow-primary/25",
-          "bg-primary hover:bg-primary/90 text-primary-foreground",
-          "border-2 border-background",
-          "active:scale-95 transition-transform duration-150",
-          "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          "h-16 w-16 rounded-full shadow-xl shadow-primary/30",
+          "bg-gradient-to-r from-primary to-primary/90",
+          "hover:from-primary/90 hover:to-primary/80",
+          "text-primary-foreground",
+          "border-3 border-background/50 backdrop-blur-sm",
+          "active:scale-95 transition-all duration-200 ease-out",
+          "focus-visible:ring-4 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
+          "hover:shadow-2xl hover:shadow-primary/40 hover:scale-105"
         )}
         onClick={onOpenPrompt}
-        aria-label="Create new prompt"
+        aria-label="Create new prompt - Tap to capture your next AI idea"
       >
         <Plus 
-          size={24} 
-          className="transition-transform duration-200 group-active:scale-90" 
+          size={28} 
+          className="transition-transform duration-200 group-active:scale-90 drop-shadow-sm" 
         />
       </Button>
     </div>

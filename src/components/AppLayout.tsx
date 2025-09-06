@@ -5,6 +5,7 @@ import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { QuickPromptDialog } from './QuickPromptDialog';
 import { MobilePromptFAB } from './MobilePromptFAB';
+import { MobilePromptDrawer } from './MobilePromptDrawer';
 import Dashboard from './Dashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -12,6 +13,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { PromptsProvider, usePromptsContext } from '@/context/PromptsContext';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -133,6 +135,7 @@ function SidebarWithContent({
   shouldBeCollapsedByDefault: boolean;
   children: React.ReactNode;
 }) {
+  const isMobile = useIsMobile();
   const location = useLocation();
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
@@ -179,7 +182,18 @@ function SidebarWithContent({
         </div>
 
         <QuickPromptDialog
-          isOpen={quickPromptOpen}
+          isOpen={quickPromptOpen && !isMobile}
+          onClose={() => setQuickPromptOpen(false)}
+          onSave={handleSavePrompt}
+          workspace={workspace}
+          products={products}
+          epics={epics}
+          selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+          selectedEpicId={selectedEpicId}
+        />
+
+        <MobilePromptDrawer
+          isOpen={quickPromptOpen && isMobile}
           onClose={() => setQuickPromptOpen(false)}
           onSave={handleSavePrompt}
           workspace={workspace}
