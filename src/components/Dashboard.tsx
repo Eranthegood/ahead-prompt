@@ -155,7 +155,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     <>
       <div className="flex-1 flex flex-col min-w-0">
         {/* View Toggle */}
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-20 right-4 z-20">
           <DashboardViewToggle 
             viewMode={viewMode} 
             onViewModeChange={setViewMode} 
