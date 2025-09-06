@@ -142,7 +142,7 @@ const CollaborativeRepoAnimation = () => {
                     >
                       <Bot className="w-4 h-4" style={{ color: agent.color }} />
                     </div>
-                    <span className="text-xs font-medium text-foreground/80">Agent {index + 1}</span>
+                    <span className="text-xs font-medium text-foreground/80">{index < 2 ? `Agent ${index + 1}` : "Agent"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <agent.icon className="w-3 h-3" style={{ color: agent.color }} />
