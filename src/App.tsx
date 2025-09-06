@@ -30,6 +30,7 @@ import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
 import PromptManagement from "./pages/PromptManagement";
+import AIAgents from "./pages/AIAgents";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -132,8 +133,13 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
+                     <Route path="/ai-agents" element={
+                       <ProtectedRoute>
+                         <AIAgents />
+                       </ProtectedRoute>
+                     } />
                      
-                    <Route path="*" element={<NotFound />} />
+                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
               </MixpanelProvider>

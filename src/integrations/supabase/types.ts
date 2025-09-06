@@ -14,6 +14,142 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_activities: {
+        Row: {
+          action_taken: string
+          activity_type: string
+          agent_id: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          processing_time_ms: number | null
+          success: boolean
+          workspace_id: string
+        }
+        Insert: {
+          action_taken: string
+          activity_type: string
+          agent_id: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          processing_time_ms?: number | null
+          success?: boolean
+          workspace_id: string
+        }
+        Update: {
+          action_taken?: string
+          activity_type?: string
+          agent_id?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          processing_time_ms?: number | null
+          success?: boolean
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_activities_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_rules: {
+        Row: {
+          actions: Json
+          agent_id: string
+          conditions: Json
+          created_at: string
+          id: string
+          is_active: boolean
+          priority: number
+          rule_type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          actions?: Json
+          agent_id: string
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          priority?: number
+          rule_type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          actions?: Json
+          agent_id?: string
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          priority?: number
+          rule_type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_agents: {
+        Row: {
+          agent_type: string
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          agent_type: string
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          agent_type?: string
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       binary_tasks: {
         Row: {
           created_at: string
