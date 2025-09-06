@@ -193,7 +193,7 @@ export interface Product {
   updated_at: string;
 }
 
-export type PromptStatus = 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
+export type PromptStatus = 'todo' | 'generating' | 'in_progress' | 'done' | 'sending_to_cursor' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged' | 'error';
 export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';
 
 // Priority levels: 1 = High, 2 = Normal, 3 = Low

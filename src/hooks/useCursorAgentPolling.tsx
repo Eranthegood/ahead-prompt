@@ -1,16 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { CursorAgent, mapCursorStatusToInternal } from '@/types/cursor';
 
-interface CursorAgent {
-  id: string;
-  status: string;
-  repository: string;
-  branch?: string;
-  pullRequestUrl?: string;
-  pullRequestNumber?: number;
-  error?: string;
-}
+// CursorAgent interface moved to src/types/cursor.ts
 
 interface UseCursorAgentPollingProps {
   agentId?: string;

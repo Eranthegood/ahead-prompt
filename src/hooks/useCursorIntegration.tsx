@@ -2,13 +2,9 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Prompt } from '@/types';
+import type { CursorAgent, CursorIntegrationConfig, mapCursorStatusToInternal } from '@/types/cursor';
 
-interface CursorAgent {
-  id: string;
-  status: string;
-  repository: string;
-  branch?: string;
-}
+// Interface moved to src/types/cursor.ts for centralized management
 
 interface CursorIntegrationHook {
   isLoading: boolean;
