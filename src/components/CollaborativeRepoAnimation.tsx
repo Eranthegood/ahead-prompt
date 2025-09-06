@@ -36,10 +36,10 @@ const CollaborativeRepoAnimation = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending" },
-                  { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing" },
-                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready" },
-                  { text: "Update unit tests", color: "hsl(var(--success))", status: "completed" }
+                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending", priority: "high" },
+                  { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing", priority: "high" },
+                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready", priority: "normal" },
+                  { text: "Update unit tests", color: "hsl(var(--success))", status: "completed", priority: "normal" }
                 ].map((prompt, index) => (
                   <motion.div
                     key={prompt.text}
@@ -48,18 +48,22 @@ const CollaborativeRepoAnimation = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.3, duration: 0.5 }}
                   >
-                    <motion.div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: prompt.color }}
-                      animate={prompt.status === "processing" ? {
-                        opacity: [0.3, 1, 0.3],
-                        scale: [1, 1.3, 1]
-                      } : {}}
-                      transition={{
-                        duration: 1.5,
-                        repeat: prompt.status === "processing" ? Infinity : 0
-                      }}
-                    />
+                    {prompt.priority === "high" ? (
+                      <span className="text-xs">🔥</span>
+                    ) : (
+                      <motion.div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: prompt.color }}
+                        animate={prompt.status === "processing" ? {
+                          opacity: [0.3, 1, 0.3],
+                          scale: [1, 1.3, 1]
+                        } : {}}
+                        transition={{
+                          duration: 1.5,
+                          repeat: prompt.status === "processing" ? Infinity : 0
+                        }}
+                      />
+                    )}
                     <span className="text-sm text-foreground/80 flex-1">{prompt.text}</span>
                     {prompt.status === "completed" && (
                       <CheckCircle className="w-4 h-4 text-success" />
