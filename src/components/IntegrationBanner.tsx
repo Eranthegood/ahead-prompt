@@ -123,11 +123,6 @@ export const IntegrationBanner: React.FC = () => {
           })}
         </div>
         
-        <div className="mt-4 sm:mt-6 text-center">
-          <p className="text-xs text-muted-foreground/70">
-            Click any logo to learn more about the integration
-          </p>
-        </div>
       </div>
     </div>
   );
