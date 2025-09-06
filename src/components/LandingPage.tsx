@@ -131,11 +131,6 @@ export default function LandingPage() {
                  </div>
                </div>
                  
-               <div className="bg-muted/50 p-4 rounded-lg">
-                 <p className="text-sm text-muted-foreground italic">
-                   "Send login component to Claude → Queue error handling, responsive design, tests → When Claude finishes, boom - next prompt ready."
-                 </p>
-               </div>
                  
                <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
                  {user ? "Build" : "Try Free Now"}
