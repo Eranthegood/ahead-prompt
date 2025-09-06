@@ -1084,6 +1084,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_secrets: {
+        Row: {
+          id: string
+          user_id: string
+          key: string
+          encrypted_value: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          key: string
+          encrypted_value: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          key?: string
+          encrypted_value?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       workspaces: {
         Row: {
           created_at: string

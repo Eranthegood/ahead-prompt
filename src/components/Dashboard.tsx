@@ -3,6 +3,7 @@ import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
+import { PRPromptCard } from '@/components/PRPromptCard';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -154,6 +155,10 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics}
         
+        {/* PR Management Card - positioned prominently at the top */}
+        <div className="p-4 border-b bg-muted/20">
+          <PRPromptCard workspaceId={workspace.id} />
+        </div>
         
         <MinimalPromptList
           workspace={workspace} 
