@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -16,148 +15,73 @@ import {
   GitBranch, 
   ExternalLink, 
   User, 
-  Calendar, 
-  FileText, 
-  Plus, 
-  Minus, 
+  Calendar,
   AlertCircle,
   CheckCircle2,
   Clock,
   RefreshCw,
-  Settings
+  Settings,
+  Zap,
+  Eye
 } from 'lucide-react';
-import { useGitHubPRs, GitHubPR } from '@/hooks/useGitHubPRs';
+import { usePromptPRs, PromptPR } from '@/hooks/usePromptPRs';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { formatDistanceToNow } from 'date-fns';
+import { getStatusDisplayInfo } from '@/types/cursor';
 
 interface PRPromptCardProps {
   workspaceId: string;
 }
 
-interface Repository {
-  name: string;
-  full_name: string;
-  owner: string;
-}
-
 export function PRPromptCard({ workspaceId }: PRPromptCardProps) {
   const { integrations } = useIntegrations();
-  const { prs, isLoading, error, fetchPRs, squashAndMerge, mergeWithMergeCommit, rebaseAndMerge } = useGitHubPRs();
+  const { promptsWithPRs, isLoading, error, refreshPrompts, mergePR } = usePromptPRs(workspaceId);
   
-  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
-  const [selectedPR, setSelectedPR] = useState<GitHubPR | null>(null);
+  const [selectedPrompt, setSelectedPrompt] = useState<PromptPR | null>(null);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   const [mergeMethod, setMergeMethod] = useState<'merge' | 'squash' | 'rebase'>('squash');
   const [commitTitle, setCommitTitle] = useState('');
   const [commitMessage, setCommitMessage] = useState('');
-  const [repositories, setRepositories] = useState<Repository[]>([]);
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Get GitHub integration
   const githubIntegration = integrations.find(i => i.id === 'github');
   const isGitHubConfigured = githubIntegration?.isConfigured && githubIntegration?.isEnabled;
 
-  // Extract repositories from GitHub integration metadata
-  useEffect(() => {
-    if (githubIntegration?.metadata?.repositories) {
-      const repos = githubIntegration.metadata.repositories.map((repo: any) => ({
-        name: repo.name,
-        full_name: repo.full_name,
-        owner: repo.full_name.split('/')[0],
-      }));
-      setRepositories(repos);
-      
-      // Auto-select first repository if none selected
-      if (repos.length > 0 && !selectedRepo) {
-        setSelectedRepo(repos[0]);
-      }
-    }
-  }, [githubIntegration, selectedRepo]);
-
-  // Fetch PRs when repository changes
-  useEffect(() => {
-    if (selectedRepo && isGitHubConfigured) {
-      fetchPRs(selectedRepo.owner, selectedRepo.name).then(() => {
-        setLastRefresh(new Date());
-      });
-    }
-  }, [selectedRepo, isGitHubConfigured, fetchPRs]);
-
-  // Auto-refresh PRs every 30 seconds
-  useEffect(() => {
-    if (!selectedRepo || !isGitHubConfigured) return;
-
-    const interval = setInterval(() => {
-      // Only refresh if not currently loading to avoid conflicts
-      if (!isLoading) {
-        fetchPRs(selectedRepo.owner, selectedRepo.name).then(() => {
-          setLastRefresh(new Date());
-        });
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [selectedRepo, isGitHubConfigured, fetchPRs, isLoading]);
-
   const handleMerge = async () => {
-    if (!selectedPR || !selectedRepo) return;
+    if (!selectedPrompt) return;
 
-    let success = false;
-    
-    switch (mergeMethod) {
-      case 'squash':
-        success = await squashAndMerge(
-          selectedRepo.owner, 
-          selectedRepo.name, 
-          selectedPR.number,
-          commitTitle || undefined,
-          commitMessage || undefined
-        );
-        break;
-      case 'merge':
-        success = await mergeWithMergeCommit(
-          selectedRepo.owner, 
-          selectedRepo.name, 
-          selectedPR.number,
-          commitMessage || undefined
-        );
-        break;
-      case 'rebase':
-        success = await rebaseAndMerge(
-          selectedRepo.owner, 
-          selectedRepo.name, 
-          selectedPR.number
-        );
-        break;
-    }
+    const success = await mergePR(
+      selectedPrompt.id,
+      mergeMethod,
+      commitTitle || undefined,
+      commitMessage || undefined
+    );
 
     if (success) {
       setMergeDialogOpen(false);
-      setSelectedPR(null);
+      setSelectedPrompt(null);
       setCommitTitle('');
       setCommitMessage('');
     }
   };
 
-  const openMergeDialog = (pr: GitHubPR) => {
-    setSelectedPR(pr);
-    setCommitTitle(pr.title);
-    setCommitMessage(`${pr.title}\n\n${pr.body || ''}`);
+  const openMergeDialog = (prompt: PromptPR) => {
+    setSelectedPrompt(prompt);
+    setCommitTitle(prompt.title);
+    setCommitMessage(prompt.description || '');
     setMergeDialogOpen(true);
   };
 
-  const getPRStatusColor = (pr: GitHubPR) => {
-    if (pr.draft) return 'secondary';
-    if (pr.mergeable === false) return 'destructive';
-    if (pr.mergeable === true) return 'default';
-    return 'secondary'; // mergeable is null (checking)
-  };
-
-  const getPRStatusText = (pr: GitHubPR) => {
-    if (pr.draft) return 'Draft';
-    if (pr.mergeable === false) return 'Conflicts';
-    if (pr.mergeable === true) return 'Ready';
-    return 'Checking';
+  const getCursorStatusBadge = (prompt: PromptPR) => {
+    if (!prompt.cursor_agent_status) return null;
+    
+    const statusInfo = getStatusDisplayInfo(prompt.cursor_agent_status as any);
+    return (
+      <Badge variant="outline" className="text-xs">
+        <div className={`w-2 h-2 rounded-full ${statusInfo.color} mr-1`} />
+        {statusInfo.label}
+      </Badge>
+    );
   };
 
   if (!isGitHubConfigured) {
@@ -195,39 +119,22 @@ export function PRPromptCard({ workspaceId }: PRPromptCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <GitPullRequest className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Pull Requests</CardTitle>
+            <CardTitle className="text-lg">Active Pull Requests</CardTitle>
           </div>
           <div className="flex items-center gap-2">
-            {repositories.length > 1 && (
-              <Select value={selectedRepo?.full_name || ''} onValueChange={(value) => {
-                const repo = repositories.find(r => r.full_name === value);
-                setSelectedRepo(repo || null);
-              }}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select repository" />
-                </SelectTrigger>
-                <SelectContent>
-                  {repositories.map((repo) => (
-                    <SelectItem key={repo.full_name} value={repo.full_name}>
-                      {repo.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => selectedRepo && fetchPRs(selectedRepo.owner, selectedRepo.name).then(() => setLastRefresh(new Date()))}
+              onClick={refreshPrompts}
               disabled={isLoading}
-              title={lastRefresh ? `Last updated: ${lastRefresh.toLocaleTimeString()}` : 'Refresh pull requests'}
+              title="Refresh pull requests from Cursor prompts"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
         <CardDescription>
-          {selectedRepo ? `Manage pull requests for ${selectedRepo.full_name}` : 'Select a repository to view pull requests'}
+          Manage pull requests created by Cursor from your prompts
         </CardDescription>
       </CardHeader>
 
@@ -244,62 +151,61 @@ export function PRPromptCard({ workspaceId }: PRPromptCardProps) {
             <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
             <span className="ml-2 text-muted-foreground">Loading pull requests...</span>
           </div>
-        ) : prs.length === 0 ? (
+        ) : promptsWithPRs.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <GitBranch className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-lg font-medium mb-1">No open pull requests</p>
-            <p className="text-sm">All caught up! 🎉</p>
+            <p className="text-lg font-medium mb-1">No active pull requests</p>
+            <p className="text-sm">Send prompts to Cursor to create PRs</p>
           </div>
         ) : (
           <ScrollArea className="h-96">
             <div className="space-y-3">
-              {prs.map((pr) => (
-                <div key={pr.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+              {promptsWithPRs.map((prompt) => (
+                <div key={prompt.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-sm leading-tight">{pr.title}</h4>
-                        <Badge variant={getPRStatusColor(pr)} className="text-xs">
-                          {getPRStatusText(pr)}
-                        </Badge>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-medium text-sm leading-tight">{prompt.title}</h4>
+                        {getCursorStatusBadge(prompt)}
+                        {prompt.github_pr_number && (
+                          <Badge variant="outline" className="text-xs">
+                            PR #{prompt.github_pr_number}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
                         <div className="flex items-center gap-1">
-                          <User className="w-3 h-3" />
-                          {pr.user.login}
-                        </div>
-                        <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {formatDistanceToNow(new Date(pr.created_at), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(prompt.created_at), { addSuffix: true })}
                         </div>
+                        {(prompt.workflow_metadata as any)?.repository && (
+                          <div className="flex items-center gap-1">
+                            <GitBranch className="w-3 h-3" />
+                            {(prompt.workflow_metadata as any).repository}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Plus className="w-3 h-3 text-green-500" />
-                          {pr.additions}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Minus className="w-3 h-3 text-red-500" />
-                          {pr.deletions}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <FileText className="w-3 h-3" />
-                          {pr.changed_files} files
-                        </span>
-                        <span>#{pr.number}</span>
-                      </div>
+                      {prompt.cursor_branch_name && (
+                        <div className="text-xs text-muted-foreground mb-2">
+                          Branch: {prompt.cursor_branch_name}
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {prompt.description || 'No description'}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
-                      <Button variant="ghost" size="sm" asChild>
-                        <a href={pr.html_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>
-                      {!pr.draft && pr.mergeable !== false && (
+                      {prompt.github_pr_url && (
+                        <Button variant="ghost" size="sm" asChild>
+                          <a href={prompt.github_pr_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      )}
+                      {prompt.github_pr_url && prompt.cursor_agent_status === 'COMPLETED' && (
                         <Button 
                           size="sm" 
-                          onClick={() => openMergeDialog(pr)}
-                          disabled={pr.mergeable === null}
+                          onClick={() => openMergeDialog(prompt)}
                         >
                           <GitMerge className="w-4 h-4 mr-1" />
                           Merge
@@ -307,9 +213,14 @@ export function PRPromptCard({ workspaceId }: PRPromptCardProps) {
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {pr.head.ref} → {pr.base.ref}
-                  </div>
+                  {(prompt.workflow_metadata as any)?.error && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        {(prompt.workflow_metadata as any).error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
               ))}
             </div>
@@ -322,7 +233,7 @@ export function PRPromptCard({ workspaceId }: PRPromptCardProps) {
             <DialogHeader>
               <DialogTitle>Merge Pull Request</DialogTitle>
               <DialogDescription>
-                {selectedPR && `Merge PR #${selectedPR.number}: ${selectedPR.title}`}
+                {selectedPrompt && `Merge PR #${selectedPrompt.github_pr_number}: ${selectedPrompt.title}`}
               </DialogDescription>
             </DialogHeader>
 
