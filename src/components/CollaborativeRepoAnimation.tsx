@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
-import { Bot, Folder } from "lucide-react";
+import { Bot, Folder, Zap, Code, GitBranch, CheckCircle } from "lucide-react";
 
 const CollaborativeRepoAnimation = () => {
   return (
-    <div className="w-full h-full relative overflow-hidden bg-background">
+    <div className="w-full h-[500px] lg:h-[600px] relative overflow-hidden bg-gradient-to-br from-background to-muted/20 rounded-lg border border-border/50">
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-full h-full max-w-[1920px] max-h-[1080px] scale-50 md:scale-75 lg:scale-90 xl:scale-100">
+        <div className="relative w-full h-full scale-75 md:scale-85 lg:scale-95">
           
           {/* Background Grid */}
           <motion.div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `
                 linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
@@ -28,43 +28,58 @@ const CollaborativeRepoAnimation = () => {
             }}
           />
 
-          {/* Title */}
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-center text-foreground">
-            <motion.h1 
-              className="text-4xl font-bold mb-2"
-              animate={{
-                textShadow: [
-                  "0 0 10px hsl(var(--foreground) / 0.3)",
-                  "0 0 20px hsl(var(--foreground) / 0.6)",
-                  "0 0 10px hsl(var(--foreground) / 0.3)"
-                ]
-              }}
-              transition={{
-                duration: 3,
-                ease: "easeInOut",
-                repeat: Infinity
-              }}
-            >
-              Collaborative Repository Activity
-            </motion.h1>
-            <p className="text-xl text-muted-foreground">
-              Multiple Agents Working Simultaneously
-            </p>
+          {/* Prompt Queue Section */}
+          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-card/90 backdrop-blur-sm border border-border/50 rounded-lg p-4 min-w-[320px] shadow-xl">
+              <h3 className="text-base font-semibold text-primary mb-3 text-center">
+                Prompt Queue
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { text: "Fix authentication bug", color: "hsl(var(--destructive))", status: "pending" },
+                  { text: "Add dark mode toggle", color: "hsl(var(--warning))", status: "processing" },
+                  { text: "Optimize database queries", color: "hsl(var(--primary))", status: "ready" },
+                  { text: "Update unit tests", color: "hsl(var(--success))", status: "completed" }
+                ].map((prompt, index) => (
+                  <motion.div
+                    key={prompt.text}
+                    className="flex items-center gap-3 p-2 rounded bg-background/60 border border-border/30"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.3, duration: 0.5 }}
+                  >
+                    <motion.div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: prompt.color }}
+                      animate={prompt.status === "processing" ? {
+                        opacity: [0.3, 1, 0.3],
+                        scale: [1, 1.3, 1]
+                      } : {}}
+                      transition={{
+                        duration: 1.5,
+                        repeat: prompt.status === "processing" ? Infinity : 0
+                      }}
+                    />
+                    <span className="text-sm text-foreground/80 flex-1">{prompt.text}</span>
+                    {prompt.status === "completed" && (
+                      <CheckCircle className="w-4 h-4 text-success" />
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Central Repository */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
             <motion.div
-              className="w-60 h-60 rounded-full flex items-center justify-center relative"
-              style={{
-                background: "radial-gradient(circle, hsl(var(--primary) / 0.8) 0%, hsl(var(--primary)) 100%)"
-              }}
+              className="relative"
               animate={{
                 scale: [1, 1.05, 1],
                 boxShadow: [
-                  "0 0 40px hsl(var(--primary) / 0.5)",
-                  "0 0 60px hsl(var(--primary) / 0.8)",
-                  "0 0 40px hsl(var(--primary) / 0.5)"
+                  "0 0 20px hsl(var(--primary) / 0.2)",
+                  "0 0 40px hsl(var(--primary) / 0.4)",
+                  "0 0 20px hsl(var(--primary) / 0.2)"
                 ]
               }}
               transition={{
@@ -73,335 +88,138 @@ const CollaborativeRepoAnimation = () => {
                 repeat: Infinity
               }}
             >
-              <Folder className="w-12 h-12 text-primary-foreground" />
-              
-              {/* Queue Section */}
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/30 backdrop-blur-sm">
+                <Folder className="w-10 h-10 text-primary" />
+              </div>
+            </motion.div>
+
+            {/* Activity Indicators around Repository */}
+            {[0, 1, 2, 3, 4, 5].map((index) => (
               <motion.div
-                className="absolute -top-44 left-1/2 transform -translate-x-1/2 bg-muted/90 border-2 border-border rounded-3xl px-8 py-3 text-foreground font-bold text-sm text-center"
+                key={index}
+                className="absolute w-2 h-2 bg-primary/60 rounded-full"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  transformOrigin: "50% -50px"
+                }}
                 animate={{
-                  boxShadow: [
-                    "0 0 10px hsl(var(--primary) / 0.3)",
-                    "0 0 20px hsl(var(--primary) / 0.6)",
-                    "0 0 10px hsl(var(--primary) / 0.3)"
-                  ]
+                  rotate: [0, 360],
+                  opacity: [0.2, 0.8, 0.2]
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 6,
+                  delay: index * 1,
+                  ease: "linear",
+                  repeat: Infinity
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Agent Bots */}
+          {[
+            { position: "top-left", color: "hsl(var(--chart-1))", status: "Generating", icon: Zap, x: "25%", y: "35%" },
+            { position: "top-right", color: "hsl(var(--chart-2))", status: "Coding", icon: Code, x: "75%", y: "35%" },
+            { position: "bottom-left", color: "hsl(var(--chart-3))", status: "Testing", icon: GitBranch, x: "25%", y: "75%" },
+            { position: "bottom-right", color: "hsl(var(--chart-4))", status: "Deploying", icon: CheckCircle, x: "75%", y: "75%" }
+          ].map((agent, index) => (
+            <div key={agent.position} className="absolute" style={{ left: agent.x, top: agent.y, transform: "translate(-50%, -50%)" }}>
+              <motion.div
+                className="relative"
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [0, 5, 0, -5, 0]
+                }}
+                transition={{
+                  duration: 3,
+                  delay: index * 0.5,
                   ease: "easeInOut",
                   repeat: Infinity
                 }}
               >
-                Queue Dozens of Prompts
-                
-                {/* Prompt Indicators */}
-                <div className="absolute -bottom-11 left-1/2 transform -translate-x-1/2 flex gap-1">
-                  {[
-                    "hsl(142 76% 36%)", // Green
-                    "hsl(38 92% 50%)",  // Orange  
-                    "hsl(0 84% 60%)",   // Red
-                    "hsl(248 53% 58%)", // Purple
-                    "hsl(186 100% 37%)", // Cyan
-                    "hsl(84 81% 44%)"   // Lime
-                  ].map((color, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-3 h-2 rounded-sm"
-                      style={{ background: color }}
-                      animate={{
-                        opacity: [0.6, 1, 0.6],
-                        scale: [1, 1.2, 1]
-                      }}
-                      transition={{
-                        duration: 1,
-                        ease: "easeInOut",
-                        repeat: Infinity,
-                        delay: i * 0.2
-                      }}
-                    />
-                  ))}
+                <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg p-3 min-w-[120px] shadow-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div 
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: agent.color, opacity: 0.2 }}
+                    >
+                      <Bot className="w-4 h-4" style={{ color: agent.color }} />
+                    </div>
+                    <span className="text-xs font-medium text-foreground/80">Agent {index + 1}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <agent.icon className="w-3 h-3" style={{ color: agent.color }} />
+                    <span className="text-xs text-muted-foreground">{agent.status}</span>
+                  </div>
                 </div>
               </motion.div>
-            </motion.div>
-          </div>
 
-          {/* Agent 1 - Top Left (Generating) */}
-          <motion.div
-            className="absolute top-52 left-96"
-            animate={{ y: [0, -10, 0] }}
-            transition={{
-              duration: 4,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 0
-            }}
-          >
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 72% 29%) 100%)",
-                filter: "drop-shadow(0 0 10px rgba(0,0,0,0.5))"
-              }}
-            >
-              <Bot className="w-6 h-6 text-white" />
+              {/* Flow Lines to Repository */}
+              <svg 
+                className="absolute top-1/2 left-1/2 pointer-events-none"
+                style={{
+                  width: '200px',
+                  height: '200px',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: -1
+                }}
+              >
+                <motion.line
+                  x1="100"
+                  y1="100"
+                  x2={agent.x === "25%" ? "150" : "50"}
+                  y2={agent.y === "35%" ? "130" : "70"}
+                  stroke={agent.color}
+                  strokeWidth="2"
+                  strokeOpacity="0.3"
+                  strokeDasharray="5,5"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: [0, 1, 0] }}
+                  transition={{
+                    duration: 4,
+                    delay: index * 0.8,
+                    ease: "easeInOut",
+                    repeat: Infinity
+                  }}
+                />
+              </svg>
             </div>
-            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
-              GENERATING
-            </div>
-          </motion.div>
+          ))}
 
-          {/* Agent 2 - Top Right (Coding) */}
-          <motion.div
-            className="absolute top-52 right-96"
-            animate={{ y: [0, -10, 0] }}
-            transition={{
-              duration: 4,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 1
-            }}
-          >
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 44%) 100%)",
-                filter: "drop-shadow(0 0 10px rgba(0,0,0,0.5))"
-              }}
-            >
-              <Bot className="w-6 h-6 text-white" />
-            </div>
-            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
-              CODING
-            </div>
-          </motion.div>
-
-          {/* Agent 3 - Bottom Left (PR Ready) */}
-          <motion.div
-            className="absolute bottom-52 left-96"
-            animate={{ y: [0, -10, 0] }}
-            transition={{
-              duration: 4,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 2
-            }}
-          >
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 72% 51%) 100%)",
-                filter: "drop-shadow(0 0 10px rgba(0,0,0,0.5))"
-              }}
-            >
-              <Bot className="w-6 h-6 text-white" />
-            </div>
-            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
-              PR READY
-            </div>
-          </motion.div>
-
-          {/* Agent 4 - Bottom Right (Merged) */}
-          <motion.div
-            className="absolute bottom-52 right-96"
-            animate={{ y: [0, -10, 0] }}
-            transition={{
-              duration: 4,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 3
-            }}
-          >
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, hsl(248 53% 58%) 0%, hsl(243 75% 59%) 100%)",
-                filter: "drop-shadow(0 0 10px rgba(0,0,0,0.5))"
-              }}
-            >
-              <Bot className="w-6 h-6 text-white" />
-            </div>
-            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap">
-              MERGED
-            </div>
-          </motion.div>
-
-          {/* Flow Lines */}
-          {/* Flow 1 - Top Left to Center */}
-          <motion.div
-            className="absolute top-72 left-[480px] w-72 h-1 opacity-70 origin-left"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, hsl(186 100% 37%) 50%, transparent 100%)",
-              transform: "rotate(25deg)"
-            }}
-            animate={{ opacity: [0.4, 0.8, 0.4] }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 0
-            }}
-          >
+          {/* Floating Data Packets */}
+          {[...Array(6)].map((_, index) => (
             <motion.div
-              className="absolute top-0 left-0 w-2 h-2 rounded-full"
-              style={{ background: "hsl(142 76% 36%)" }}
+              key={index}
+              className="absolute w-1 h-1 bg-primary/40 rounded-full"
+              initial={{
+                left: "50%",
+                top: "50%",
+                scale: 0
+              }}
               animate={{
-                x: [0, 280],
-                scale: [0, 1, 1, 0],
-                opacity: [0, 1, 1, 0]
+                left: [
+                  "50%",
+                  index % 2 === 0 ? "25%" : "75%",
+                  "50%"
+                ],
+                top: [
+                  "50%",
+                  index % 3 === 0 ? "35%" : index % 3 === 1 ? "75%" : "45%",
+                  "50%"
+                ],
+                scale: [0, 1, 0],
+                opacity: [0, 0.8, 0]
               }}
               transition={{
-                duration: 3,
-                ease: "linear",
-                repeat: Infinity,
-                delay: 0,
-                times: [0, 0.1, 0.9, 1]
+                duration: 5,
+                delay: index * 0.8,
+                ease: "easeInOut",
+                repeat: Infinity
               }}
             />
-          </motion.div>
+          ))}
 
-          {/* Flow 2 - Top Right to Center */}
-          <motion.div
-            className="absolute top-72 right-[480px] w-72 h-1 opacity-70 origin-right"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, hsl(186 100% 37%) 50%, transparent 100%)",
-              transform: "rotate(-25deg)"
-            }}
-            animate={{ opacity: [0.4, 0.8, 0.4] }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 0.5
-            }}
-          >
-            <motion.div
-              className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ background: "hsl(38 92% 50%)" }}
-              animate={{
-                x: [0, -280],
-                scale: [0, 1, 1, 0],
-                opacity: [0, 1, 1, 0]
-              }}
-              transition={{
-                duration: 3,
-                ease: "linear",
-                repeat: Infinity,
-                delay: 1,
-                times: [0, 0.1, 0.9, 1]
-              }}
-            />
-          </motion.div>
-
-          {/* Flow 3 - Bottom Left to Center */}
-          <motion.div
-            className="absolute bottom-72 left-[480px] w-72 h-1 opacity-70 origin-left"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, hsl(186 100% 37%) 50%, transparent 100%)",
-              transform: "rotate(-25deg)"
-            }}
-            animate={{ opacity: [0.4, 0.8, 0.4] }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 1
-            }}
-          >
-            <motion.div
-              className="absolute top-0 left-0 w-2 h-2 rounded-full"
-              style={{ background: "hsl(0 84% 60%)" }}
-              animate={{
-                x: [0, 280],
-                scale: [0, 1, 1, 0],
-                opacity: [0, 1, 1, 0]
-              }}
-              transition={{
-                duration: 3,
-                ease: "linear",
-                repeat: Infinity,
-                delay: 2,
-                times: [0, 0.1, 0.9, 1]
-              }}
-            />
-          </motion.div>
-
-          {/* Flow 4 - Bottom Right to Center */}
-          <motion.div
-            className="absolute bottom-72 right-[480px] w-72 h-1 opacity-70 origin-right"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, hsl(186 100% 37%) 50%, transparent 100%)",
-              transform: "rotate(25deg)"
-            }}
-            animate={{ opacity: [0.4, 0.8, 0.4] }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 1.5
-            }}
-          >
-            <motion.div
-              className="absolute top-0 right-0 w-2 h-2 rounded-full"
-              style={{ background: "hsl(248 53% 58%)" }}
-              animate={{
-                x: [0, -280],
-                scale: [0, 1, 1, 0],
-                opacity: [0, 1, 1, 0]
-              }}
-              transition={{
-                duration: 3,
-                ease: "linear",
-                repeat: Infinity,
-                delay: 3,
-                times: [0, 0.1, 0.9, 1]
-              }}
-            />
-          </motion.div>
-
-          {/* Activity Indicators */}
-          <motion.div
-            className="absolute top-[340px] left-[860px] w-1.5 h-1.5 rounded-full"
-            style={{ background: "hsl(186 100% 37%)" }}
-            animate={{
-              opacity: [0.6, 1, 0.6],
-              scale: [1, 1.5, 1]
-            }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 0
-            }}
-          />
-
-          <motion.div
-            className="absolute top-[340px] right-[860px] w-1.5 h-1.5 rounded-full"
-            style={{ background: "hsl(84 81% 44%)" }}
-            animate={{
-              opacity: [0.6, 1, 0.6],
-              scale: [1, 1.5, 1]
-            }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 0.7
-            }}
-          />
-
-          <motion.div
-            className="absolute top-[640px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full"
-            style={{ background: "hsl(327 73% 70%)" }}
-            animate={{
-              opacity: [0.6, 1, 0.6],
-              scale: [1, 1.5, 1]
-            }}
-            transition={{
-              duration: 2,
-              ease: "easeInOut",
-              repeat: Infinity,
-              delay: 1.4
-            }}
-          />
         </div>
       </div>
     </div>
