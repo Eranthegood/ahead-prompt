@@ -253,7 +253,7 @@ export function InteractivePromptCards() {
 
       {/* Interactive Cards */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10"
+        className="grid grid-cols-3 gap-4 relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
