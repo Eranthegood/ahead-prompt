@@ -398,7 +398,7 @@ export function InteractivePromptCards() {
                         }`}
                         onClick={() => handleStatusClick(prompt)}
                       >
-                        {prompt.status === 'in_progress' ? 'In Progress' : 
+                        {prompt.status === 'in_progress' ? 'Agent is working' : 
                          prompt.status === 'done' ? 'Done' : 'Todo'}
                       </Badge>
                     </div>
