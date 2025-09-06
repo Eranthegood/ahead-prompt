@@ -66,17 +66,22 @@ const FormattingToolbar: React.FC<{ editor: any }> = ({ editor }) => {
   ];
 
   return (
-    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+    <div className="flex items-center gap-2 p-3 border rounded-md bg-card border-border">
       {toolbarButtons.map((button, index) => 
         button === null ? (
-          <div key={`separator-${index}`} className="w-px h-6 bg-border mx-2" />
+          <div key={`separator-${index}`} className="w-px h-6 bg-border mx-1" />
         ) : (
           <Button
             key={index}
             variant="ghost"
             size="sm"
             onClick={button.action}
-            className={button.isActive ? 'bg-muted' : ''}
+            className={`h-8 w-8 p-0 transition-colors ${
+              button.isActive 
+                ? 'bg-primary/10 text-primary border border-primary/20' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+            }`}
+            aria-label={`Toggle ${button.icon.name}`}
           >
             <button.icon className="h-4 w-4" />
           </Button>
@@ -462,7 +467,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             Capture Your Next AI Move
             {draftRestored && (
-              <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
+              <div className="flex items-center gap-1 text-sm text-accent">
                 <RotateCcw className="h-4 w-4" />
                 <span>Draft restored</span>
               </div>
@@ -480,10 +485,10 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             <FormattingToolbar editor={editor} />
 
             {/* Rich text editor */}
-            <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
+            <div className="border rounded-md bg-card border-border shadow-sm flex-1 overflow-y-auto max-h-[400px]">
               <EditorContent 
                 editor={editor}
-                className="w-full h-full"
+                className="w-full h-full text-card-foreground"
               />
             </div>
 
@@ -491,18 +496,22 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             <div className="space-y-4">
               {/* Priority selector */}
               <div>
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                <label className="text-sm font-medium text-foreground mb-2 block">
                   Priority
                 </label>
                 <Select value={selectedPriority.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-9 bg-card text-card-foreground border-border">
                     <SelectValue placeholder="Select a priority..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                  <SelectContent className="bg-popover text-popover-foreground border border-border shadow-lg z-50">
                     {PRIORITY_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value.toString()}>
+                      <SelectItem 
+                        key={option.value} 
+                        value={option.value.toString()}
+                        className="hover:bg-muted focus:bg-muted"
+                      >
                         <div className="flex items-center gap-2">
-                          {option.value === 1 && <Flame className="h-3 w-3 text-red-500" />}
+                          {option.value === 1 && <Flame className="h-3 w-3 text-destructive" />}
                           <span>{option.label}</span>
                         </div>
                       </SelectItem>
@@ -523,7 +532,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
               {/* AI Provider Selection */}
               <div className="space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">
+                <div className="text-sm font-medium text-foreground">
                   AI Provider
                 </div>
                 <ProviderSelector
@@ -533,11 +542,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               </div>
 
               {/* Knowledge Integration Section */}
-              <div className="space-y-3 p-3 border rounded-md bg-muted/30">
+              <div className="space-y-3 p-4 border rounded-md bg-card/50 border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <BookOpen className="h-4 w-4 text-foreground" />
+                    <label className="text-sm font-medium text-foreground">
                       Use knowledge
                     </label>
                   </div>
@@ -553,33 +562,33 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                     <div className="text-xs text-muted-foreground">
                       Select knowledge to include ({knowledgeItems.length} available)
                     </div>
-                    <div className="max-h-32 overflow-y-auto space-y-1">
+                    <div className="max-h-32 overflow-y-auto space-y-1 scrollbar-thin">
                       {knowledgeItems.map(item => (
                         <div 
                           key={item.id}
-                          className={`text-xs p-2 rounded cursor-pointer transition-colors ${
+                          className={`text-xs p-2 rounded cursor-pointer transition-all duration-200 ${
                             selectedKnowledgeIds.includes(item.id) 
-                              ? 'bg-primary/20 text-primary border border-primary/30' 
-                              : 'bg-background hover:bg-muted border border-border'
+                              ? 'bg-primary/15 text-primary border border-primary/30 shadow-sm' 
+                              : 'bg-card hover:bg-muted/80 border border-border text-card-foreground'
                           }`}
                           onClick={() => handleKnowledgeToggle(item.id)}
                         >
                           <div className="font-medium truncate">{item.title}</div>
-                          <div className="text-muted-foreground truncate">{item.category}</div>
+                          <div className="text-muted-foreground truncate mt-1">{item.category}</div>
                         </div>
                       ))}
                     </div>
                     {selectedKnowledgeIds.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
+                      <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
                         {selectedKnowledgeItems.map(item => (
                           <Badge 
                             key={item.id} 
                             variant="secondary" 
-                            className="text-xs flex items-center gap-1"
+                            className="text-xs flex items-center gap-1 bg-primary/10 text-primary border border-primary/20"
                           >
                             {item.title}
                             <X 
-                              className="h-3 w-3 cursor-pointer" 
+                              className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
                               onClick={() => handleKnowledgeToggle(item.id)}
                             />
                           </Badge>
@@ -592,7 +601,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
                 {enableKnowledge && knowledgeItems.length === 0 && (
                   <button 
                     onClick={handleOpenKnowledge}
-                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer"
+                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer transition-colors p-2 rounded bg-muted/30 hover:bg-muted/50 w-full text-left"
                   >
                     No knowledge available for this product. Click to add some →
                   </button>
@@ -603,8 +612,12 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex justify-end gap-3 pt-4 border-t mt-auto flex-shrink-0">
-          <Button variant="outline" onClick={onClose} className="flex items-center gap-2">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border mt-auto flex-shrink-0 bg-background/80 backdrop-blur-sm">
+          <Button 
+            variant="outline" 
+            onClick={onClose} 
+            className="flex items-center gap-2 border-border text-foreground hover:bg-muted"
+          >
             Cancel
             <div className="flex items-center gap-1 text-xs opacity-70">
               <Keyboard className="h-3 w-3" />
@@ -614,7 +627,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           <Button 
             onClick={handleSave} 
             disabled={!hasContent || isLoading}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {isLoading ? (
               showAnimation ? 'Enhancing with AI...' : 'Saving...'
@@ -634,9 +647,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
     {/* Knowledge Modal */}
     <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto bg-background text-foreground border-border">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-foreground">
             Knowledge for {products?.find(p => p.id === selectedProduct)?.name || 'Product'}
           </DialogTitle>
         </DialogHeader>

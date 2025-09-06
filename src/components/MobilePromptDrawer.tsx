@@ -224,19 +224,19 @@ export function MobilePromptDrawer({
         <div className="px-4 pb-4 space-y-4 overflow-y-auto">
           {/* Prompt Content */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Your Idea</label>
+            <label className="text-sm font-medium text-foreground">Your Idea</label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Type your prompt idea here..."
-              className="min-h-[120px] resize-none text-base"
+              className="min-h-[120px] resize-none text-base bg-card text-card-foreground border-border focus:ring-primary focus:border-primary"
               autoFocus
             />
           </div>
 
           {/* Priority Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Priority</label>
+            <label className="text-sm font-medium text-foreground">Priority</label>
             <div className="grid grid-cols-3 gap-2">
               {PRIORITY_OPTIONS.map((priority) => {
                 const Icon = PRIORITY_ICONS[priority.value];
@@ -247,7 +247,11 @@ export function MobilePromptDrawer({
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedPriority(priority.value)}
-                    className="justify-start gap-2"
+                    className={`justify-start gap-2 transition-colors ${
+                      isSelected 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-card text-card-foreground border-border hover:bg-muted'
+                    }`}
                   >
                     <Icon className={`h-4 w-4 ${isSelected ? '' : PRIORITY_COLORS[priority.value]}`} />
                     {priority.label}
@@ -271,7 +275,7 @@ export function MobilePromptDrawer({
 
           {/* AI Provider Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">AI Provider</label>
+            <label className="text-sm font-medium text-foreground">AI Provider</label>
             <ProviderSelector
               value={providerConfig}
               onChange={setProviderConfig}
@@ -282,7 +286,7 @@ export function MobilePromptDrawer({
           {knowledgeItems.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Use Knowledge Base</label>
+                <label className="text-sm font-medium text-foreground">Use Knowledge Base</label>
                 <Switch
                   checked={enableKnowledge}
                   onCheckedChange={setEnableKnowledge}
@@ -294,20 +298,23 @@ export function MobilePromptDrawer({
                   <div className="text-xs text-muted-foreground">
                     Select knowledge items to enhance your prompt:
                   </div>
-                  <div className="max-h-24 overflow-y-auto space-y-1">
+                  <div className="max-h-24 overflow-y-auto space-y-1 scrollbar-thin">
                     {knowledgeItems.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center gap-2 text-sm"
+                        className="flex items-center gap-2 text-sm p-2 rounded bg-card border border-border"
                       >
                         <input
                           type="checkbox"
                           id={`kb-${item.id}`}
                           checked={selectedKnowledgeIds.includes(item.id)}
                           onChange={() => handleKnowledgeToggle(item.id)}
-                          className="rounded"
+                          className="rounded border-border accent-primary"
                         />
-                        <label htmlFor={`kb-${item.id}`} className="truncate flex-1">
+                        <label 
+                          htmlFor={`kb-${item.id}`} 
+                          className="truncate flex-1 text-card-foreground cursor-pointer"
+                        >
                           {item.title}
                         </label>
                       </div>
@@ -315,9 +322,13 @@ export function MobilePromptDrawer({
                   </div>
                   
                   {selectedKnowledgeItems.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
                       {selectedKnowledgeItems.map((item) => (
-                        <Badge key={item.id} variant="secondary" className="text-xs">
+                        <Badge 
+                          key={item.id} 
+                          variant="secondary" 
+                          className="text-xs bg-primary/10 text-primary border border-primary/20"
+                        >
                           {item.title}
                         </Badge>
                       ))}
@@ -329,19 +340,24 @@ export function MobilePromptDrawer({
           )}
         </div>
 
-        <DrawerFooter>
+        <DrawerFooter className="bg-background/95 backdrop-blur-sm border-t border-border">
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={isLoading}
+              className="border-border text-foreground hover:bg-muted"
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleSave} 
               disabled={!content.trim() || isLoading}
-              className="gap-2"
+              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                   Creating...
                 </>
               ) : (
