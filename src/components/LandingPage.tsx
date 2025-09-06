@@ -178,30 +178,6 @@ export default function LandingPage() {
          </div>
        </section>
 
-      {/* Chaos Centralization Section */}
-      <section className="py-16 px-6 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Tired of 5 open tabs and half-written Notion blocks?
-              </h2>
-               
-              <p className="text-xl text-muted-foreground">
-                Centralize the chaos. Your copy-paste-ready prompt workspace that moves at brain speed.
-              </p>
-                
-              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                {user ? "Build" : "End the Chaos Free"}
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-            
-          </div>
-        </div>
-      </section>
-
-      {/* Results Section */}
       
 
 
