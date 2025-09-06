@@ -111,12 +111,12 @@ Please respond with a JSON object containing:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt }
         ],
-        temperature: 0.3,
-        max_tokens: 1000
+        response_format: { type: "json_object" },
+        max_completion_tokens: 1000
       }),
     });
 
@@ -127,7 +127,14 @@ Please respond with a JSON object containing:
     }
 
     const aiResponse = await response.json();
-    const optimizationResult = JSON.parse(aiResponse.choices[0].message.content);
+    
+    let optimizationResult;
+    try {
+      optimizationResult = JSON.parse(aiResponse.choices[0].message.content);
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response as JSON:', aiResponse.choices[0].message.content);
+      throw new Error('Invalid response format from AI');
+    }
 
     console.log('Optimization completed:', optimizationResult);
 

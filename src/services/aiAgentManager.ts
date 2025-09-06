@@ -192,19 +192,36 @@ export class AIAgentManager {
         processing_time_ms: Date.now() - startTime
       });
     } catch (error) {
-      // Log failed activity
-      await this.logActivity({
-        agent_id: `prompt_optimizer_${workspaceId}`,
-        workspace_id: workspaceId,
-        activity_type: 'prompt_optimization',
-        entity_type: 'prompt',
-        entity_id: promptId,
-        action_taken: 'optimize_prompt_failed',
-        metadata: {},
-        success: false,
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        processing_time_ms: Date.now() - startTime
-      });
+      console.error('Prompt optimization failed:', error);
+      
+      // Try to find existing agent for error logging, or skip logging if no agent found
+      try {
+        const { data: existingAgent } = await supabase
+          .from('ai_agents')
+          .select('id')
+          .eq('workspace_id', workspaceId)
+          .eq('agent_type', 'prompt_optimizer')
+          .eq('is_active', true)
+          .single();
+
+        if (existingAgent) {
+          await this.logActivity({
+            agent_id: existingAgent.id,
+            workspace_id: workspaceId,
+            activity_type: 'prompt_optimization',
+            entity_type: 'prompt',
+            entity_id: promptId,
+            action_taken: 'optimize_prompt_failed',
+            metadata: {},
+            success: false,
+            error_message: error instanceof Error ? error.message : 'Unknown error',
+            processing_time_ms: Date.now() - startTime
+          });
+        }
+      } catch (logError) {
+        console.error('Failed to log error activity:', logError);
+      }
+      
       throw error;
     }
   }
