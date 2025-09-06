@@ -28,7 +28,6 @@ import FigmaIntegration from "./pages/FigmaIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
-import MotionDesignDemo from "./pages/MotionDesignDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
 
 import FeedbackBubble from "./components/FeedbackBubble";
@@ -126,11 +125,6 @@ function App() {
                          <ThemeDemo />
                        </ProtectedRoute>
                      } />
-                    <Route path="/motion-demo" element={
-                      <ProtectedRoute>
-                        <MotionDesignDemo />
-                      </ProtectedRoute>
-                    } />
                      <Route path="/admin/mixpanel" element={
                        <ProtectedRoute>
                          <MixpanelAdmin />

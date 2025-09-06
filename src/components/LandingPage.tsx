@@ -5,6 +5,7 @@ import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, T
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { InteractivePromptCards } from "@/components/InteractivePromptCards";
+
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
 // Logo components
@@ -32,9 +33,7 @@ const GitHubLogo = ({
   </svg>;
 export default function LandingPage() {
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const handleSignIn = () => {
     navigate('/build');
   };
@@ -153,15 +152,57 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">
-                Capture Ideas While AI Works
+                AI-Enhanced Prompts Ready for Any Platform
               </h2>
               
               <p className="text-muted-foreground text-lg">
-                Don't lose brilliant ideas during AI wait times. Capture, organize, and queue your next moves instantly.
+                Don't lose brilliant ideas during AI wait times. Our CLEAR Principle transforms raw thoughts into structured, platform-ready prompts.
               </p>
+
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-primary">
+                  CLEAR Prompt Enhancement Framework
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <span className="font-semibold">Context-Rich:</span>
+                      <span className="text-muted-foreground ml-1">Auto-inject project knowledge</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <span className="font-semibold">Logic-Structured:</span>
+                      <span className="text-muted-foreground ml-1">Clear reasoning paths</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <span className="font-semibold">Execution-Ready:</span>
+                      <span className="text-muted-foreground ml-1">Actionable instructions</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary mt-2"></span>
+                    <div>
+                      <span className="font-semibold">AI-Optimized:</span>
+                      <span className="text-muted-foreground ml-1">Works on any platform</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
+                  <p className="text-sm font-medium">
+                    ✨ Your prompts are automatically enhanced and ready to push to Cursor, Claude, ChatGPT, or any AI platform
+                  </p>
+                </div>
+              </div>
                 
               <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                {user ? "Build" : "Try it now"}
+                {user ? "Build" : "Try Enhanced Prompts"}
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
@@ -195,7 +236,57 @@ export default function LandingPage() {
       </section>
 
       {/* Cursor Multi-Agent Section */}
-      
+      <section className="py-16 px-6 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+            <div className="space-y-6 lg:col-span-2">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Queue Dozens of Prompts.<br />Run Them All at Once.
+              </h2>
+              
+              <h3 className="text-xl font-semibold text-primary">
+                Cursor Multi-Agent Integration
+              </h3>
+               
+              <p className="text-xl text-muted-foreground">
+                Stop waiting for AI one prompt at a time. Queue 10, 20, even 50 related prompts in Ahead, then push them all to Cursor Agent with one click.
+              </p>
+               
+              <div className="space-y-4">
+                <h4 className="font-semibold">The new workflow:</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Queue dozens of prompts</strong> while you think</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>One-click batch export</strong> to Cursor</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Multiple AI agents</strong> work simultaneously</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                    <span><strong>Ship features 4x faster</strong></span>
+                  </div>
+                </div>
+              </div>
+                
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                {user ? "Build" : "Try Multi-Agent Free"}
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            {/* Collaborative Animation */}
+            <div className="flex justify-center items-center">
+              <CollaborativeRepoAnimation />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Integration Banner */}
       <IntegrationBanner />
