@@ -213,25 +213,55 @@ export function KanbanPromptBoard({
   }
 
   return (
-    <div className="flex-1 p-3 sm:p-6">
+    <main 
+      className="flex-1 p-4 sm:p-6" 
+      role="main"
+      aria-label="Kanban board for prompt management"
+    >
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
+        accessibility={{
+          announcements: {
+            onDragStart: ({ active }) => `Started dragging prompt ${active.id}`,
+            onDragOver: ({ active, over }) => over ? `Dragging prompt ${active.id} over ${over.id}` : '',
+            onDragEnd: ({ active, over }) => over ? `Dropped prompt ${active.id} on ${over.id}` : `Cancelled dragging prompt ${active.id}`,
+            onDragCancel: ({ active }) => `Cancelled dragging prompt ${active.id}`,
+          },
+        }}
       >
-        <div className="flex gap-6 overflow-x-auto pb-6">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 pb-6"
+          role="application"
+          aria-label="Drag and drop kanban board"
+        >
           {COLUMNS.map((column) => {
             const columnPrompts = getPromptsByStatus(column.status);
             
             return (
-              <div key={column.status} className="flex-1 min-w-80">
-                <Card className={`h-full ${column.color} border-border`}>
-                  <CardHeader className="pb-4">
+              <section 
+                key={column.status} 
+                className="flex flex-col min-h-[400px]"
+                aria-labelledby={`column-title-${column.status}`}
+                role="region"
+              >
+                <Card className={`h-full ${column.color} border-border shadow-sm hover:shadow-md transition-shadow`}>
+                  <CardHeader className="pb-3 px-4 pt-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-foreground">{column.title}</h3>
-                        <Badge variant="secondary" className="text-xs">
+                      <div className="flex items-center gap-3">
+                        <h3 
+                          id={`column-title-${column.status}`}
+                          className="font-semibold text-foreground text-sm"
+                        >
+                          {column.title}
+                        </h3>
+                        <Badge 
+                          variant="secondary" 
+                          className="text-xs px-2 py-1 font-medium"
+                          aria-label={`${columnPrompts.length} prompts in ${column.title} column`}
+                        >
                           {columnPrompts.length}
                         </Badge>
                       </div>
@@ -239,74 +269,90 @@ export function KanbanPromptBoard({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleCreatePrompt(column.status)}
-                        className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
+                        className="text-muted-foreground hover:text-foreground hover:bg-accent/50 h-8 w-8 p-0 rounded-md transition-colors"
+                        aria-label={`Add new prompt to ${column.title} column`}
+                        title={`Add new prompt to ${column.title}`}
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-                    <SortableContext
-                      items={columnPrompts.map(p => p.id)}
-                      strategy={verticalListSortingStrategy}
-                      id={`column-${column.status}`}
+                  <CardContent className="px-4 pb-4 flex-1">
+                    <div 
+                      className="space-y-3 max-h-[calc(100vh-300px)] overflow-y-auto scroll-smooth"
+                      role="list"
+                      aria-label={`${column.title} prompts`}
                     >
-                      {columnPrompts.map((prompt) => (
-                        <DraggablePromptCard
-                          key={prompt.id}
-                          prompt={prompt}
-                          onPromptClick={handlePromptClick}
-                          onEdit={handleEdit}
-                          onStatusChange={handleStatusChange}
-                          onPriorityChange={handlePriorityChange}
-                          onDuplicate={handleDuplicate}
-                          onDelete={handleDelete}
-                          onCopy={handleCopy}
-                          onCopyGenerated={handleCopyGenerated}
-                          isHovered={hoveredPromptId === prompt.id}
-                          onHover={onPromptHover}
-                        />
-                      ))}
-                    </SortableContext>
-                    
-                    {columnPrompts.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <p className="text-sm">No prompts yet</p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCreatePrompt(column.status)}
-                          className="mt-2"
+                      <SortableContext
+                        items={columnPrompts.map(p => p.id)}
+                        strategy={verticalListSortingStrategy}
+                        id={`column-${column.status}`}
+                      >
+                        {columnPrompts.map((prompt) => (
+                          <div key={prompt.id} role="listitem">
+                            <DraggablePromptCard
+                              prompt={prompt}
+                              onPromptClick={handlePromptClick}
+                              onEdit={handleEdit}
+                              onStatusChange={handleStatusChange}
+                              onPriorityChange={handlePriorityChange}
+                              onDuplicate={handleDuplicate}
+                              onDelete={handleDelete}
+                              onCopy={handleCopy}
+                              onCopyGenerated={handleCopyGenerated}
+                              isHovered={hoveredPromptId === prompt.id}
+                              onHover={onPromptHover}
+                            />
+                          </div>
+                        ))}
+                      </SortableContext>
+                      
+                      {columnPrompts.length === 0 && (
+                        <div 
+                          className="text-center py-12 text-muted-foreground"
+                          role="status"
+                          aria-label={`No prompts in ${column.title} column`}
                         >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add prompt
-                        </Button>
-                      </div>
-                    )}
+                          <p className="text-sm mb-3">No prompts yet</p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCreatePrompt(column.status)}
+                            className="mt-2 hover:bg-accent/50 transition-colors"
+                            aria-label={`Add first prompt to ${column.title} column`}
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add prompt
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
-              </div>
+              </section>
             );
           })}
         </div>
 
         <DragOverlay>
           {activePrompt ? (
-            <PromptCard
-              prompt={activePrompt}
-              onPromptClick={handlePromptClick}
-              onEdit={handleEdit}
-              onStatusChange={handleStatusChange}
-              onPriorityChange={handlePriorityChange}
-              onDuplicate={handleDuplicate}
-              onDelete={handleDelete}
-              onCopy={handleCopy}
-              onCopyGenerated={handleCopyGenerated}
-            />
+            <div role="dialog" aria-label="Dragging prompt preview">
+              <PromptCard
+                prompt={activePrompt}
+                onPromptClick={handlePromptClick}
+                onEdit={handleEdit}
+                onStatusChange={handleStatusChange}
+                onPriorityChange={handlePriorityChange}
+                onDuplicate={handleDuplicate}
+                onDelete={handleDelete}
+                onCopy={handleCopy}
+                onCopyGenerated={handleCopyGenerated}
+              />
+            </div>
           ) : null}
         </DragOverlay>
       </DndContext>
-    </div>
+    </main>
   );
 }
