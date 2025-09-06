@@ -32,9 +32,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const noHeaderPages = ['/auth'];
   const shouldShowHeader = !noHeaderPages.includes(location.pathname);
   
-  // Pages qui n'ont pas besoin de sidebar (landing page, auth)
-  const noSidebarPages = ['/auth'];
-  const shouldShowSidebar = user && workspace && !noSidebarPages.includes(location.pathname);
+  // Pages that should show the sidebar
+  const allowedSidebarPages = ['/build', '/settings', '/integrations'];
+  const shouldShowSidebar = user && workspace && allowedSidebarPages.some(path => location.pathname.startsWith(path));
   
   // Determine default collapsed state - collapsed on non-build pages
   const shouldBeCollapsedByDefault = location.pathname !== '/build';
