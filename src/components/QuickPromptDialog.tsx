@@ -16,6 +16,7 @@ import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
+import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -127,6 +128,10 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [hasContent, setHasContent] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
+  
+  // Animation state for prompt generation
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [generationStep, setGenerationStep] = useState<'input' | 'knowledge' | 'processing' | 'output' | 'complete'>('input');
   
   const { toast } = useToast();
 
@@ -292,7 +297,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   };
 
 
-  // Main save handler - creates prompt and lets usePrompts handle generation
+  // Main save handler - creates prompt with enhanced AI animation
   const handleSave = async () => {
     if (!editor) return;
     
@@ -302,6 +307,31 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     setIsLoading(true);
     
     try {
+      // Show animation if knowledge is enabled and items are selected
+      const shouldShowAnimation = enableKnowledge && selectedKnowledgeIds.length > 0;
+      
+      if (shouldShowAnimation) {
+        // Start animation sequence
+        setShowAnimation(true);
+        setGenerationStep('input');
+        
+        // Simulate processing steps
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setGenerationStep('knowledge');
+        
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        setGenerationStep('processing');
+        
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setGenerationStep('output');
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setGenerationStep('complete');
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setShowAnimation(false);
+      }
+
       // Create prompt data and save
       const promptData = createPromptData(content);
       await onSave(promptData);
@@ -319,7 +349,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       clearDraft();
       toast({
         title: 'Prompt created!',
-        description: 'Your prompt will be generated automatically.',
+        description: shouldShowAnimation ? 'Your enhanced prompt has been generated!' : 'Your prompt will be generated automatically.',
         variant: 'default'
       });
       
@@ -345,6 +375,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         description: 'Failed to create prompt. Please try again.',
         variant: 'destructive'
       });
+      setShowAnimation(false);
     } finally {
       setIsLoading(false);
     }
@@ -586,7 +617,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
             className="flex items-center gap-2"
           >
             {isLoading ? (
-              'Saving...'
+              showAnimation ? 'Enhancing with AI...' : 'Saving...'
             ) : (
               <>
                 Save
@@ -617,6 +648,13 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+    
+    {/* Prompt Generation Animation */}
+    <PromptGenerationAnimation
+      isVisible={showAnimation}
+      currentStep={generationStep}
+      selectedProvider={providerConfig.provider}
+    />
     </>
   );
 };
