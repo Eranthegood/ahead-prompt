@@ -67,7 +67,13 @@ export function useCursorIntegration(): CursorIntegrationHook {
       }
 
       // Update prompt with Cursor agent data
-      await supabase
+      console.log('Updating prompt with agent data:', {
+        promptId: prompt.id,
+        agentId: data.agent.id,
+        agentStatus: data.agent.status
+      });
+
+      const { error: updateError } = await supabase
         .from('prompts')
         .update({
           status: 'sent_to_cursor',
@@ -81,6 +87,13 @@ export function useCursorIntegration(): CursorIntegrationHook {
           }
         })
         .eq('id', prompt.id);
+
+      if (updateError) {
+        console.error('Failed to update prompt with agent data:', updateError);
+        throw new Error(`Failed to sync agent data: ${updateError.message}`);
+      }
+
+      console.log('Successfully updated prompt with agent data');
 
       // Create status job for Ahead build card linkage
       const job = await createJob({
