@@ -4,7 +4,7 @@ import { Bot, Folder, Zap, Code, GitBranch, CheckCircle } from "lucide-react";
 const CollaborativeRepoAnimation = () => {
   return (
     <div className="w-full h-[500px] lg:h-[600px] relative overflow-hidden bg-gradient-to-br from-background to-muted/20 rounded-lg border border-border/50">
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center bg-white">
         <div className="relative w-full h-full scale-75 md:scale-85 lg:scale-95">
           
           {/* Background Grid */}
