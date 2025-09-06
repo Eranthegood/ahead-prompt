@@ -17,6 +17,7 @@ import { CursorAgentModal } from '@/components/CursorAgentModal';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
+import { getStatusDisplayInfo } from '@/types/cursor';
 
 interface PromptCardProps {
   prompt: Prompt & {
@@ -41,6 +42,17 @@ const statusOptions = [
   { value: 'done', label: 'Done', variant: 'success' as const }
 ];
 
+// Enhanced status display for Cursor workflow
+const getCursorStatusDisplay = (status: PromptStatus, cursorAgentStatus?: string) => {
+  // If we have a Cursor agent status, show that instead
+  if (cursorAgentStatus && ['sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'error'].includes(status)) {
+    return getStatusDisplayInfo(cursorAgentStatus as any);
+  }
+  
+  // Otherwise use internal status
+  return getStatusDisplayInfo(status);
+};
+
 export function PromptCard({
   prompt,
   onPromptClick,
@@ -62,7 +74,7 @@ export function PromptCard({
   const { sendToCursor, isLoading: cursorLoading, cancelAgent, mergePullRequest, updateAgentStatus } = useCursorIntegration();
   
   // Real-time agent polling for active Cursor agents
-  const isAgentActive = ['sent_to_cursor', 'cursor_working'].includes(prompt.status);
+  const isAgentActive = ['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status);
   const { isPolling, lastPolled } = useCursorAgentPolling({
     agentId: prompt.cursor_agent_id,
     enabled: isAgentActive,
@@ -72,7 +84,9 @@ export function PromptCard({
       if (agent?.id) updateAgentStatus(agent.id);
     }
   });
+  
   const priority = prompt.priority || 3;
+  const statusDisplay = getCursorStatusDisplay(prompt.status, prompt.cursor_agent_status || undefined);
   
   const playSlideSound = () => {
     try {
@@ -152,8 +166,18 @@ export function PromptCard({
                     )}
                     
                     {/* Cursor Agent Working Indicator */}
-                    {['sent_to_cursor', 'cursor_working'].includes(prompt.status) && (
+                    {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
                       <AgentWorkingIndicator size="sm" className="ml-1" />
+                    )}
+                    
+                    {/* Enhanced Cursor Status Badge */}
+                    {['sending_to_cursor', 'sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'error'].includes(prompt.status) && (
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs border-0 text-white ${statusDisplay.color}`}
+                      >
+                        {statusDisplay.label}
+                      </Badge>
                     )}
                     
                     {/* Sending to Cursor Indicator */}
@@ -162,6 +186,13 @@ export function PromptCard({
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                         <span className="text-xs text-blue-600 dark:text-blue-400">Sending...</span>
                       </div>
+                    )}
+                    
+                    {/* Error Status Display */}
+                    {prompt.status === 'error' && prompt.cursor_agent_status && (
+                      <Badge variant="destructive" className="text-xs">
+                        Failed: {prompt.cursor_agent_status}
+                      </Badge>
                     )}
                     
                     {prompt.product && (
@@ -215,13 +246,14 @@ export function PromptCard({
                   </div>
                 </div>
 
-                {/* Cursor Workflow Progress */}
                 <CursorWorkflowProgress
                   status={prompt.status}
                   cursorAgentId={prompt.cursor_agent_id}
+                  cursorAgentStatus={prompt.cursor_agent_status}
                   githubPrUrl={prompt.github_pr_url}
                   githubPrNumber={prompt.github_pr_number}
                   cursorBranchName={prompt.cursor_branch_name}
+                  error={prompt.status === 'error' ? (prompt.cursor_logs as any)?.error || 'Unknown error' : undefined}
                   onViewAgent={() => setShowAgentModal(true)}
                   onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
                   onMergePR={() => {

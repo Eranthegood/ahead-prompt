@@ -2,19 +2,13 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Prompt } from '@/types';
-import type { CursorAgent, CursorIntegrationConfig, mapCursorStatusToInternal } from '@/types/cursor';
+import { CursorAgent, CursorIntegrationConfig, mapCursorStatusToInternal } from '@/types/cursor';
 
 // Interface moved to src/types/cursor.ts for centralized management
 
 interface CursorIntegrationHook {
   isLoading: boolean;
-  sendToCursor: (prompt: Prompt, config: {
-    repository: string;
-    ref: string;
-    branchName?: string;
-    autoCreatePr: boolean;
-    model: string;
-  }) => Promise<CursorAgent | null>;
+  sendToCursor: (prompt: Prompt, config: CursorIntegrationConfig) => Promise<CursorAgent | null>;
   updateAgentStatus: (agentId: string) => Promise<void>;
   cancelAgent: (agentId: string) => Promise<void>;
   mergePullRequest: (prUrl: string) => Promise<void>;
@@ -24,13 +18,7 @@ export function useCursorIntegration(): CursorIntegrationHook {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const sendToCursor = useCallback(async (prompt: Prompt, config: {
-    repository: string;
-    ref: string;
-    branchName?: string;
-    autoCreatePr: boolean;
-    model: string;
-  }): Promise<CursorAgent | null> => {
+  const sendToCursor = useCallback(async (prompt: Prompt, config: CursorIntegrationConfig): Promise<CursorAgent | null> => {
     setIsLoading(true);
     
     try {
@@ -131,17 +119,25 @@ export function useCursorIntegration(): CursorIntegrationHook {
         return;
       }
 
-      // Update the prompt with latest agent status
-      const { error: updateError } = await supabase
-        .from('prompts')
-        .update({
-          cursor_agent_status: data.agent.status,
-          cursor_logs: {
-            lastUpdated: new Date().toISOString(),
-            statusCheck: data.agent
-          }
-        })
-        .eq('cursor_agent_id', agentId);
+        const newStatus = mapCursorStatusToInternal(data.agent.status);
+        
+        // Update prompt with latest agent data and mapped status
+        const { error: updateError } = await supabase
+          .from('prompts')
+          .update({
+            status: newStatus,
+            cursor_agent_status: data.agent.status,
+            cursor_branch_name: data.agent.branch,
+            github_pr_url: data.agent.pullRequestUrl,
+            github_pr_number: data.agent.pullRequestNumber,
+            cursor_logs: {
+              lastStatusCheck: new Date().toISOString(),
+              agentData: data.agent,
+              logs: data.agent.logs || []
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq('cursor_agent_id', agentId);
 
       if (updateError) {
         console.error('Failed to update prompt status:', updateError);

@@ -11,16 +11,19 @@ import {
   ExternalLink, 
   Eye,
   GitMerge,
-  X
+  X,
+  AlertCircle
 } from 'lucide-react';
 import type { PromptStatus } from '@/types';
 
 interface CursorWorkflowProgressProps {
   status: PromptStatus;
   cursorAgentId?: string;
+  cursorAgentStatus?: string;
   githubPrUrl?: string;
   githubPrNumber?: number;
   cursorBranchName?: string;
+  error?: string;
   onViewAgent?: () => void;
   onViewPR?: () => void;
   onMergePR?: () => void;
@@ -40,9 +43,11 @@ const WORKFLOW_STEPS = [
 export function CursorWorkflowProgress({
   status,
   cursorAgentId,
+  cursorAgentStatus,
   githubPrUrl,
   githubPrNumber,
   cursorBranchName,
+  error,
   onViewAgent,
   onViewPR,
   onMergePR,
@@ -54,10 +59,20 @@ export function CursorWorkflowProgress({
   };
 
   const getStatusColor = () => {
-    switch (status) {
+    // Use Cursor agent status if available for more accurate coloring
+    const displayStatus = cursorAgentStatus?.toUpperCase() || status;
+    
+    switch (displayStatus) {
+      case 'PENDING':
+      case 'QUEUED':
       case 'sent_to_cursor':
-      case 'cursor_working':
         return 'bg-blue-500';
+      case 'RUNNING':
+      case 'cursor_working':
+        return 'bg-blue-600';
+      case 'sending_to_cursor':
+        return 'bg-purple-500';
+      case 'COMPLETED':
       case 'pr_created':
       case 'pr_review':
         return 'bg-orange-500';
@@ -66,12 +81,16 @@ export function CursorWorkflowProgress({
       case 'pr_merged':
       case 'done':
         return 'bg-emerald-500';
+      case 'FAILED':
+      case 'CANCELLED':
+      case 'error':
+        return 'bg-red-500';
       default:
         return 'bg-muted-foreground';
     }
   };
 
-  const isWorkflowActive = ['sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'pr_merged'].includes(status);
+  const isWorkflowActive = ['sending_to_cursor', 'sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'pr_merged', 'error'].includes(status);
 
   if (!isWorkflowActive) {
     return null;
@@ -79,6 +98,16 @@ export function CursorWorkflowProgress({
 
   return (
     <div className="space-y-3 mt-3 pt-3 border-t border-border/50">
+      {/* Error Display */}
+      {status === 'error' && (
+        <div className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+          <AlertCircle className="w-4 h-4 text-red-500" />
+          <div className="text-sm">
+            <span className="font-medium text-red-700 dark:text-red-400">Agent Failed</span>
+            {error && <div className="text-red-600 dark:text-red-300 text-xs mt-1">{error}</div>}
+          </div>
+        </div>
+      )}
       {/* Progress bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">

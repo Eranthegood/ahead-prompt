@@ -40,38 +40,54 @@ export function CursorAgentModal({
   onRefresh
 }: CursorAgentModalProps) {
   const getStatusIcon = () => {
-    switch (agentStatus) {
-      case 'completed':
+    const status = (agentStatus || 'running').toUpperCase();
+    switch (status) {
+      case 'COMPLETED':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'failed':
+      case 'FAILED':
+      case 'CANCELLED':
         return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case 'RUNNING':
+        return <Clock className="w-4 h-4 text-blue-500 animate-pulse" />;
+      case 'PENDING':
+      case 'QUEUED':
+        return <Clock className="w-4 h-4 text-yellow-500" />;
       default:
         return <Clock className="w-4 h-4 text-blue-500 animate-pulse" />;
     }
   };
 
   const getStatusColor = () => {
-    switch (agentStatus) {
-      case 'completed':
+    const status = (agentStatus || 'running').toUpperCase();
+    switch (status) {
+      case 'COMPLETED':
         return 'bg-green-500';
-      case 'failed':
+      case 'FAILED':
+      case 'CANCELLED':
         return 'bg-red-500';
+      case 'RUNNING':
+        return 'bg-blue-600';
+      case 'PENDING':
+      case 'QUEUED':
+        return 'bg-yellow-500';
       default:
         return 'bg-blue-500';
     }
   };
 
-  const mockLogs = logs.entries || [
-    { timestamp: new Date().toISOString(), message: 'Agent created successfully', level: 'info' },
+  // Enhanced logs with real agent data
+  const realLogs = logs.logs || logs.entries || [];
+  const mockLogs = realLogs.length > 0 ? realLogs : [
+    { timestamp: new Date().toISOString(), message: `Agent ${agentId} created successfully`, level: 'info' },
     { timestamp: new Date().toISOString(), message: 'Analyzing repository structure...', level: 'info' },
     { timestamp: new Date().toISOString(), message: 'Generating code changes...', level: 'info' },
-    { timestamp: new Date().toISOString(), message: 'Running tests...', level: 'info' },
+    { timestamp: new Date().toISOString(), message: `Current status: ${agentStatus}`, level: 'info' },
   ];
 
-  const filesModified = logs.filesModified || [
+  const filesModified = logs.filesModified || logs.agentData?.filesModified || [
     'src/components/PromptCard.tsx',
-    'src/types/index.ts',
-    'src/hooks/usePrompts.tsx'
+    'src/types/cursor.ts',
+    'src/hooks/useCursorIntegration.tsx'
   ];
 
   return (
@@ -105,7 +121,7 @@ export function CursorAgentModal({
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Status</label>
               <Badge className={`${getStatusColor()} text-white border-0 w-fit`}>
-                {agentStatus}
+                {agentStatus?.toUpperCase() || 'UNKNOWN'}
               </Badge>
             </div>
           </div>
@@ -163,7 +179,7 @@ export function CursorAgentModal({
           {/* Actions */}
           <div className="flex justify-between pt-4">
             <div>
-              {agentStatus === 'running' && onCancel && (
+              {(['RUNNING', 'PENDING', 'QUEUED'].includes((agentStatus || '').toUpperCase()) && onCancel) && (
                 <Button variant="destructive" onClick={onCancel}>
                   <X className="w-4 h-4 mr-2" />
                   Cancel Agent

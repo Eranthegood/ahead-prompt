@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { CursorAgent, mapCursorStatusToInternal } from '@/types/cursor';
+import { CursorAgent, mapCursorStatusToInternal } from '@/types/cursor';
 
 // CursorAgent interface moved to src/types/cursor.ts
 
@@ -24,8 +24,9 @@ export function useCursorAgentPolling({
   const intervalRef = useRef<NodeJS.Timeout>();
   const lastStatusRef = useRef<string | null>(null);
   const failureCountRef = useRef<number>(0);
-  const { toast } = useToast();
-  const pollAgentStatus = async (currentAgentId: string) => {
+    const { toast } = useToast();
+    
+    const pollAgentStatus = async (currentAgentId: string) => {
     try {
       setError(null);
       console.log('Polling Cursor agent status:', currentAgentId);
@@ -60,6 +61,9 @@ export function useCursorAgentPolling({
 
         const newStatus = (data.agent.status || '').toUpperCase();
         const prevStatus = (lastStatusRef.current || '').toUpperCase();
+        
+        // Map Cursor status to internal status
+        const internalStatus = mapCursorStatusToInternal(newStatus as any);
 
         if (newStatus && newStatus !== prevStatus) {
           lastStatusRef.current = newStatus;
@@ -90,7 +94,7 @@ export function useCursorAgentPolling({
           }
 
           // PR creation notification
-          if (data.agent.pullRequestUrl) {
+          if (data.agent.pullRequestUrl && !prevStatus.includes('COMPLETED')) {
             toast({ title: 'Pull Request Created', description: 'View the PR to review and merge your changes.' });
           }
         }

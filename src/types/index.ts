@@ -64,7 +64,7 @@ export interface Database {
           product_id: string | null;
           title: string;
           description: string | null;
-          status: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
+          status: 'todo' | 'generating' | 'in_progress' | 'done' | 'sending_to_cursor' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged' | 'error';
           priority: number;
           order_index: number;
           generated_prompt: string | null;
@@ -88,7 +88,7 @@ export interface Database {
           product_id?: string | null;
           title: string;
           description?: string | null;
-          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sending_to_cursor' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged' | 'error';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
@@ -112,7 +112,7 @@ export interface Database {
           product_id?: string | null;
           title?: string;
           description?: string | null;
-          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged';
+          status?: 'todo' | 'generating' | 'in_progress' | 'done' | 'sending_to_cursor' | 'sent_to_cursor' | 'cursor_working' | 'pr_created' | 'pr_review' | 'pr_ready' | 'pr_merged' | 'error';
           priority?: number;
           order_index?: number;
           generated_prompt?: string | null;
