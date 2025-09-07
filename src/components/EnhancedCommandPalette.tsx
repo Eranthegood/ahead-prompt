@@ -107,11 +107,10 @@ export function EnhancedCommandPalette({
             status: prompt.status
           }
         });
-        setSelectedPrompt(prompt);
         onOpenChange(false);
         toast({
           title: "Prompt créé avec succès",
-          description: "Votre nouvelle idée a été ajoutée."
+          description: `"${prompt.title}" a été ajouté à votre liste de prompts.`
         });
       }
     } catch (error) {
@@ -159,6 +158,10 @@ export function EnhancedCommandPalette({
           switch (item.id) {
             case 'settings':
               onNavigate?.('/settings');
+              break;
+            case 'prompt-library':
+              // Déclencher l'ouverture de la Prompt Library
+              window.dispatchEvent(new CustomEvent('open-prompt-library'));
               break;
             case 'shortcuts':
               onNavigate?.('/keyboard-shortcuts');
@@ -264,6 +267,13 @@ export function EnhancedCommandPalette({
                 </div>
               </CommandItem>
             )}
+            <CommandItem onSelect={() => handleSelect({ id: 'prompt-library', title: 'Bibliothèque de prompts', path: '/prompt-library' }, 'action')}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Bibliothèque de prompts
+              <div className="ml-auto text-xs text-muted-foreground">
+                {formatShortcut('l')}
+              </div>
+            </CommandItem>
             <CommandItem onSelect={() => handleSelect({ id: 'settings', title: 'Paramètres', path: '/settings' }, 'action')}>
               <Settings className="mr-2 h-4 w-4" />
               Paramètres
