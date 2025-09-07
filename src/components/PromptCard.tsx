@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, ExternalLink, Clock, Zap } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, ExternalLink, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -349,7 +349,7 @@ export function PromptCard({
                     )}
                   </Button>
                   
-                  {/* Send to Cursor */}
+                   {/* Send to Cursor */}
                   {prompt.product?.github_repo_url && (
                     <Button
                       variant="ghost"
@@ -364,6 +364,34 @@ export function PromptCard({
                       aria-label="Send to Cursor"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  
+                  {/* Merge PR - Only shown for prompts with completed PRs */}
+                  {prompt.github_pr_url && prompt.status === 'pr_ready' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await mergePullRequest(prompt.github_pr_url!);
+                          toast({
+                            title: 'PR Merged',
+                            description: 'Pull request has been merged successfully'
+                          });
+                        } catch (error) {
+                          toast({
+                            title: 'Merge Failed',
+                            description: 'Failed to merge the pull request',
+                            variant: 'destructive'
+                          });
+                        }
+                      }}
+                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-700"
+                      aria-label="Merge PR"
+                    >
+                      <GitMerge className="h-3.5 w-3.5" />
                     </Button>
                   )}
                   
