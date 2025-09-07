@@ -89,7 +89,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
   // Reset form when prompt changes - always load original content first
   useEffect(() => {
-    if (prompt && editor) {
+    if (prompt && editor && !editor.isDestroyed) {
       // Always load the original user content (description) into the editor first
       const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
       
@@ -99,10 +99,22 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         hasDescription: !!prompt.description,
         descriptionLength: prompt.description?.length || 0,
         descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
-        originalContentLength: originalContent.length
+        originalContentLength: originalContent.length,
+        editorReady: !!editor,
+        editorDestroyed: editor.isDestroyed
       });
       
-      editor.commands.setContent(originalContent);
+      // Set content with a small delay to ensure editor is ready
+      setTimeout(() => {
+        if (editor && !editor.isDestroyed) {
+          editor.commands.setContent(originalContent);
+          
+          // Calculate initial text length from original content
+          const cleanText = stripHtmlAndNormalize(originalContent);
+          setTextLength(cleanText.length);
+        }
+      }, 10);
+      
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
       setPriority(prompt.priority || 3);
@@ -110,10 +122,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       
       // Load the AI-generated prompt separately for the preview panel
       setGeneratedPrompt(prompt.generated_prompt || '');
-      
-      // Calculate initial text length from original content
-      const cleanText = stripHtmlAndNormalize(originalContent);
-      setTextLength(cleanText.length);
     }
   }, [prompt, editor]);
 
