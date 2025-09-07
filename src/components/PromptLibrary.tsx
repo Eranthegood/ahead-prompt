@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,30 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PromptLibraryItem | null>(null);
   const { toast } = useToast();
+
+  // Add keyboard shortcut for creating prompt when library is open
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        (event.target instanceof HTMLElement && event.target.contentEditable === 'true')
+      ) {
+        return;
+      }
+
+      if (event.key.toLowerCase() === 'l') {
+        event.preventDefault();
+        setShowCreateDialog(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
