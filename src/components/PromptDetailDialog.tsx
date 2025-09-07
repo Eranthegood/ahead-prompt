@@ -460,7 +460,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 {/* Editor with clear labeling */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Original Idea/Description</Label>
+                    <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
                     <span className="text-xs text-muted-foreground">Your original input</span>
                   </div>
                   <div className="border rounded-md min-h-[200px] bg-background">
@@ -682,8 +682,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             {/* Rich text editor with clear labeling */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Original Idea/Description</Label>
-                <span className="text-xs text-muted-foreground">This is your original input</span>
+                <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
+                <span className="text-xs text-muted-foreground">Your original input</span>
               </div>
               <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
                 <EditorContent 
