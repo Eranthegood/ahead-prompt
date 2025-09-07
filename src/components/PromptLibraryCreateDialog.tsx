@@ -28,7 +28,7 @@ export function PromptLibraryCreateDialog({
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [aiModel, setAiModel] = useState<string>(AI_MODELS[0].value);
-  const [category, setCategory] = useState<string>('');
+  const [category, setCategory] = useState<string>('none');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ export function PromptLibraryCreateDialog({
       setTitle(editItem.title);
       setBody(editItem.body);
       setAiModel(editItem.ai_model);
-      setCategory(editItem.category || '');
+      setCategory(editItem.category || 'none');
       setTags(editItem.tags);
     } else {
       resetForm();
@@ -52,7 +52,7 @@ export function PromptLibraryCreateDialog({
     setTitle('');
     setBody('');
     setAiModel(AI_MODELS[0].value);
-    setCategory('');
+    setCategory('none');
     setTags([]);
     setNewTag('');
   };
@@ -87,7 +87,7 @@ export function PromptLibraryCreateDialog({
           title: title.trim(),
           body: body.trim(),
           ai_model: aiModel,
-          category: category || undefined,
+          category: category === 'none' ? undefined : category,
           tags,
         });
         onEditComplete?.();
@@ -96,7 +96,7 @@ export function PromptLibraryCreateDialog({
           title: title.trim(),
           body: body.trim(),
           ai_model: aiModel,
-          category: category || undefined,
+          category: category === 'none' ? undefined : category,
           tags,
         });
       }
@@ -176,7 +176,7 @@ export function PromptLibraryCreateDialog({
                 <SelectValue placeholder="Select a category..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No category</SelectItem>
+                <SelectItem value="none">No category</SelectItem>
                 {PROMPT_CATEGORIES.map(cat => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
