@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink, Clock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
@@ -241,38 +242,48 @@ export function PromptCard({
                     <AgentWorkingIndicator size="sm" />
                   )}
                   
-                  {/* Status Badge */}
-                  <Badge 
-                    variant={
-                      prompt.status === 'done' ? 'success' : 
-                      prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                    }
-                    className="text-xs px-2 py-1 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Smart bidirectional cycling between todo and in_progress
-                      let nextStatus: PromptStatus;
-                      
-                      if (prompt.status === 'todo') {
-                        nextStatus = 'in_progress';
-                      } else if (prompt.status === 'in_progress') {
-                        // Allow going back to todo for easy correction
-                        nextStatus = 'todo';
-                      } else if (prompt.status === 'done') {
-                        nextStatus = 'todo';
-                      } else {
-                        // For any other status, go to todo
-                        nextStatus = 'todo';
+                  {/* Status Dropdown */}
+                  {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
+                    <Badge 
+                      variant={
+                        prompt.status === 'done' ? 'success' : 
+                        prompt.status === 'in_progress' ? 'secondary' : 'outline'
                       }
-                      
-                      handleStatusChange(nextStatus);
-                    }}
-                  >
-                    {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status)
-                      ? `${statusDisplay.label}${liveStatus?.progress != null ? ` • ${liveStatus.progress}%` : ''}`
-                      : (prompt.status === 'in_progress' ? 'In Progress' : 
-                         prompt.status === 'done' ? 'Done' : 'Todo')}
-                  </Badge>
+                      className="text-xs px-2 py-1"
+                    >
+                      {`${statusDisplay.label}${liveStatus?.progress != null ? ` • ${liveStatus.progress}%` : ''}`}
+                    </Badge>
+                  ) : (
+                    <Select
+                      value={prompt.status}
+                      onValueChange={(value: PromptStatus) => {
+                        handleStatusChange(value);
+                      }}
+                    >
+                      <SelectTrigger 
+                        className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/50 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <SelectValue asChild>
+                          <Badge 
+                            variant={
+                              prompt.status === 'done' ? 'success' : 
+                              prompt.status === 'in_progress' ? 'secondary' : 'outline'
+                            }
+                            className="text-xs px-2 py-1 cursor-pointer"
+                          >
+                            {prompt.status === 'in_progress' ? 'In Progress' : 
+                             prompt.status === 'done' ? 'Done' : 'Todo'}
+                          </Badge>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">Todo</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               </div>
               
@@ -411,31 +422,6 @@ export function PromptCard({
                       
                       <DropdownMenuSeparator />
                       
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="flex items-center gap-2">
-                          <ArrowRight className="h-4 w-4" />
-                          Change status
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="w-48">
-                          {statusOptions.map((option) => (
-                            <DropdownMenuItem
-                              key={option.value}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleStatusChange(option.value as PromptStatus);
-                              }}
-                              disabled={option.value === prompt.status}
-                              className="flex items-center justify-between"
-                            >
-                              <span>{option.label}</span>
-                              <Badge variant={option.variant} className="text-xs">
-                                {option.value === prompt.status ? 'Current' : ''}
-                              </Badge>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger className="flex items-center gap-2">
                           <Flame className="h-4 w-4" />
