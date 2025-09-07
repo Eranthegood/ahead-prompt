@@ -232,10 +232,36 @@ export function PromptCard({
                 
                 {/* Priority & Status Indicators */}
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Priority Indicator */}
-                  <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor}`}>
-                    <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
-                  </div>
+                  {/* Priority Dropdown */}
+                  <Select
+                    value={priority.toString()}
+                    onValueChange={(value: string) => {
+                      onPriorityChange(prompt, parseInt(value));
+                    }}
+                  >
+                    <SelectTrigger 
+                      className="w-auto h-6 border-none bg-transparent p-0 hover:bg-accent/50 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <SelectValue asChild>
+                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} cursor-pointer`}>
+                          <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRIORITY_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value.toString()}>
+                          <div className="flex items-center gap-2">
+                            {option.value === 1 && <Flame className="h-3 w-3 text-destructive" />}
+                            {option.value === 2 && <Minus className="h-3 w-3 text-orange-500" />}
+                            {option.value === 3 && <Clock className="h-3 w-3 text-muted-foreground" />}
+                            {option.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   
                   {/* Working Indicator */}
                   {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
