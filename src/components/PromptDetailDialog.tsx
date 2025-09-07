@@ -85,35 +85,35 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     },
   });
 
-  // Smart auto-save handler for original idea blur events
-  const handleOriginalIdeaBlurSave = useCallback(async (content: string) => {
+  // Smart auto-save handler for blur events
+  const handleBlurSave = useCallback(async (content: string) => {
     if (!prompt || !preferences.autoSaveEnabled) return;
 
     const cleanText = stripHtmlAndNormalize(content);
     if (!cleanText.trim() || content === '<p></p>') {
-      // Avoid overwriting existing original_description with empty content
+      // Avoid overwriting existing description with empty content
       return;
     }
 
     try {
-      await updatePromptSilently(prompt.id, { original_description: content });
-      setOriginalIdeaHasChanges(false);
+      await updatePromptSilently(prompt.id, { description: content });
+      setHasUnsavedChanges(false);
     } catch (error) {
-      console.error('Error auto-saving original idea on blur:', error);
+      console.error('Error auto-saving on blur:', error);
     }
   }, [prompt, preferences.autoSaveEnabled, updatePromptSilently]);
 
-  // Auto-save hook for original idea with smart blur save
+  // Auto-save hook with smart blur save
   const { clearDraft } = useAutoSave({
-    key: prompt ? `prompt_original_idea_${prompt.id}` : 'prompt_original_idea_edit',
+    key: prompt ? `prompt_${prompt.id}` : 'prompt_edit',
     editor: originalIdeaEditor,
     isOpen: open,
     onRestore: (content) => {
       setDraftRestored(true);
-      setOriginalIdeaHasChanges(true);
+      setHasUnsavedChanges(true);
       setTimeout(() => setDraftRestored(false), 3000); // Hide indicator after 3s
     },
-    onBlurSave: handleOriginalIdeaBlurSave,
+    onBlurSave: handleBlurSave,
   });
 
   // Reset form when prompt changes - always load original content first
