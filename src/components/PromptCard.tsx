@@ -240,18 +240,18 @@ export function PromptCard({
                     }}
                   >
                     <SelectTrigger 
-                      className="w-auto h-6 border-none bg-transparent p-0 hover:bg-accent/50 transition-colors"
+                      className="w-auto h-6 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <SelectValue asChild>
-                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} cursor-pointer`}>
+                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} cursor-pointer hover:scale-105 transition-all duration-200`}>
                           <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
                         </div>
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-popover/95 backdrop-blur-sm border-border/40">
                       {PRIORITY_OPTIONS.map(option => (
-                        <SelectItem key={option.value} value={option.value.toString()}>
+                        <SelectItem key={option.value} value={option.value.toString()} className="text-sm">
                           <div className="flex items-center gap-2">
                             {option.value === 1 && <Flame className="h-3 w-3 text-destructive" />}
                             {option.value === 2 && <Minus className="h-3 w-3 text-orange-500" />}
@@ -287,7 +287,7 @@ export function PromptCard({
                       }}
                     >
                       <SelectTrigger 
-                        className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/50 transition-colors"
+                        className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <SelectValue asChild>
@@ -296,17 +296,17 @@ export function PromptCard({
                               prompt.status === 'done' ? 'success' : 
                               prompt.status === 'in_progress' ? 'secondary' : 'outline'
                             }
-                            className="text-xs px-2 py-1 cursor-pointer"
+                            className="text-xs px-2 py-1 cursor-pointer hover:bg-opacity-80 transition-all duration-200"
                           >
                             {prompt.status === 'in_progress' ? 'In Progress' : 
                              prompt.status === 'done' ? 'Done' : 'Todo'}
                           </Badge>
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">Todo</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
+                      <SelectContent className="bg-popover/95 backdrop-blur-sm border-border/40">
+                        <SelectItem value="todo" className="text-sm">Todo</SelectItem>
+                        <SelectItem value="in_progress" className="text-sm">In Progress</SelectItem>
+                        <SelectItem value="done" className="text-sm">Done</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
