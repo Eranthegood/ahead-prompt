@@ -835,6 +835,59 @@ export type Database = {
           },
         ]
       }
+      prompt_library: {
+        Row: {
+          ai_model: string
+          body: string
+          category: string | null
+          created_at: string
+          id: string
+          is_favorite: boolean
+          tags: string[] | null
+          title: string
+          updated_at: string
+          usage_count: number
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          ai_model?: string
+          body: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          usage_count?: number
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          ai_model?: string
+          body?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          usage_count?: number
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_library_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompt_test_runs: {
         Row: {
           created_at: string

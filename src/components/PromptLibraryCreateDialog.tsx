@@ -27,7 +27,7 @@ export function PromptLibraryCreateDialog({
   const { createItem, updateItem } = usePromptLibrary();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [aiModel, setAiModel] = useState(AI_MODELS[0].value);
+  const [aiModel, setAiModel] = useState<string>(AI_MODELS[0].value);
   const [category, setCategory] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
@@ -154,7 +154,7 @@ export function PromptLibraryCreateDialog({
           {/* AI Model */}
           <div className="space-y-2">
             <Label htmlFor="ai-model">AI Model</Label>
-            <Select value={aiModel} onValueChange={setAiModel}>
+            <Select value={aiModel} onValueChange={(value: string) => setAiModel(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

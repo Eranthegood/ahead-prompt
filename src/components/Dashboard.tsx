@@ -5,6 +5,8 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
+import { PromptLibrary } from '@/components/PromptLibrary';
+import { PromptLibraryCreateDialog } from '@/components/PromptLibraryCreateDialog';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useEpics } from '@/hooks/useEpics';
@@ -30,8 +32,9 @@ void QPD_Keep;
 
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
+  const [promptLibraryOpen, setPromptLibraryOpen] = useState(false);
+  const [promptLibraryCreateOpen, setPromptLibraryCreateOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
@@ -97,10 +100,12 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
     't': () => setDebugConsoleOpen(true),
+    'lo': () => window.dispatchEvent(new CustomEvent('open-prompt-library')),
+    'll': () => window.dispatchEvent(new CustomEvent('open-prompt-library-create')),
     'c': async () => {
       // If hovering over a prompt, copy its generated prompt
       if (hoveredPromptId) {
@@ -121,6 +126,21 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
       }
     }
   });
+  
+  // Add event listeners for prompt library commands
+  useEffect(() => {
+    const handlePromptLibrary = () => setPromptLibraryOpen(true);
+    const handlePromptLibraryCreate = () => setPromptLibraryCreateOpen(true);
+    
+    window.addEventListener('open-prompt-library', handlePromptLibrary);
+    window.addEventListener('open-prompt-library-create', handlePromptLibraryCreate);
+    
+    return () => {
+      window.removeEventListener('open-prompt-library', handlePromptLibrary);
+      window.removeEventListener('open-prompt-library-create', handlePromptLibraryCreate);
+    };
+  }, []);
+  
   const handleToggleCompletedItems = (show: boolean) => {
     saveCompletedItemsPreference(show);
   };
@@ -168,8 +188,17 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
 
       <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
 
-
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
+      
+      <PromptLibrary
+        open={promptLibraryOpen}
+        onOpenChange={setPromptLibraryOpen}
+      />
+      
+      <PromptLibraryCreateDialog
+        open={promptLibraryCreateOpen}
+        onOpenChange={setPromptLibraryCreateOpen}
+      />
     </>
   );
 };

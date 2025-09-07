@@ -4,13 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Sparkles, Moon, Sun, Lock, Crown, Bell, Users, UserPlus, HelpCircle, Plug } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Sparkles, Moon, Sun, Lock, Crown, Bell, Users, UserPlus, HelpCircle, Plug, Library } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { PromptLibrary } from './PromptLibrary';
 import { hasPromptEnhancerAccess } from '@/utils/accessControl';
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
@@ -27,6 +28,7 @@ export function UserAccountSection() {
   const navigate = useNavigate();
   const { state } = useSidebar();
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   
   const isCollapsed = state === 'collapsed';
 
@@ -81,6 +83,11 @@ export function UserAccountSection() {
             <DropdownMenuItem onClick={() => navigate('/achievements')}>
               <Trophy className="mr-2 h-4 w-4" />
               <span>Achievements</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
+              <Library className="mr-2 h-4 w-4" />
+              <span>Prompt Library</span>
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => {
@@ -201,12 +208,17 @@ export function UserAccountSection() {
             <span>Keyboard Shortcuts</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/achievements')}>
-            <Trophy className="mr-2 h-4 w-4" />
-            <span>Achievements</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => {
+            <DropdownMenuItem onClick={() => navigate('/achievements')}>
+              <Trophy className="mr-2 h-4 w-4" />
+              <span>Achievements</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
+              <Library className="mr-2 h-4 w-4" />
+              <span>Prompt Library</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={() => {
             const destination = hasPromptEnhancerAccess(user?.id) 
               ? '/prompt-enhancer' 
               : '/prompt-enhancer-coming-soon';
@@ -270,5 +282,11 @@ export function UserAccountSection() {
           onOpenChange={(open) => setShowShortcuts(open)} 
         />
       )}
+      
+      {/* Prompt Library Modal */}
+      <PromptLibrary
+        open={showPromptLibrary}
+        onOpenChange={setShowPromptLibrary}
+      />
     </div>;
 }

@@ -18,14 +18,14 @@ export function usePromptLibrary() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .select('*')
         .eq('workspace_id', workspace.id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setItems(data || []);
+      setItems((data || []) as unknown as PromptLibraryItem[]);
     } catch (error: any) {
       console.error('Error fetching prompt library:', error);
       toast({
@@ -43,7 +43,7 @@ export function usePromptLibrary() {
 
     try {
       const { data: newItem, error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .insert({
           workspace_id: workspace.id,
           user_id: user.id,
@@ -60,13 +60,13 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => [newItem, ...prev]);
+      setItems(prev => [newItem as unknown as PromptLibraryItem, ...prev]);
       toast({
         title: 'Prompt saved to library',
         description: `"${data.title}" has been added to your prompt library.`,
       });
 
-      return newItem;
+      return newItem as unknown as PromptLibraryItem;
     } catch (error: any) {
       console.error('Error creating prompt library item:', error);
       toast({
@@ -81,7 +81,7 @@ export function usePromptLibrary() {
   const updateItem = async (id: string, updates: Partial<PromptLibraryItem>): Promise<void> => {
     try {
       const { error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .update(updates)
         .eq('id', id);
 
@@ -108,7 +108,7 @@ export function usePromptLibrary() {
   const deleteItem = async (id: string): Promise<void> => {
     try {
       const { error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .delete()
         .eq('id', id);
 
@@ -135,7 +135,7 @@ export function usePromptLibrary() {
       if (!item) return;
 
       const { error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .update({ usage_count: item.usage_count + 1 })
         .eq('id', id);
 
@@ -155,7 +155,7 @@ export function usePromptLibrary() {
       if (!item) return;
 
       const { error } = await supabase
-        .from('prompt_library')
+        .from('prompt_library' as any)
         .update({ is_favorite: !item.is_favorite })
         .eq('id', id);
 
