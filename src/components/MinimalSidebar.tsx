@@ -38,7 +38,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library } from 'lucide-react';
 import { Workspace, Product } from '@/types';
 
 
@@ -49,6 +49,7 @@ import { UserAccountSection } from './UserAccountSection';
 
 import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
+import { PromptLibrary } from './PromptLibrary';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -132,6 +133,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   // Knowledge Modal states
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [selectedKnowledgeProduct, setSelectedKnowledgeProduct] = useState<Product | undefined>();
+  const [isPromptLibraryOpen, setIsPromptLibraryOpen] = useState(false);
 
   // Filter function to get prompts that match current view filters (only active prompts)
   const getVisiblePrompts = (productFilter?: string, epicFilter?: string) => {
@@ -500,6 +502,37 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
           {/* Quick Actions */}
           <div className="mb-3 sm:mb-4 space-y-1 sm:space-y-2">
+            {/* Prompt Library */}
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full aspect-square p-0 hover:bg-accent/50"
+                    onClick={() => setIsPromptLibraryOpen(true)}
+                    aria-label="Prompt Library"
+                  >
+                    <Library className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Prompt Library</p>
+                  <p className="text-xs text-muted-foreground">Press L to open</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-left font-normal text-sm sm:text-base py-2 hover:bg-accent/50"
+                onClick={() => setIsPromptLibraryOpen(true)}
+              >
+                <Library className="mr-2 sm:mr-3 h-4 w-4" />
+                Prompt Library
+                <kbd className="ml-auto px-1.5 py-0.5 text-xs bg-muted text-muted-foreground rounded border">L</kbd>
+              </Button>
+            )}
+
+            {/* All Prompts */}
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -1122,6 +1155,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
           <MinimalKnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
         </DialogContent>
       </Dialog>
+
+      {/* Prompt Library */}
+      <PromptLibrary
+        open={isPromptLibraryOpen}
+        onOpenChange={setIsPromptLibraryOpen}
+      />
     </TooltipProvider>
   );
 }
