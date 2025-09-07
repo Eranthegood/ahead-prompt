@@ -11,9 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { PromptCard } from '@/components/PromptCard';
+import { MinimalistPromptCard } from '@/components/MinimalistPromptCard';
+import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface MinimalPromptListProps {
   workspace: Workspace;
@@ -41,6 +44,7 @@ export function MinimalPromptList({
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
+  const { preferences } = useUserPreferences();
   
   console.debug('[MinimalPromptList] Render with props:', { 
     selectedProductId, 
@@ -60,6 +64,8 @@ export function MinimalPromptList({
   
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [showCursorDialog, setShowCursorDialog] = useState(false);
+  const [cursorPrompt, setCursorPrompt] = useState<Prompt | null>(null);
 
   // Derive effective product when only epic is selected
   const effectiveProductId = useMemo(() => {
@@ -429,20 +435,35 @@ export function MinimalPromptList({
                 </div>
                 <div className="space-y-2 sm:space-y-3">
                   {epicPrompts.map((prompt) => (
-                    <PromptCard 
-                      key={prompt.id} 
-                      prompt={prompt} 
-                      onPromptClick={handlePromptClick}
-                      onEdit={handleEdit}
-                      onStatusChange={handleStatusChangeWrapper}
-                      onPriorityChange={handlePriorityChangeWrapper}
-                      onDuplicate={handleDuplicate}
-                      onDelete={handleDelete}
-                      onCopy={handleCopy}
-                      onCopyGenerated={handleCopyGenerated}
-                      isHovered={hoveredPromptId === prompt.id}
-                      onHover={onPromptHover}
-                    />
+                    preferences.promptCardMode === 'minimalist' ? (
+                      <MinimalistPromptCard
+                        key={prompt.id}
+                        prompt={prompt}
+                        onPromptClick={handlePromptClick}
+                        onCopyGenerated={handleCopyGenerated}
+                        onShowCursorDialog={() => {
+                          setCursorPrompt(prompt);
+                          setShowCursorDialog(true);
+                        }}
+                        isHovered={hoveredPromptId === prompt.id}
+                        onHover={onPromptHover}
+                      />
+                    ) : (
+                      <PromptCard 
+                        key={prompt.id} 
+                        prompt={prompt} 
+                        onPromptClick={handlePromptClick}
+                        onEdit={handleEdit}
+                        onStatusChange={handleStatusChangeWrapper}
+                        onPriorityChange={handlePriorityChangeWrapper}
+                        onDuplicate={handleDuplicate}
+                        onDelete={handleDelete}
+                        onCopy={handleCopy}
+                        onCopyGenerated={handleCopyGenerated}
+                        isHovered={hoveredPromptId === prompt.id}
+                        onHover={onPromptHover}
+                      />
+                    )
                   ))}
                 </div>
               </div>
@@ -452,20 +473,35 @@ export function MinimalPromptList({
           /* Unified Prompt List - High priority prompts naturally appear at top due to sorting */
           <div className="space-y-2 sm:space-y-3">
             {promptsWithInfo.map((prompt) => (
-              <PromptCard 
-                key={prompt.id} 
-                prompt={prompt} 
-                onPromptClick={handlePromptClick}
-                onEdit={handleEdit}
-                onStatusChange={handleStatusChangeWrapper}
-                onPriorityChange={handlePriorityChangeWrapper}
-                onDuplicate={handleDuplicate}
-                onDelete={handleDelete}
-                onCopy={handleCopy}
-                onCopyGenerated={handleCopyGenerated}
-                isHovered={hoveredPromptId === prompt.id}
-                onHover={onPromptHover}
-              />
+              preferences.promptCardMode === 'minimalist' ? (
+                <MinimalistPromptCard
+                  key={prompt.id}
+                  prompt={prompt}
+                  onPromptClick={handlePromptClick}
+                  onCopyGenerated={handleCopyGenerated}
+                  onShowCursorDialog={() => {
+                    setCursorPrompt(prompt);
+                    setShowCursorDialog(true);
+                  }}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
+                />
+              ) : (
+                <PromptCard 
+                  key={prompt.id} 
+                  prompt={prompt} 
+                  onPromptClick={handlePromptClick}
+                  onEdit={handleEdit}
+                  onStatusChange={handleStatusChangeWrapper}
+                  onPriorityChange={handlePriorityChangeWrapper}
+                  onDuplicate={handleDuplicate}
+                  onDelete={handleDelete}
+                  onCopy={handleCopy}
+                  onCopyGenerated={handleCopyGenerated}
+                  isHovered={hoveredPromptId === prompt.id}
+                  onHover={onPromptHover}
+                />
+              )
             ))}
           </div>
         )}
@@ -478,6 +514,13 @@ export function MinimalPromptList({
         onOpenChange={setDetailDialogOpen}
         products={products}
         epics={epics}
+      />
+
+      {/* Cursor Config Dialog */}
+      <CursorConfigDialog
+        isOpen={showCursorDialog}
+        onClose={() => setShowCursorDialog(false)}
+        prompt={cursorPrompt}
       />
     </div>
   );

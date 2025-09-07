@@ -25,7 +25,8 @@ export default function Settings() {
   const {
     preferences,
     saveCompletedItemsPreference,
-    saveAutoSavePreference
+    saveAutoSavePreference,
+    savePromptCardModePreference
   } = useUserPreferences();
   const {
     hasUnlockedFeature
@@ -91,6 +92,19 @@ export default function Settings() {
                   </p>
                 </div>
                 <Switch checked={preferences.compactMode} />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Promptcard: Minimalist</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display prompts in a clean, horizontal layout with essential info only
+                  </p>
+                </div>
+                <Switch 
+                  checked={preferences.promptCardMode === 'minimalist'} 
+                  onCheckedChange={(checked) => savePromptCardModePreference(checked ? 'minimalist' : 'default')} 
+                />
               </div>
             </CardContent>
           </Card>

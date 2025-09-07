@@ -6,6 +6,7 @@ interface UserPreferences {
   showCompletedItems: boolean;
   theme: 'light' | 'dark' | 'system';
   compactMode: boolean;
+  promptCardMode: 'default' | 'minimalist';
   gamificationEnabled: boolean;
   autoSaveEnabled: boolean;
 }
@@ -18,6 +19,7 @@ const defaultPreferences: UserPreferences = {
   showCompletedItems: true,
   theme: 'light', // Default to light theme to avoid dark mode issues before unlock
   compactMode: false,
+  promptCardMode: 'default',
   gamificationEnabled: false, // Disabled by default
   autoSaveEnabled: false, // Disabled by default for better UX
 };
@@ -96,6 +98,13 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save prompt card mode preference
+  const savePromptCardModePreference = (mode: 'default' | 'minimalist') => {
+    updatePreferences({
+      promptCardMode: mode,
+    });
+  };
+
   return {
     preferences,
     loading,
@@ -106,5 +115,6 @@ export const useUserPreferences = () => {
     saveCompactModePreference,
     saveGamificationPreference,
     saveAutoSavePreference,
+    savePromptCardModePreference,
   };
 };
