@@ -678,7 +678,21 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
   // Update prompt silently without toast notifications
   const updatePromptSilently = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
-    const updateData = { ...updates, updated_at: new Date().toISOString() };
+    // Backfill original_description on first meaningful edit
+    const existing = prompts.find(p => p.id === promptId);
+    let finalUpdates = { ...updates } as Partial<Prompt>;
+    if (
+      updates.description &&
+      existing &&
+      (!existing.original_description || existing.original_description.trim().length === 0)
+    ) {
+      const originalSeed = (existing.description && existing.description.trim().length > 0)
+        ? existing.description
+        : updates.description;
+      finalUpdates.original_description = originalSeed || undefined;
+    }
+
+    const updateData = { ...finalUpdates, updated_at: new Date().toISOString() };
 
     try {
       await withOptimisticUpdate(
@@ -703,7 +717,21 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
 
   // Update prompt with optimistic update and auto-generation
   const updatePrompt = async (promptId: string, updates: Partial<Prompt>): Promise<void> => {
-    const updateData = { ...updates, updated_at: new Date().toISOString() };
+    // Backfill original_description on first meaningful edit
+    const existing = prompts.find(p => p.id === promptId);
+    let finalUpdates = { ...updates } as Partial<Prompt>;
+    if (
+      updates.description &&
+      existing &&
+      (!existing.original_description || existing.original_description.trim().length === 0)
+    ) {
+      const originalSeed = (existing.description && existing.description.trim().length > 0)
+        ? existing.description
+        : updates.description;
+      finalUpdates.original_description = originalSeed || undefined;
+    }
+
+    const updateData = { ...finalUpdates, updated_at: new Date().toISOString() };
 
     try {
       await withOptimisticUpdate(

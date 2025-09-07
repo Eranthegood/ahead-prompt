@@ -176,11 +176,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   };
 
   const handleRegenerateFromOriginal = async () => {
-    if (!prompt || !prompt.description?.trim()) return;
+    if (!prompt) return;
+
+    // Prefer the immutable original_description, then fallback to current description, then editor content
+    const sourceHtml = prompt.original_description || prompt.description || (editor ? editor.getHTML() : '');
+    const clean = stripHtmlAndNormalize(sourceHtml || '');
+    if (!clean.trim()) return;
     
     setIsRegenerating(true);
     try {
-      const response = await PromptTransformService.transformPrompt(prompt.description);
+      const response = await PromptTransformService.transformPrompt(sourceHtml);
       
       if (response.error) {
         throw new Error(response.error);
