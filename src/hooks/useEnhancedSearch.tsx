@@ -41,7 +41,8 @@ export function useEnhancedSearch(
   const [hasSearched, setHasSearched] = useState(false);
 
   const { workspace } = useWorkspace();
-  const { prompts } = usePromptsContext();
+  const promptsCtx = usePromptsContext();
+  const prompts = promptsCtx?.prompts ?? [];
   const { products } = useProducts(workspace?.id || '');
   const { epics } = useEpics(workspace?.id || '');
   const { knowledgeItems } = useKnowledge(workspace?.id || '');
