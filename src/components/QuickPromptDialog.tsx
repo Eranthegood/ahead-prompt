@@ -24,6 +24,7 @@ import { PRIORITY_OPTIONS } from '@/types';
 interface CreatePromptData {
   title: string;
   description?: string;
+  original_description?: string;
   epic_id?: string;
   product_id?: string;
   priority?: PromptPriority;
@@ -265,6 +266,10 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
    * Creates prompt data with proper product/epic assignment validation
    * This ensures prompts are correctly associated with selected products/epics
    */
+  /**
+   * Creates prompt data with proper product/epic assignment validation
+   * This ensures prompts are correctly associated with selected products/epics
+   */
   const createPromptData = (content: string): CreatePromptData => {
     // Validate epic-product relationship
     let finalProductId = selectedProduct;
@@ -296,6 +301,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     return {
       title: generateTitleFromContent(content),
       description: content,
+      original_description: content, // Set immutable original content
       epic_id: finalEpicId || undefined,
       product_id: finalProductId || undefined,
       priority: selectedPriority,

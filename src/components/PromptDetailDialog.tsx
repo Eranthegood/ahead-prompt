@@ -96,19 +96,22 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   // Reset form when prompt changes - always load original content first
   useEffect(() => {
     if (prompt && editor && !editor.isDestroyed) {
-      // Always load the original user content (description) into the editor first
-      const originalContent = prompt.description || prompt.generated_prompt || `<h1>${prompt.title}</h1>`;
+       // Always load the original user content (original_description) into the editor first
+       const originalContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<h1>${prompt.title}</h1>`;
       
-      console.log('PromptDetailDialog: Loading prompt content', {
-        promptId: prompt.id,
-        title: prompt.title,
-        hasDescription: !!prompt.description,
-        descriptionLength: prompt.description?.length || 0,
-        descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
-        originalContentLength: originalContent.length,
-        editorReady: !!editor,
-        editorDestroyed: editor.isDestroyed
-      });
+       console.log('PromptDetailDialog: Loading prompt content', {
+         promptId: prompt.id,
+         title: prompt.title,
+         hasOriginalDescription: !!prompt.original_description,
+         hasDescription: !!prompt.description,
+         originalDescriptionLength: prompt.original_description?.length || 0,
+         descriptionLength: prompt.description?.length || 0,
+         originalDescriptionPreview: prompt.original_description?.substring(0, 100) || 'No original description',
+         descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
+         originalContentLength: originalContent.length,
+         editorReady: !!editor,
+         editorDestroyed: editor.isDestroyed
+       });
       
       // Set content with a small delay to ensure editor is ready
       setTimeout(() => {
@@ -475,7 +478,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                     <span className="text-xs text-muted-foreground">{!prompt.description && !!prompt.generated_prompt ? 'Displaying generated prompt (original idea empty)' : 'Your original input'}</span>
+                     <span className="text-xs text-muted-foreground">
+                       {!prompt.original_description && !prompt.description && !!prompt.generated_prompt 
+                         ? 'Displaying generated prompt (original idea empty)' 
+                         : 'Your original input'}
+                     </span>
                   </div>
                   <div className="border rounded-md min-h-[200px] bg-background">
                     <EditorContent 
@@ -697,7 +704,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                <span className="text-xs text-muted-foreground">{!prompt.description && !!prompt.generated_prompt ? 'Displaying generated prompt (original idea empty)' : 'Your original input'}</span>
+                 <span className="text-xs text-muted-foreground">
+                   {!prompt.original_description && !prompt.description && !!prompt.generated_prompt 
+                     ? 'Displaying generated prompt (original idea empty)' 
+                     : 'Your original input'}
+                 </span>
               </div>
               <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
                 <EditorContent 

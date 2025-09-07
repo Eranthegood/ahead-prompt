@@ -176,7 +176,9 @@ export type Epic = Database['public']['Tables']['epics']['Row'] & {
   auto_create_pr?: boolean;
   base_branch_override?: string | null;
 };
-export type Prompt = Database['public']['Tables']['prompts']['Row'];
+export type Prompt = Database['public']['Tables']['prompts']['Row'] & {
+  original_description?: string | null;
+};
 export type KnowledgeItem = Database['public']['Tables']['knowledge_items']['Row'];
 
 // Add Product type (will be available after migration)

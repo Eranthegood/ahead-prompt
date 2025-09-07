@@ -13,6 +13,7 @@ import type { Prompt, PromptStatus } from '@/types';
 interface CreatePromptData {
   title: string;
   description?: string;
+  original_description?: string;
   status?: PromptStatus;
   priority?: number;
   epic_id?: string;
@@ -162,6 +163,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     workspace_id: workspaceId!,
     title: promptData.title.trim(),
     description: promptData.description?.trim() || null,
+    original_description: promptData.original_description?.trim() || promptData.description?.trim() || null,
     status: promptData.status || 'todo',
     priority: promptData.priority || 2,
     order_index: 0,
@@ -188,6 +190,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       workspace_id: workspaceId!,
       title: promptData.title.trim(),
       description: promptData.description?.trim() || null,
+      original_description: promptData.original_description?.trim() || promptData.description?.trim() || null,
       status: promptData.status || 'todo',
       priority: promptData.priority || 2,
       epic_id: promptData.epic_id || null,

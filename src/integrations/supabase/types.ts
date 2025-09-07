@@ -912,6 +912,7 @@ export type Database = {
           id: string
           is_debug_session: boolean | null
           order_index: number
+          original_description: string | null
           priority: number | null
           product_id: string | null
           status: string
@@ -936,6 +937,7 @@ export type Database = {
           id?: string
           is_debug_session?: boolean | null
           order_index?: number
+          original_description?: string | null
           priority?: number | null
           product_id?: string | null
           status?: string
@@ -960,6 +962,7 @@ export type Database = {
           id?: string
           is_debug_session?: boolean | null
           order_index?: number
+          original_description?: string | null
           priority?: number | null
           product_id?: string | null
           status?: string
@@ -1081,33 +1084,6 @@ export type Database = {
           total_xp?: number
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      user_secrets: {
-        Row: {
-          id: string
-          user_id: string
-          key: string
-          encrypted_value: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          key: string
-          encrypted_value: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          key?: string
-          encrypted_value?: string
-          created_at?: string
-          updated_at?: string
         }
         Relationships: []
       }
