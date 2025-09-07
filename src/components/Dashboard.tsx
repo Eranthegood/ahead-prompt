@@ -104,7 +104,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
     'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
     't': () => setDebugConsoleOpen(true),
-    'lo': () => window.dispatchEvent(new CustomEvent('open-prompt-library')),
+    'l': () => window.dispatchEvent(new CustomEvent('open-prompt-library')),
     'll': () => window.dispatchEvent(new CustomEvent('open-prompt-library-create')),
     'c': async () => {
       // If hovering over a prompt, copy its generated prompt
