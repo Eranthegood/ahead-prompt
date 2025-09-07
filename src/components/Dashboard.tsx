@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
-import { CommandPalette } from '@/components/CommandPalette';
+import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
@@ -186,7 +186,13 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
         />
       </div>
 
-      <CommandPalette open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} workspace={workspace} injectedQuery={searchQuery} onSetSearchQuery={setSearchQuery} onNavigate={() => {}} />
+      <EnhancedCommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen} 
+        injectedQuery={searchQuery} 
+        onSetSearchQuery={setSearchQuery} 
+        onNavigate={(path: string) => window.location.href = path} 
+      />
 
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />
       

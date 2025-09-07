@@ -16,7 +16,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
-import { CommandPalette } from '@/components/CommandPalette';
+import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
 
 
 interface GlobalHeaderProps {
@@ -178,14 +178,14 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
         )}
       </header>
 
-      {/* Command Palette */}
+      {/* Enhanced Command Palette */}
       {workspace && user && (
-        <CommandPalette
+        <EnhancedCommandPalette
           open={showCommandPalette}
           onOpenChange={setShowCommandPalette}
-          workspace={workspace}
           injectedQuery={searchQuery}
           onSetSearchQuery={setSearchQuery}
+          onNavigate={handleNavigate}
         />
       )}
     </>
