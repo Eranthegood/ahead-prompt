@@ -458,10 +458,10 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 </div>
 
                 {/* Editor */}
-                <div className="border rounded-md min-h-[200px]">
+                <div className="border rounded-md min-h-[200px] bg-background">
                   <EditorContent 
                     editor={editor}
-                    className="w-full h-full"
+                    className="w-full h-full p-4 prose prose-sm max-w-none focus-within:outline-none"
                   />
                 </div>
 
@@ -677,7 +677,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
               <EditorContent 
                 editor={editor}
-                className="w-full h-full"
+                className="w-full h-full p-4 prose prose-sm max-w-none focus-within:outline-none"
               />
             </div>
 
