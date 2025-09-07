@@ -40,6 +40,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [draftRestored, setDraftRestored] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [originalHtml, setOriginalHtml] = useState<string>('');
   const { toast } = useToast();
   const { updatePrompt, updatePromptSilently } = usePrompts();
   const { preferences } = useUserPreferences();
@@ -114,16 +115,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
        });
       
       // Set content with a small delay to ensure editor is ready
+      setOriginalHtml(originalContent);
       setTimeout(() => {
         if (editor && !editor.isDestroyed) {
           editor.commands.setContent(originalContent);
-          
+          const afterText = editor.getText();
+          console.log('PromptDetailDialog: after setContent text length', afterText?.length || 0);
           // Calculate initial text length from original content
           const cleanText = stripHtmlAndNormalize(originalContent);
           setTextLength(cleanText.length);
         }
       }, 10);
-      
+
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
       setPriority(prompt.priority || 3);
@@ -486,9 +489,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   </div>
                   <div className="border rounded-md min-h-[200px] bg-background">
                     <EditorContent 
+                      key={`editor-${prompt.id}-${prompt.updated_at || ''}`}
                       editor={editor}
-                      className="w-full h-full p-4 prose prose-sm max-w-none focus-within:outline-none"
+                      className="w-full p-4 prose prose-sm max-w-none focus-within:outline-none"
                     />
+                    {editor.getText().trim().length === 0 && originalHtml && (
+                      <div className="p-4 border-t bg-muted/30">
+                        <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
+                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: originalHtml }} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -712,9 +722,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               </div>
               <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
                 <EditorContent 
+                  key={`editor-${prompt.id}-${prompt.updated_at || ''}`}
                   editor={editor}
-                  className="w-full h-full p-4 prose prose-sm max-w-none focus-within:outline-none"
+                  className="w-full p-4 prose prose-sm max-w-none focus-within:outline-none"
                 />
+                {editor.getText().trim().length === 0 && originalHtml && (
+                  <div className="p-4 border-t bg-muted/30">
+                    <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
+                    <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: originalHtml }} />
+                  </div>
+                )}
               </div>
             </div>
 
