@@ -250,9 +250,21 @@ export function PromptCard({
                     className="text-xs px-2 py-1 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={(e) => {
                       e.stopPropagation();
-                      const currentIndex = statusOptions.findIndex(s => s.value === prompt.status);
-                      const nextIndex = (currentIndex + 1) % statusOptions.length;
-                      const nextStatus = statusOptions[nextIndex].value as PromptStatus;
+                      // Smart bidirectional cycling between todo and in_progress
+                      let nextStatus: PromptStatus;
+                      
+                      if (prompt.status === 'todo') {
+                        nextStatus = 'in_progress';
+                      } else if (prompt.status === 'in_progress') {
+                        // Allow going back to todo for easy correction
+                        nextStatus = 'todo';
+                      } else if (prompt.status === 'done') {
+                        nextStatus = 'todo';
+                      } else {
+                        // For any other status, go to todo
+                        nextStatus = 'todo';
+                      }
+                      
                       handleStatusChange(nextStatus);
                     }}
                   >
