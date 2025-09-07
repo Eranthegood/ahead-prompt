@@ -79,48 +79,10 @@ export function EnhancedCommandPalette({
     }
   }, [injectedQuery, query, onSetSearchQuery]);
 
-  const handleCreatePrompt = async () => {
-    if (!createPrompt) {
-      toast({
-        title: "Indisponible",
-        description: "La création de prompt n'est pas disponible ici.",
-        variant: "destructive"
-      });
-      return;
-    }
-    try {
-      const prompt = await createPrompt({
-        title: query || 'New idea',
-        description: query || '',
-        priority: 2,
-        status: 'todo'
-      });
-      
-      if (prompt) {
-        addRecentItem({
-          id: prompt.id,
-          title: prompt.title,
-          type: 'prompt',
-          metadata: {
-            body: prompt.description,
-            priority: prompt.priority.toString(),
-            status: prompt.status
-          }
-        });
-        onOpenChange(false);
-        toast({
-          title: "Prompt créé avec succès",
-          description: `"${prompt.title}" a été ajouté à votre liste de prompts.`
-        });
-      }
-    } catch (error) {
-      console.error('Error creating prompt:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le prompt.",
-        variant: "destructive"
-      });
-    }
+  const handleCreatePrompt = () => {
+    // Déclencher l'ouverture du QuickPromptDialog
+    window.dispatchEvent(new CustomEvent('open-quick-prompt'));
+    onOpenChange(false);
   };
 
   const handleSelect = useCallback((item: any, type: string, action?: string) => {
@@ -258,15 +220,13 @@ export function EnhancedCommandPalette({
 
           {/* Quick Actions */}
           <CommandGroup heading="Actions rapides">
-            {canCreatePrompt && (
-              <CommandItem onSelect={handleCreatePrompt}>
-                <Plus className="mr-2 h-4 w-4" />
-                Créer un nouveau prompt
-                <div className="ml-auto text-xs text-muted-foreground">
-                  {formatShortcut('n')}
-                </div>
-              </CommandItem>
-            )}
+            <CommandItem onSelect={handleCreatePrompt}>
+              <Plus className="mr-2 h-4 w-4" />
+              Créer un nouveau prompt
+              <div className="ml-auto text-xs text-muted-foreground">
+                {formatShortcut('n')}
+              </div>
+            </CommandItem>
             <CommandItem onSelect={() => handleSelect({ id: 'prompt-library', title: 'Bibliothèque de prompts', path: '/prompt-library' }, 'action')}>
               <BookOpen className="mr-2 h-4 w-4" />
               Bibliothèque de prompts
