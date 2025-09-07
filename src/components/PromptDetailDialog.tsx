@@ -98,7 +98,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   useEffect(() => {
     if (prompt && editor && !editor.isDestroyed) {
        // Always load the original user content (original_description) into the editor first
-       const originalContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<h1>${prompt.title}</h1>`;
+       const originalContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<p>${prompt.title}</p>`;
       
        console.log('PromptDetailDialog: Loading prompt content', {
          promptId: prompt.id,
@@ -345,7 +345,16 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   if (!prompt || !editor) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(next) => {
+        if (next) {
+          onOpenChange(true);
+        } else {
+          handleClose();
+        }
+      }}
+    >
       <DialogContent 
         className="w-[95vw] max-w-4xl h-[90vh] max-h-[600px] lg:max-h-[85vh] p-0 flex flex-col"
         onKeyDown={handleKeyDown}
@@ -496,7 +505,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     {editor.getText().trim().length === 0 && originalHtml && (
                       <div className="p-4 border-t bg-muted/30">
                         <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
-                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: originalHtml }} />
+                        <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: originalHtml }} />
                       </div>
                     )}
                   </div>
@@ -729,7 +738,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 {editor.getText().trim().length === 0 && originalHtml && (
                   <div className="p-4 border-t bg-muted/30">
                     <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
-                    <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: originalHtml }} />
+                    <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: originalHtml }} />
                   </div>
                 )}
               </div>
