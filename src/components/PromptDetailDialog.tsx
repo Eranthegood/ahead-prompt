@@ -445,25 +445,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
                 <Separator />
 
-                {/* Original User Idea */}
-                {prompt.original_description && prompt.original_description.trim() && (
-                  <>
-                    <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-start gap-2 mb-2">
-                        <div className="flex items-center gap-1 text-blue-700 dark:text-blue-300">
-                          <Flame className="h-4 w-4" />
-                          <span className="text-sm font-medium">Your Original Idea</span>
-                        </div>
-                      </div>
-                      <div 
-                        className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: prompt.original_description }}
-                      />
-                    </div>
-                    <Separator />
-                  </>
-                )}
-
                 {/* Context Warning */}
                 {textLength < 20 && textLength > 0 && (
                   <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
@@ -670,25 +651,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             </div>
 
             <Separator />
-
-            {/* Original User Idea */}
-            {prompt.original_description && prompt.original_description.trim() && (
-              <>
-                <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-start gap-2 mb-2">
-                    <div className="flex items-center gap-1 text-blue-700 dark:text-blue-300">
-                      <Flame className="h-4 w-4" />
-                      <span className="text-sm font-medium">Your Original Idea</span>
-                    </div>
-                  </div>
-                  <div 
-                    className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: prompt.original_description }}
-                  />
-                </div>
-                <Separator />
-              </>
-            )}
 
             {/* Context Warning */}
             {textLength < 20 && textLength > 0 && (
