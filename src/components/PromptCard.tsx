@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, ArrowRight, Sparkles, Flame, Check, ExternalLink, Clock, Zap } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, ExternalLink, Clock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -186,7 +186,7 @@ export function PromptCard({
       return { icon: Flame, color: 'text-destructive', bgColor: 'bg-destructive/10' };
     }
     if (priority === 2) {
-      return { icon: ArrowRight, color: 'text-orange-500', bgColor: 'bg-orange-500/10' };
+      return { icon: Minus, color: 'text-orange-500', bgColor: 'bg-orange-500/10' };
     }
     return { icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted/50' };
   };
