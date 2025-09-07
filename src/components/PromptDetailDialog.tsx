@@ -876,6 +876,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="absolute top-0 right-0 text-xs text-muted-foreground bg-muted-foreground/10 px-2 py-1 rounded-bl text-mono">
                   AI Prompt
                 </div>
+                {generatedPrompt && (
+                  <div className="absolute top-0 left-0 text-xs text-muted-foreground bg-blue-500/10 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-br">
+                    Basé sur: {prompt.original_description ? 'Description originale' : prompt.description ? 'Description éditée' : 'Titre uniquement'}
+                  </div>
+                )}
                 <pre className="font-mono text-sm text-foreground whitespace-pre-wrap leading-relaxed pt-6">
                   {generatedPrompt ? 
                     generatedPrompt.replace(/<[^>]*>/g, '') : 
