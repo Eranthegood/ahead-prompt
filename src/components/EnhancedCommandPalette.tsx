@@ -53,7 +53,9 @@ export function EnhancedCommandPalette({
   const [query, setQuery] = useState('');
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
 
-  const { createPrompt } = usePromptsContext();
+  const promptsCtx = usePromptsContext();
+  const createPrompt = promptsCtx?.createPrompt;
+  const canCreatePrompt = !!createPrompt;
   const { workspace } = useWorkspace();
   const { products } = useProducts(workspace?.id || '');
   const { epics } = useEpics(workspace?.id || '');
@@ -78,6 +80,14 @@ export function EnhancedCommandPalette({
   }, [injectedQuery, query, onSetSearchQuery]);
 
   const handleCreatePrompt = async () => {
+    if (!createPrompt) {
+      toast({
+        title: "Indisponible",
+        description: "La création de prompt n'est pas disponible ici.",
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       const prompt = await createPrompt({
         title: query || 'New idea',
@@ -245,13 +255,15 @@ export function EnhancedCommandPalette({
 
           {/* Quick Actions */}
           <CommandGroup heading="Actions rapides">
-            <CommandItem onSelect={handleCreatePrompt}>
-              <Plus className="mr-2 h-4 w-4" />
-              Créer un nouveau prompt
-              <div className="ml-auto text-xs text-muted-foreground">
-                {formatShortcut('n')}
-              </div>
-            </CommandItem>
+            {canCreatePrompt && (
+              <CommandItem onSelect={handleCreatePrompt}>
+                <Plus className="mr-2 h-4 w-4" />
+                Créer un nouveau prompt
+                <div className="ml-auto text-xs text-muted-foreground">
+                  {formatShortcut('n')}
+                </div>
+              </CommandItem>
+            )}
             <CommandItem onSelect={() => handleSelect({ id: 'settings', title: 'Paramètres', path: '/settings' }, 'action')}>
               <Settings className="mr-2 h-4 w-4" />
               Paramètres
