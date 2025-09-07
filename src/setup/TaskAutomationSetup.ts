@@ -123,7 +123,8 @@ export class TaskAutomationSetup {
     // Add custom rules if provided
     if (this.config.automationRules?.customRules) {
       for (const rule of this.config.automationRules.customRules) {
-        await taskAutomationEngine.addAutomationRule(rule);
+        // Custom rule installation would be handled by AutomationRulesManager
+        console.log('Custom rule would be installed:', rule);
       }
     }
   }

@@ -603,4 +603,4 @@ export const DEVELOPMENT_WORKFLOW_RULES = [
   'AUTO_ESCALATE_OVERDUE_TASKS'
 ];
 
-export { AutomationRulesManager };
+// Export already done at line 4

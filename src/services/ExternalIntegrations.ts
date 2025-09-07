@@ -475,8 +475,13 @@ export class GitHubIntegration implements ExternalSystemIntegration {
     if (updates.title) updateData.title = updates.title;
     if (updates.description) updateData.body = updates.description;
     if (updates.tags) updateData.labels = updates.tags;
-    if (updates.status === 'done') updateData.state = 'closed';
-    else if (updates.status !== 'done') updateData.state = 'open';
+    if (updates.status) {
+      if (updates.status === 'done') {
+        updateData.state = 'closed';
+      } else {
+        updateData.state = 'open';
+      }
+    }
 
     const response = await fetch(`${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/issues/${externalId}`, {
       method: 'PATCH',
