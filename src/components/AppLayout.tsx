@@ -154,7 +154,7 @@ function SidebarWithContent({
   const shouldForceOpen = location.pathname === '/build';
 
   return (
-    <SidebarProvider defaultOpen={shouldForceOpen || !shouldBeCollapsedByDefault} open={shouldForceOpen ? true : undefined}>
+    <SidebarProvider defaultOpen={shouldForceOpen || !shouldBeCollapsedByDefault}>
       <div className="min-h-screen w-full bg-background flex">
         <MinimalSidebar 
           workspace={workspace}
