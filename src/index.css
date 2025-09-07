@@ -400,3 +400,92 @@
     -webkit-line-clamp: 3;
   }
 }
+
+/* Enhanced Scroll Area Styles - Cross-browser Compatible */
+.enhanced-scroll-area {
+  scrollbar-gutter: stable;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.enhanced-scroll-area [data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.enhanced-scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.enhanced-scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 6px;
+}
+
+.enhanced-scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: hsl(var(--border) / 0.6);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  min-height: 40px;
+  transition: all 0.2s ease;
+}
+
+.enhanced-scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--border) / 0.8);
+  background-clip: content-box;
+}
+
+.enhanced-scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--border));
+  background-clip: content-box;
+}
+
+.enhanced-scrollbar {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.enhanced-scroll-area:hover .enhanced-scrollbar {
+  opacity: 1;
+}
+
+/* Firefox */
+.enhanced-scroll-area [data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border) / 0.6) transparent;
+}
+
+/* Smooth scrolling for all enhanced scroll areas */
+.enhanced-scroll-area [data-radix-scroll-area-viewport] {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+.enhanced-scrollbar:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Prompt Library specific styles */
+.prompt-library-scroll {
+  height: calc(100vh - 280px);
+  min-height: 400px;
+}
+
+@media (max-height: 600px) {
+  .prompt-library-scroll {
+    height: calc(100vh - 200px);
+    min-height: 300px;
+  }
+}
+
+/* Animation for scroll indicators */
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.scroll-indicator-pulse {
+  animation: fadeInOut 2s ease-in-out infinite;
+}

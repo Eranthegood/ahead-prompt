@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { EnhancedScrollArea } from '@/components/ui/enhanced-scroll-area';
 import { usePromptLibrary } from '@/hooks/usePromptLibrary';
 import { 
   Search, 
@@ -160,7 +160,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
               </Tabs>
             </div>
 
-            {/* Items Grid */}
+            {/* Items Grid with Enhanced Scroll */}
             <div className="flex-1 px-6 pt-4">
               {loading ? (
                 <div className="flex items-center justify-center h-64">
@@ -191,8 +191,8 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
                   )}
                 </div>
               ) : (
-                <ScrollArea className="h-full">
-                  <div className="space-y-2 pb-6">
+                <EnhancedScrollArea className="prompt-library-scroll" showIndicators={true}>
+                  <div className="space-y-2 pb-6 pr-2">
                     {filteredItems.map(item => (
                       <div
                         key={item.id}
@@ -283,7 +283,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </EnhancedScrollArea>
               )}
             </div>
           </div>
