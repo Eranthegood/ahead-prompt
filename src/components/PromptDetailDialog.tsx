@@ -5,9 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save, Zap, Flame, Minus } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save, Zap, Flame, Minus, Edit3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -41,6 +42,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [originalHtml, setOriginalHtml] = useState<string>('');
+  const [editedOriginalIdea, setEditedOriginalIdea] = useState<string>('');
+  const [originalIdeaHasChanges, setOriginalIdeaHasChanges] = useState(false);
+  const [isSavingOriginalIdea, setIsSavingOriginalIdea] = useState(false);
   const { toast } = useToast();
   const { updatePrompt, updatePromptSilently } = usePrompts();
   const { preferences } = useUserPreferences();
@@ -98,7 +102,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   useEffect(() => {
     if (prompt && editor && !editor.isDestroyed) {
        // Always load the original user content (original_description) into the editor first
-       const originalContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<p>${prompt.title}</p>`;
+       const editorContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<p>${prompt.title}</p>`;
       
        console.log('PromptDetailDialog: Loading prompt content', {
          promptId: prompt.id,
@@ -109,23 +113,23 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
          descriptionLength: prompt.description?.length || 0,
          originalDescriptionPreview: prompt.original_description?.substring(0, 100) || 'No original description',
          descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
-         originalContentLength: originalContent.length,
+         originalContentLength: editorContent.length,
          editorReady: !!editor,
          editorDestroyed: editor.isDestroyed
        });
       
-      // Set content with a small delay to ensure editor is ready
-      setOriginalHtml(originalContent);
-      setTimeout(() => {
-        if (editor && !editor.isDestroyed) {
-          editor.commands.setContent(originalContent);
-          const afterText = editor.getText();
-          console.log('PromptDetailDialog: after setContent text length', afterText?.length || 0);
-          // Calculate initial text length from original content
-          const cleanText = stripHtmlAndNormalize(originalContent);
-          setTextLength(cleanText.length);
-        }
-      }, 10);
+       // Set content with a small delay to ensure editor is ready
+       setOriginalHtml(editorContent);
+       setTimeout(() => {
+         if (editor && !editor.isDestroyed) {
+           editor.commands.setContent(editorContent);
+           const afterText = editor.getText();
+           console.log('PromptDetailDialog: after setContent text length', afterText?.length || 0);
+           // Calculate initial text length from original content
+           const cleanText = stripHtmlAndNormalize(editorContent);
+           setTextLength(cleanText.length);
+         }
+       }, 10);
 
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
@@ -134,6 +138,11 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       
       // Load the AI-generated prompt separately for the preview panel
       setGeneratedPrompt(prompt.generated_prompt || '');
+      
+      // Initialize the editable original idea
+      const originalIdeaContent = prompt.original_description || '';
+      setEditedOriginalIdea(stripHtmlAndNormalize(originalIdeaContent));
+      setOriginalIdeaHasChanges(false);
     }
   }, [prompt, editor]);
 
@@ -178,14 +187,21 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const handleRegenerateFromOriginal = async () => {
     if (!prompt) return;
 
-    // Prefer the immutable original_description, then fallback to current description, then editor content
-    const sourceHtml = prompt.original_description || prompt.description || (editor ? editor.getHTML() : '');
-    const clean = stripHtmlAndNormalize(sourceHtml || '');
-    if (!clean.trim()) return;
+    // Use the currently edited original idea if available, otherwise fallback to stored data
+    const sourceText = editedOriginalIdea.trim() || stripHtmlAndNormalize(prompt.original_description || '') || stripHtmlAndNormalize(prompt.description || '') || (editor ? stripHtmlAndNormalize(editor.getHTML()) : '');
+    if (!sourceText.trim()) return;
     
     setIsRegenerating(true);
     try {
-      const response = await PromptTransformService.transformPrompt(sourceHtml);
+      // Save the edited original idea if it has changes
+      if (originalIdeaHasChanges) {
+        await updatePrompt(prompt.id, {
+          original_description: editedOriginalIdea
+        });
+        setOriginalIdeaHasChanges(false);
+      }
+      
+      const response = await PromptTransformService.transformPrompt(sourceText);
       
       if (response.error) {
         throw new Error(response.error);
@@ -202,19 +218,57 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       }
 
       toast({
-        title: 'Prompt regenerated from original text',
-        description: 'Prompt has been regenerated and saved successfully'
+        title: 'Prompt regenerated from original idea',
+        description: originalIdeaHasChanges ? 'Original idea updated and prompt regenerated' : 'Prompt regenerated from your original idea'
       });
     } catch (error) {
       console.error('Error regenerating prompt from original:', error);
       toast({
         title: 'Error',
-        description: 'Unable to regenerate prompt from original text',
+        description: 'Unable to regenerate prompt from original idea',
         variant: 'destructive'
       });
     } finally {
       setIsRegenerating(false);
     }
+  };
+
+  const handleSaveOriginalIdea = async () => {
+    if (!prompt || !originalIdeaHasChanges) return;
+    
+    setIsSavingOriginalIdea(true);
+    try {
+      await updatePrompt(prompt.id, {
+        original_description: editedOriginalIdea
+      });
+      setOriginalIdeaHasChanges(false);
+      toast({
+        title: 'Original idea saved',
+        description: 'Your original idea has been updated successfully'
+      });
+    } catch (error) {
+      console.error('Error saving original idea:', error);
+      toast({
+        title: 'Error',
+        description: 'Unable to save original idea',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSavingOriginalIdea(false);
+    }
+  };
+
+  const handleResetOriginalIdea = () => {
+    if (!prompt) return;
+    const resetContent = prompt.original_description || '';
+    setEditedOriginalIdea(stripHtmlAndNormalize(resetContent));
+    setOriginalIdeaHasChanges(false);
+  };
+
+  const handleOriginalIdeaChange = (value: string) => {
+    setEditedOriginalIdea(value);
+    const storedContent = stripHtmlAndNormalize(prompt?.original_description || '');
+    setOriginalIdeaHasChanges(value !== storedContent);
   };
 
   const handleOptimizePrompt = async () => {
@@ -326,6 +380,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
     if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSave();
+    } else if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleRegenerateFromOriginal();
     } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSave();
@@ -342,6 +399,12 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         updatePromptSilently(prompt.id, { description: content }).catch(console.error);
       }
     }
+    
+    // Also save original idea changes
+    if (originalIdeaHasChanges && preferences.autoSaveEnabled && prompt) {
+      updatePromptSilently(prompt.id, { original_description: editedOriginalIdea }).catch(console.error);
+    }
+    
     onOpenChange(false);
   };
 
@@ -400,7 +463,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   </Button>
           </DialogTitle>
           <DialogDescription>
-            Edit prompt details with rich text formatting, product and epic assignment. Press Ctrl+S to save.
+            Edit prompt details with rich text formatting, product and epic assignment. Press Ctrl+S to save, Ctrl+R to regenerate from original idea.
           </DialogDescription>
         </DialogHeader>
 
@@ -445,20 +508,54 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
                 <Separator />
 
-                {/* Original User Idea */}
-                {prompt.original_description && prompt.original_description.trim() && (
+                {/* Editable Original Idea */}
+                {(prompt.original_description?.trim() || editedOriginalIdea.trim()) && (
                   <>
                     <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-start gap-2 mb-2">
+                      <div className="flex items-start justify-between gap-2 mb-3">
                         <div className="flex items-center gap-1 text-blue-700 dark:text-blue-300">
-                          <Flame className="h-4 w-4" />
+                          <Edit3 className="h-4 w-4" />
                           <span className="text-sm font-medium">Your Original Idea</span>
                         </div>
+                        <div className="flex items-center gap-1">
+                          {originalIdeaHasChanges && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleSaveOriginalIdea}
+                              disabled={isSavingOriginalIdea}
+                              className="h-7 px-2 text-xs text-blue-700 dark:text-blue-300"
+                            >
+                              {isSavingOriginalIdea ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Save className="h-3 w-3" />
+                              )}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleResetOriginalIdea}
+                            disabled={!originalIdeaHasChanges}
+                            className="h-7 px-2 text-xs text-blue-700 dark:text-blue-300"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
-                      <div 
-                        className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: prompt.original_description }}
+                      <Textarea
+                        value={editedOriginalIdea}
+                        onChange={(e) => handleOriginalIdeaChange(e.target.value)}
+                        placeholder="Enter your original idea here..."
+                        className="text-sm bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 placeholder:text-blue-600 dark:placeholder:text-blue-400 min-h-[80px] resize-none"
                       />
+                      {originalIdeaHasChanges && (
+                        <div className="flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400">
+                          <AlertTriangle className="h-3 w-3" />
+                          <span>Unsaved changes to original idea</span>
+                        </div>
+                      )}
                     </div>
                     <Separator />
                   </>
@@ -616,8 +713,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                       size="sm"
                       onClick={handleRegeneratePrompt}
                       disabled={isRegenerating || textLength === 0}
+                      title="Regenerate from current content"
                     >
                       {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRegenerateFromOriginal}
+                      disabled={isRegenerating || (!editedOriginalIdea.trim() && !prompt.original_description?.trim())}
+                      title="Regenerate from original idea (Ctrl+R)"
+                    >
+                      {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Flame className="h-4 w-4" />}
                     </Button>
                     <Button
                       variant="ghost"
@@ -671,20 +778,54 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
             <Separator />
 
-            {/* Original User Idea */}
-            {prompt.original_description && prompt.original_description.trim() && (
+            {/* Editable Original Idea */}
+            {(prompt.original_description?.trim() || editedOriginalIdea.trim()) && (
               <>
                 <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-start gap-2 mb-2">
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex items-center gap-1 text-blue-700 dark:text-blue-300">
-                      <Flame className="h-4 w-4" />
+                      <Edit3 className="h-4 w-4" />
                       <span className="text-sm font-medium">Your Original Idea</span>
                     </div>
+                    <div className="flex items-center gap-1">
+                      {originalIdeaHasChanges && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSaveOriginalIdea}
+                          disabled={isSavingOriginalIdea}
+                          className="h-7 px-2 text-xs text-blue-700 dark:text-blue-300"
+                        >
+                          {isSavingOriginalIdea ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Save className="h-3 w-3" />
+                          )}
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleResetOriginalIdea}
+                        disabled={!originalIdeaHasChanges}
+                        className="h-7 px-2 text-xs text-blue-700 dark:text-blue-300"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
-                  <div 
-                    className="text-sm text-blue-800 dark:text-blue-200 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: prompt.original_description }}
+                  <Textarea
+                    value={editedOriginalIdea}
+                    onChange={(e) => handleOriginalIdeaChange(e.target.value)}
+                    placeholder="Enter your original idea here..."
+                    className="text-sm bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 placeholder:text-blue-600 dark:placeholder:text-blue-400 min-h-[80px] resize-none"
                   />
+                  {originalIdeaHasChanges && (
+                    <div className="flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>Unsaved changes to original idea</span>
+                    </div>
+                  )}
                 </div>
                 <Separator />
               </>
@@ -896,12 +1037,25 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                   size="sm"
                   onClick={handleRegeneratePrompt}
                   disabled={isRegenerating || textLength === 0}
-                  title={textLength === 0 ? "Add content to regenerate" : "Regenerate prompt"}
+                  title={textLength === 0 ? "Add content to regenerate" : "Regenerate from current content"}
                 >
                   {isRegenerating ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <RefreshCw className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRegenerateFromOriginal}
+                  disabled={isRegenerating || (!editedOriginalIdea.trim() && !prompt.original_description?.trim())}
+                  title="Regenerate from original idea (Ctrl+R)"
+                >
+                  {isRegenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Flame className="h-4 w-4" />
                   )}
                 </Button>
                 <Button
