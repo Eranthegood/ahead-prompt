@@ -10,6 +10,7 @@ import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { AIAgentManager } from '@/services/aiAgentManager';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCursorIntegration } from '@/hooks/useCursorIntegration';
@@ -77,6 +78,7 @@ export function PromptCard({
   const [isOptimizing, setIsOptimizing] = useState(false);
   const { toast } = useToast();
   const { workspace } = useWorkspace();
+  const isMobile = useIsMobile();
   const { sendToCursor, isLoading: cursorLoading, cancelAgent, mergePullRequest, updateAgentStatus } = useCursorIntegration();
   
   // Real-time agent polling for active Cursor agents
@@ -194,6 +196,14 @@ export function PromptCard({
   const priorityDisplay = getPriorityDisplay();
   const PriorityIcon = priorityDisplay.icon;
 
+  // Enhanced event prevention for mobile touch events
+  const preventEventBubbling = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Use nativeEvent for stopImmediatePropagation
+    e.nativeEvent.stopImmediatePropagation();
+  };
+
   return (
     <>
       <PromptContextMenu
@@ -241,7 +251,9 @@ export function PromptCard({
                   >
                     <SelectTrigger 
                       className="w-auto h-6 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={preventEventBubbling}
+                      onTouchStart={isMobile ? preventEventBubbling : undefined}
+                      onTouchEnd={isMobile ? preventEventBubbling : undefined}
                     >
                       <SelectValue asChild>
                         <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} cursor-pointer hover:scale-105 transition-all duration-200`}>
@@ -288,7 +300,9 @@ export function PromptCard({
                     >
                       <SelectTrigger 
                         className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={preventEventBubbling}
+                        onTouchStart={isMobile ? preventEventBubbling : undefined}
+                        onTouchEnd={isMobile ? preventEventBubbling : undefined}
                       >
                         <SelectValue asChild>
                           <Badge 
