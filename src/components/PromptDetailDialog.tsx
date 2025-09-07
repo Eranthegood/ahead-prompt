@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save, Zap } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Calendar, Package, Hash, Clock, Copy, RefreshCw, Loader2, AlertTriangle, RotateCcw, Save, Zap, Flame, Minus } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,7 @@ import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { AIAgentManager } from '@/services/aiAgentManager';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { Prompt, Product, Epic } from '@/types';
+import { Prompt, Product, Epic, PRIORITY_OPTIONS } from '@/types';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -31,6 +31,7 @@ interface PromptDetailDialogProps {
 export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics }: PromptDetailDialogProps) {
   const [productId, setProductId] = useState<string>('none');
   const [epicId, setEpicId] = useState<string>('none');
+  const [priority, setPriority] = useState<number>(3);
   const [saving, setSaving] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -104,6 +105,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       editor.commands.setContent(originalContent);
       setProductId(prompt.product_id || 'none');
       setEpicId(prompt.epic_id || 'none');
+      setPriority(prompt.priority || 3);
       setHasUnsavedChanges(false);
       
       // Load the AI-generated prompt separately for the preview panel
@@ -269,6 +271,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
         description: content,
         product_id: productId === 'none' ? null : productId,
         epic_id: epicId === 'none' ? null : epicId,
+        priority,
       });
 
       // Clear draft and unsaved changes after successful save
@@ -500,6 +503,27 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                       </SelectContent>
                     </Select>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label>Priority</Label>
+                    <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PRIORITY_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            <div className="flex items-center gap-2">
+                              {option.value === 1 && <Flame className="h-4 w-4 text-destructive" />}
+                              {option.value === 2 && <Minus className="h-4 w-4 text-orange-500" />}
+                              {option.value === 3 && <Clock className="h-4 w-4 text-muted-foreground" />}
+                              {option.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -657,8 +681,8 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
               />
             </div>
 
-            {/* Product and Epic assignment */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Product, Epic and Priority assignment */}
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Product</Label>
                 <Select value={productId} onValueChange={(value) => {
@@ -700,6 +724,27 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                             style={{ backgroundColor: epic.color }}
                           />
                           {epic.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Priority</Label>
+                <Select value={priority.toString()} onValueChange={(value) => setPriority(parseInt(value))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    {PRIORITY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        <div className="flex items-center gap-2">
+                          {option.value === 1 && <Flame className="h-4 w-4 text-destructive" />}
+                          {option.value === 2 && <Minus className="h-4 w-4 text-orange-500" />}
+                          {option.value === 3 && <Clock className="h-4 w-4 text-muted-foreground" />}
+                          {option.label}
                         </div>
                       </SelectItem>
                     ))}
