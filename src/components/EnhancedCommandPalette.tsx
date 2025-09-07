@@ -31,6 +31,7 @@ import { useEnhancedSearch } from '@/hooks/useEnhancedSearch';
 import { useRecentItems } from '@/hooks/useRecentItems';
 import { formatShortcut } from '@/utils/keyboardUtils';
 import { Prompt, Epic, Product, KnowledgeItem } from '@/types';
+import type { PromptLibraryItem } from '@/types/prompt-library';
 import { useToast } from '@/hooks/use-toast';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { Badge } from '@/components/ui/badge';
@@ -107,6 +108,8 @@ export function EnhancedCommandPalette({
           copyPromptForLovable(item);
         } else if (type === 'knowledge') {
           copyKnowledgeForLovable(item);
+        } else if (type === 'promptLibrary') {
+          copyPromptLibraryForLovable(item);
         }
         break;
       case 'view':
@@ -151,6 +154,15 @@ export function EnhancedCommandPalette({
     toast({
       title: "Copié dans le presse-papiers", 
       description: "L'élément de connaissance a été copié."
+    });
+  };
+
+  const copyPromptLibraryForLovable = async (item: PromptLibraryItem) => {
+    const content = `Template: ${item.title}\n\n${item.body}${item.tags && item.tags.length > 0 ? `\n\nTags: ${item.tags.join(', ')}` : ''}${item.category ? `\nCategory: ${item.category}` : ''}`;
+    await navigator.clipboard.writeText(content);
+    toast({
+      title: "Copié dans le presse-papiers", 
+      description: "Le template a été copié."
     });
   };
 
@@ -397,6 +409,39 @@ export function EnhancedCommandPalette({
                       )}
                       <span className="truncate">
                         {item.content.slice(0, 40)}...
+                      </span>
+                    </div>
+                  </div>
+                  <Copy className="ml-2 h-3 w-3 opacity-50" />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+
+          {searchResults.promptLibrary.length > 0 && (
+            <CommandGroup heading="Templates de prompts">
+              {searchResults.promptLibrary.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  onSelect={() => handleSelect(item, 'promptLibrary', 'copy')}
+                  className="group"
+                >
+                  <Star className="mr-2 h-4 w-4" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{item.title}</div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {item.category && (
+                        <Badge variant="outline" className="text-xs">
+                          {item.category}
+                        </Badge>
+                      )}
+                      {item.ai_model && (
+                        <Badge variant="outline" className="text-xs">
+                          {item.ai_model}
+                        </Badge>
+                      )}
+                      <span className="truncate">
+                        {item.body.slice(0, 40)}...
                       </span>
                     </div>
                   </div>

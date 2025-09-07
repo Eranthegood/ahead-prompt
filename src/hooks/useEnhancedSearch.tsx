@@ -3,15 +3,18 @@ import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useKnowledge } from '@/hooks/useKnowledge';
+import { usePromptLibrary } from '@/hooks/usePromptLibrary';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { supabase } from '@/integrations/supabase/client';
 import { Prompt, Epic, Product, KnowledgeItem } from '@/types';
+import type { PromptLibraryItem } from '@/types/prompt-library';
 
 interface SearchResults {
   prompts: Prompt[];
   epics: Epic[];
   products: Product[];
   knowledge: KnowledgeItem[];
+  promptLibrary: PromptLibraryItem[];
 }
 
 interface UseEnhancedSearchOptions {
@@ -34,7 +37,8 @@ export function useEnhancedSearch(
     prompts: [],
     epics: [],
     products: [],
-    knowledge: []
+    knowledge: [],
+    promptLibrary: []
   });
   
   const [isSearching, setIsSearching] = useState(false);
@@ -46,11 +50,12 @@ export function useEnhancedSearch(
   const { products } = useProducts(workspace?.id || '');
   const { epics } = useEpics(workspace?.id || '');
   const { knowledgeItems } = useKnowledge(workspace?.id || '');
+  const { items: promptLibraryItems } = usePromptLibrary();
 
   // Client-side fuzzy search for immediate results
   const clientSearchResults = useMemo(() => {
     if (!query.trim() || !enableFuzzySearch) {
-      return { prompts: [], epics: [], products: [], knowledge: [] };
+      return { prompts: [], epics: [], products: [], knowledge: [], promptLibrary: [] };
     }
 
     const searchTerm = query.toLowerCase();
@@ -76,18 +81,26 @@ export function useEnhancedSearch(
       item.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
     ).slice(0, maxResults);
 
+    const searchPromptLibrary = promptLibraryItems.filter(item =>
+      item.title.toLowerCase().includes(searchTerm) ||
+      item.body.toLowerCase().includes(searchTerm) ||
+      item.tags?.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+      item.category?.toLowerCase().includes(searchTerm)
+    ).slice(0, maxResults);
+
     return {
       prompts: searchPrompts,
       epics: searchEpics,
       products: searchProducts,
-      knowledge: searchKnowledge
+      knowledge: searchKnowledge,
+      promptLibrary: searchPromptLibrary
     };
-  }, [query, prompts, epics, products, knowledgeItems, maxResults, enableFuzzySearch]);
+  }, [query, prompts, epics, products, knowledgeItems, promptLibraryItems, maxResults, enableFuzzySearch]);
 
   // Advanced server-side search with full-text capabilities
   const performAdvancedSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim() || !workspace?.id) {
-      setSearchResults({ prompts: [], epics: [], products: [], knowledge: [] });
+      setSearchResults({ prompts: [], epics: [], products: [], knowledge: [], promptLibrary: [] });
       setHasSearched(false);
       return;
     }
@@ -133,17 +146,27 @@ export function useEnhancedSearch(
         .order('updated_at', { ascending: false })
         .limit(maxResults);
 
+      // Search prompt library
+      const { data: promptLibraryResults } = await supabase
+        .from('prompt_library' as any)
+        .select('*')
+        .eq('workspace_id', workspace.id)
+        .or(`title.ilike.${searchTerm},body.ilike.${searchTerm},category.ilike.${searchTerm}`)
+        .order('updated_at', { ascending: false })
+        .limit(maxResults);
+
       setSearchResults({
         prompts: (promptResults || []) as Prompt[],
         epics: (epicResults || []) as Epic[],
         products: (productResults || []) as Product[],
-        knowledge: (knowledgeResults || []) as KnowledgeItem[]
+        knowledge: (knowledgeResults || []) as KnowledgeItem[],
+        promptLibrary: (promptLibraryResults || []) as unknown as PromptLibraryItem[]
       });
       
       setHasSearched(true);
     } catch (error) {
       console.error('Advanced search error:', error);
-      setSearchResults({ prompts: [], epics: [], products: [], knowledge: [] });
+      setSearchResults({ prompts: [], epics: [], products: [], knowledge: [], promptLibrary: [] });
     } finally {
       setIsSearching(false);
     }
@@ -175,14 +198,16 @@ export function useEnhancedSearch(
       prompts: mergeUnique(clientSearchResults.prompts, searchResults.prompts),
       epics: mergeUnique(clientSearchResults.epics, searchResults.epics),
       products: mergeUnique(clientSearchResults.products, searchResults.products),
-      knowledge: mergeUnique(clientSearchResults.knowledge, searchResults.knowledge)
+      knowledge: mergeUnique(clientSearchResults.knowledge, searchResults.knowledge),
+      promptLibrary: mergeUnique(clientSearchResults.promptLibrary, searchResults.promptLibrary)
     };
   }, [clientSearchResults, searchResults, hasSearched, isSearching, maxResults]);
 
   const totalResults = combinedResults.prompts.length + 
                       combinedResults.epics.length + 
                       combinedResults.products.length + 
-                      combinedResults.knowledge.length;
+                      combinedResults.knowledge.length + 
+                      combinedResults.promptLibrary.length;
 
   return {
     searchResults: combinedResults,
