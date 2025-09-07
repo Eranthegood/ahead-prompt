@@ -517,11 +517,13 @@ export function MinimalPromptList({
       />
 
       {/* Cursor Config Dialog */}
-      <CursorConfigDialog
-        isOpen={showCursorDialog}
-        onClose={() => setShowCursorDialog(false)}
-        prompt={cursorPrompt}
-      />
+      {cursorPrompt && (
+        <CursorConfigDialog
+          isOpen={showCursorDialog}
+          onClose={() => setShowCursorDialog(false)}
+          prompt={cursorPrompt}
+        />
+      )}
     </div>
   );
 }
