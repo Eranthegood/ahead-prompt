@@ -16,7 +16,8 @@ import {
   Trash2, 
   Filter,
   Library,
-  Zap
+  Zap,
+  Lightbulb
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
@@ -110,181 +111,197 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl h-[85vh] flex flex-col p-0 gap-0">
-          <DialogHeader className="px-6 py-4 border-b border-border/40">
-            <DialogTitle className="text-lg font-medium text-foreground flex items-center gap-2">
-              <Library className="w-5 h-5 text-muted-foreground" />
-              Prompt Library
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="flex-1 flex flex-col">
-            {/* Search and Actions Bar */}
-            <div className="px-6 py-4 border-b border-border/30">
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
-                  <Input
-                    placeholder="Search prompts..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 border-border/40 bg-muted/20 focus:bg-background transition-colors"
-                  />
-                </div>
-                <Button 
-                  onClick={() => setShowCreateDialog(true)} 
-                  className="px-4 gap-2 bg-primary hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Prompt
-                  <kbd className="ml-2 px-1.5 py-0.5 text-xs bg-primary-foreground/20 text-primary-foreground rounded border">L</kbd>
-                </Button>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-background">
+          {/* Minimal Header */}
+          <DialogHeader className="px-6 py-3 border-b border-border/20">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-base font-normal text-muted-foreground">
+                Prompt Library
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <kbd className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded border">⌘K</kbd>
               </div>
             </div>
+          </DialogHeader>
 
-            {/* Category Tabs */}
-            <div className="px-6 py-3 border-b border-border/20">
-              <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-                <TabsList className="bg-muted/30 h-9">
-                  <TabsTrigger value="all" className="text-sm px-4">All</TabsTrigger>
-                  <TabsTrigger value="favorites" className="text-sm px-4 gap-1.5">
-                    <Star className="w-3.5 h-3.5" />
-                    Favorites
-                  </TabsTrigger>
-                  {PROMPT_CATEGORIES.slice(0, 4).map(category => (
-                    <TabsTrigger key={category} value={category} className="text-sm px-4">
-                      {category}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
+          {/* Search Bar */}
+          <div className="px-6 py-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Recherchez ou tapez un"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 border-0 bg-muted/30 focus:bg-muted/50 transition-colors h-10"
+              />
             </div>
+          </div>
 
-            {/* Items Grid with Enhanced Scroll */}
-            <div className="flex-1 px-6 pt-4">
-              {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/60"></div>
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-center max-w-md mx-auto">
-                  <div className="w-16 h-16 rounded-full bg-muted/40 flex items-center justify-center mb-4">
-                    <Library className="w-8 h-8 text-muted-foreground/60" />
-                  </div>
-                  <h3 className="font-medium text-foreground mb-2 text-lg">
-                    {items.length === 0 ? 'No prompts yet' : 'No matching prompts'}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                    {items.length === 0 
-                      ? 'Create your first prompt to get started with your library'
-                      : 'Try adjusting your search or filter to find what you\'re looking for'
-                    }
-                  </p>
-                  {items.length === 0 && (
-                    <Button 
-                      onClick={() => setShowCreateDialog(true)} 
-                      className="gap-2 px-6"
+          {/* Category Filters - Minimal */}
+          {(selectedCategory !== 'all' || searchQuery) && (
+            <div className="px-6 pb-4">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                    selectedCategory === 'all'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setSelectedCategory('favorites')}
+                  className={`px-3 py-1 text-sm rounded-full transition-colors flex items-center gap-1 ${
+                    selectedCategory === 'favorites'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  <Star className="w-3 h-3" />
+                  Favorites
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="flex-1 px-6 pb-6">
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground"></div>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-center">
+                <Library className="w-12 h-12 text-muted-foreground/40 mb-4" />
+                <h3 className="font-medium text-foreground mb-2">
+                  {items.length === 0 ? 'No prompts yet' : 'No matching prompts'}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  {items.length === 0 
+                    ? 'Create your first prompt to get started'
+                    : 'Try adjusting your search or filter'
+                  }
+                </p>
+                {items.length === 0 && (
+                  <Button 
+                    onClick={() => setShowCreateDialog(true)} 
+                    className="gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create First Prompt
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <EnhancedScrollArea className="prompt-library-scroll" showIndicators={false}>
+                <div className="space-y-1">
+                  {filteredItems.map(item => (
+                    <div
+                      key={item.id}
+                      className="group flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted/30 transition-all duration-150 cursor-pointer"
+                      onClick={() => setSelectedItem(item)}
                     >
-                      <Plus className="w-4 h-4" />
-                      Create Your First Prompt
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <EnhancedScrollArea className="prompt-library-scroll" showIndicators={true}>
-                  <div className="space-y-2 pb-6 pr-2">
-                    {filteredItems.map(item => (
-                      <div
-                        key={item.id}
-                        className="group p-4 rounded-lg border border-border/40 hover:border-border/80 hover:shadow-sm transition-all duration-200 bg-card/30 hover:bg-card/60"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-medium text-foreground text-base leading-tight">
-                                {item.title}
-                              </h3>
-                              <div className="flex items-center gap-1.5">
-                                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-muted/40">
-                                  {item.ai_model}
-                                </Badge>
-                                {item.category && item.category !== 'General' && (
-                                  <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                                    {item.category}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
-                              {item.body}
-                            </p>
-                            
-                            {item.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 mb-3">
-                                {item.tags.slice(0, 4).map(tag => (
-                                  <Badge key={tag} variant="outline" className="text-xs px-2 py-0.5 bg-muted/20">
-                                    #{tag}
-                                  </Badge>
-                                ))}
-                                {item.tags.length > 4 && (
-                                  <Badge variant="outline" className="text-xs px-2 py-0.5 bg-muted/20">
-                                    +{item.tags.length - 4} more
-                                  </Badge>
-                                )}
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span>Used {item.usage_count} times</span>
-                              <span>{new Date(item.created_at).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleFavorite(item.id)}
-                              className="w-8 h-8 p-0 hover:bg-muted/60"
-                            >
-                              {item.is_favorite ? (
-                                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                              ) : (
-                                <Star className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleCopyPrompt(item)}
-                              className="w-8 h-8 p-0 hover:bg-muted/60 text-muted-foreground hover:text-foreground"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedItem(item)}
-                              className="w-8 h-8 p-0 hover:bg-muted/60 text-muted-foreground hover:text-foreground"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteItem(item)}
-                              className="w-8 h-8 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
+                      {/* Icon */}
+                      <div className="w-8 h-8 rounded-md bg-muted/50 flex items-center justify-center flex-shrink-0">
+                        <Lightbulb className="w-4 h-4 text-muted-foreground" />
                       </div>
-                    ))}
-                  </div>
-                </EnhancedScrollArea>
-              )}
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-medium text-foreground text-sm truncate">
+                            {item.title}
+                          </h3>
+                          {item.is_favorite && (
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {item.body}
+                        </p>
+                        {item.tags.length > 0 && (
+                          <div className="flex items-center gap-1 mt-1">
+                            {item.tags.slice(0, 3).map(tag => (
+                              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 h-5">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {item.tags.length > 3 && (
+                              <span className="text-xs text-muted-foreground">+{item.tags.length - 3}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Actions & Shortcuts */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyPrompt(item);
+                          }}
+                          className="w-7 h-7 p-0 hover:bg-muted/60"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(item.id);
+                          }}
+                          className="w-7 h-7 p-0 hover:bg-muted/60"
+                        >
+                          {item.is_favorite ? (
+                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          ) : (
+                            <Star className="w-3.5 h-3.5" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteItem(item);
+                          }}
+                          className="w-7 h-7 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      
+                      {/* Usage count */}
+                      <div className="text-xs text-muted-foreground/60 min-w-0">
+                        {item.usage_count > 0 && `${item.usage_count}x`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </EnhancedScrollArea>
+            )}
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="px-6 py-4 border-t border-border/20 bg-muted/10">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                {filteredItems.length} prompt{filteredItems.length !== 1 ? 's' : ''}
+              </span>
+              <Button 
+                onClick={() => setShowCreateDialog(true)} 
+                size="sm"
+                className="gap-2"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                New Prompt
+                <kbd className="ml-1 px-1.5 py-0.5 text-xs bg-primary-foreground/20 text-primary-foreground rounded">L</kbd>
+              </Button>
             </div>
           </div>
         </DialogContent>
