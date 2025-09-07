@@ -137,6 +137,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
                 >
                   <Plus className="w-4 h-4" />
                   New Prompt
+                  <kbd className="ml-2 px-1.5 py-0.5 text-xs bg-primary-foreground/20 text-primary-foreground rounded border">L</kbd>
                 </Button>
               </div>
             </div>
