@@ -65,7 +65,13 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   // Smart auto-save handler for blur events
   const handleBlurSave = useCallback(async (content: string) => {
     if (!prompt || !preferences.autoSaveEnabled) return;
-    
+
+    const cleanText = stripHtmlAndNormalize(content);
+    if (!cleanText.trim() || content === '<p></p>') {
+      // Avoid overwriting existing description with empty content
+      return;
+    }
+
     try {
       await updatePromptSilently(prompt.id, { description: content });
       setHasUnsavedChanges(false);
@@ -91,7 +97,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   useEffect(() => {
     if (prompt && editor && !editor.isDestroyed) {
       // Always load the original user content (description) into the editor first
-      const originalContent = prompt.description || `<h1>${prompt.title}</h1>`;
+      const originalContent = prompt.description || prompt.generated_prompt || `<h1>${prompt.title}</h1>`;
       
       console.log('PromptDetailDialog: Loading prompt content', {
         promptId: prompt.id,
@@ -469,7 +475,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                    <span className="text-xs text-muted-foreground">Your original input</span>
+                     <span className="text-xs text-muted-foreground">{!prompt.description && !!prompt.generated_prompt ? 'Displaying generated prompt (original idea empty)' : 'Your original input'}</span>
                   </div>
                   <div className="border rounded-md min-h-[200px] bg-background">
                     <EditorContent 
@@ -691,7 +697,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                <span className="text-xs text-muted-foreground">Your original input</span>
+                <span className="text-xs text-muted-foreground">{!prompt.description && !!prompt.generated_prompt ? 'Displaying generated prompt (original idea empty)' : 'Your original input'}</span>
               </div>
               <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
                 <EditorContent 
