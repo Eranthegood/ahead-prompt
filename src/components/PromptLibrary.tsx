@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedScrollArea } from '@/components/ui/enhanced-scroll-area';
+import { Textarea } from '@/components/ui/textarea';
 import { usePromptLibrary } from '@/hooks/usePromptLibrary';
 import { 
   Search, 
@@ -36,6 +37,8 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PromptLibraryItem | null>(null);
   const [viewingItem, setViewingItem] = useState<PromptLibraryItem | null>(null);
+  const [showTaskDialog, setShowTaskDialog] = useState(false);
+  const [taskTemplate, setTaskTemplate] = useState('');
   const { toast } = useToast();
 
   // Add keyboard shortcut for creating prompt when library is open
@@ -56,11 +59,17 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
         event.preventDefault();
         setShowCreateDialog(true);
       }
+      
+      // Q key to create task from viewing prompt
+      if (event.key.toLowerCase() === 'q' && viewingItem) {
+        event.preventDefault();
+        handleCreateTask();
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
+  }, [open, viewingItem]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -101,6 +110,27 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
         description: 'Could not copy prompt to clipboard.',
       });
     }
+  };
+
+  const handleCreateTask = () => {
+    if (!viewingItem) return;
+    
+    const template = `Task: Implement "${viewingItem.title}"
+
+Based on prompt:
+${viewingItem.body}
+
+Tags: ${viewingItem.tags.join(', ')}
+
+TODO:
+- [ ] Analyze requirements
+- [ ] Plan implementation
+- [ ] Execute
+- [ ] Test
+- [ ] Document`;
+    
+    setTaskTemplate(template);
+    setShowTaskDialog(true);
   };
 
   const handleDeleteItem = async (item: PromptLibraryItem) => {
@@ -356,7 +386,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
           </div>
           
           <div className="px-6 py-4 border-t bg-muted/10">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
@@ -375,6 +405,19 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
               </Button>
               
               <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCreateTask()}
+                className="gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Create Task
+                <kbd className="ml-1 px-1.5 py-0.5 text-xs bg-primary-foreground/20 text-primary-foreground rounded">Q</kbd>
+              </Button>
+              
+              <div className="flex-1" />
+              
+              <Button
                 onClick={() => {
                   if (viewingItem) handleCopyPrompt(viewingItem);
                 }}
@@ -382,6 +425,60 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
               >
                 <Copy className="w-4 h-4" />
                 Copy to Clipboard
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Task Creation Dialog */}
+      <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
+        <DialogContent className="max-w-2xl h-[70vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-lg font-medium">
+              Create Task from Prompt: {viewingItem?.title}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Task Template (modify as needed)
+                </label>
+                <Textarea
+                  value={taskTemplate}
+                  onChange={(e) => setTaskTemplate(e.target.value)}
+                  className="min-h-[300px] font-mono text-sm"
+                  placeholder="Enter your task template..."
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t bg-muted/10">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                onClick={() => setShowTaskDialog(false)}
+              >
+                Cancel
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  // Copy task template to clipboard
+                  navigator.clipboard.writeText(taskTemplate);
+                  toast({
+                    title: 'Task template copied',
+                    description: 'The task template has been copied to your clipboard.',
+                  });
+                  setShowTaskDialog(false);
+                }}
+                className="gap-2"
+              >
+                <Copy className="w-4 h-4" />
+                Copy Task Template
               </Button>
             </div>
           </div>
