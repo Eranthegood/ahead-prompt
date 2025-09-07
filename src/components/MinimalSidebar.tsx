@@ -433,12 +433,12 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                     </h2>
                   </div>
                 </Button>
-                <SidebarTrigger className="h-5 w-5 shrink-0" />
+                <SidebarTrigger className="h-7 w-7 shrink-0" />
               </div>
             </div>
           ) : (
             <div className="mb-4 sm:mb-6 flex flex-col items-center gap-2">
-              <SidebarTrigger className="h-5 w-5" />
+              <SidebarTrigger className="h-7 w-7" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
