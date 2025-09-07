@@ -50,7 +50,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const { preferences } = useUserPreferences();
   const { workspace } = useWorkspace();
 
-  // Rich text editor
+  // Rich text editor for main content
   const editor = useEditor({
     extensions: [StarterKit],
     content: '',
@@ -64,6 +64,24 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       const cleanText = stripHtmlAndNormalize(htmlContent);
       setTextLength(cleanText.length);
       setHasUnsavedChanges(true);
+    },
+  });
+
+  // Rich text editor for original idea
+  const originalIdeaEditor = useEditor({
+    extensions: [StarterKit],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[120px] p-4 bg-blue-50/50 dark:bg-blue-950/50 text-blue-800 dark:text-blue-200',
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const htmlContent = editor.getHTML();
+      const cleanText = stripHtmlAndNormalize(htmlContent);
+      setEditedOriginalIdea(cleanText);
+      const storedContent = stripHtmlAndNormalize(prompt?.original_description || '');
+      setOriginalIdeaHasChanges(cleanText !== storedContent);
     },
   });
 
@@ -88,7 +106,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   // Auto-save hook with smart blur save
   const { clearDraft } = useAutoSave({
     key: prompt ? `prompt_${prompt.id}` : 'prompt_edit',
-    editor,
+    editor: originalIdeaEditor,
     isOpen: open,
     onRestore: (content) => {
       setDraftRestored(true);
@@ -100,9 +118,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
   // Reset form when prompt changes - always load original content first
   useEffect(() => {
-    if (prompt && editor && !editor.isDestroyed) {
-       // Always load the original user content (original_description) into the editor first
-       const editorContent = prompt.original_description || prompt.description || prompt.generated_prompt || `<p>${prompt.title}</p>`;
+    if (prompt && originalIdeaEditor && !originalIdeaEditor.isDestroyed) {
+       // Load the original user content into the original idea editor
+       const editorContent = prompt.original_description || prompt.description || `<p>${prompt.title}</p>`;
       
        console.log('PromptDetailDialog: Loading prompt content', {
          promptId: prompt.id,
@@ -114,20 +132,21 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
          originalDescriptionPreview: prompt.original_description?.substring(0, 100) || 'No original description',
          descriptionPreview: prompt.description?.substring(0, 100) || 'No description',
          originalContentLength: editorContent.length,
-         editorReady: !!editor,
-         editorDestroyed: editor.isDestroyed
+         editorReady: !!originalIdeaEditor,
+         editorDestroyed: originalIdeaEditor.isDestroyed
        });
       
        // Set content with a small delay to ensure editor is ready
        setOriginalHtml(editorContent);
        setTimeout(() => {
-         if (editor && !editor.isDestroyed) {
-           editor.commands.setContent(editorContent);
-           const afterText = editor.getText();
+         if (originalIdeaEditor && !originalIdeaEditor.isDestroyed) {
+           originalIdeaEditor.commands.setContent(editorContent);
+           const afterText = originalIdeaEditor.getText();
            console.log('PromptDetailDialog: after setContent text length', afterText?.length || 0);
            // Calculate initial text length from original content
            const cleanText = stripHtmlAndNormalize(editorContent);
            setTextLength(cleanText.length);
+           setEditedOriginalIdea(cleanText);
          }
        }, 10);
 
@@ -140,11 +159,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       setGeneratedPrompt(prompt.generated_prompt || '');
       
       // Initialize the editable original idea
-      const originalIdeaContent = prompt.original_description || '';
-      setEditedOriginalIdea(stripHtmlAndNormalize(originalIdeaContent));
       setOriginalIdeaHasChanges(false);
     }
-  }, [prompt, editor]);
+  }, [prompt, originalIdeaEditor]);
 
   const handleRegeneratePrompt = async () => {
     if (!editor || !prompt) return;
@@ -187,16 +204,17 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   const handleRegenerateFromOriginal = async () => {
     if (!prompt) return;
 
-    // Use the currently edited original idea if available, otherwise fallback to stored data
-    const sourceText = editedOriginalIdea.trim() || stripHtmlAndNormalize(prompt.original_description || '') || stripHtmlAndNormalize(prompt.description || '') || (editor ? stripHtmlAndNormalize(editor.getHTML()) : '');
+    // Use the currently edited original idea from the editor
+    const sourceText = originalIdeaEditor ? stripHtmlAndNormalize(originalIdeaEditor.getHTML()) : editedOriginalIdea.trim();
     if (!sourceText.trim()) return;
     
     setIsRegenerating(true);
     try {
       // Save the edited original idea if it has changes
-      if (originalIdeaHasChanges) {
+      if (originalIdeaHasChanges && originalIdeaEditor) {
+        const htmlContent = originalIdeaEditor.getHTML();
         await updatePrompt(prompt.id, {
-          original_description: editedOriginalIdea
+          original_description: htmlContent
         });
         setOriginalIdeaHasChanges(false);
       }
@@ -234,12 +252,13 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   };
 
   const handleSaveOriginalIdea = async () => {
-    if (!prompt || !originalIdeaHasChanges) return;
+    if (!prompt || !originalIdeaHasChanges || !originalIdeaEditor) return;
     
     setIsSavingOriginalIdea(true);
     try {
+      const htmlContent = originalIdeaEditor.getHTML();
       await updatePrompt(prompt.id, {
-        original_description: editedOriginalIdea
+        original_description: htmlContent
       });
       setOriginalIdeaHasChanges(false);
       toast({
@@ -259,16 +278,18 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   };
 
   const handleResetOriginalIdea = () => {
-    if (!prompt) return;
+    if (!prompt || !originalIdeaEditor) return;
     const resetContent = prompt.original_description || '';
+    originalIdeaEditor.commands.setContent(resetContent);
     setEditedOriginalIdea(stripHtmlAndNormalize(resetContent));
     setOriginalIdeaHasChanges(false);
   };
 
-  const handleOriginalIdeaChange = (value: string) => {
-    setEditedOriginalIdea(value);
+  const handleOriginalIdeaChange = (htmlContent: string) => {
+    const cleanText = stripHtmlAndNormalize(htmlContent);
+    setEditedOriginalIdea(cleanText);
     const storedContent = stripHtmlAndNormalize(prompt?.original_description || '');
-    setOriginalIdeaHasChanges(value !== storedContent);
+    setOriginalIdeaHasChanges(cleanText !== storedContent);
   };
 
   const handleOptimizePrompt = async () => {
@@ -335,9 +356,9 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
   };
 
   const handleSave = async () => {
-    if (!prompt || !editor) return;
+    if (!prompt || !originalIdeaEditor) return;
 
-    const content = editor.getHTML();
+    const content = originalIdeaEditor.getHTML();
     if (!content || content === '<p></p>') return;
 
     setSaving(true);
@@ -347,7 +368,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       
       await updatePrompt(prompt.id, {
         title: updatedTitle, // Auto-generated descriptive title
-        description: content,
+        original_description: content, // Save the rich content to original_description
         product_id: productId === 'none' ? null : productId,
         epic_id: epicId === 'none' ? null : epicId,
         priority,
@@ -356,6 +377,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
       // Clear draft and unsaved changes after successful save
       clearDraft();
       setHasUnsavedChanges(false);
+      setOriginalIdeaHasChanges(false);
       
       toast({
         title: 'Sauvegardé',
@@ -508,7 +530,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
                 <Separator />
 
-                {/* Editable Original Idea */}
+                {/* Editable Original Idea with Rich Editor */}
                 {(prompt.original_description?.trim() || editedOriginalIdea.trim()) && (
                   <>
                     <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -544,12 +566,77 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                           </Button>
                         </div>
                       </div>
-                      <Textarea
-                        value={editedOriginalIdea}
-                        onChange={(e) => handleOriginalIdeaChange(e.target.value)}
-                        placeholder="Enter your original idea here..."
-                        className="text-sm bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 placeholder:text-blue-600 dark:placeholder:text-blue-400 min-h-[80px] resize-none"
-                      />
+                      
+                      {/* Formatting toolbar for original idea */}
+                      <div className="flex items-center gap-1 p-2 border rounded-md bg-blue-100/50 dark:bg-blue-900/50 mb-3 overflow-x-auto">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleBold().run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('bold') ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <Bold className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleItalic().run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('italic') ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <Italic className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('heading', { level: 1 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <Heading1 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('heading', { level: 2 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <Heading2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('heading', { level: 3 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <Heading3 className="h-4 w-4" />
+                        </Button>
+                        <div className="w-px h-6 bg-border mx-2" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleBulletList().run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('bulletList') ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <List className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => originalIdeaEditor?.chain().focus().toggleOrderedList().run()}
+                          className={`h-8 w-8 p-0 ${originalIdeaEditor?.isActive('orderedList') ? 'bg-blue-200 dark:bg-blue-800' : ''}`}
+                        >
+                          <ListOrdered className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* Rich text editor for original idea */}
+                      <div className="border rounded-md bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 min-h-[120px]">
+                        <EditorContent 
+                          key={`original-editor-${prompt.id}-${prompt.updated_at || ''}`}
+                          editor={originalIdeaEditor}
+                          className="w-full prose prose-sm max-w-none focus-within:outline-none"
+                        />
+                      </div>
+                      
                       {originalIdeaHasChanges && (
                         <div className="flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400">
                           <AlertTriangle className="h-3 w-3" />
@@ -570,67 +657,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                     </AlertDescription>
                   </Alert>
                 )}
-
-                {/* Compact toolbar */}
-                <div className="flex items-center gap-1 p-2 border rounded-md bg-muted/30 overflow-x-auto">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-muted' : ''}`}
-                  >
-                    <Bold className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-muted' : ''}`}
-                  >
-                    <Italic className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                    className={`h-8 w-8 p-0 ${editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}`}
-                  >
-                    <Heading1 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-muted' : ''}`}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Editor with clear labeling */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                     <span className="text-xs text-muted-foreground">
-                       {!prompt.original_description && !prompt.description && !!prompt.generated_prompt 
-                         ? 'Displaying generated prompt (original idea empty)' 
-                         : 'Your original input'}
-                     </span>
-                  </div>
-                  <div className="border rounded-md min-h-[200px] bg-background">
-                    <EditorContent 
-                      key={`editor-${prompt.id}-${prompt.updated_at || ''}`}
-                      editor={editor}
-                      className="w-full p-4 prose prose-sm max-w-none focus-within:outline-none"
-                    />
-                    {editor.getText().trim().length === 0 && originalHtml && (
-                      <div className="p-4 border-t bg-muted/30">
-                        <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
-                        <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: originalHtml }} />
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 {/* Assignment - Stacked */}
                 <div className="space-y-4">
@@ -778,7 +804,7 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
 
             <Separator />
 
-            {/* Editable Original Idea */}
+            {/* Editable Original Idea with Rich Editor */}
             {(prompt.original_description?.trim() || editedOriginalIdea.trim()) && (
               <>
                 <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -814,12 +840,78 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                       </Button>
                     </div>
                   </div>
-                  <Textarea
-                    value={editedOriginalIdea}
-                    onChange={(e) => handleOriginalIdeaChange(e.target.value)}
-                    placeholder="Enter your original idea here..."
-                    className="text-sm bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 placeholder:text-blue-600 dark:placeholder:text-blue-400 min-h-[80px] resize-none"
-                  />
+                  
+                  {/* Formatting toolbar for original idea */}
+                  <div className="flex items-center gap-2 p-2 border rounded-md bg-blue-100/50 dark:bg-blue-900/50 mb-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                      className={originalIdeaEditor?.isActive('heading', { level: 1 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <Heading1 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                      className={originalIdeaEditor?.isActive('heading', { level: 2 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <Heading2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                      className={originalIdeaEditor?.isActive('heading', { level: 3 }) ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <Heading3 className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-border mx-2" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleBold().run()}
+                      className={originalIdeaEditor?.isActive('bold') ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleItalic().run()}
+                      className={originalIdeaEditor?.isActive('italic') ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <Italic className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-border mx-2" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleBulletList().run()}
+                      className={originalIdeaEditor?.isActive('bulletList') ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => originalIdeaEditor?.chain().focus().toggleOrderedList().run()}
+                      className={originalIdeaEditor?.isActive('orderedList') ? 'bg-blue-200 dark:bg-blue-800' : ''}
+                    >
+                      <ListOrdered className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Rich text editor for original idea */}
+                  <div className="border rounded-md bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 min-h-[120px] max-h-[400px] overflow-y-auto">
+                    <EditorContent 
+                      key={`desktop-original-editor-${prompt.id}-${prompt.updated_at || ''}`}
+                      editor={originalIdeaEditor}
+                      className="w-full prose prose-sm max-w-none focus-within:outline-none"
+                    />
+                  </div>
+                  
                   {originalIdeaHasChanges && (
                     <div className="flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400">
                       <AlertTriangle className="h-3 w-3" />
@@ -840,93 +932,6 @@ export function PromptDetailDialog({ prompt, open, onOpenChange, products, epics
                 </AlertDescription>
               </Alert>
             )}
-
-            {/* Formatting toolbar */}
-            <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                className={editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}
-              >
-                <Heading1 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
-              >
-                <Heading2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                className={editor.isActive('heading', { level: 3 }) ? 'bg-muted' : ''}
-              >
-                <Heading3 className="h-4 w-4" />
-              </Button>
-              <div className="w-px h-6 bg-border mx-2" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                className={editor.isActive('bold') ? 'bg-muted' : ''}
-              >
-                <Bold className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                className={editor.isActive('italic') ? 'bg-muted' : ''}
-              >
-                <Italic className="h-4 w-4" />
-              </Button>
-              <div className="w-px h-6 bg-border mx-2" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleBulletList().run()}
-                className={editor.isActive('bulletList') ? 'bg-muted' : ''}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                className={editor.isActive('orderedList') ? 'bg-muted' : ''}
-              >
-                <ListOrdered className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Rich text editor with clear labeling */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-foreground">Idea/Description</Label>
-                 <span className="text-xs text-muted-foreground">
-                   {!prompt.original_description && !prompt.description && !!prompt.generated_prompt 
-                     ? 'Displaying generated prompt (original idea empty)' 
-                     : 'Your original input'}
-                 </span>
-              </div>
-              <div className="border rounded-md bg-background flex-1 overflow-y-auto max-h-[400px]">
-                <EditorContent 
-                  key={`editor-${prompt.id}-${prompt.updated_at || ''}`}
-                  editor={editor}
-                  className="w-full p-4 prose prose-sm max-w-none focus-within:outline-none"
-                />
-                {editor.getText().trim().length === 0 && originalHtml && (
-                  <div className="p-4 border-t bg-muted/30">
-                    <div className="text-xs text-muted-foreground mb-2">Showing original input</div>
-                    <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: originalHtml }} />
-                  </div>
-                )}
-              </div>
-            </div>
 
             {/* Product, Epic and Priority assignment */}
             <div className="grid grid-cols-3 gap-4">
