@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { hasPromptEnhancerAccess } from '@/utils/accessControl';
-import { AdminUserIdDisplay } from '@/components/AdminUserIdDisplay';
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
@@ -174,9 +173,6 @@ export function UserAccountSection() {
               </div>
             </div>
           </div>
-
-          {/* Admin User ID Display - Only show for debugging */}
-          <AdminUserIdDisplay />
 
           <DropdownMenuSeparator />
 
