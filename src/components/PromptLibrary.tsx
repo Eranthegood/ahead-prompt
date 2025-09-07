@@ -35,6 +35,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PromptLibraryItem | null>(null);
+  const [viewingItem, setViewingItem] = useState<PromptLibraryItem | null>(null);
   const { toast } = useToast();
 
   // Add keyboard shortcut for creating prompt when library is open
@@ -201,7 +202,7 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
                     <div
                       key={item.id}
                       className="group flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted/30 transition-all duration-150 cursor-pointer"
-                      onClick={() => setSelectedItem(item)}
+                      onClick={() => setViewingItem(item)}
                     >
                       {/* Icon */}
                       <div className="w-8 h-8 rounded-md bg-muted/50 flex items-center justify-center flex-shrink-0">
@@ -314,6 +315,78 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
         editItem={selectedItem}
         onEditComplete={() => setSelectedItem(null)}
       />
+
+      {/* View Dialog */}
+      <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
+        <DialogContent className="max-w-3xl h-[80vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-lg font-medium">
+              {viewingItem?.title}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="space-y-4">
+              {/* Tags */}
+              {viewingItem?.tags && viewingItem.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {viewingItem.tags.map(tag => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              
+              {/* Content */}
+              <div className="prose prose-sm max-w-none">
+                <div className="whitespace-pre-wrap text-foreground leading-relaxed">
+                  {viewingItem?.body}
+                </div>
+              </div>
+              
+              {/* Meta info */}
+              <div className="pt-4 border-t border-border/20">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Category: {viewingItem?.category}</span>
+                  <span>Used {viewingItem?.usage_count || 0} times</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t bg-muted/10">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (viewingItem) toggleFavorite(viewingItem.id);
+                }}
+                className="gap-2"
+              >
+                {viewingItem?.is_favorite ? (
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ) : (
+                  <Star className="w-4 h-4" />
+                )}
+                {viewingItem?.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  if (viewingItem) handleCopyPrompt(viewingItem);
+                }}
+                className="gap-2"
+              >
+                <Copy className="w-4 h-4" />
+                Copy to Clipboard
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
