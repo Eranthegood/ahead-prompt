@@ -111,15 +111,20 @@ export function TruncatedTitle({
   if (variant === 'inline') {
     return (
       <div className={cn("relative flex items-center gap-2", className)}>
-        <span>{truncatedTitle}</span>
+        {/* Show full title on medium screens and up, truncated on smaller screens */}
+        <span className="md:hidden">{truncatedTitle}</span>
+        <span className="hidden md:inline">{title}</span>
+        
+        {/* Only show "see more" button on smaller screens where truncation happens */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsDialogOpen(true)}
-          className="h-6 px-2 text-xs text-primary hover:text-primary-glow"
+          className="h-6 px-2 text-xs text-primary hover:text-primary-glow md:hidden"
         >
           see more
         </Button>
+        
         {showCopyButton && (
           <Button
             variant="ghost"
@@ -160,18 +165,23 @@ export function TruncatedTitle({
     );
   }
 
-  // Default modal variant
+  // Default modal variant with responsive behavior
   return (
     <div className={cn("relative flex items-center gap-2", className)}>
-      <span>{truncatedTitle}</span>
+      {/* Show full title on medium screens and up, truncated on smaller screens */}
+      <span className="md:hidden">{truncatedTitle}</span>
+      <span className="hidden md:inline">{title}</span>
+      
+      {/* Only show "see more" button on smaller screens where truncation happens */}
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setIsDialogOpen(true)}
-        className="h-6 px-2 text-xs text-primary hover:text-primary-glow"
+        className="h-6 px-2 text-xs text-primary hover:text-primary-glow md:hidden"
       >
         see more
       </Button>
+      
       {showCopyButton && (
         <Button
           variant="ghost"
@@ -184,7 +194,7 @@ export function TruncatedTitle({
       )}
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
