@@ -214,8 +214,12 @@ export function PromptDetailDialog({
       });
     } finally {
       setIsRegenerating(false);
-    }
-  };
+      // Then optimize
+      await AIAgentManager.executePromptOptimization(prompt.id, workspace.id);
+      toast({
+        title: 'Prompt optimisé',
+        description: 'Votre prompt a été amélioré par l\'IA avec un titre plus descriptif et une meilleure structure.',
+      });
   const handleOptimizePrompt = async () => {
     if (!workspace || !prompt || !editor) {
       toast({
@@ -246,7 +250,7 @@ export function PromptDetailDialog({
       await AIAgentManager.executePromptOptimization(prompt.id, workspace.id);
       toast({
         title: 'Prompt optimisé',
-        description: 'Votre prompt a été amélioré par l\'IA. Rechargez pour voir les modifications.'
+        description: 'Votre prompt a été amélioré par l\'IA avec un titre plus descriptif et une meilleure structure.',
       });
     } catch (error) {
       console.error('Erreur lors de l\'optimisation:', error);
@@ -736,5 +740,6 @@ export function PromptDetailDialog({
           </div>
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 }

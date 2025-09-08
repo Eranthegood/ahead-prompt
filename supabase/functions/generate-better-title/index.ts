@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { rawIdea, knowledgeContext, provider = 'openai', model } = await req.json();
+    const { title, description, provider = 'openai', model } = await req.json();
     
     // Validate required API keys based on provider
     if (provider === 'openai') {
@@ -28,9 +28,9 @@ serve(async (req) => {
       }
     }
 
-    if (!rawIdea || typeof rawIdea !== 'string' || rawIdea.trim().length === 0) {
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return new Response(
-        JSON.stringify({ error: 'rawIdea is required and must be a non-empty string' }), 
+        JSON.stringify({ error: 'title is required and must be a non-empty string' }), 
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -38,65 +38,39 @@ serve(async (req) => {
       );
     }
 
-    console.log('Transforming prompt for idea:', rawIdea, 'using provider:', provider);
-    if (knowledgeContext) {
-      console.log('Including knowledge context:', knowledgeContext.length, 'items');
-    }
+    console.log('Generating better title for:', title, 'using provider:', provider);
 
-    // Build context-aware system prompt
-    let systemPrompt = `You are an expert in creating high-quality prompts for Lovable development platform. Transform the raw idea into a structured, professional prompt following these guidelines:
+    // Build title-focused system prompt
+    const systemPrompt = `You are an expert UX copywriter and prompt engineer specializing in creating compelling, descriptive titles for development prompts.
 
-TITLE CREATION (Critical):
-- Create a compelling, specific title under 60 characters
-- Use action-oriented language describing the key functionality
-- Avoid generic terms like "system", "app", "feature" 
-- Focus on user benefits and specific capabilities
-- Examples: "Real-time Chat with File Sharing" instead of "Chat System"
+TITLE CREATION PRINCIPLES:
+- Maximum 60 characters for optimal readability
+- Use action-oriented, specific language 
+- Avoid generic terms like "system", "app", "feature", "component"
+- Focus on primary functionality and user benefits
+- Use active voice and power words
+- Be specific about what the prompt achieves
 
-CONTENT STRUCTURE (CLEAR Framework):
-- Concise (150 words max for main content)
-- Logical (implementation order)
-- Explicit (specific technologies when relevant)
-- Adaptive (suggested MVP approach)
-- Reflective (measurable criteria)
+EXAMPLES OF GOOD TRANSFORMATIONS:
+❌ "Login System" → ✅ "Secure JWT Authentication with Password Reset"
+❌ "Chat Feature" → ✅ "Real-time Chat with File Sharing & Typing Indicators"  
+❌ "Dashboard App" → ✅ "Analytics Dashboard with Interactive Charts"
+❌ "Payment Component" → ✅ "Stripe Integration with Subscription Management"
+❌ "Search Function" → ✅ "Advanced Search with Filters & Auto-complete"
+❌ "User Profile" → ✅ "Editable User Profile with Avatar Upload"
 
-FORMAT REQUIREMENTS:
-- Start with compelling title
-- Use clear markdown structure
-- Include specific requirements and acceptance criteria
-- Add technical context when relevant
-- End with MVP suggestions
+Generate 3 alternative titles based on the original title and description. Return them as a JSON array with the best option first.
 
-Respond ONLY with the transformed prompt in this exact format:
-# [Compelling Title Here]
+Respond ONLY with valid JSON in this exact format:
+{
+  "titles": [
+    "Best title option (most specific and compelling)",
+    "Alternative title option 2", 
+    "Alternative title option 3"
+  ]
+}`;
 
-[Clear description of functionality and requirements]
-
-## Key Features
-- [Specific feature 1]
-- [Specific feature 2]
-- [Specific feature 3]
-
-## Technical Requirements
-- [Technical detail 1]
-- [Technical detail 2]
-
-## MVP Approach
-[Suggested starting point for development]`;
-
-    // Add knowledge context if provided
-    if (knowledgeContext && Array.isArray(knowledgeContext) && knowledgeContext.length > 0) {
-      systemPrompt += `\n\nAVAILABLE PROJECT CONTEXT (integrate in response if relevant):`;
-      knowledgeContext.forEach((item, index) => {
-        systemPrompt += `\n\n${index + 1}. ${item.title} (${item.category}):\n${item.content}`;
-        if (item.tags && item.tags.length > 0) {
-          systemPrompt += `\nTags: ${item.tags.join(', ')}`;
-        }
-      });
-      systemPrompt += `\n\nUse this information to enrich and personalize the prompt according to the project context.`;
-    }
-
-    let transformedPrompt: string;
+    let generatedTitles: string;
 
     if (provider === 'claude') {
       const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
@@ -111,11 +85,11 @@ Respond ONLY with the transformed prompt in this exact format:
         },
         body: JSON.stringify({
           model: claudeModel,
-          max_tokens: 800,
+          max_tokens: 300,
           messages: [
             {
               role: 'user',
-              content: `${systemPrompt}\n\nUser request: ${rawIdea}`
+              content: `${systemPrompt}\n\nOriginal Title: ${title}\nDescription: ${description || 'No description provided'}`
             }
           ],
         }),
@@ -128,7 +102,7 @@ Respond ONLY with the transformed prompt in this exact format:
       }
 
       const data = await response.json();
-      transformedPrompt = data.content[0].text;
+      generatedTitles = data.content[0].text;
     } else {
       // OpenAI provider
       const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
@@ -144,10 +118,11 @@ Respond ONLY with the transformed prompt in this exact format:
           model: openaiModel,
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: rawIdea }
+            { role: 'user', content: `Original Title: ${title}\nDescription: ${description || 'No description provided'}` }
           ],
-          max_tokens: 800,
+          max_tokens: 300,
           temperature: 0.7,
+          response_format: { type: "json_object" }
         }),
       });
 
@@ -158,20 +133,29 @@ Respond ONLY with the transformed prompt in this exact format:
       }
 
       const data = await response.json();
-      transformedPrompt = data.choices[0].message.content;
+      generatedTitles = data.choices[0].message.content;
     }
 
-    console.log('Successfully transformed prompt using provider:', provider);
+    console.log('Successfully generated titles using provider:', provider);
+
+    // Parse the response to ensure it's valid JSON
+    let parsedTitles;
+    try {
+      parsedTitles = JSON.parse(generatedTitles);
+    } catch (parseError) {
+      console.error('Failed to parse titles response as JSON:', generatedTitles);
+      throw new Error('Invalid response format from AI');
+    }
 
     return new Response(
-      JSON.stringify({ transformedPrompt }), 
+      JSON.stringify(parsedTitles), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
 
   } catch (error) {
-    console.error('Error in transform-prompt function:', error);
+    console.error('Error in generate-better-title function:', error);
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Unknown error occurred' 
