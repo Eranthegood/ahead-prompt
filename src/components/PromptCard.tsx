@@ -255,10 +255,10 @@ export function PromptCard({
                     </SelectContent>
                   </Select>
 
-                  {/* Title */}
+                  {/* Enhanced Title with responsive length */}
                   <TruncatedTitle 
                     title={prompt.title}
-                    maxLength={35}
+                    maxLength={window.innerWidth >= 768 ? 80 : 45}
                     className="font-medium text-foreground text-sm"
                     showCopyButton={false}
                     variant="inline"
@@ -294,6 +294,27 @@ export function PromptCard({
                   </Select>
                 )}
               </div>
+
+              {/* Description Preview - Show on medium screens and up */}
+              {prompt.description && (
+                <div className="hidden md:block">
+                  <div 
+                    className="text-sm text-muted-foreground leading-relaxed pl-7"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      maxHeight: '2.4rem'
+                    }}
+                    dangerouslySetInnerHTML={{ 
+                      __html: prompt.description.length > 120 
+                        ? `${prompt.description.substring(0, 120)}...` 
+                        : prompt.description 
+                    }}
+                  />
+                </div>
+              )}
               
               {/* Context Row */}
               <div className="flex items-center justify-between">
@@ -310,6 +331,12 @@ export function PromptCard({
                       <Hash className="h-2.5 w-2.5 mr-1" />
                       {prompt.epic.name}
                     </Badge>
+                  )}
+                  {/* Show creation date if no product/epic context */}
+                  {!prompt.product && !prompt.epic && (
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(prompt.created_at), 'MMM d')}
+                    </span>
                   )}
                 </div>
                 
