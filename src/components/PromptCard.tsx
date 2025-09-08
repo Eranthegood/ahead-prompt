@@ -219,48 +219,31 @@ export function PromptCard({
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
         >
-          <CardContent className="p-3 sm:p-4">
-            {/* Main Click Area */}
-            <div 
-              className="space-y-3"
-              onClick={() => onPromptClick(prompt)}
-            >
-              {/* Header Row */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <TruncatedTitle 
-                    title={prompt.title}
-                    maxLength={45}
-                    className="font-medium text-foreground text-sm leading-tight"
-                    showCopyButton={false}
-                    variant="inline"
-                  />
-                </div>
-                
-                {/* Priority & Status Indicators */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Priority Dropdown */}
+          <CardContent className="p-2 sm:p-3">
+            {/* Minimalist Layout */}
+            <div className="space-y-2" onClick={() => onPromptClick(prompt)}>
+              {/* Compact Header */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {/* Priority Indicator */}
                   <Select
                     value={priority.toString()}
-                    onValueChange={(value: string) => {
-                      onPriorityChange(prompt, parseInt(value));
-                    }}
+                    onValueChange={(value: string) => onPriorityChange(prompt, parseInt(value))}
                   >
                     <SelectTrigger 
-                      className="w-auto h-6 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
+                      className="w-auto h-5 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
                       onPointerDown={stopEventPropagation}
                       onClick={stopEventPropagation}
-                      onTouchStart={stopEventPropagation}
                     >
                       <SelectValue asChild>
-                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} cursor-pointer hover:scale-105 transition-all duration-200`}>
-                          <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
+                        <div className={`flex items-center justify-center h-5 w-5 rounded-full ${priorityDisplay.bgColor}`}>
+                          <PriorityIcon className={`h-2.5 w-2.5 ${priorityDisplay.color}`} />
                         </div>
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-popover/95 backdrop-blur-sm border-border/40">
+                    <SelectContent>
                       {PRIORITY_OPTIONS.map(option => (
-                        <SelectItem key={option.value} value={option.value.toString()} className="text-sm">
+                        <SelectItem key={option.value} value={option.value.toString()}>
                           <div className="flex items-center gap-2">
                             {option.value === 1 && <Flame className="h-3 w-3 text-destructive" />}
                             {option.value === 2 && <Minus className="h-3 w-3 text-orange-500" />}
@@ -271,103 +254,72 @@ export function PromptCard({
                       ))}
                     </SelectContent>
                   </Select>
-                  
-                  {/* Working Indicator */}
+
+                  {/* Title */}
+                  <TruncatedTitle 
+                    title={prompt.title}
+                    maxLength={35}
+                    className="font-medium text-foreground text-sm"
+                    showCopyButton={false}
+                    variant="inline"
+                  />
+                </div>
+                
+                {/* Status Badge */}
+                {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
+                  <Badge variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'} className="text-xs px-2 py-0.5">
+                    {`${statusDisplay.label}${liveStatus?.progress != null ? ` ${liveStatus.progress}%` : ''}`}
+                  </Badge>
+                ) : (
+                  <Select value={prompt.status} onValueChange={(value: PromptStatus) => handleStatusChange(value)}>
+                    <SelectTrigger 
+                      className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/30 [&>svg]:hidden"
+                      onPointerDown={stopEventPropagation}
+                      onClick={stopEventPropagation}
+                    >
+                      <SelectValue asChild>
+                        <Badge 
+                          variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'}
+                          className="text-xs px-2 py-0.5 cursor-pointer"
+                        >
+                          {prompt.status === 'in_progress' ? 'In Progress' : prompt.status === 'done' ? 'Done' : 'Todo'}
+                        </Badge>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todo">Todo</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+              
+              {/* Context Row */}
+              <div className="flex items-center justify-between">
+                {/* Product/Epic Tags */}
+                <div className="flex items-center gap-1.5">
+                  {prompt.product && (
+                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 font-normal">
+                      <Package className="h-2.5 w-2.5 mr-1" />
+                      {prompt.product.name}
+                    </Badge>
+                  )}
+                  {prompt.epic && (
+                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 font-normal">
+                      <Hash className="h-2.5 w-2.5 mr-1" />
+                      {prompt.epic.name}
+                    </Badge>
+                  )}
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex items-center gap-1">
                   {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
                     <AgentWorkingIndicator size="sm" />
                   )}
                   
-                  {/* Status Dropdown */}
-                  {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
-                    <Badge 
-                      variant={
-                        prompt.status === 'done' ? 'success' : 
-                        prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                      }
-                      className="text-xs px-2 py-1"
-                    >
-                      {`${statusDisplay.label}${liveStatus?.progress != null ? ` • ${liveStatus.progress}%` : ''}`}
-                    </Badge>
-                  ) : (
-                    <Select
-                      value={prompt.status}
-                      onValueChange={(value: PromptStatus) => {
-                        handleStatusChange(value);
-                      }}
-                    >
-                      <SelectTrigger 
-                        className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
-                        onPointerDown={stopEventPropagation}
-                        onClick={stopEventPropagation}
-                        onTouchStart={stopEventPropagation}
-                      >
-                        <SelectValue asChild>
-                          <Badge 
-                            variant={
-                              prompt.status === 'done' ? 'success' : 
-                              prompt.status === 'in_progress' ? 'secondary' : 'outline'
-                            }
-                            className="text-xs px-2 py-1 cursor-pointer hover:bg-opacity-80 transition-all duration-200"
-                          >
-                            {prompt.status === 'in_progress' ? 'In Progress' : 
-                             prompt.status === 'done' ? 'Done' : 'Todo'}
-                          </Badge>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover/95 backdrop-blur-sm border-border/40">
-                        <SelectItem value="todo" className="text-sm">Todo</SelectItem>
-                        <SelectItem value="in_progress" className="text-sm">In Progress</SelectItem>
-                        <SelectItem value="done" className="text-sm">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-              </div>
-              
-              {/* Content Preview */}
-              {prompt.description ? (
-                <div 
-                  className="text-sm text-muted-foreground leading-relaxed overflow-hidden"
-                  style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    maxHeight: '2.5rem'
-                  }}
-                  dangerouslySetInnerHTML={{ __html: prompt.description }}
-                />
-              ) : (
-                <div className="text-sm text-muted-foreground italic opacity-60">
-                  No description
-                </div>
-              )}
-              
-              {/* Context Tags - Mobile Optimized */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {(prompt.product || prompt.epic) ? (
-                    <div className="flex items-center gap-2">
-                      {prompt.product && (
-                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                          {prompt.product.name}
-                        </Badge>
-                      )}
-                      {prompt.epic && (
-                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                          #{prompt.epic.name}
-                        </Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">
-                      {format(new Date(prompt.created_at), 'MMM d')}
-                    </span>
-                  )}
-                </div>
-                
-                {/* Quick Actions */}
-                <div className="flex items-center gap-1">
-                  {/* Quick Copy */}
+                  {/* Copy Button */}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -376,17 +328,12 @@ export function PromptCard({
                       handleCopy();
                     }}
                     disabled={!isUsable}
-                    className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Copy prompt"
+                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    {justCopied ? (
-                      <Check className="h-3.5 w-3.5 text-green-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
+                    {justCopied ? <Check className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
                   </Button>
                   
-                   {/* Send to Cursor */}
+                  {/* Cursor Button */}
                   {prompt.product?.github_repo_url && (
                     <Button
                       variant="ghost"
@@ -397,173 +344,36 @@ export function PromptCard({
                         setShowCursorDialog(true);
                       }}
                       disabled={!isUsable}
-                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-purple-600 hover:text-purple-700"
-                      aria-label="Send to Cursor"
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-purple-600"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <ExternalLink className="h-3 w-3" />
                     </Button>
                   )}
-                  
-                  {/* Merge PR - Only shown for prompts with completed PRs */}
-                  {prompt.github_pr_url && prompt.status === 'pr_ready' && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await mergePullRequest(prompt.github_pr_url!);
-                          toast({
-                            title: 'PR Merged',
-                            description: 'Pull request has been merged successfully'
-                          });
-                        } catch (error) {
-                          toast({
-                            title: 'Merge Failed',
-                            description: 'Failed to merge the pull request',
-                            variant: 'destructive'
-                          });
-                        }
-                      }}
-                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-700"
-                      aria-label="Merge PR"
-                    >
-                      <GitMerge className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                  
-                  {/* More Actions */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label="More actions"
-                      >
-                        <MoreHorizontal className="h-3.5 w-3.5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        onEdit(prompt);
-                      }} className="flex items-center gap-2">
-                        <Edit className="h-4 w-4" />
-                        Edit prompt
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem onClick={() => onCopy(prompt)} className="flex items-center gap-2">
-                        <Copy className="h-4 w-4" />
-                        Copy content
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onCopyGenerated(prompt);
-                      }} className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4" />
-                        Copy generated prompt
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleOptimizePrompt();
-                      }} className="flex items-center gap-2" disabled={isOptimizing || !prompt.description?.trim()}>
-                        <Zap className="h-4 w-4" />
-                        {isOptimizing ? 'Optimisation...' : 'Optimiser avec IA'}
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        onDuplicate(prompt);
-                      }} className="flex items-center gap-2">
-                        <Copy className="h-4 w-4" />
-                        Duplicate
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuSeparator />
-                      
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="flex items-center gap-2">
-                          <Flame className="h-4 w-4" />
-                          Change priority
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="w-48">
-                          {PRIORITY_OPTIONS.map((option) => (
-                            <DropdownMenuItem
-                              key={option.value}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                onPriorityChange(prompt, option.value);
-                              }}
-                              disabled={option.value === priority}
-                              className="flex items-center justify-between"
-                            >
-                              <span>{option.label}</span>
-                              <Badge variant={option.variant} className="text-xs">
-                                {option.value === priority ? 'Current' : ''}
-                              </Badge>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      
-                      <DropdownMenuSeparator />
-                      
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowCursorDialog(true);
-                        }}
-                        disabled={!prompt.description && !prompt.generated_prompt}
-                        className="flex items-center gap-2"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Send to Cursor
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuSeparator />
-                      
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onDelete(prompt);
-                        }}
-                        className="flex items-center gap-2 text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Delete prompt
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
               </div>
             </div>
 
-            {/* Cursor Workflow Progress - Always visible when active */}
-            <CursorWorkflowProgress
-              status={prompt.status}
-              cursorAgentId={prompt.cursor_agent_id}
-              cursorAgentStatus={prompt.cursor_agent_status}
-              githubPrUrl={prompt.github_pr_url}
-              githubPrNumber={prompt.github_pr_number}
-              cursorBranchName={prompt.cursor_branch_name}
-              error={prompt.status === 'error' ? (prompt.cursor_logs as any)?.error || 'Unknown error' : undefined}
-              onViewAgent={() => setShowAgentModal(true)}
-              onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
-              onMergePR={() => {
-                toast({
-                  title: 'Merge PR',
-                  description: 'PR merge functionality coming soon!',
-                });
-              }}
-              onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
-            />
+            {/* Cursor Workflow Progress - Compact when active */}
+            {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) && (
+              <CursorWorkflowProgress
+                status={prompt.status}
+                cursorAgentId={prompt.cursor_agent_id}
+                cursorAgentStatus={prompt.cursor_agent_status}
+                githubPrUrl={prompt.github_pr_url}
+                githubPrNumber={prompt.github_pr_number}
+                cursorBranchName={prompt.cursor_branch_name}
+                error={prompt.status === 'error' ? (prompt.cursor_logs as any)?.error || 'Unknown error' : undefined}
+                onViewAgent={() => setShowAgentModal(true)}
+                onViewPR={() => prompt.github_pr_url && window.open(prompt.github_pr_url, '_blank')}
+                onMergePR={() => {
+                  toast({
+                    title: 'Merge PR',
+                    description: 'PR merge functionality coming soon!',
+                  });
+                }}
+                onCancel={() => cancelAgent(prompt.cursor_agent_id!)}
+              />
+            )}
           </CardContent>
         </Card>
       </PromptContextMenu>
