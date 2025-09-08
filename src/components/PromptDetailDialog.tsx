@@ -91,7 +91,7 @@ export function PromptDetailDialog({
     key: prompt ? `prompt-${prompt.id}` : '',
     editor: editor,
     isOpen: open,
-    onBlur: handleBlurSave
+    onBlurSave: handleBlurSave
   });
 
   // Load prompt data when prompt changes
