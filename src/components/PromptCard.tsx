@@ -219,10 +219,10 @@ export function PromptCard({
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
         >
-          <CardContent className="p-2 sm:p-3">
-            {/* Minimalist Layout */}
-            <div className="space-y-2" onClick={() => onPromptClick(prompt)}>
-              {/* Compact Header */}
+          <CardContent className="p-1.5 sm:p-2">
+            {/* Ultra Minimalist Layout */}
+            <div className="space-y-1" onClick={() => onPromptClick(prompt)}>
+              {/* Single Row Layout */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   {/* Priority Indicator */}
@@ -231,13 +231,13 @@ export function PromptCard({
                     onValueChange={(value: string) => onPriorityChange(prompt, parseInt(value))}
                   >
                     <SelectTrigger 
-                      className="w-auto h-5 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
+                      className="w-auto h-4 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
                       onPointerDown={stopEventPropagation}
                       onClick={stopEventPropagation}
                     >
                       <SelectValue asChild>
-                        <div className={`flex items-center justify-center h-5 w-5 rounded-full ${priorityDisplay.bgColor}`}>
-                          <PriorityIcon className={`h-2.5 w-2.5 ${priorityDisplay.color}`} />
+                        <div className={`flex items-center justify-center h-4 w-4 rounded-full ${priorityDisplay.bgColor}`}>
+                          <PriorityIcon className={`h-2 w-2 ${priorityDisplay.color}`} />
                         </div>
                       </SelectValue>
                     </SelectTrigger>
@@ -255,98 +255,35 @@ export function PromptCard({
                     </SelectContent>
                   </Select>
 
-                  {/* Enhanced Title with responsive length */}
+                  {/* Compact Title */}
                   <TruncatedTitle 
                     title={prompt.title}
-                    maxLength={window.innerWidth >= 768 ? 80 : 45}
+                    maxLength={window.innerWidth >= 768 ? 60 : 35}
                     className="font-medium text-foreground text-sm"
                     showCopyButton={false}
                     variant="inline"
                   />
-                </div>
-                
-                {/* Status Badge */}
-                {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
-                  <Badge variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'} className="text-xs px-2 py-0.5">
-                    {`${statusDisplay.label}${liveStatus?.progress != null ? ` ${liveStatus.progress}%` : ''}`}
-                  </Badge>
-                ) : (
-                  <Select value={prompt.status} onValueChange={(value: PromptStatus) => handleStatusChange(value)}>
-                    <SelectTrigger 
-                      className="w-auto h-6 text-xs border-none bg-transparent p-0 hover:bg-accent/30 [&>svg]:hidden"
-                      onPointerDown={stopEventPropagation}
-                      onClick={stopEventPropagation}
-                    >
-                      <SelectValue asChild>
-                        <Badge 
-                          variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'}
-                          className="text-xs px-2 py-0.5 cursor-pointer"
-                        >
-                          {prompt.status === 'in_progress' ? 'In Progress' : prompt.status === 'done' ? 'Done' : 'Todo'}
-                        </Badge>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todo">Todo</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Description Preview - Show on medium screens and up */}
-              {prompt.description && (
-                <div className="hidden md:block">
-                  <div 
-                    className="text-sm text-muted-foreground leading-relaxed pl-7"
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      maxHeight: '2.4rem'
-                    }}
-                    dangerouslySetInnerHTML={{ 
-                      __html: prompt.description.length > 120 
-                        ? `${prompt.description.substring(0, 120)}...` 
-                        : prompt.description 
-                    }}
-                  />
-                </div>
-              )}
-              
-              {/* Context Row */}
-              <div className="flex items-center justify-between">
-                {/* Product/Epic Tags */}
-                <div className="flex items-center gap-1.5">
+                  
+                  {/* Context Badges - Inline */}
                   {prompt.product && (
-                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 font-normal">
-                      <Package className="h-2.5 w-2.5 mr-1" />
+                    <Badge variant="outline" className="text-xs px-1 py-0 font-normal opacity-60">
                       {prompt.product.name}
                     </Badge>
                   )}
                   {prompt.epic && (
-                    <Badge variant="outline" className="text-xs px-1.5 py-0.5 font-normal">
-                      <Hash className="h-2.5 w-2.5 mr-1" />
+                    <Badge variant="outline" className="text-xs px-1 py-0 font-normal opacity-60">
                       {prompt.epic.name}
                     </Badge>
                   )}
-                  {/* Show creation date if no product/epic context */}
-                  {!prompt.product && !prompt.epic && (
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(prompt.created_at), 'MMM d')}
-                    </span>
-                  )}
                 </div>
                 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-1">
+                {/* Right Side Actions */}
+                <div className="flex items-center gap-1.5">
                   {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
                     <AgentWorkingIndicator size="sm" />
                   )}
                   
-                  {/* Copy Button */}
+                  {/* Copy Button - Always Visible */}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -355,9 +292,9 @@ export function PromptCard({
                       handleCopy();
                     }}
                     disabled={!isUsable}
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-5 w-5 p-0 hover:bg-accent/50"
                   >
-                    {justCopied ? <Check className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+                    {justCopied ? <Check className="h-2.5 w-2.5 text-green-600" /> : <Copy className="h-2.5 w-2.5" />}
                   </Button>
                   
                   {/* Cursor Button */}
@@ -371,10 +308,39 @@ export function PromptCard({
                         setShowCursorDialog(true);
                       }}
                       disabled={!isUsable}
-                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-purple-600"
+                      className="h-5 w-5 p-0 hover:bg-accent/50 text-purple-600"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-2.5 w-2.5" />
                     </Button>
+                  )}
+                  
+                  {/* Status Badge */}
+                  {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
+                    <Badge variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'} className="text-xs px-1.5 py-0">
+                      {`${statusDisplay.label}${liveStatus?.progress != null ? ` ${liveStatus.progress}%` : ''}`}
+                    </Badge>
+                  ) : (
+                    <Select value={prompt.status} onValueChange={(value: PromptStatus) => handleStatusChange(value)}>
+                      <SelectTrigger 
+                        className="w-auto h-5 text-xs border-none bg-transparent p-0 hover:bg-accent/30 [&>svg]:hidden"
+                        onPointerDown={stopEventPropagation}
+                        onClick={stopEventPropagation}
+                      >
+                        <SelectValue asChild>
+                          <Badge 
+                            variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'}
+                            className="text-xs px-1.5 py-0 cursor-pointer"
+                          >
+                            {prompt.status === 'in_progress' ? 'In Progress' : prompt.status === 'done' ? 'Done' : 'Todo'}
+                          </Badge>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">Todo</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
               </div>
