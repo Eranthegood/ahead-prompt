@@ -521,7 +521,7 @@ export function PromptDetailDialog({
                   </div>
                 </div>
                 <div className="border rounded-md bg-muted/20 p-4 max-h-[300px] overflow-y-auto">
-                  <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{
+                  <div className="font-apple-system text-sm leading-relaxed" dangerouslySetInnerHTML={{
                 __html: generatedPrompt || 'No prompt generated. Use the button above to generate a prompt based on your content.'
               }} />
                 </div>
@@ -724,9 +724,9 @@ export function PromptDetailDialog({
                 <div className="absolute top-0 right-0 text-xs text-muted-foreground bg-muted-foreground/10 px-2 py-1 rounded-bl text-mono">
                   AI Prompt
                 </div>
-                <pre className="font-mono text-sm text-foreground whitespace-pre-wrap leading-relaxed pt-6">
+                <div className="font-apple-system text-sm text-foreground whitespace-pre-wrap leading-relaxed pt-6">
                   {generatedPrompt ? generatedPrompt.replace(/<[^>]*>/g, '') : 'No prompt generated. Click the button to generate a prompt based on your content.'}
-                </pre>
+                </div>
               </div>
             </div>
             
