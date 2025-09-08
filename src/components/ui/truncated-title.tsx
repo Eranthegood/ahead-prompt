@@ -132,7 +132,7 @@ export function TruncatedTitle({
         )}
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Eye className="h-4 w-4" />
