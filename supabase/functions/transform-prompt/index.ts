@@ -44,45 +44,18 @@ serve(async (req) => {
     }
 
     // Build context-aware system prompt
-    let systemPrompt = `You are an expert in creating high-quality prompts for Lovable development platform. Transform the raw idea into a structured, professional prompt following these guidelines:
+    let systemPrompt = `You are an expert in creating prompts for Lovable. Transform the raw idea into a structured prompt following the CLEAR framework:
 
-TITLE CREATION (Critical):
-- Create a compelling, specific title under 60 characters
-- Use action-oriented language describing the key functionality
-- Avoid generic terms like "system", "app", "feature" 
-- Focus on user benefits and specific capabilities
-- Examples: "Real-time Chat with File Sharing" instead of "Chat System"
+Concise (150 words max), Logical (implementation order), Explicit (specific technologies), Adaptive (suggested MVP), Reflective (measurable criteria).
 
-CONTENT STRUCTURE (CLEAR Framework):
-- Concise (150 words max for main content)
-- Logical (implementation order)
-- Explicit (specific technologies when relevant)
-- Adaptive (suggested MVP approach)
-- Reflective (measurable criteria)
+Required structure:
+# Title
+→ Main features
+→ Technical structure  
+→ Specific details
+→ MVP starting point
 
-FORMAT REQUIREMENTS:
-- Start with compelling title
-- Use clear markdown structure
-- Include specific requirements and acceptance criteria
-- Add technical context when relevant
-- End with MVP suggestions
-
-Respond ONLY with the transformed prompt in this exact format:
-# [Compelling Title Here]
-
-[Clear description of functionality and requirements]
-
-## Key Features
-- [Specific feature 1]
-- [Specific feature 2]
-- [Specific feature 3]
-
-## Technical Requirements
-- [Technical detail 1]
-- [Technical detail 2]
-
-## MVP Approach
-[Suggested starting point for development]`;
+Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, no additional comments.`;
 
     // Add knowledge context if provided
     if (knowledgeContext && Array.isArray(knowledgeContext) && knowledgeContext.length > 0) {
@@ -132,7 +105,7 @@ Respond ONLY with the transformed prompt in this exact format:
     } else {
       // OpenAI provider
       const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-      const openaiModel = model || 'gpt-5-2025-08-07';
+      const openaiModel = model || 'gpt-4o';
       
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',

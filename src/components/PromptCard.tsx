@@ -168,7 +168,7 @@ export function PromptCard({
       await AIAgentManager.executePromptOptimization(prompt.id, workspace.id);
       toast({
         title: 'Prompt optimisé',
-        description: 'Votre prompt a été amélioré par l\'IA avec un titre plus descriptif',
+        description: 'Votre prompt a été amélioré par l\'IA',
       });
     } catch (error) {
       console.error('Erreur lors de l\'optimisation:', error);

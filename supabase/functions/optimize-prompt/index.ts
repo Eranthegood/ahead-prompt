@@ -71,25 +71,15 @@ serve(async (req) => {
     }
 
     // Prepare the optimization request
-    const systemPrompt = `You are an expert prompt engineer and UX copywriter. Your task is to analyze and improve prompts for AI development workflows, with special focus on creating compelling, descriptive titles.
-
-TITLE IMPROVEMENT GUIDELINES:
-- Keep titles under 60 characters for optimal readability
-- Use action-oriented, specific language (avoid generic terms like "system", "app", "feature")
-- Include the primary user benefit or key functionality
-- Use active voice and power words
-- Be specific about what the prompt achieves (e.g., "User Authentication System" → "Secure JWT Login with Password Reset")
-
-DESCRIPTION IMPROVEMENT GUIDELINES:
-- Make instructions clearer and more specific
-- Add necessary context that might be missing
-- Improve logical flow and organization
-- Make vague requirements more precise
-- Identify missing elements that would improve results
-- Include technical specifications when relevant
-- Specify expected user interactions and edge cases
+    const systemPrompt = `You are an expert prompt engineer. Your task is to analyze and improve prompts for AI development workflows.
 
 Analyze the following prompt and provide specific, actionable improvements:
+
+1. **Clarity**: Make the instructions clearer and more specific
+2. **Context**: Add necessary context that might be missing
+3. **Structure**: Improve the logical flow and organization
+4. **Specificity**: Make vague requirements more precise
+5. **Completeness**: Identify missing elements that would improve results
 
 Original Prompt:
 Title: ${prompt.title}
@@ -98,16 +88,14 @@ Description: ${prompt.description || 'No description provided'}
 Please respond with a JSON object containing:
 {
   "improvements": {
-    "title": "improved compelling title that describes the specific functionality",
-    "description": "enhanced description with clear structure, technical details, and implementation guidance",
+    "title": "improved title if needed",
+    "description": "improved description with specific enhancements",
     "suggestions": [
-      "specific improvement suggestion 1",
-      "specific improvement suggestion 2",
-      "specific improvement suggestion 3"
+      "specific suggestion 1",
+      "specific suggestion 2"
     ],
     "clarity_score": 8.5,
-    "completeness_score": 7.0,
-    "title_reasoning": "brief explanation of why this title is better"
+    "completeness_score": 7.0
   }
 }`;
 
@@ -123,7 +111,7 @@ Please respond with a JSON object containing:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt }
         ],
