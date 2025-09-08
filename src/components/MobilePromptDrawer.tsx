@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -73,6 +73,11 @@ export function MobilePromptDrawer({
   const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
   const [isLoading, setIsLoading] = useState(false);
   
+  // Mobile-specific refs and state
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const [initialViewportHeight, setInitialViewportHeight] = useState<number | null>(null);
+  
   // AI Provider state
   const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
     provider: 'openai',
@@ -89,6 +94,38 @@ export function MobilePromptDrawer({
   const productIdForKnowledge = selectedProduct || selectedProductId;
   const { knowledgeItems } = useKnowledge(workspace.id, productIdForKnowledge || undefined);
 
+  // Mobile focus management
+  const focusTextarea = useCallback(() => {
+    if (textareaRef.current && isOpen) {
+      // Use setTimeout to ensure the drawer animation has completed
+      setTimeout(() => {
+        textareaRef.current?.focus();
+        // For iOS Safari, we need to trigger the focus after a longer delay
+        setTimeout(() => {
+          textareaRef.current?.focus();
+        }, 100);
+      }, 300);
+    }
+  }, [isOpen]);
+
+  // Handle viewport changes (mobile keyboard)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleViewportChange = () => {
+      if (initialViewportHeight === null) {
+        setInitialViewportHeight(window.innerHeight);
+      }
+    };
+
+    handleViewportChange();
+    window.addEventListener('resize', handleViewportChange);
+    
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+    };
+  }, [initialViewportHeight]);
+
   // Reset form when dialog opens
   useEffect(() => {
     if (isOpen) {
@@ -97,8 +134,11 @@ export function MobilePromptDrawer({
       setSelectedProduct(selectedProductId || null);
       setSelectedPriority(2);
       setSelectedKnowledgeIds([]);
+      setIsFocused(false);
+      // Focus textarea after opening
+      focusTextarea();
     }
-  }, [isOpen, selectedProductId, selectedEpicId]);
+  }, [isOpen, selectedProductId, selectedEpicId, focusTextarea]);
 
   // Handle knowledge selection
   const handleKnowledgeToggle = (knowledgeId: string) => {
@@ -170,6 +210,19 @@ export function MobilePromptDrawer({
     };
   };
 
+  // Enhanced mobile input handling
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  }, []);
+
+  const handleTextareaFocus = useCallback(() => {
+    setIsFocused(true);
+  }, []);
+
+  const handleTextareaBlur = useCallback(() => {
+    setIsFocused(false);
+  }, []);
+
   // Handle save
   const handleSave = async () => {
     if (!content.trim()) {
@@ -178,6 +231,8 @@ export function MobilePromptDrawer({
         description: 'Please enter your prompt idea.',
         variant: 'destructive'
       });
+      // Refocus textarea on mobile
+      focusTextarea();
       return;
     }
 
@@ -208,9 +263,14 @@ export function MobilePromptDrawer({
 
   const PriorityIcon = PRIORITY_ICONS[selectedPriority];
 
+  // Calculate dynamic height based on keyboard state
+  const drawerHeight = isFocused 
+    ? 'max-h-[90vh] sm:max-h-[85vh]' 
+    : 'max-h-[85vh]';
+
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className={`${drawerHeight} focus-within:max-h-[90vh]`}>
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
@@ -226,11 +286,22 @@ export function MobilePromptDrawer({
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Your Idea</label>
             <Textarea
+              ref={textareaRef}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={handleContentChange}
+              onFocus={handleTextareaFocus}
+              onBlur={handleTextareaBlur}
               placeholder="Type your prompt idea here..."
-              className="min-h-[120px] resize-none text-base bg-card text-card-foreground border-border focus:ring-primary focus:border-primary"
-              autoFocus
+              className="min-h-[120px] resize-none text-base bg-card text-card-foreground border-border focus:ring-primary focus:border-primary touch-manipulation"
+              style={{
+                WebkitAppearance: 'none',
+                fontSize: '16px', // Prevents zoom on iOS
+              }}
+              inputMode="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              spellCheck="true"
             />
           </div>
 
