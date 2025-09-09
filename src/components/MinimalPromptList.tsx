@@ -446,7 +446,7 @@ export function MinimalPromptList({
       </div>
 
       {/* Linear-style Table Header */}
-      <div className="flex items-center py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 mb-2">
+      <div className="flex items-center py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 mb-2">
         <div className="w-8 mr-3">Pri</div>
         <div className="flex-1 mr-4">Title</div>
         <div className="w-30 mr-4 hidden sm:block">Context</div>
