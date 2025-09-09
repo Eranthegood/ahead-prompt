@@ -72,7 +72,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 className="flex items-center gap-2 cursor-pointer" 
                 onClick={() => navigate('/')}
               >
-                <Zap className="w-8 h-8 text-primary" />
                 <div className="font-mono text-lg font-bold text-primary">
                   Ahead
                 </div>
