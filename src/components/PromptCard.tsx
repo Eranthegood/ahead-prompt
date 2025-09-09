@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, ExternalLink, Clock, Zap, GitMerge } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -306,7 +306,7 @@ export function PromptCard({
                       disabled={!isUsable}
                       className="h-7 w-7 p-0 hover:bg-accent/50 text-purple-600"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <GitBranch className="h-3.5 w-3.5" />
                     </Button>
                   )}
                   
