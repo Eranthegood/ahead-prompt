@@ -211,19 +211,19 @@ export default function BlogPostPage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
             {post.title}
           </h1>
 
           {/* Excerpt */}
           {post.excerpt && (
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-xl text-white mb-8 leading-relaxed">
               {post.excerpt}
             </p>
           )}
 
           {/* Meta Information */}
-          <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-white">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
@@ -289,7 +289,7 @@ export default function BlogPostPage() {
         )}
 
         {/* Content */}
-        <div className="prose prose-lg max-w-none mb-16">
+        <div className="prose prose-lg max-w-none mb-16 text-white">
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
 
@@ -321,7 +321,7 @@ export default function BlogPostPage() {
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <section>
-            <h3 className="text-2xl font-bold mb-8">Related Articles</h3>
+            <h3 className="text-2xl font-bold mb-8 text-white">Related Articles</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {relatedPosts.map((relatedPost) => (
                 <BlogPostCard

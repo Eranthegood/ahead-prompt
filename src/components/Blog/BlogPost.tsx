@@ -68,13 +68,13 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
             ))}
           </div>
           
-          <h2 className="text-2xl font-bold mb-3 line-clamp-2">{post.title}</h2>
+          <h2 className="text-2xl font-bold mb-3 line-clamp-2 text-white">{post.title}</h2>
           
           {post.excerpt && (
-            <p className="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
+            <p className="text-white mb-4 line-clamp-3">{post.excerpt}</p>
           )}
           
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center justify-between text-sm text-white">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
@@ -118,9 +118,9 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
             )}
             
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold mb-2 line-clamp-2">{post.title}</h3>
+              <h3 className="font-semibold mb-2 line-clamp-2 text-white">{post.title}</h3>
               
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-3 text-xs text-white">
                 <span>{format(new Date(post.published_at), 'd MMM', { locale: fr })}</span>
                 {post.reading_time_minutes && (
                   <span>{post.reading_time_minutes} min</span>
@@ -159,13 +159,13 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
           ))}
         </div>
         
-        <h3 className="text-xl font-bold mb-3 line-clamp-2">{post.title}</h3>
+        <h3 className="text-xl font-bold mb-3 line-clamp-2 text-white">{post.title}</h3>
         
         {post.excerpt && (
-          <p className="text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
+          <p className="text-white mb-4 line-clamp-2">{post.excerpt}</p>
         )}
         
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-white">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
