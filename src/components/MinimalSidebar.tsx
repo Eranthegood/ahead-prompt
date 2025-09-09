@@ -479,7 +479,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <div className="bg-accent/30 rounded-lg p-3">
+              <div>
                 <Button 
                   onClick={() => {
                     console.log('Add Prompt clicked');
