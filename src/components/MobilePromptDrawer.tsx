@@ -270,7 +270,10 @@ export function MobilePromptDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className={`${drawerHeight} focus-within:max-h-[90vh]`}>
+      <DrawerContent 
+        className={`${drawerHeight} focus-within:max-h-[90vh]`}
+        style={{ backgroundColor: '#16161c' }}
+      >
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
@@ -411,7 +414,10 @@ export function MobilePromptDrawer({
           )}
         </div>
 
-        <DrawerFooter className="bg-background/95 backdrop-blur-sm border-t border-border">
+        <DrawerFooter 
+          className="backdrop-blur-sm border-t border-border"
+          style={{ backgroundColor: '#16161c' }}
+        >
           <div className="grid grid-cols-2 gap-2">
             <Button 
               variant="outline" 

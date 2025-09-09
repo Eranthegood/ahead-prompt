@@ -471,6 +471,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col quickprompt-enhanced"
+        style={{ backgroundColor: '#16161c' }}
         onKeyDown={handleKeyDown}
         data-dialog-content
       >
@@ -658,7 +659,11 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
     {/* Knowledge Modal */}
     <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto bg-background text-foreground border-border quickprompt-enhanced" data-dialog-content>
+      <DialogContent 
+        className="sm:max-w-3xl max-h-[85vh] overflow-y-auto bg-background text-foreground border-border quickprompt-enhanced" 
+        style={{ backgroundColor: '#16161c' }}
+        data-dialog-content
+      >
         <DialogHeader>
           <DialogTitle className="text-foreground">
             Knowledge for {products?.find(p => p.id === selectedProduct)?.name || 'Product'}
