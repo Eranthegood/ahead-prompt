@@ -151,7 +151,7 @@ export function LinearPromptItem({
       </div>
 
       {/* Actions - Fixed width, show on hover */}
-      <div className="flex items-center gap-1 w-24 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-3">
+      <div className="flex items-center gap-1 w-24 transition-opacity duration-150 mr-3">
         {/* Copy Button */}
         <Button
           variant="ghost"
