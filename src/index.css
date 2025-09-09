@@ -16,31 +16,31 @@
     --popover: 0 0% 100%;           /* Blanc #FFFFFF */
     --popover-foreground: 0 0% 15%;
 
-    /* Couleur primaire - Rose vif #FF4970 */
-    --primary: 344 100% 64%;
+    /* Linear-inspired color system */
+    --primary: 220 13% 18%;            /* Linear's dark blue-gray #1d2125 */
     --primary-foreground: 0 0% 98%;
-    --primary-muted: 344 100% 85%;
-    --primary-glow: 344 100% 75%;
+    --primary-muted: 220 13% 85%;
+    --primary-glow: 220 13% 75%;
 
-    /* Couleur secondaire - Gris clair #E5E5E5 */
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 15%;
+    /* Linear's subtle grays */
+    --secondary: 220 9% 96%;            /* Very light gray #f6f8fa */
+    --secondary-foreground: 220 13% 18%;
 
-    /* Couleur accent - Orange/Jaune #FAB83E */
-    --accent: 41 94% 61%;
-    --accent-foreground: 0 0% 15%;
+    /* Linear's accent blue */
+    --accent: 211 100% 50%;             /* Linear blue #0969da */
+    --accent-foreground: 0 0% 98%;
 
-    /* États muted */
-    --muted: 0 0% 90%;              /* Gris clair #E5E5E5 */
-    --muted-foreground: 0 0% 45%;
+    /* Linear's muted system */
+    --muted: 220 14% 96%;               /* #f6f8fa */
+    --muted-foreground: 220 9% 46%;     /* #656d76 */
 
     /* Destructive reste sur la couleur primaire */
     --destructive: 344 100% 64%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 85%;
-    --input: 0 0% 95%;
-    --ring: 344 100% 64%;
+    --border: 220 13% 91%;              /* #e1e4e8 */
+    --input: 0 0% 100%;                 /* Pure white */
+    --ring: 211 100% 50%;
 
     --radius: 0.5rem;
 

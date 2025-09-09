@@ -12,6 +12,7 @@ import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { PromptCard } from '@/components/PromptCard';
 import { MinimalistPromptCard } from '@/components/MinimalistPromptCard';
+import { LinearPromptItem } from '@/components/LinearPromptItem';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
@@ -321,20 +322,23 @@ export function MinimalPromptList({
 
   if (loading) {
     return (
-      <div className="space-y-4 p-6">
+      <div className="space-y-4 sm:space-y-5">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-6 w-16" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div key={i} className="flex items-center py-2 px-3">
+            <div className="w-8 h-8 flex-shrink-0 mr-3">
+              <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+            </div>
+            <div className="flex-1 min-w-0 mr-4">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" style={{width: `${60 + i * 8}%`}} />
+              <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" style={{width: `${40 + i * 6}%`}} />
+            </div>
+            <div className="w-30 mr-4 hidden sm:block">
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" style={{width: '60%'}} />
+            </div>
+            <div className="w-20 mr-4">
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" style={{width: '80%'}} />
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -346,28 +350,28 @@ export function MinimalPromptList({
         <div className="text-center max-w-lg mx-auto">
           <div className="flex flex-col items-center gap-6">
             <div 
-              className="p-6 rounded-full bg-gradient-to-br from-primary/10 to-primary-glow/10 cursor-pointer hover:scale-110 transition-transform duration-300"
+              className="p-6 rounded-xl bg-gray-50 dark:bg-gray-800 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
               onClick={() => {
                 console.log('[MinimalPromptList] Dispatching open-quick-prompt event');
                 const event = new CustomEvent('open-quick-prompt');
                 window.dispatchEvent(event);
               }}
             >
-              <Plus className="h-16 w-16 text-primary hover:text-primary-glow transition-colors duration-300" />
+              <Plus className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto" />
             </div>
             
             <div className="space-y-3">
-              <h3 className="text-2xl font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                {searchQuery ? 'No prompts found' : 'Start Building Something Amazing'}
+              <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+                {searchQuery ? 'No prompts found' : 'No prompts yet'}
               </h3>
-              <p className="text-muted-foreground text-lg leading-relaxed max-w-md text-center mx-auto">
+              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-sm text-center mx-auto">
                 {searchQuery 
                   ? 'Try adjusting your search query to find what you\'re looking for'
-                  : 'Create your first AI prompt and accelerate your development workflow by 4x'
+                  : 'Create your first prompt to get started with your AI-powered workflow'
                 }
               </p>
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">T</kbd> for bugs
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-4">
+                Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded border border-gray-200 dark:border-gray-700">Q</kbd> for quick task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded border border-gray-200 dark:border-gray-700">T</kbd> for bugs
               </p>
             </div>
           </div>
@@ -377,16 +381,16 @@ export function MinimalPromptList({
   }
 
   return (
-    <div className="flex-1 p-3 sm:p-6">
+    <div className="flex-1 p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-4 sm:mb-6">
-        <nav className="mb-2">
-          <div className="flex items-center text-sm text-muted-foreground">
+      <div className="mb-6">
+        <nav className="mb-3">
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <span className="font-medium">All prompts</span>
             {effectiveProductId && (
               <>
                 <span className="mx-2">›</span>
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-gray-900 dark:text-gray-100">
                   {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
                 </span>
               </>
@@ -394,17 +398,17 @@ export function MinimalPromptList({
             {selectedEpicId && (
               <>
                 <span className="mx-2">›</span>
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-gray-900 dark:text-gray-100">
                   {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
                 </span>
               </>
             )}
           </div>
         </nav>
-        <p className="text-sm sm:text-base text-muted-foreground">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
           {searchQuery && (
-            <span className="ml-2 text-primary">
+            <span className="ml-2 text-blue-600 dark:text-blue-400">
               • Search: "{searchQuery}"
               {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
                 <span className="text-xs ml-1 hidden sm:inline">
@@ -416,8 +420,17 @@ export function MinimalPromptList({
         </p>
       </div>
 
+      {/* Linear-style Table Header */}
+      <div className="flex items-center py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 mb-2">
+        <div className="w-8 mr-3">Pri</div>
+        <div className="flex-1 mr-4">Title</div>
+        <div className="w-30 mr-4 hidden sm:block">Context</div>
+        <div className="w-20 mr-4">Status</div>
+        <div className="w-20">Actions</div>
+      </div>
+
       {/* Prompt List */}
-      <div className="space-y-4 sm:space-y-6">
+      <div>
         {/* Epic Breakdown View */}
         {promptsByEpic ? (
           Array.from(promptsByEpic.entries()).map(([epicId, epicPrompts]) => {
@@ -425,83 +438,49 @@ export function MinimalPromptList({
             const epicName = epic?.name || 'Unassigned';
             
             return (
-              <div key={epicId || 'unassigned'}>
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="h-px bg-border flex-1" />
-                  <Badge variant="outline" className="bg-background">
-                    {epicName} ({epicPrompts.length})
-                  </Badge>
-                  <div className="h-px bg-border flex-1" />
+              <div key={epicId || 'unassigned'} className="mb-8">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 px-3 py-1 bg-gray-50 dark:bg-gray-800 rounded-full">
+                    {epicName} • {epicPrompts.length} prompts
+                  </div>
+                  <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
                 </div>
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-px">
                   {epicPrompts.map((prompt) => (
-                    preferences.promptCardMode === 'minimalist' ? (
-                      <MinimalistPromptCard
-                        key={prompt.id}
-                        prompt={prompt}
-                        onPromptClick={handlePromptClick}
-                        onCopyGenerated={handleCopyGenerated}
-                        onShowCursorDialog={() => {
-                          setCursorPrompt(prompt);
-                          setShowCursorDialog(true);
-                        }}
-                        isHovered={hoveredPromptId === prompt.id}
-                        onHover={onPromptHover}
-                      />
-                    ) : (
-                      <PromptCard 
-                        key={prompt.id} 
-                        prompt={prompt} 
-                        onPromptClick={handlePromptClick}
-                        onEdit={handleEdit}
-                        onStatusChange={handleStatusChangeWrapper}
-                        onPriorityChange={handlePriorityChangeWrapper}
-                        onDuplicate={handleDuplicate}
-                        onDelete={handleDelete}
-                        onCopy={handleCopy}
-                        onCopyGenerated={handleCopyGenerated}
-                        isHovered={hoveredPromptId === prompt.id}
-                        onHover={onPromptHover}
-                      />
-                    )
+                    <LinearPromptItem
+                      key={prompt.id}
+                      prompt={prompt}
+                      onPromptClick={handlePromptClick}
+                      onCopyGenerated={handleCopyGenerated}
+                      onShowCursorDialog={() => {
+                        setCursorPrompt(prompt);
+                        setShowCursorDialog(true);
+                      }}
+                      isHovered={hoveredPromptId === prompt.id}
+                      onHover={onPromptHover}
+                    />
                   ))}
                 </div>
               </div>
             );
           })
         ) : (
-          /* Unified Prompt List - High priority prompts naturally appear at top due to sorting */
-          <div className="space-y-2 sm:space-y-3">
+          /* Single List View */
+          <div className="space-y-px">
             {promptsWithInfo.map((prompt) => (
-              preferences.promptCardMode === 'minimalist' ? (
-                <MinimalistPromptCard
-                  key={prompt.id}
-                  prompt={prompt}
-                  onPromptClick={handlePromptClick}
-                  onCopyGenerated={handleCopyGenerated}
-                  onShowCursorDialog={() => {
-                    setCursorPrompt(prompt);
-                    setShowCursorDialog(true);
-                  }}
-                  isHovered={hoveredPromptId === prompt.id}
-                  onHover={onPromptHover}
-                />
-              ) : (
-                <PromptCard 
-                  key={prompt.id} 
-                  prompt={prompt} 
-                  onPromptClick={handlePromptClick}
-                  onEdit={handleEdit}
-                  onStatusChange={handleStatusChangeWrapper}
-                  onPriorityChange={handlePriorityChangeWrapper}
-                  onDuplicate={handleDuplicate}
-                  onDelete={handleDelete}
-                  onCopy={handleCopy}
-                  onCopyGenerated={handleCopyGenerated}
-                  isHovered={hoveredPromptId === prompt.id}
-                  onHover={onPromptHover}
-                />
-              )
+              <LinearPromptItem
+                key={prompt.id}
+                prompt={prompt}
+                onPromptClick={handlePromptClick}
+                onCopyGenerated={handleCopyGenerated}
+                onShowCursorDialog={() => {
+                  setCursorPrompt(prompt);
+                  setShowCursorDialog(true);
+                }}
+                isHovered={hoveredPromptId === prompt.id}
+                onHover={onPromptHover}
+              />
             ))}
           </div>
         )}
