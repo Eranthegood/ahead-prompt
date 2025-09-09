@@ -63,16 +63,19 @@ serve(async (req) => {
 
     for (const article of articles) {
       try {
+        // Generate external_id from title if not provided
+        const externalId = article.id || `string-${Date.now()}-${article.title.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 50)}`
+        
         // Store article in knowledge base or dedicated table
         const articleData = {
-          external_id: article.id,
+          external_id: externalId,
           title: article.title,
-          content: article.content,
+          content: article.content || article.html_content,
           meta_description: article.meta_description,
           keywords: article.keywords || [],
           url: article.url,
           published_at: article.published_at ? new Date(article.published_at).toISOString() : null,
-          status: article.status,
+          status: article.status || 'draft',
           seo_score: article.seo_score,
           source: 'string.com',
           webhook_received_at: new Date().toISOString(),
