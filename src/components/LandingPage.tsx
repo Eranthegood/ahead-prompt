@@ -82,7 +82,7 @@ export default function LandingPage() {
       <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-24 sm:pb-28 pt-20 sm:pt-24 md:pt-32">
         <div className="max-w-4xl text-left space-y-6 sm:space-y-8">
           <div className="space-y-4 sm:space-y-6">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system font-bold tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system tracking-tight leading-tight">
               Stay <span className="text-primary">3 moves ahead</span>
               <br />
               while AI generates your code
