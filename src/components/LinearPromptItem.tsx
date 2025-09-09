@@ -137,7 +137,9 @@ export function LinearPromptItem({
             isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
           } ${!isUsable ? 'opacity-60' : ''} ${
             isSliding ? 'animate-slide-out-right' : ''
-          } ${isCompleting && !isSliding ? 'animate-fade-out' : ''}`}
+          } ${isCompleting && !isSliding ? 'animate-fade-out' : ''} ${
+            priority === 1 ? 'border-l-4 border-red-500 bg-red-50/30 dark:bg-red-950/20 hover:bg-red-50/50 dark:hover:bg-red-950/30' : ''
+          }`}
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
           onClick={() => onPromptClick(prompt)}
@@ -145,7 +147,9 @@ export function LinearPromptItem({
       {/* Priority indicator - Fixed 32px column */}
       <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mr-3">
         <div 
-          className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-all cursor-pointer hover:scale-110 hover:shadow-sm`}
+          className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-all cursor-pointer hover:scale-110 hover:shadow-sm ${
+            priority === 1 ? 'ring-2 ring-red-500/50 shadow-md' : ''
+          }`}
           onClick={(e) => {
             e.stopPropagation();
             if (onPriorityChange) {
