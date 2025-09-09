@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,8 @@ import {
   Filter,
   Library,
   Zap,
-  Lightbulb
+  Lightbulb,
+  X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
@@ -151,6 +152,11 @@ TODO:
               </DialogTitle>
               <div className="flex items-center gap-2">
                 <kbd className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded border">⌘K</kbd>
+                <DialogClose asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DialogClose>
               </div>
             </div>
           </DialogHeader>
