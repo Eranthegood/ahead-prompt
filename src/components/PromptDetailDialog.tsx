@@ -114,9 +114,9 @@ export function PromptDetailDialog({
           <DialogTitle>Edit Idea</DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
           {/* Main Content Panel */}
-          <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+          <div className="flex flex-col space-y-6 overflow-y-auto pr-3 min-h-0">
             {/* Description */}
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
