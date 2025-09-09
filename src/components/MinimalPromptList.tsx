@@ -473,21 +473,24 @@ export function MinimalPromptList({
                 </div>
                 <div className="space-y-px">
                   {epicPrompts.map((prompt) => (
-                    <LinearPromptItem
-                      key={prompt.id}
-                      prompt={prompt}
-                      onPromptClick={handlePromptClick}
-                      onCopyGenerated={handleCopyGenerated}
-                      onShowCursorDialog={() => {
-                        setCursorPrompt(prompt);
-                        setShowCursorDialog(true);
-                      }}
-                      onPriorityChange={handlePriorityChangeWrapper}
-                      onStatusChange={handleStatusChangeWrapper}
-                      onMoreActions={handleMoreActions}
-                      isHovered={hoveredPromptId === prompt.id}
-                      onHover={onPromptHover}
-                    />
+                  <LinearPromptItem
+                    key={prompt.id}
+                    prompt={prompt}
+                    onPromptClick={handlePromptClick}
+                    onCopyGenerated={handleCopyGenerated}
+                    onShowCursorDialog={() => {
+                      setCursorPrompt(prompt);
+                      setShowCursorDialog(true);
+                    }}
+                    onPriorityChange={handlePriorityChangeWrapper}
+                    onStatusChange={handleStatusChangeWrapper}
+                    onMoreActions={handleMoreActions}
+                    onEdit={handleEdit}
+                    onDuplicate={handleDuplicate}
+                    onDelete={handleDelete}
+                    isHovered={hoveredPromptId === prompt.id}
+                    onHover={onPromptHover}
+                  />
                   ))}
                 </div>
               </div>
@@ -561,6 +564,9 @@ export function MinimalPromptList({
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
                     onMoreActions={handleMoreActions}
+                    onEdit={handleEdit}
+                    onDuplicate={handleDuplicate}
+                    onDelete={handleDelete}
                     isHovered={hoveredPromptId === item.id}
                     onHover={onPromptHover}
                   />

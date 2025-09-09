@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal, ChevronDown, Merge } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
@@ -21,6 +22,9 @@ interface LinearPromptItemProps {
   onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
   onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
   onMoreActions?: (prompt: Prompt) => void;
+  onDuplicate?: (prompt: Prompt) => void;
+  onDelete?: (prompt: Prompt) => void;
+  onEdit?: (prompt: Prompt) => void;
   isHovered?: boolean;
   onHover?: (promptId: string | null) => void;
 }
@@ -44,6 +48,9 @@ export function LinearPromptItem({
   onPriorityChange,
   onStatusChange,
   onMoreActions,
+  onDuplicate,
+  onDelete,
+  onEdit,
   isHovered,
   onHover
 }: LinearPromptItemProps) {
@@ -123,16 +130,18 @@ export function LinearPromptItem({
   };
 
   return (
-    <div 
-      className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
-        isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
-      } ${!isUsable ? 'opacity-60' : ''} ${
-        isSliding ? 'animate-slide-out-right' : ''
-      } ${isCompleting && !isSliding ? 'animate-fade-out' : ''}`}
-      onMouseEnter={() => onHover?.(prompt.id)}
-      onMouseLeave={() => onHover?.(null)}
-      onClick={() => onPromptClick(prompt)}
-    >
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <div 
+          className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
+            isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
+          } ${!isUsable ? 'opacity-60' : ''} ${
+            isSliding ? 'animate-slide-out-right' : ''
+          } ${isCompleting && !isSliding ? 'animate-fade-out' : ''}`}
+          onMouseEnter={() => onHover?.(prompt.id)}
+          onMouseLeave={() => onHover?.(null)}
+          onClick={() => onPromptClick(prompt)}
+        >
       {/* Priority indicator - Fixed 32px column */}
       <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mr-3">
         <div 
@@ -312,5 +321,44 @@ export function LinearPromptItem({
       </div>
 
     </div>
+      </ContextMenuTrigger>
+      
+      <ContextMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <ContextMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit?.(prompt);
+          }}
+          className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <Edit className="h-4 w-4" />
+          Edit prompt
+        </ContextMenuItem>
+        
+        <ContextMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate?.(prompt);
+          }}
+          className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <CopyIcon className="h-4 w-4" />
+          Duplicate prompt
+        </ContextMenuItem>
+        
+        <ContextMenuSeparator />
+        
+        <ContextMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.(prompt);
+          }}
+          className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete prompt
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
