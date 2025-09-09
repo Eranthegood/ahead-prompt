@@ -1041,6 +1041,60 @@ export type Database = {
           },
         ]
       }
+      seo_articles: {
+        Row: {
+          content: string | null
+          created_at: string
+          external_id: string
+          id: string
+          keywords: string[] | null
+          meta_description: string | null
+          metadata: Json | null
+          published_at: string | null
+          seo_score: number | null
+          source: string
+          status: string
+          title: string
+          updated_at: string
+          url: string | null
+          webhook_received_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          external_id: string
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          metadata?: Json | null
+          published_at?: string | null
+          seo_score?: number | null
+          source?: string
+          status?: string
+          title: string
+          updated_at?: string
+          url?: string | null
+          webhook_received_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          external_id?: string
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          metadata?: Json | null
+          published_at?: string | null
+          seo_score?: number | null
+          source?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          url?: string | null
+          webhook_received_at?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_name: string
@@ -1137,6 +1191,39 @@ export type Database = {
           total_xp?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          processed_count: number | null
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          processed_count?: number | null
+          source: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          processed_count?: number | null
+          source?: string
+          status?: string
         }
         Relationships: []
       }
