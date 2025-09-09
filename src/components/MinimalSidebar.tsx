@@ -513,7 +513,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full aspect-square p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
+                    className="w-full aspect-square p-0 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
                     onClick={() => setIsPromptLibraryOpen(true)}
                     aria-label="Prompt Library"
                   >
@@ -528,7 +528,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             ) : (
               <Button 
                 variant="ghost" 
-                className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-accent/60 border border-transparent hover:border-border/40 rounded-md"
+                className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 rounded-md"
                 onClick={() => setIsPromptLibraryOpen(true)}
               >
                 <div className="flex items-center">
@@ -545,7 +545,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full aspect-square p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
+                    className="w-full aspect-square p-0 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
                     onClick={() => {
                       navigate('/');
                       onProductSelect('all');
@@ -571,16 +571,16 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                  </TooltipContent>
                </Tooltip>
              ) : (
-               <Button 
-                 variant="ghost" 
-                 className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-accent/60 border border-transparent hover:border-border/40 rounded-md"
-                 onClick={() => {
-                   navigate('/build');
-                   onProductSelect('all');
-                   onEpicSelect(undefined);
-                 }}
-                 aria-label={`All Prompts (${activePromptsCount})`}
-               >
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 rounded-md"
+                  onClick={() => {
+                    navigate('/build');
+                    onProductSelect('all');
+                    onEpicSelect(undefined);
+                  }}
+                  aria-label={`All Prompts (${activePromptsCount})`}
+                >
                  <div className="flex items-center">
                    <FileText className="mr-3 h-4 w-4 text-foreground/70" />
                    <span className="text-foreground">All Prompts</span>
@@ -602,13 +602,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Products</h3>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
-                        onClick={() => setIsCreateProductOpen(true)}
-                        aria-label="Create Product"
-                      >
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                          onClick={() => setIsCreateProductOpen(true)}
+                          aria-label="Create Product"
+                        >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </TooltipTrigger>
