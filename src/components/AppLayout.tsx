@@ -172,7 +172,10 @@ function SidebarWithContent({
         
         <div className="flex-1 flex flex-col min-w-0">
           {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
-          <main className="flex-1">
+          <main 
+            className="flex-1" 
+            style={{ backgroundColor: '#191a23' }}
+          >
             {React.isValidElement(children) && children.type === Dashboard 
               ? React.cloneElement(children as React.ReactElement<any>, {
                   selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
