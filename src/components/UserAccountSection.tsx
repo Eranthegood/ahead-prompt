@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { PromptLibrary } from './PromptLibrary';
-import { hasPromptEnhancerAccess } from '@/utils/accessControl';
+
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
@@ -90,18 +90,6 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => {
-              const destination = hasPromptEnhancerAccess(user?.id) 
-                ? '/prompt-enhancer' 
-                : '/prompt-enhancer-coming-soon';
-              navigate(destination);
-            }}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              <div className="flex items-center gap-2">
-                <span>Prompt Enhancer</span>
-                <Badge variant="secondary" className="text-xs">Soon</Badge>
-              </div>
-            </DropdownMenuItem>
             
             <DropdownMenuSeparator />
             
@@ -218,18 +206,6 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => {
-            const destination = hasPromptEnhancerAccess(user?.id) 
-              ? '/prompt-enhancer' 
-              : '/prompt-enhancer-coming-soon';
-            navigate(destination);
-          }}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            <div className="flex items-center gap-2">
-              <span>Prompt Enhancer</span>
-              <Badge variant="secondary" className="text-xs">Soon</Badge>
-            </div>
-          </DropdownMenuItem>
 
           {/* Theme Switch */}
           <div className="flex items-center justify-between py-2 px-2 mt-2">
