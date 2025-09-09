@@ -161,6 +161,16 @@ export function LinearPromptItem({
         </Button>
       </div>
 
+      {/* Status - positioned left of title */}
+      <div className="w-20 flex-shrink-0 mr-4 flex items-center">
+        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
+          <AgentWorkingIndicator size="sm" className="mr-2" />
+        )}
+        <div className={`text-xs font-medium ${getStatusColor()}`}>
+          {getStatusLabel()}
+        </div>
+      </div>
+
       {/* Title - flexible column */}
       <div className="flex-1 min-w-0 mr-4">
         <div className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1">
@@ -185,16 +195,6 @@ export function LinearPromptItem({
             {prompt.product.name}
           </div>
         )}
-      </div>
-
-      {/* Status - 80px column */}
-      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-end">
-        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
-          <AgentWorkingIndicator size="sm" className="mr-2" />
-        )}
-        <div className={`text-xs font-medium ${getStatusColor()}`}>
-          {getStatusLabel()}
-        </div>
       </div>
 
     </div>
