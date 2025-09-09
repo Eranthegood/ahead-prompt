@@ -73,6 +73,17 @@ const PRODUCT_COLORS = [
   { value: '#6B7280', label: 'Gray' },
 ];
 
+const PRODUCT_ICONS = [
+  { icon: Package, name: 'Package', label: 'Package' },
+  { icon: Zap, name: 'Zap', label: 'Lightning' },
+  { icon: Sparkles, name: 'Sparkles', label: 'Sparkles' },
+  { icon: Trophy, name: 'Trophy', label: 'Trophy' },
+  { icon: BookOpen, name: 'BookOpen', label: 'Book' },
+  { icon: GitBranch, name: 'GitBranch', label: 'Git Branch' },
+  { icon: BarChart3, name: 'BarChart3', label: 'Chart' },
+  { icon: TrendingUp, name: 'TrendingUp', label: 'Trending' },
+];
+
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -106,6 +117,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     name: '',
     description: '',
     color: '#3B82F6',
+    icon: 'Package', // Default icon
   });
   const [newEpicData, setNewEpicData] = useState({
     name: '',
@@ -240,12 +252,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         name: newProductData.name.trim(),
         description: newProductData.description.trim() || undefined,
         color: newProductData.color,
+        // Note: icon field will be added once database schema is updated
       });
 
       if (newProduct) {
         onProductSelect(newProduct.id);
         setIsCreateProductOpen(false);
-        setNewProductData({ name: '', description: '', color: '#3B82F6' });
+        setNewProductData({ name: '', description: '', color: '#3B82F6', icon: 'Package' });
       }
     } finally {
       setIsCreating(false);
@@ -791,6 +804,32 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   placeholder="Knowledge URL (optional)"
                   className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground focus:border-transparent"
                 />
+              </div>
+              
+              {/* Icon selection */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-foreground">Icon</label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {PRODUCT_ICONS.map((iconItem) => {
+                    const IconComponent = iconItem.icon;
+                    const isSelected = newProductData.icon === iconItem.name;
+                    return (
+                      <button
+                        key={iconItem.name}
+                        type="button"
+                        onClick={() => setNewProductData(prev => ({ ...prev, icon: iconItem.name }))}
+                        className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 flex items-center justify-center ${
+                          isSelected
+                            ? 'border-primary scale-110 shadow-md bg-primary/10' 
+                            : 'border-muted-foreground/20 hover:border-muted-foreground/40'
+                        }`}
+                        title={iconItem.label}
+                      >
+                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               
               {/* Color selection */}
