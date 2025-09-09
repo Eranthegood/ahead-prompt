@@ -174,7 +174,7 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Article not found</h1>
+          <h1 className="text-2xl font-bold mb-4 text-white">Article not found</h1>
           <Button onClick={() => navigate('/blog')}>Back to Blog</Button>
         </div>
       </div>
@@ -304,11 +304,11 @@ export default function BlogPostPage() {
                   className="w-16 h-16 rounded-full"
                 />
               )}
-              <div>
-                <h4 className="font-semibold text-lg">
+               <div>
+                <h4 className="font-semibold text-lg text-white">
                   {post.author.full_name || 'Author'}
                 </h4>
-                <p className="text-muted-foreground">
+                <p className="text-white">
                   Blog contributor
                 </p>
               </div>

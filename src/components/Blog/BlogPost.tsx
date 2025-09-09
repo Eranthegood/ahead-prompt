@@ -92,7 +92,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
               </div>
             </div>
             
-            <Button variant="ghost" size="sm" className="group">
+            <Button variant="ghost" size="sm" className="group text-white">
               Read more
               <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
