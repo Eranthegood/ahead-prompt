@@ -62,7 +62,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
       style={{ backgroundColor: '#191a23' }}
     >
         <div className="container flex h-full items-center justify-between px-4">
-          {/* Left side - Logo and navigation */}
+          {/* Left side - Logo, navigation, and Search Bar */}
           <div className="flex items-center gap-4">
             {/* Sidebar Trigger for authenticated users */}
             {showSidebarTrigger && (
@@ -80,25 +80,25 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 </div>
               </div>
             )}
+            
+            {/* Search Bar - Left aligned */}
+            {showSearch && workspace && user && (
+              <div className="w-80">
+                <form onSubmit={handleSearch}>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search everything... (Ctrl+K)"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setShowCommandPalette(true)}
+                      className="pl-10 bg-muted/50 border-border"
+                    />
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
-
-          {/* Left - Search Bar */}
-          {showSearch && workspace && user && (
-            <div className="flex-1 max-w-lg ml-4">
-              <form onSubmit={handleSearch}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search everything... (Ctrl+K)"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setShowCommandPalette(true)}
-                    className="pl-10 bg-muted/50 border-border"
-                  />
-                </div>
-              </form>
-            </div>
-          )}
 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
