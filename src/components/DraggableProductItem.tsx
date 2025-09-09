@@ -114,7 +114,7 @@ export function DraggableProductItem({
                     </div>
                     {product.promptCount > 0 && (
                        <Badge 
-                         className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0"
+                         className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0"
                        >
                          {product.promptCount > 99 ? '99+' : product.promptCount}
                        </Badge>
@@ -229,7 +229,7 @@ export function DraggableProductItem({
                      </span>
                    </div>
                    <Badge 
-                     className="ml-2 text-xs flex-shrink-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0"
+                     className="ml-2 text-xs flex-shrink-0 bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0"
                    >
                      {product.promptCount}
                    </Badge>
