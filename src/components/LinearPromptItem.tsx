@@ -16,6 +16,9 @@ interface LinearPromptItemProps {
   onPromptClick: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
   onShowCursorDialog: () => void;
+  onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
+  onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
+  onMoreActions?: (prompt: Prompt) => void;
   isHovered?: boolean;
   onHover?: (promptId: string | null) => void;
 }
@@ -36,6 +39,9 @@ export function LinearPromptItem({
   onPromptClick,
   onCopyGenerated,
   onShowCursorDialog,
+  onPriorityChange,
+  onStatusChange,
+  onMoreActions,
   isHovered,
   onHover
 }: LinearPromptItemProps) {
@@ -106,8 +112,12 @@ export function LinearPromptItem({
           className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-all cursor-pointer hover:scale-110 hover:shadow-sm`}
           onClick={(e) => {
             e.stopPropagation();
-            // Handle priority click - could cycle through priorities or open priority menu
-            console.log('Priority clicked for prompt:', prompt.id);
+            if (onPriorityChange) {
+              // Cycle through priorities: 1 (High) -> 2 (Normal) -> 3 (Low) -> 1
+              const currentPriority = prompt.priority || 3;
+              const nextPriority = currentPriority === 3 ? 1 : currentPriority + 1;
+              onPriorityChange(prompt, nextPriority);
+            }
           }}
         >
           <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
@@ -159,7 +169,9 @@ export function LinearPromptItem({
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            // This could open a context menu or additional actions
+            if (onMoreActions) {
+              onMoreActions(prompt);
+            }
           }}
           className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
           aria-label="More actions"
@@ -173,8 +185,14 @@ export function LinearPromptItem({
         className="w-20 flex-shrink-0 mr-4 flex items-center justify-start cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
         onClick={(e) => {
           e.stopPropagation();
-          // Handle status click - could cycle through statuses or open status menu
-          console.log('Status clicked for prompt:', prompt.id);
+          if (onStatusChange) {
+            // Cycle through statuses: todo -> in_progress -> done -> todo
+            let nextStatus: PromptStatus;
+            if (prompt.status === 'todo') nextStatus = 'in_progress';
+            else if (prompt.status === 'in_progress') nextStatus = 'done';
+            else nextStatus = 'todo';
+            onStatusChange(prompt, nextStatus);
+          }
         }}
       >
         {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (

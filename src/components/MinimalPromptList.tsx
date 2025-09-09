@@ -238,6 +238,13 @@ export function MinimalPromptList({
     }
   };
 
+  const handleMoreActions = (prompt: Prompt) => {
+    // This could open a context menu with duplicate, delete, edit options
+    // For now, let's just show a simple alert with available actions
+    console.log('More actions for prompt:', prompt.id);
+    // TODO: Implement context menu or dropdown with options
+  };
+
   const handleCopyGenerated = async (prompt: Prompt) => {
     try {
       // Check if prompt is usable before proceeding
@@ -457,6 +464,9 @@ export function MinimalPromptList({
                         setCursorPrompt(prompt);
                         setShowCursorDialog(true);
                       }}
+                      onPriorityChange={handlePriorityChangeWrapper}
+                      onStatusChange={handleStatusChangeWrapper}
+                      onMoreActions={handleMoreActions}
                       isHovered={hoveredPromptId === prompt.id}
                       onHover={onPromptHover}
                     />
@@ -478,6 +488,9 @@ export function MinimalPromptList({
                   setCursorPrompt(prompt);
                   setShowCursorDialog(true);
                 }}
+                onPriorityChange={handlePriorityChangeWrapper}
+                onStatusChange={handleStatusChangeWrapper}
+                onMoreActions={handleMoreActions}
                 isHovered={hoveredPromptId === prompt.id}
                 onHover={onPromptHover}
               />
