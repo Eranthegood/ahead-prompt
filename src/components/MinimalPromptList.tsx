@@ -410,29 +410,27 @@ export function MinimalPromptList({
       {/* Header */}
       <div className="mb-6">
         <nav className="mb-3">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <span className="font-medium">All prompts</span>
-              {effectiveProductId && (
-                <>
-                  <span className="mx-2">›</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
-                  </span>
-                </>
-              )}
-              {selectedEpicId && (
-                <>
-                  <span className="mx-2">›</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
-                  </span>
-                </>
-              )}
-            </div>
-            <div className="text-gray-500 dark:text-gray-400">
-              {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
-            </div>
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-medium">All prompts</span>
+            {effectiveProductId && (
+              <>
+                <span className="mx-2">›</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
+                </span>
+              </>
+            )}
+            {selectedEpicId && (
+              <>
+                <span className="mx-2">›</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
+                </span>
+              </>
+            )}
+            <span className="ml-2 text-gray-500 dark:text-gray-400">
+              ({promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''})
+            </span>
           </div>
         </nav>
         {searchQuery && (
