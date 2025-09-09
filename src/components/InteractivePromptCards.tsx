@@ -418,27 +418,6 @@ export function InteractivePromptCards() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.6 }}
       >
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 text-xs sm:text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <ExternalLink className="h-3 w-3 text-purple-600" />
-            <span className="hidden sm:inline">Send to Cursor</span>
-            <span className="sm:hidden">Send</span>
-          </span>
-          <span className="hidden sm:inline">{" • "}</span>
-          <span className="inline-flex items-center gap-1">
-            <Copy className="h-3 w-3" />
-            <span className="hidden sm:inline">Copy prompt</span>
-            <span className="sm:hidden">Copy</span>
-          </span>
-          <span className="hidden sm:inline">{" • "}</span>
-          <span className="text-center sm:inline">
-            <span className="hidden sm:inline">Click status to advance</span>
-            <span className="sm:hidden">Tap status</span>
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground/70">
-          Demo resets every 10 seconds
-        </p>
       </motion.div>
 
       {/* CSS for grid animation - defined in global styles */}
