@@ -47,6 +47,7 @@ export function LinearPromptItem({
   onHover
 }: LinearPromptItemProps) {
   const [justCopied, setJustCopied] = useState(false);
+  const [isSliding, setIsSliding] = useState(false);
   
   // Live status stream from Agent Status Service keyed by Cursor agent id
   const { latest: liveStatus } = useAgentStatusStream(prompt.cursor_agent_id || undefined);
@@ -63,6 +64,22 @@ export function LinearPromptItem({
     setJustCopied(true);
     setTimeout(() => setJustCopied(false), 1200);
     onCopyGenerated(prompt);
+  };
+
+  const handleStatusChange = (newStatus: PromptStatus) => {
+    if (newStatus === 'done') {
+      setIsSliding(true);
+      // Give animation time to complete before calling the actual status change
+      setTimeout(() => {
+        if (onStatusChange) {
+          onStatusChange(prompt, newStatus);
+        }
+      }, 300); // Match the slide-out-right animation duration
+    } else {
+      if (onStatusChange) {
+        onStatusChange(prompt, newStatus);
+      }
+    }
   };
 
   // Get priority display
@@ -102,7 +119,9 @@ export function LinearPromptItem({
     <div 
       className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
         isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
-      } ${!isUsable ? 'opacity-60' : ''}`}
+      } ${!isUsable ? 'opacity-60' : ''} ${
+        isSliding ? 'animate-slide-out-right' : ''
+      }`}
       onMouseEnter={() => onHover?.(prompt.id)}
       onMouseLeave={() => onHover?.(null)}
       onClick={() => onPromptClick(prompt)}
@@ -213,8 +232,8 @@ export function LinearPromptItem({
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (onStatusChange && prompt.status !== 'todo') {
-                    onStatusChange(prompt, 'todo');
+                  if (prompt.status !== 'todo') {
+                    handleStatusChange('todo');
                   }
                 }}
                 className={`${prompt.status === 'todo' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
@@ -224,8 +243,8 @@ export function LinearPromptItem({
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (onStatusChange && prompt.status !== 'in_progress') {
-                    onStatusChange(prompt, 'in_progress');
+                  if (prompt.status !== 'in_progress') {
+                    handleStatusChange('in_progress');
                   }
                 }}
                 className={`${prompt.status === 'in_progress' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
@@ -235,8 +254,8 @@ export function LinearPromptItem({
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (onStatusChange && prompt.status !== 'done') {
-                    onStatusChange(prompt, 'done');
+                  if (prompt.status !== 'done') {
+                    handleStatusChange('done');
                   }
                 }}
                 className={`${prompt.status === 'done' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
