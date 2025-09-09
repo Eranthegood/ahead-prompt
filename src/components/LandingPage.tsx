@@ -79,7 +79,7 @@ export default function LandingPage() {
   }];
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
-      <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-36 sm:pb-42 pt-30 sm:pt-36 md:pt-48">
+      <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-44 sm:pb-52 pt-36 sm:pt-44 md:pt-56">
         <div className="max-w-4xl text-left space-y-6 sm:space-y-8">
           <div className="space-y-4 sm:space-y-6">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system tracking-tight leading-tight">
