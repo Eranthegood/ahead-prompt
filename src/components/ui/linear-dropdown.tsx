@@ -64,7 +64,7 @@ export const LinearDropdown: React.FC<LinearDropdownProps> = ({
               )}
               <span className="flex-1">{option.label}</span>
               {allowMultiple && option.isSelected && (
-                <Check className="w-4 h-4 text-primary" />
+                <Check className="w-4 h-4 text-primary flex-shrink-0" />
               )}
             </DropdownMenuItem>
           );
