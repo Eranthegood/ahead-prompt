@@ -133,12 +133,12 @@ export function LinearPromptItem({
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <div 
-          className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
-            isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
+          className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-muted ${
+            isHovered ? 'bg-muted' : ''
           } ${!isUsable ? 'opacity-60' : ''} ${
             isSliding ? 'animate-slide-out-right' : ''
           } ${isCompleting && !isSliding ? 'animate-fade-out' : ''} ${
-            priority === 1 ? 'border-l-4 border-red-500 bg-red-50/30 dark:bg-red-950/20 hover:bg-red-50/50 dark:hover:bg-red-950/30' : ''
+            priority === 1 ? 'border-l-4 border-red-500 bg-red-50/30 dark:bg-red-950/20 hover:bg-muted' : ''
           }`}
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
@@ -175,7 +175,7 @@ export function LinearPromptItem({
             handleCopy();
           }}
           disabled={!isUsable}
-          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
+          className="h-7 w-7 p-0 hover:bg-muted flex-shrink-0"
           aria-label="Copy prompt"
         >
           {justCopied ? (
@@ -199,7 +199,7 @@ export function LinearPromptItem({
                     onShowCursorDialog();
                   }}
                   disabled={!isUsable}
-                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
+                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-muted flex-shrink-0"
                   aria-label="Send to Cursor"
                 >
                   <Merge className="h-3.5 w-3.5" />
@@ -222,7 +222,7 @@ export function LinearPromptItem({
               onMoreActions(prompt);
             }
           }}
-          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
+          className="h-7 w-7 p-0 hover:bg-muted flex-shrink-0"
           aria-label="More actions"
         >
           <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />

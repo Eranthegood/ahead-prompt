@@ -105,7 +105,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 70%; /* Improved from 65% for better contrast */
 
-    --accent: 211 100% 50%;         /* Bleu au lieu d'orange */
+    --accent: 0 0% 20%;             /* Gris clair pour les hovers */
     --accent-foreground: 0 0% 95%;
 
     --destructive: 344 85% 58%;
@@ -140,7 +140,7 @@
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 344 85% 58%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent: 0 0% 20%;     /* Gris clair pour les hovers */
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 18%;
     --sidebar-ring: 344 85% 58%;
