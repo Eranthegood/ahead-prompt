@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
+import FeaturedPRCard from "@/components/FeaturedPRCard";
 
 const Home = () => {
   const { user, loading } = useAuth();
@@ -17,7 +18,16 @@ const Home = () => {
     );
   }
 
-  return <LandingPage />;
+  return (
+    <div>
+      {user && (
+        <div className="container mx-auto px-4 py-6">
+          <FeaturedPRCard className="max-w-4xl mx-auto mb-8" />
+        </div>
+      )}
+      <LandingPage />
+    </div>
+  );
 };
 
 export default Home;
