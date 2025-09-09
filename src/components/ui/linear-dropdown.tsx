@@ -5,8 +5,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Check } from 'lucide-react';
+import { Check, Flame, Minus, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Helper function to get consistent priority display (matches prompt cards)
+export const getPriorityDisplay = (priority: number) => {
+  if (priority === 1) {
+    return { icon: Flame, color: 'text-destructive' };
+  }
+  if (priority === 2) {
+    return { icon: Minus, color: 'text-orange-500' };
+  }
+  return { icon: Clock, color: 'text-muted-foreground' };
+};
 
 interface DropdownOption {
   id: string;
