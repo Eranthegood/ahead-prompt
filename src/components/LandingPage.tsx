@@ -80,45 +80,56 @@ export default function LandingPage() {
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
       <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-52 sm:pb-64 pt-44 sm:pt-52 md:pt-72">
-        <div className="max-w-4xl text-left space-y-6 sm:space-y-8">
-          <div className="space-y-4 sm:space-y-6">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system tracking-tight leading-tight">
-              Stay <span className="text-primary">3 moves ahead</span>
-              <br />
-              while AI generates your code
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed px-2">
-              Queue your next prompts while AI works
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-start items-start">
-            <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
-              {user ? "Build" : "Get Ahead - Free"}
-              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-start items-start gap-4 sm:gap-6 mt-6 opacity-60">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-              <span>Integration with</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 group cursor-pointer">
-                <CursorLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
-                <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
-                  Cursor
-                </span>
+        <div className="max-w-7xl w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-4 sm:space-y-6">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system tracking-tight leading-tight">
+                  Stay <span className="text-primary">3 moves ahead</span>
+                  <br />
+                  while AI generates your code
+                </h1>
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                  Queue your next prompts while AI works
+                </p>
               </div>
-              <div className="flex items-center gap-2 group cursor-pointer">
-                <GitHubLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
-                <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
-                  GitHub
-                </span>
+              
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-start items-start">
+                <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
+                  {user ? "Build" : "Get Ahead - Free"}
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-start items-start gap-4 sm:gap-6 mt-6 opacity-60">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <span>Integration with</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 group cursor-pointer">
+                    <CursorLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
+                    <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
+                      Cursor
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 group cursor-pointer">
+                    <GitHubLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
+                    <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
+                      GitHub
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            <div className="flex items-center justify-center min-h-[600px]">
+              <ErrorBoundary>
+                <Suspense fallback={<div className="min-h-[600px] w-full bg-muted/30 rounded-lg" />}>
+                  <InteractivePromptCardsLazy />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
           </div>
-
         </div>
       </main>
 
@@ -155,14 +166,6 @@ export default function LandingPage() {
                  {user ? "Build" : "Try Free Now"}
                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                </Button>
-             </div>
-             
-              <div className="flex items-center justify-center min-h-[600px]">
-              <ErrorBoundary>
-                <Suspense fallback={<div className="min-h-[600px] w-full bg-muted/30 rounded-lg" />}>
-                  <InteractivePromptCardsLazy />
-                </Suspense>
-              </ErrorBoundary>
               </div>
            </div>
          </div>
