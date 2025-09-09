@@ -779,7 +779,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   placeholder="Description (optional)"
                   value={newProductData.description}
                   onChange={(e) => setNewProductData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground resize-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:border-transparent"
+                  className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground resize-none focus:border-transparent"
                   rows={3}
                 />
               </div>
