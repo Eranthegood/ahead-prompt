@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal, ChevronDown, Merge } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
@@ -173,20 +174,29 @@ export function LinearPromptItem({
         
         {/* Cursor Button */}
         {prompt.product?.github_repo_url && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isUsable) return;
-              onShowCursorDialog();
-            }}
-            disabled={!isUsable}
-            className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
-            aria-label="Send to Cursor"
-          >
-            <Merge className="h-3.5 w-3.5" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isUsable) return;
+                    onShowCursorDialog();
+                  }}
+                  disabled={!isUsable}
+                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
+                  aria-label="Send to Cursor"
+                >
+                  <Merge className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Send to Cursor</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {/* More actions */}
