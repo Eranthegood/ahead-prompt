@@ -2,103 +2,68 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { useProducts } from '@/hooks/useProducts';
-import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen } from 'lucide-react';
+import { Package, Edit, Trash2, Plus, MoreVertical, BookOpen, DollarSign, Archive } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { KnowledgeModal } from '@/components/KnowledgeModal';
+import { ModernProductCreator } from '@/components/ModernProductCreator';
 import type { Product, Workspace } from '@/types';
 
 interface ProductManagementProps {
   workspace: Workspace;
 }
 
-const PRODUCT_COLORS = [
-  { value: '#3B82F6', label: 'Blue' },
-  { value: '#10B981', label: 'Green' },
-  { value: '#8B5CF6', label: 'Purple' },
-  { value: '#F59E0B', label: 'Orange' },
-  { value: '#EF4444', label: 'Red' },
-  { value: '#6B7280', label: 'Gray' },
-];
-
 export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace }) => {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts(workspace.id);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    color: '#3B82F6',
-  });
-  const [createKnowledge, setCreateKnowledge] = useState(false);
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenEdit = (product: Product) => {
     setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      description: product.description || '',
-      color: product.color,
-    });
   };
 
   const handleCloseDialog = () => {
     setEditingProduct(null);
     setIsCreateDialogOpen(false);
-    setIsKnowledgeModalOpen(false);
-    setFormData({ name: '', description: '', color: '#3B82F6' });
-    setCreateKnowledge(false);
-    setCreatedProduct(null);
   };
 
   const handleKnowledgeModalClose = () => {
     setIsKnowledgeModalOpen(false);
+    setCreatedProduct(null);
     handleCloseDialog();
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      if (editingProduct) {
-        await updateProduct(editingProduct.id, {
-          name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          color: formData.color,
-        });
-        handleCloseDialog();
-      } else {
-        const newProduct = await createProduct({
-          name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          color: formData.color,
-        });
-        
-        if (newProduct && createKnowledge) {
-          setCreatedProduct(newProduct);
-          setIsCreateDialogOpen(false);
-          setIsKnowledgeModalOpen(true);
-        } else {
-          handleCloseDialog();
-        }
-      }
-    } finally {
-      setIsSubmitting(false);
+  const handleSave = async (productData: any) => {
+    if (editingProduct) {
+      await updateProduct(editingProduct.id, productData);
+      handleCloseDialog();
+      return editingProduct;
+    } else {
+      const newProduct = await createProduct(productData);
+      handleCloseDialog();
+      return newProduct;
     }
+  };
+
+  const handleCreateKnowledge = (product: Product) => {
+    setCreatedProduct(product);
+    setIsKnowledgeModalOpen(true);
   };
 
   const handleDelete = async (productId: string) => {
     if (window.confirm('Are you sure you want to delete this product? All associated epics will also be deleted.')) {
       await deleteProduct(productId);
     }
+  };
+
+  const formatPrice = (price: number | null) => {
+    if (price === null || price === undefined) return null;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(price);
   };
 
   if (loading) {
@@ -138,15 +103,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
         {products.map((product) => (
           <Card key={product.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1">
                 <div 
-                  className="w-3 h-3 rounded-full" 
+                  className="w-3 h-3 rounded-full flex-shrink-0" 
                   style={{ backgroundColor: product.color }}
                 />
-                <div>
-                  <h3 className="font-medium">{product.name}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-medium truncate">{product.name}</h3>
                   {product.description && (
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                       {product.description}
                     </p>
                   )}
@@ -155,7 +120,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -175,9 +140,27 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
               </DropdownMenu>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="space-y-3">
+              {/* Price and Inventory */}
+              {(product.price !== null || product.inventory_count !== null) && (
+                <div className="flex items-center gap-4 text-sm">
+                  {product.price !== null && (
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="w-3 h-3 text-muted-foreground" />
+                      <span className="font-medium">{formatPrice(product.price)}</span>
+                    </div>
+                  )}
+                  {product.inventory_count !== null && (
+                    <div className="flex items-center gap-1">
+                      <Archive className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">{product.inventory_count} in stock</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Created on {new Date(product.created_at).toLocaleDateString()}</span>
+                <span>Created {new Date(product.created_at).toLocaleDateString()}</span>
                 <Badge variant="outline">
                   <Package className="w-3 h-3 mr-1" />
                   Product
@@ -204,108 +187,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
         )}
       </div>
 
-      {/* Create/Edit Dialog */}
-      <Dialog 
-        open={isCreateDialogOpen || !!editingProduct} 
-        onOpenChange={(open) => !open && handleCloseDialog()}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
-              {editingProduct ? 'Edit product' : 'New Product'}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="product-name">Product name</Label>
-              <Input
-                id="product-name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ex: Mobile App, Website..."
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="product-description">Description (optional)</Label>
-              <Textarea
-                id="product-description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Briefly describe this product..."
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label>Color</Label>
-              <div className="flex items-center gap-2 mt-2">
-                {PRODUCT_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, color: color.value }))}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      formData.color === color.value 
-                        ? 'border-primary scale-110' 
-                        : 'border-muted hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.label}
-                  />
-                ))}
-                <div className="flex items-center gap-2 ml-2">
-                  <Palette className="w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="color"
-                    value={formData.color}
-                    onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-8 h-8 rounded border cursor-pointer"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Knowledge creation option - only show when creating new product */}
-            {!editingProduct && (
-              <div className="flex items-center space-x-2 py-2">
-                <Switch
-                  id="create-knowledge"
-                  checked={createKnowledge}
-                  onCheckedChange={setCreateKnowledge}
-                />
-                <Label htmlFor="create-knowledge" className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Add initial knowledge after creating product
-                </Label>
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={handleCloseDialog}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!formData.name.trim() || isSubmitting}
-              >
-                {isSubmitting 
-                  ? (editingProduct ? 'Updating...' : 'Creating...')
-                  : (editingProduct ? 'Update' : createKnowledge ? 'Create & Add Knowledge' : 'Create')
-                }
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Modern Product Creator */}
+      <ModernProductCreator
+        isOpen={isCreateDialogOpen || !!editingProduct}
+        onClose={handleCloseDialog}
+        onSave={handleSave}
+        workspace={workspace}
+        editingProduct={editingProduct}
+        onCreateKnowledge={handleCreateKnowledge}
+      />
 
       {/* Knowledge Modal */}
       {createdProduct && (

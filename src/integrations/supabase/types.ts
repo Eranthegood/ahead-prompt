@@ -810,8 +810,10 @@ export type Database = {
           description: string | null
           github_repo_url: string | null
           id: string
+          inventory_count: number | null
           name: string
           order_index: number | null
+          price: number | null
           updated_at: string
           workspace_id: string
         }
@@ -823,8 +825,10 @@ export type Database = {
           description?: string | null
           github_repo_url?: string | null
           id?: string
+          inventory_count?: number | null
           name: string
           order_index?: number | null
+          price?: number | null
           updated_at?: string
           workspace_id: string
         }
@@ -836,8 +840,10 @@ export type Database = {
           description?: string | null
           github_repo_url?: string | null
           id?: string
+          inventory_count?: number | null
           name?: string
           order_index?: number | null
+          price?: number | null
           updated_at?: string
           workspace_id?: string
         }
