@@ -419,7 +419,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         
         <SidebarContent 
           className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-4 sm:p-5'} flex flex-col min-h-full`}
-          style={{ backgroundColor: '#1d1e27' }}
+          style={{ backgroundColor: '#16161c' }}
         >
           {/* Logo and Brand */}
           {!isCollapsed ? (
