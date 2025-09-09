@@ -116,6 +116,22 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingEpic, setIsCreatingEpic] = useState(false);
   
+  // Epic creation during product creation
+  const [pendingEpics, setPendingEpics] = useState<Array<{
+    id: string;
+    name: string;
+    description: string;
+    color: string;
+    icon: string;
+  }>>([]);
+  const [isAddingEpic, setIsAddingEpic] = useState(false);
+  const [epicFormData, setEpicFormData] = useState({
+    name: '',
+    description: '',
+    color: '#8B5CF6',
+    icon: 'Hash',
+  });
+  
   // Edit states
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [isEditEpicOpen, setIsEditEpicOpen] = useState(false);
@@ -243,9 +259,22 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       });
 
       if (newProduct) {
+        // Create pending epics for the new product
+        for (const pendingEpic of pendingEpics) {
+          await createEpic({
+            name: pendingEpic.name,
+            description: pendingEpic.description,
+            color: pendingEpic.color,
+            product_id: newProduct.id,
+          });
+        }
+
         onProductSelect(newProduct.id);
         setIsCreateProductOpen(false);
         setNewProductData({ name: '', description: '', color: '#3B82F6' });
+        setPendingEpics([]);
+        setIsAddingEpic(false);
+        setEpicFormData({ name: '', description: '', color: '#8B5CF6', icon: 'Hash' });
       }
     } finally {
       setIsCreating(false);
@@ -833,6 +862,139 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                     </label>
                   </div>
                 </div>
+              </div>
+
+              {/* Initial Epics Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-foreground">Initial Epics</label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsAddingEpic(true)}
+                    className="text-xs"
+                  >
+                    <Plus className="w-3 h-3 mr-1" />
+                    Add Epic
+                  </Button>
+                </div>
+
+                {/* Pending Epics List */}
+                {pendingEpics.length > 0 && (
+                  <div className="space-y-2">
+                    {pendingEpics.map((epic) => (
+                      <div key={epic.id} className="flex items-center justify-between p-3 border border-border rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: epic.color }}
+                          />
+                          <div>
+                            <div className="text-sm font-medium text-foreground">{epic.name}</div>
+                            {epic.description && (
+                              <div className="text-xs text-muted-foreground">{epic.description}</div>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPendingEpics(prev => prev.filter(e => e.id !== epic.id))}
+                          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Epic Creation Form */}
+                {isAddingEpic && (
+                  <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/10">
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        placeholder="Epic name"
+                        value={epicFormData.name}
+                        onChange={(e) => setEpicFormData(prev => ({ ...prev, name: e.target.value }))}
+                        className="w-full bg-transparent border border-border rounded-md p-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary"
+                        autoFocus
+                      />
+                      <textarea
+                        placeholder="Add a description..."
+                        value={epicFormData.description}
+                        onChange={(e) => setEpicFormData(prev => ({ ...prev, description: e.target.value }))}
+                        className="w-full bg-transparent border border-border rounded-md p-2 text-sm text-foreground placeholder-muted-foreground resize-none focus:border-primary"
+                        rows={2}
+                      />
+                      
+                      {/* Epic Color Selection */}
+                      <div className="flex items-center gap-2">
+                        {[
+                          { value: '#8B5CF6', label: 'Purple' },
+                          { value: '#10B981', label: 'Green' },
+                          { value: '#3B82F6', label: 'Blue' },
+                          { value: '#F59E0B', label: 'Orange' },
+                          { value: '#EF4444', label: 'Red' },
+                          { value: '#6B7280', label: 'Gray' },
+                        ].map((color) => (
+                          <button
+                            key={color.value}
+                            type="button"
+                            onClick={() => setEpicFormData(prev => ({ ...prev, color: color.value }))}
+                            className={`w-6 h-6 rounded-full border-2 transition-all hover:scale-110 ${
+                              epicFormData.color === color.value 
+                                ? 'border-primary scale-110' 
+                                : 'border-muted-foreground/20'
+                            }`}
+                            style={{ backgroundColor: color.value }}
+                            title={color.label}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setIsAddingEpic(false);
+                          setEpicFormData({ name: '', description: '', color: '#8B5CF6', icon: 'Hash' });
+                        }}
+                        className="text-xs"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          if (epicFormData.name.trim()) {
+                            const newEpic = {
+                              id: Date.now().toString(),
+                              name: epicFormData.name.trim(),
+                              description: epicFormData.description.trim(),
+                              color: epicFormData.color,
+                              icon: epicFormData.icon,
+                            };
+                            setPendingEpics(prev => [...prev, newEpic]);
+                            setEpicFormData({ name: '', description: '', color: '#8B5CF6', icon: 'Hash' });
+                            setIsAddingEpic(false);
+                          }
+                        }}
+                        disabled={!epicFormData.name.trim()}
+                        className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground"
+                      >
+                        Add Epic
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
