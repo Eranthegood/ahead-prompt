@@ -79,7 +79,7 @@ export default function LandingPage() {
   }];
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
-      <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-52 sm:pb-64 pt-44 sm:pt-52 md:pt-72">
+      <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-52 sm:pb-64 pt-44 sm:pt-52 md:pt-72">
         <div className="max-w-7xl w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 sm:space-y-8">
