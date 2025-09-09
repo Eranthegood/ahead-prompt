@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.cursor-webhook]
 verify_jwt = false
+
+[functions.string-webhook]
+verify_jwt = false
