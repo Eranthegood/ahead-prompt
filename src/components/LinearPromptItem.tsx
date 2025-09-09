@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal, ChevronDown } from 'lucide-react';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
@@ -181,26 +182,70 @@ export function LinearPromptItem({
       </div>
 
       {/* Status - Fixed 80px column, aligned */}
-      <div 
-        className="w-20 flex-shrink-0 mr-4 flex items-center justify-start cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (onStatusChange) {
-            // Cycle through statuses: todo -> in_progress -> done -> todo
-            let nextStatus: PromptStatus;
-            if (prompt.status === 'todo') nextStatus = 'in_progress';
-            else if (prompt.status === 'in_progress') nextStatus = 'done';
-            else nextStatus = 'todo';
-            onStatusChange(prompt, nextStatus);
-          }
-        }}
-      >
-        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
-          <AgentWorkingIndicator size="sm" className="mr-1.5" />
+      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-start">
+        {/* Cursor workflow statuses are not editable */}
+        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor', 'pr_created', 'pr_review', 'pr_ready', 'pr_merged', 'error'].includes(prompt.status) ? (
+          <div className="flex items-center px-2 py-1">
+            <AgentWorkingIndicator size="sm" className="mr-1.5" />
+            <div className={`text-xs font-medium ${getStatusColor()} line-clamp-1`}>
+              {getStatusLabel()}
+            </div>
+          </div>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-auto p-2 -mx-2 justify-start hover:bg-gray-100 dark:hover:bg-gray-700 text-xs font-medium w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={`${getStatusColor()} line-clamp-1`}>
+                  {getStatusLabel()}
+                </div>
+                <ChevronDown className="h-3 w-3 ml-1 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="start" 
+              className="w-28 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onStatusChange && prompt.status !== 'todo') {
+                    onStatusChange(prompt, 'todo');
+                  }
+                }}
+                className={`${prompt.status === 'todo' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                To do
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onStatusChange && prompt.status !== 'in_progress') {
+                    onStatusChange(prompt, 'in_progress');
+                  }
+                }}
+                className={`${prompt.status === 'in_progress' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                In progress
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onStatusChange && prompt.status !== 'done') {
+                    onStatusChange(prompt, 'done');
+                  }
+                }}
+                className={`${prompt.status === 'done' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                Done
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
-        <div className={`text-xs font-medium ${getStatusColor()} line-clamp-1`}>
-          {getStatusLabel()}
-        </div>
       </div>
 
       {/* Title - Flexible column with consistent height */}
