@@ -74,6 +74,7 @@ const PRODUCT_COLORS = [
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
   const { epics, createEpic, updateEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
@@ -690,8 +691,8 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* Onboarding Checklist */}
-          {!isCollapsed && (
+          {/* Onboarding Checklist - Only show for unauthenticated users */}
+          {!isCollapsed && !user && (
             <SidebarGroup className="mt-4">
               <SidebarGroupContent>
                 <OnboardingChecklist workspace={workspace} />
