@@ -410,39 +410,41 @@ export function MinimalPromptList({
       {/* Header */}
       <div className="mb-6">
         <nav className="mb-3">
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-medium">All prompts</span>
-            {effectiveProductId && (
-              <>
-                <span className="mx-2">›</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
-                </span>
-              </>
-            )}
-            {selectedEpicId && (
-              <>
-                <span className="mx-2">›</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
-                </span>
-              </>
-            )}
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-gray-600 dark:text-gray-400">
+              <span className="font-medium">All prompts</span>
+              {effectiveProductId && (
+                <>
+                  <span className="mx-2">›</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {products.find(p => p.id === effectiveProductId)?.name || 'Unknown Product'}
+                  </span>
+                </>
+              )}
+              {selectedEpicId && (
+                <>
+                  <span className="mx-2">›</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {epics.find(e => e.id === selectedEpicId)?.name || 'Unknown Epic'}
+                  </span>
+                </>
+              )}
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
+            </div>
           </div>
         </nav>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {promptsWithInfo.length} prompt{promptsWithInfo.length !== 1 ? 's' : ''}
-          {searchQuery && (
-            <span className="ml-2 text-blue-600 dark:text-blue-400">
-              • Search: "{searchQuery}"
-              {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
-                <span className="text-xs ml-1 hidden sm:inline">
-                  (found in: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
-                </span>
-              )}
-            </span>
-          )}
-        </p>
+        {searchQuery && (
+          <p className="text-sm text-blue-600 dark:text-blue-400">
+            Search: "{searchQuery}"
+            {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
+              <span className="text-xs ml-1 hidden sm:inline">
+                (found in: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
+              </span>
+            )}
+          </p>
+        )}
       </div>
 
       {/* Linear-style Table Header */}
