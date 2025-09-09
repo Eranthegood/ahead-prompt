@@ -215,12 +215,12 @@ export function PromptCard({
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
         >
-          <CardContent className="p-1.5 sm:p-2">
+          <CardContent className="p-2.5 sm:p-3">
             {/* Ultra Minimalist Layout */}
-            <div className="space-y-1" onClick={() => onPromptClick(prompt)}>
+            <div className="space-y-1.5" onClick={() => onPromptClick(prompt)}>
               {/* Single Row Layout */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Priority Indicator */}
                   <Select
                     value={priority.toString()}
@@ -232,8 +232,8 @@ export function PromptCard({
                       onClick={stopEventPropagation}
                     >
                       <SelectValue asChild>
-                        <div className={`flex items-center justify-center h-4 w-4 rounded-full ${priorityDisplay.bgColor}`}>
-                          <PriorityIcon className={`h-2 w-2 ${priorityDisplay.color}`} />
+                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor}`}>
+                          <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
                         </div>
                       </SelectValue>
                     </SelectTrigger>
@@ -255,7 +255,7 @@ export function PromptCard({
                   <TruncatedTitle 
                     title={prompt.title}
                     maxLength={window.innerWidth >= 768 ? 60 : 35}
-                    className="font-medium text-foreground text-sm"
+                    className="font-medium text-foreground text-base"
                     showCopyButton={false}
                     variant="inline"
                   />
@@ -274,7 +274,7 @@ export function PromptCard({
                 </div>
                 
                 {/* Right Side Actions */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2.5">
                   {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
                     <AgentWorkingIndicator size="sm" />
                   )}
@@ -288,9 +288,9 @@ export function PromptCard({
                       handleCopy();
                     }}
                     disabled={!isUsable}
-                    className="h-5 w-5 p-0 hover:bg-accent/50"
+                    className="h-7 w-7 p-0 hover:bg-accent/50"
                   >
-                    {justCopied ? <Check className="h-2.5 w-2.5 text-green-600" /> : <Copy className="h-2.5 w-2.5" />}
+                    {justCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
                   </Button>
                   
                   {/* Cursor Button */}
@@ -304,9 +304,9 @@ export function PromptCard({
                         setShowCursorDialog(true);
                       }}
                       disabled={!isUsable}
-                      className="h-5 w-5 p-0 hover:bg-accent/50 text-purple-600"
+                      className="h-7 w-7 p-0 hover:bg-accent/50 text-purple-600"
                     >
-                      <ExternalLink className="h-2.5 w-2.5" />
+                      <ExternalLink className="h-3.5 w-3.5" />
                     </Button>
                   )}
                   
