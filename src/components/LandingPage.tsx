@@ -1,13 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle } from "lucide-react";
+import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { InteractivePromptCards } from "@/components/InteractivePromptCards";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
-import AutomationHero from "@/components/AutomationHero";
 // Logo components
 const CursorLogo = ({
   className
@@ -61,10 +60,49 @@ export default function LandingPage() {
     role: "Full-Stack Developer"
   }];
   return <div className="min-h-screen bg-background flex flex-col">
-      {/* Hero Section - replaced with dark automation-themed motion design */}
-      <div className="px-3 sm:px-6 pt-12 sm:pt-16 md:pt-24 pb-8">
-        <AutomationHero />
-      </div>
+      {/* Hero Section */}
+      <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
+        <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+              Stay <span className="text-primary">3 moves ahead</span>
+              <br />
+              while AI generates your code
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+              Queue your next prompts while AI works
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+            <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
+              {user ? "Build" : "Get Ahead - Free"}
+              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-6 opacity-60">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+              <span>Integration with</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <CursorLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
+                <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
+                  Cursor
+                </span>
+              </div>
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <GitHubLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
+                <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
+                  GitHub
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
 
       {/* Stay 3 Moves Ahead Feature Section */}
       <section className="py-16 px-6 bg-background">
