@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
@@ -35,7 +34,7 @@ export function MinimalPromptList({
   workspace, 
   selectedProductId, 
   selectedEpicId, 
-  searchQuery: externalSearchQuery, 
+  searchQuery, 
   hoveredPromptId, 
   onPromptHover,
   onCopy,
@@ -47,12 +46,6 @@ export function MinimalPromptList({
   const { epics } = useEpics(workspace.id);
   const { toast } = useToast();
   const { preferences } = useUserPreferences();
-  
-  // Local search state
-  const [localSearchQuery, setLocalSearchQuery] = useState('');
-  
-  // Use local search query, fallback to external
-  const searchQuery = localSearchQuery || externalSearchQuery;
   
   console.debug('[MinimalPromptList] Render with props:', { 
     selectedProductId, 
@@ -443,30 +436,6 @@ export function MinimalPromptList({
         {searchQuery && (
           <p className="text-sm text-blue-600 dark:text-blue-400">
             Search: "{searchQuery}"
-            {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
-              <span className="text-xs ml-1 hidden sm:inline">
-                (found in: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
-              </span>
-            )}
-          </p>
-        )}
-      </div>
-
-      {/* Search Bar - Left Aligned */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search prompts..."
-            value={localSearchQuery}
-            onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
-          />
-        </div>
-        {localSearchQuery && (
-          <p className="text-sm text-blue-600 dark:text-blue-400 mt-2">
-            Search: "{localSearchQuery}"
             {searchResults.length > 0 && searchResults[0].matchedFields.length > 0 && (
               <span className="text-xs ml-1 hidden sm:inline">
                 (found in: {searchResults.slice(0, 3).map(r => r.matchedFields).flat().filter((field, index, arr) => arr.indexOf(field) === index).join(', ')})
