@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
 import { Prompt, Product, Epic, PRIORITY_OPTIONS } from '@/types';
+import { Copy, FileText, Sparkles } from 'lucide-react';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -71,6 +73,24 @@ export function PromptDetailDialog({
     }
   };
 
+  const handleCopyGeneratedPrompt = async () => {
+    if (prompt?.generated_prompt) {
+      try {
+        await navigator.clipboard.writeText(prompt.generated_prompt);
+        toast({
+          title: 'Copied!',
+          description: 'Generated prompt copied to clipboard'
+        });
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to copy to clipboard',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onOpenChange(false);
@@ -87,77 +107,117 @@ export function PromptDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-2xl max-h-[80vh] flex flex-col" 
+        className="max-w-5xl max-h-[85vh] flex flex-col" 
         onKeyDown={handleKeyDown}
       >
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>Edit Idea</DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto space-y-6 py-4">
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your idea..."
-              className="min-h-[200px] resize-none"
-            />
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+          {/* Main Content Panel */}
+          <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe your idea..."
+                className="min-h-[200px] resize-none"
+              />
+            </div>
+
+            {/* Product Selection */}
+            <div className="space-y-2">
+              <Label>Product</Label>
+              <Select value={productId} onValueChange={setProductId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select product" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Product</SelectItem>
+                  {products.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      {product.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Epic Selection */}
+            <div className="space-y-2">
+              <Label>Epic</Label>
+              <Select value={epicId} onValueChange={setEpicId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select epic" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Epic</SelectItem>
+                  {filteredEpics.map((epic) => (
+                    <SelectItem key={epic.id} value={epic.id}>
+                      {epic.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Priority Selection */}
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <Select value={priority.toString()} onValueChange={(value) => setPriority(Number(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRIORITY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value.toString()}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Product Selection */}
-          <div className="space-y-2">
-            <Label>Product</Label>
-            <Select value={productId} onValueChange={setProductId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select product" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No Product</SelectItem>
-                {products.map((product) => (
-                  <SelectItem key={product.id} value={product.id}>
-                    {product.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Generated Prompt Side Panel */}
+          <div className="hidden lg:flex flex-col border-l border-border pl-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <Label className="text-sm font-medium">Generated Prompt</Label>
+              </div>
+              {prompt?.generated_prompt && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyGeneratedPrompt}
+                  className="h-8 px-3"
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  Copy
+                </Button>
+              )}
+            </div>
 
-          {/* Epic Selection */}
-          <div className="space-y-2">
-            <Label>Epic</Label>
-            <Select value={epicId} onValueChange={setEpicId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select epic" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No Epic</SelectItem>
-                {filteredEpics.map((epic) => (
-                  <SelectItem key={epic.id} value={epic.id}>
-                    {epic.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Priority Selection */}
-          <div className="space-y-2">
-            <Label>Priority</Label>
-            <Select value={priority.toString()} onValueChange={(value) => setPriority(Number(value))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                {PRIORITY_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value.toString()}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex-1 overflow-y-auto">
+              {prompt?.generated_prompt ? (
+                <div className="bg-muted/30 rounded-lg p-4 text-sm whitespace-pre-wrap font-mono">
+                  {prompt.generated_prompt}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                  <FileText className="h-8 w-8 mb-3 opacity-50" />
+                  <p className="text-sm">No generated prompt yet</p>
+                  <p className="text-xs opacity-75 mt-1">
+                    The AI-enhanced version will appear here once generated
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
