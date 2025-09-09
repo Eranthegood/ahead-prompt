@@ -102,7 +102,14 @@ export function LinearPromptItem({
     >
       {/* Priority indicator - Fixed 32px column */}
       <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mr-3">
-        <div className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-colors`}>
+        <div 
+          className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-all cursor-pointer hover:scale-110 hover:shadow-sm`}
+          onClick={(e) => {
+            e.stopPropagation();
+            // Handle priority click - could cycle through priorities or open priority menu
+            console.log('Priority clicked for prompt:', prompt.id);
+          }}
+        >
           <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
         </div>
       </div>
