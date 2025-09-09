@@ -88,7 +88,7 @@ export default function LandingPage() {
                   Stay organized and productive while vibecoding
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                  Queue your next prompts while AI works
+                  No more lost prompts in Google Docs; store, organize, and send your prompts from one place.
                 </p>
               </div>
               
