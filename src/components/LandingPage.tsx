@@ -79,27 +79,27 @@ export default function LandingPage() {
   }];
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Section */}
-      <main className="flex-1 flex items-center justify-center px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
-        <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
+      <main className="flex-1 flex items-center justify-start px-3 sm:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pt-24">
+        <div className="max-w-4xl text-left space-y-6 sm:space-y-8">
           <div className="space-y-4 sm:space-y-6">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
               Stay <span className="text-primary">3 moves ahead</span>
               <br />
               while AI generates your code
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed px-2">
               Queue your next prompts while AI works
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-start items-start">
             <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
               {user ? "Build" : "Get Ahead - Free"}
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-6 opacity-60">
+          <div className="flex flex-col sm:flex-row justify-start items-start gap-4 sm:gap-6 mt-6 opacity-60">
             <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <span>Integration with</span>
             </div>
