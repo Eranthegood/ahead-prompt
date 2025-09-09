@@ -162,7 +162,14 @@ export function LinearPromptItem({
       </div>
 
       {/* Status - Fixed 80px column, aligned */}
-      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-start">
+      <div 
+        className="w-20 flex-shrink-0 mr-4 flex items-center justify-start cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          // Handle status click - could cycle through statuses or open status menu
+          console.log('Status clicked for prompt:', prompt.id);
+        }}
+      >
         {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
           <AgentWorkingIndicator size="sm" className="mr-1.5" />
         )}
