@@ -81,45 +81,83 @@ serve(async (req) => {
           }
         }
 
-        // Try to insert into knowledge table first (if it exists)
-        let { data: knowledge, error: knowledgeError } = await supabase
-          .from('knowledge')
-          .insert({
-            title: article.title,
-            description: article.meta_description || `Article SEO de String.com: ${article.title}`,
-            content: article.content,
-            tags: article.keywords || [],
-            url: article.url,
-            metadata: articleData
+        // Store SEO article first
+        const { data: seoArticle, error: seoError } = await supabase
+          .from('seo_articles')
+          .upsert(articleData, { 
+            onConflict: 'external_id',
+            ignoreDuplicates: false 
           })
           .select()
           .single()
 
-        // If knowledge table doesn't exist, create a dedicated seo_articles table
-        if (knowledgeError && knowledgeError.code === '42P01') {
-          console.log('Knowledge table not found, using dedicated seo_articles storage')
-          
-          const { data: seoArticle, error: seoError } = await supabase
-            .from('seo_articles')
-            .upsert(articleData, { 
-              onConflict: 'external_id',
-              ignoreDuplicates: false 
-            })
-            .select()
-            .single()
-
-          if (seoError) {
-            console.error('Error storing SEO article:', seoError)
-            throw seoError
-          }
-
-          processedArticles.push(seoArticle)
-        } else if (knowledgeError) {
-          console.error('Error storing in knowledge:', knowledgeError)
-          throw knowledgeError
-        } else {
-          processedArticles.push(knowledge)
+        if (seoError) {
+          console.error('Error storing SEO article:', seoError)
+          throw seoError
         }
+
+        // Auto-create blog post from SEO article if it's published
+        if (article.status === 'published' && seoArticle) {
+          // Get or create default workspace (you might want to customize this)
+          const { data: workspaces } = await supabase
+            .from('workspaces')
+            .select('*')
+            .limit(1)
+
+          if (workspaces && workspaces.length > 0) {
+            const workspace = workspaces[0]
+            
+            // Create blog post
+            const blogPostData = {
+              title: article.title,
+              slug: null, // Will be auto-generated
+              excerpt: article.meta_description,
+              content: article.content,
+              featured_image_url: null,
+              meta_description: article.meta_description,
+              keywords: article.keywords || [],
+              status: 'draft', // Start as draft for review
+              author_id: workspace.owner_id,
+              seo_article_id: seoArticle.id,
+              workspace_id: workspace.id
+            }
+
+            const { data: blogPost, error: blogError } = await supabase
+              .from('blog_posts')
+              .upsert(blogPostData, {
+                onConflict: 'seo_article_id',
+                ignoreDuplicates: false
+              })
+              .select()
+              .single()
+
+            if (blogError) {
+              console.error('Error creating blog post:', blogError)
+              // Don't throw here, SEO article creation was successful
+            } else {
+              console.log(`Blog post created: ${blogPost.title}`)
+              
+              // Try to assign to a "SEO" category if it exists
+              const { data: seoCategory } = await supabase
+                .from('blog_categories')
+                .select('id')
+                .eq('slug', 'seo')
+                .eq('workspace_id', workspace.id)
+                .single()
+
+              if (seoCategory) {
+                await supabase
+                  .from('blog_post_categories')
+                  .upsert({
+                    post_id: blogPost.id,
+                    category_id: seoCategory.id
+                  })
+              }
+            }
+          }
+        }
+
+        processedArticles.push(seoArticle)
 
         console.log(`Successfully processed article: ${article.title}`)
 

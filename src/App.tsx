@@ -31,6 +31,9 @@ import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
 import PromptManagement from "./pages/PromptManagement";
 import StringIntegration from "./pages/StringIntegration";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
 
 import FeedbackBubble from "./components/FeedbackBubble";
@@ -117,6 +120,13 @@ function App() {
                      <Route path="/integrations/string" element={
                        <ProtectedRoute>
                          <StringIntegration />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/blog" element={<Blog />} />
+                     <Route path="/blog/:slug" element={<BlogPost />} />
+                     <Route path="/admin/blog" element={
+                       <ProtectedRoute>
+                         <AdminBlog />
                        </ProtectedRoute>
                      } />
                      <Route path="/settings/repository-mapping" element={
