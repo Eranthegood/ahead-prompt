@@ -784,6 +784,15 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 />
               </div>
               
+              {/* Knowledge URL input */}
+              <div className="space-y-2">
+                <input 
+                  type="url" 
+                  placeholder="Knowledge URL (optional)"
+                  className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground focus:border-transparent"
+                />
+              </div>
+              
               {/* Color selection */}
               <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Color</label>
