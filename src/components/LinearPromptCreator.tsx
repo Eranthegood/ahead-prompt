@@ -239,7 +239,8 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         />
       )}
       
-      <div className="bg-card border border-border rounded-lg w-full max-w-4xl mx-auto shadow-lg linear-prompt-creator">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-lg w-full max-w-4xl mx-auto shadow-lg linear-prompt-creator max-h-[90vh] overflow-y-auto">
         {/* Header with breadcrumb */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2 text-sm">
@@ -338,6 +339,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
               {isGenerating ? 'Creating...' : 'Create prompt'}
             </Button>
           </div>
+        </div>
         </div>
       </div>
     </>
