@@ -280,6 +280,18 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
             autoFocus
           />
           
+          {/* Expanded rich text editor */}
+          {isExpanded && (
+            <div className="space-y-4 border-t border-border pt-6">
+              <div className="min-h-[200px] border border-border rounded-md">
+                <EditorContent 
+                  editor={editor} 
+                  className="prose prose-sm max-w-none p-4 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-md"
+                />
+              </div>
+            </div>
+          )}
+          
           {/* Linear action buttons */}
           <LinearActionButtons
             priority={priority}
@@ -299,18 +311,6 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
             onKnowledgeChange={setSelectedKnowledge}
             onExpandToggle={() => setIsExpanded(!isExpanded)}
           />
-
-          {/* Expanded rich text editor */}
-          {isExpanded && (
-            <div className="space-y-4 border-t border-border pt-6">
-              <div className="min-h-[200px] border border-border rounded-md">
-                <EditorContent 
-                  editor={editor} 
-                  className="prose prose-sm max-w-none p-4 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-md"
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer actions */}
