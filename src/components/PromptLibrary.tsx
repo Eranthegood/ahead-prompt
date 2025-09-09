@@ -152,11 +152,6 @@ TODO:
               </DialogTitle>
               <div className="flex items-center gap-2">
                 <kbd className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded border">⌘K</kbd>
-                <DialogClose asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
               </div>
             </div>
           </DialogHeader>
