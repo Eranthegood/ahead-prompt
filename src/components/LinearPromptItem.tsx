@@ -107,44 +107,8 @@ export function LinearPromptItem({
         </div>
       </div>
 
-      {/* Title - flexible column */}
-      <div className="flex-1 min-w-0 mr-4">
-        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1">
-          {prompt.title}
-        </div>
-        {prompt.description && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
-            {prompt.description}
-          </div>
-        )}
-      </div>
-
-      {/* Epic/Product context - 120px column */}
-      <div className="w-30 flex-shrink-0 mr-4 hidden sm:block">
-        {prompt.epic && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-            {prompt.epic.name}
-          </div>
-        )}
-        {prompt.product && (
-          <div className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1">
-            {prompt.product.name}
-          </div>
-        )}
-      </div>
-
-      {/* Status - 80px column */}
-      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-end">
-        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
-          <AgentWorkingIndicator size="sm" className="mr-2" />
-        )}
-        <div className={`text-xs font-medium ${getStatusColor()}`}>
-          {getStatusLabel()}
-        </div>
-      </div>
-
-      {/* Actions - show on hover */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+      {/* Actions - show on hover, positioned left of title */}
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-3">
         {/* Copy Button */}
         <Button
           variant="ghost"
@@ -196,6 +160,43 @@ export function LinearPromptItem({
           <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
         </Button>
       </div>
+
+      {/* Title - flexible column */}
+      <div className="flex-1 min-w-0 mr-4">
+        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1">
+          {prompt.title}
+        </div>
+        {prompt.description && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+            {prompt.description}
+          </div>
+        )}
+      </div>
+
+      {/* Epic/Product context - 120px column */}
+      <div className="w-30 flex-shrink-0 mr-4 hidden sm:block">
+        {prompt.epic && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+            {prompt.epic.name}
+          </div>
+        )}
+        {prompt.product && (
+          <div className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1">
+            {prompt.product.name}
+          </div>
+        )}
+      </div>
+
+      {/* Status - 80px column */}
+      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-end">
+        {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
+          <AgentWorkingIndicator size="sm" className="mr-2" />
+        )}
+        <div className={`text-xs font-medium ${getStatusColor()}`}>
+          {getStatusLabel()}
+        </div>
+      </div>
+
     </div>
   );
 }
