@@ -93,22 +93,22 @@ export function LinearPromptItem({
 
   return (
     <div 
-      className={`group flex items-center py-2 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
+      className={`group flex items-center h-12 py-1 px-3 -mx-3 rounded-md transition-all duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 ${
         isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
       } ${!isUsable ? 'opacity-60' : ''}`}
       onMouseEnter={() => onHover?.(prompt.id)}
       onMouseLeave={() => onHover?.(null)}
       onClick={() => onPromptClick(prompt)}
     >
-      {/* Priority indicator - 32px column */}
+      {/* Priority indicator - Fixed 32px column */}
       <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mr-3">
-        <div className={`p-1.5 rounded-full ${priorityDisplay.bg} transition-colors`}>
+        <div className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-colors`}>
           <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
         </div>
       </div>
 
-      {/* Actions - show on hover, positioned left of title */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-3">
+      {/* Actions - Fixed width, show on hover */}
+      <div className="flex items-center gap-1 w-24 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-3">
         {/* Copy Button */}
         <Button
           variant="ghost"
@@ -118,7 +118,7 @@ export function LinearPromptItem({
             handleCopy();
           }}
           disabled={!isUsable}
-          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
           aria-label="Copy prompt"
         >
           {justCopied ? (
@@ -139,7 +139,7 @@ export function LinearPromptItem({
               onShowCursorDialog();
             }}
             disabled={!isUsable}
-            className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
             aria-label="Send to Cursor"
           >
             <ExternalLink className="h-3.5 w-3.5" />
@@ -154,44 +154,44 @@ export function LinearPromptItem({
             e.stopPropagation();
             // This could open a context menu or additional actions
           }}
-          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="h-7 w-7 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
           aria-label="More actions"
         >
           <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
         </Button>
       </div>
 
-      {/* Status - positioned left of title */}
-      <div className="w-20 flex-shrink-0 mr-4 flex items-center">
+      {/* Status - Fixed 80px column, aligned */}
+      <div className="w-20 flex-shrink-0 mr-4 flex items-center justify-start">
         {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
-          <AgentWorkingIndicator size="sm" className="mr-2" />
+          <AgentWorkingIndicator size="sm" className="mr-1.5" />
         )}
-        <div className={`text-xs font-medium ${getStatusColor()}`}>
+        <div className={`text-xs font-medium ${getStatusColor()} line-clamp-1`}>
           {getStatusLabel()}
         </div>
       </div>
 
-      {/* Title - flexible column */}
-      <div className="flex-1 min-w-0 mr-4">
-        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1">
+      {/* Title - Flexible column with consistent height */}
+      <div className="flex-1 min-w-0 mr-4 py-1">
+        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1 h-4">
           {prompt.title}
         </div>
         {prompt.description && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1 h-3">
             {prompt.description}
           </div>
         )}
       </div>
 
-      {/* Epic/Product context - 120px column */}
-      <div className="w-30 flex-shrink-0 mr-4 hidden sm:block">
+      {/* Epic/Product context - Fixed 120px column, aligned */}
+      <div className="w-30 flex-shrink-0 mr-4 hidden sm:flex flex-col justify-center py-1">
         {prompt.epic && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 h-3 leading-3">
             {prompt.epic.name}
           </div>
         )}
         {prompt.product && (
-          <div className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1">
+          <div className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1 h-3 leading-3 mt-0.5">
             {prompt.product.name}
           </div>
         )}
