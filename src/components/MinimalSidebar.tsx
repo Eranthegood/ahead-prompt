@@ -609,7 +609,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="h-6 w-6 p-0 hover:bg-accent/50 border border-transparent hover:border-border -mr-1"
+                          className="h-6 w-6 p-0 hover:bg-accent/50 border border-transparent hover:border-border -mr-1 -ml-5"
                           onClick={() => setIsCreateProductOpen(true)}
                           aria-label="Create Product"
                         >
