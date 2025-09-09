@@ -308,11 +308,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between p-4 border-t border-border">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-            <Paperclip className="w-4 h-4" />
-          </Button>
-          
+        <div className="flex items-center justify-end p-4 border-t border-border">
           <div className="flex items-center gap-3">
             <Button 
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
