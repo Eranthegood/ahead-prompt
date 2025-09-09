@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Edit, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
+import { Expand, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -255,7 +255,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
               onClick={() => setIsExpanded(!isExpanded)}
               className="h-8 w-8 p-0"
             >
-              <Edit className="w-4 h-4" />
+              <Expand className="w-4 h-4" />
             </Button>
             <Button 
               variant="ghost" 
