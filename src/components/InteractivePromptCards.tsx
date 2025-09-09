@@ -220,22 +220,6 @@ export function InteractivePromptCards() {
         ))}
       </div>
 
-      {/* Title */}
-      <motion.div 
-        className="text-center mb-6 sm:mb-8"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h3 className="text-lg sm:text-xl font-semibold mb-2 flex items-center justify-center gap-2">
-          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-          Try the Core Workflow
-        </h3>
-        <p className="text-muted-foreground text-xs sm:text-sm px-4">
-          Click the buttons to see how prompts flow through your development process
-        </p>
-      </motion.div>
-
       {/* Interactive Cards */}
       <motion.div
         className="flex flex-col gap-4 sm:gap-6 relative z-10 w-full max-w-none sm:max-w-lg lg:max-w-md mx-auto"
