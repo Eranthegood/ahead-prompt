@@ -229,7 +229,8 @@ export function DraggableProductItem({
                      </span>
                    </div>
                    <Badge 
-                     className="ml-2 text-xs flex-shrink-0 bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0"
+                     variant="secondary"
+                     className="ml-2 text-xs flex-shrink-0"
                    >
                      {product.promptCount}
                    </Badge>
