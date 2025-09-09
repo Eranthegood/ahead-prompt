@@ -284,7 +284,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
               <div className="min-h-[200px] border border-border rounded-md">
                 <EditorContent 
                   editor={editor} 
-                  className="prose prose-sm max-w-none p-4 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-md"
+                  className="prose prose-sm max-w-none p-4 rounded-md"
                 />
               </div>
             </div>
