@@ -30,11 +30,7 @@ const Circle = forwardRef<
     >
       {children}
       {pulse && !reduceMotion && (
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-primary/40"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.8, 0.3, 0.8] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse" />
       )}
     </motion.div>
   );
@@ -67,10 +63,10 @@ export const AutomationHero: React.FC = () => {
         {/* Subtle animated gradient wash */}
         {!reduceMotion && (
           <motion.div
-            className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(80,80,80,0.25),transparent_40%),radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.18),transparent_35%)]"
-            initial={{ opacity: 0.6, rotate: 0 }}
-            animate={{ opacity: 0.8, rotate: 360 }}
-            transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(80,80,80,0.15),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.12),transparent_45%)]"
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: 0.6 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
           />
         )}
 
@@ -101,14 +97,8 @@ export const AutomationHero: React.FC = () => {
               className="relative mx-auto h-[320px] w-full max-w-3xl overflow-hidden rounded-xl border border-white/10 bg-neutral-950/60 backdrop-blur"
               ref={containerRef}
             >
-              {/* Floating background spark */}
-              {!reduceMotion && (
-                <motion.div
-                  className="absolute -top-10 left-1/2 h-24 w-24 -translate-x-1/2 rounded-full bg-primary/20 blur-2xl"
-                  animate={{ y: [0, 10, 0], opacity: [0.6, 0.9, 0.6] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                />
-              )}
+              {/* Container background only */}
+              <div className="absolute inset-0 bg-neutral-950/40" />
 
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="grid grid-cols-3 grid-rows-3 items-center justify-items-center w-full h-full px-8 py-6">
