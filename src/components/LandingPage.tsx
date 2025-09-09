@@ -85,9 +85,7 @@ export default function LandingPage() {
             <div className="space-y-6 sm:space-y-8">
               <div className="space-y-4 sm:space-y-6">
                 <h1 className="text-3xl sm:text-4xl md:text-6xl font-apple-system tracking-tight leading-tight">
-                  Stay <span className="text-primary">3 moves ahead</span>
-                  <br />
-                  while AI generates your code
+                  Stay organized and productive while vibecoding
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed">
                   Queue your next prompts while AI works
