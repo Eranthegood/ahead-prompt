@@ -227,10 +227,6 @@ export function InteractivePromptCards() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h3 className="text-lg sm:text-xl font-semibold mb-2 flex items-center justify-center gap-2">
-          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-          Try the Core Workflow
-        </h3>
         <p className="text-muted-foreground text-xs sm:text-sm px-4">
           Click the buttons to see how prompts flow through your development process
         </p>
