@@ -183,15 +183,31 @@ export function LinearPromptItem({
         )}
       </div>
 
-      {/* Epic/Product context - Fixed 120px column, aligned */}
+      {/* Epic/Product context - Fixed 120px column, aligned, clickable */}
       <div className="w-30 flex-shrink-0 mr-4 hidden sm:flex flex-col justify-center py-1">
         {prompt.epic && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 h-3 leading-3">
+          <div 
+            className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 h-3 leading-3 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle epic click - could navigate to epic or filter by epic
+              console.log('Epic clicked:', prompt.epic?.id, prompt.epic?.name);
+            }}
+            title={`Filter by epic: ${prompt.epic.name}`}
+          >
             {prompt.epic.name}
           </div>
         )}
         {prompt.product && (
-          <div className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1 h-3 leading-3 mt-0.5">
+          <div 
+            className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1 h-3 leading-3 mt-0.5 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle product click - could navigate to product or filter by product
+              console.log('Product clicked:', prompt.product?.id, prompt.product?.name);
+            }}
+            title={`Filter by product: ${prompt.product.name}`}
+          >
             {prompt.product.name}
           </div>
         )}
