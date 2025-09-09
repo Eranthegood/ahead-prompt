@@ -417,10 +417,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     <TooltipProvider>
       <Sidebar className="border-r shrink-0" collapsible="icon">
         
-        <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-3 sm:p-4'} flex flex-col min-h-full`}>
+        <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-4 sm:p-5'} flex flex-col min-h-full bg-gradient-to-b from-background to-muted/20`}>
           {/* Logo and Brand */}
           {!isCollapsed ? (
-            <div className="mb-4 sm:mb-6">
+            <div className="mb-6 pb-4 border-b border-border/50">
               <div className="flex items-center justify-between">
                 <Button 
                   variant="ghost" 
@@ -428,23 +428,23 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   onClick={() => navigate('/')}
                 >
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
+                    <h2 className="text-lg font-semibold text-foreground tracking-tight">
                       <span>Ahead</span>
                     </h2>
                   </div>
                 </Button>
-                <SidebarTrigger className="h-7 w-7 shrink-0" />
+                <SidebarTrigger className="h-7 w-7 shrink-0 hover:bg-accent/50" />
               </div>
             </div>
           ) : (
-            <div className="mb-4 sm:mb-6 flex flex-col items-center gap-2">
-              <SidebarTrigger className="h-7 w-7" />
+            <div className="mb-6 flex flex-col items-center gap-3 pb-4 border-b border-border/50">
+              <SidebarTrigger className="h-7 w-7 hover:bg-accent/50" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="w-8 h-8 p-0"
+                    className="w-8 h-8 p-0 hover:bg-accent/50"
                     onClick={() => navigate('/')}
                     aria-label="Home"
                   >
@@ -460,13 +460,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
 
           {/* Add Prompt Action */}
-          <div className="mb-4 sm:mb-6">
+          <div className="mb-6">
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     onClick={onQuickAdd}
-                    className="w-full aspect-square bg-primary hover:bg-primary/90 text-primary-foreground p-0"
+                    className="w-full aspect-square bg-primary hover:bg-primary/90 text-primary-foreground p-0 shadow-sm"
                     size="sm"
                     aria-label="Add Prompt"
                   >
@@ -479,36 +479,41 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <>
+              <div className="bg-accent/30 rounded-lg p-3">
                 <Button 
                   onClick={() => {
                     console.log('Add Prompt clicked');
                     setOpenMobile?.(false);
                     onQuickAdd();
                   }}
-                  className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base"
+                  className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium h-10 shadow-sm"
                   size="sm"
                   aria-label="Add Prompt"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Prompt
                 </Button>
-                <p className="text-xs text-muted-foreground mt-2 px-1 hidden sm:block">
-                  Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">T</kbd> for bugs
+                <p className="text-xs text-muted-foreground mt-2 px-1">
+                  Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted/70 text-muted-foreground rounded border border-border/40">Q</kbd> for task or <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted/70 text-muted-foreground rounded border border-border/40">T</kbd> for bugs
                 </p>
-              </>
+              </div>
             )}
           </div>
 
           {/* Quick Actions */}
-          <div className="mb-3 sm:mb-4 space-y-1 sm:space-y-2">
+          <div className="mb-6 space-y-2">
+            {/* Section Label */}
+            {!isCollapsed && (
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-3">Navigation</h3>
+            )}
+            
             {/* Prompt Library */}
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full aspect-square p-0 hover:bg-accent/50"
+                    className="w-full aspect-square p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
                     onClick={() => setIsPromptLibraryOpen(true)}
                     aria-label="Prompt Library"
                   >
@@ -523,12 +528,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             ) : (
               <Button 
                 variant="ghost" 
-                className="w-full justify-start text-left font-normal text-sm sm:text-base py-2 hover:bg-accent/50"
+                className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-accent/60 border border-transparent hover:border-border/40 rounded-md"
                 onClick={() => setIsPromptLibraryOpen(true)}
               >
-                <Library className="mr-2 sm:mr-3 h-4 w-4" />
-                Prompt Library
-                <kbd className="ml-auto px-1.5 py-0.5 text-xs bg-muted text-muted-foreground rounded border">L</kbd>
+                <div className="flex items-center">
+                  <Library className="mr-3 h-4 w-4 text-foreground/70" />
+                  <span className="text-foreground">Prompt Library</span>
+                </div>
+                <kbd className="px-2 py-1 text-xs bg-muted/70 text-muted-foreground rounded border border-border/40">L</kbd>
               </Button>
             )}
 
@@ -538,7 +545,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full aspect-square p-0"
+                    className="w-full aspect-square p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
                     onClick={() => {
                       navigate('/');
                       onProductSelect('all');
@@ -548,62 +555,68 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   >
                     <div className="relative">
                       <FileText className="h-4 w-4" />
-                      {activePromptsCount > 0 && (
-                        <Badge 
-                          variant="secondary" 
-                          className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center"
-                        >
-                          {activePromptsCount > 99 ? '99+' : activePromptsCount}
-                        </Badge>
-                      )}
-                    </div>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>All Prompts</p>
-                  <p className="text-xs text-muted-foreground">{activePromptsCount} active prompts (To do + In progress)</p>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start text-left font-normal text-sm sm:text-base py-2"
-                onClick={() => {
-                  navigate('/build');
-                  onProductSelect('all');
-                  onEpicSelect(undefined);
-                }}
-                aria-label={`All Prompts (${activePromptsCount})`}
-              >
-                <FileText className="mr-2 sm:mr-3 h-4 w-4" />
-                All Prompts
-                <Badge variant="secondary" className="ml-auto text-xs">
-                  {activePromptsCount}</Badge>
-              </Button>
-            )}
+                       {activePromptsCount > 0 && (
+                         <Badge 
+                           className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs rounded-full flex items-center justify-center bg-primary/80 text-primary-foreground border border-primary/20"
+                         >
+                           {activePromptsCount > 99 ? '99+' : activePromptsCount}
+                         </Badge>
+                       )}
+                     </div>
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent side="right">
+                   <p>All Prompts</p>
+                   <p className="text-xs text-muted-foreground">{activePromptsCount} active prompts</p>
+                 </TooltipContent>
+               </Tooltip>
+             ) : (
+               <Button 
+                 variant="ghost" 
+                 className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-accent/60 border border-transparent hover:border-border/40 rounded-md"
+                 onClick={() => {
+                   navigate('/build');
+                   onProductSelect('all');
+                   onEpicSelect(undefined);
+                 }}
+                 aria-label={`All Prompts (${activePromptsCount})`}
+               >
+                 <div className="flex items-center">
+                   <FileText className="mr-3 h-4 w-4 text-foreground/70" />
+                   <span className="text-foreground">All Prompts</span>
+                 </div>
+                 <Badge 
+                   className="bg-primary/80 text-primary-foreground border border-primary/20 text-xs px-2 py-0.5"
+                 >
+                   {activePromptsCount}
+                 </Badge>
+               </Button>
+             )}
           </div>
 
           {/* Products with Epic Hierarchy */}
-          <SidebarGroup className="mt-2">
+          <SidebarGroup className="mt-4 flex-1">
             {!isCollapsed && (
-              <div className="mb-2 sm:mb-3 flex items-center justify-between">
-                <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">Products</h3>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-5 w-5 sm:h-6 sm:w-6 p-0"
-                      onClick={() => setIsCreateProductOpen(true)}
-                      aria-label="Create Product"
-                    >
-                      <Plus className="h-2 w-2 sm:h-3 sm:w-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Create Product</p>
-                  </TooltipContent>
-                </Tooltip>
+              <div className="mb-4 pb-2 border-b border-border/30">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Products</h3>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 w-6 p-0 hover:bg-accent/60 border border-transparent hover:border-border/40"
+                        onClick={() => setIsCreateProductOpen(true)}
+                        aria-label="Create Product"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Create Product</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             )}
             
