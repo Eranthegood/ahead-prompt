@@ -57,7 +57,10 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header 
+      className="sticky top-0 z-50 h-14 border-b border-border backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      style={{ backgroundColor: '#191a23' }}
+    >
         <div className="container flex h-full items-center justify-between px-4">
           {/* Left side - Logo and navigation */}
           <div className="flex items-center gap-4">
