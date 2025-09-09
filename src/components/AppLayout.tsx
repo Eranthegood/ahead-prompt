@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
-import { QuickPromptDialog } from './QuickPromptDialog';
+import { LinearPromptCreator } from './LinearPromptCreator';
 import { MobilePromptFAB } from './MobilePromptFAB';
 import { MobilePromptDrawer } from './MobilePromptDrawer';
 import Dashboard from './Dashboard';
@@ -21,6 +21,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
@@ -137,6 +138,7 @@ function SidebarWithContent({
 }) {
   const isMobile = useIsMobile();
   const location = useLocation();
+  const navigate = useNavigate();
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
@@ -181,7 +183,7 @@ function SidebarWithContent({
           </main>
         </div>
 
-        <QuickPromptDialog
+        <LinearPromptCreator
           isOpen={quickPromptOpen && !isMobile}
           onClose={() => setQuickPromptOpen(false)}
           onSave={handleSavePrompt}
@@ -190,6 +192,8 @@ function SidebarWithContent({
           epics={epics}
           selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
           selectedEpicId={selectedEpicId}
+          onCreateProduct={() => navigate('/build?create=product')}
+          onCreateEpic={() => navigate('/build?create=epic')}
         />
 
         <MobilePromptDrawer

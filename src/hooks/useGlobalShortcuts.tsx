@@ -28,6 +28,16 @@ export function useGlobalShortcuts(shortcuts: ShortcutMap) {
       if (event.shiftKey) shortcutString += 'shift+';
       shortcutString += key;
 
+      // Special handling for expansion shortcut (Ctrl+F/Cmd+F)
+      // Allow this to work even in input fields when inside LinearPromptCreator
+      if (shortcutString === 'ctrl+f' || shortcutString === 'cmd+f') {
+        const isInLinearPrompt = document.querySelector('.linear-prompt-creator');
+        if (isInLinearPrompt) {
+          // Let the LinearPromptCreator handle this
+          return;
+        }
+      }
+
       // Execute if shortcut exists
       const callback = shortcuts[shortcutString];
       if (callback) {
