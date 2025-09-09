@@ -71,8 +71,6 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     setProviderConfig,
     selectedKnowledge,
     setSelectedKnowledge,
-    createMore,
-    setCreateMore,
     isExpanded,
     setIsExpanded,
     resetForm,
@@ -186,15 +184,10 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         description: "Your prompt has been saved successfully.",
       });
 
-      // Reset form if not creating more
-      if (!createMore) {
-        resetForm();
-        editor?.commands.clearContent();
-        onClose();
-      } else {
-        setTitle('');
-        editor?.commands.clearContent();
-      }
+      // Reset form and close
+      resetForm();
+      editor?.commands.clearContent();
+      onClose();
     } catch (error) {
       console.error('Error creating prompt:', error);
       toast({
@@ -321,16 +314,6 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
           </Button>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Switch 
-                id="create-more" 
-                checked={createMore}
-                onCheckedChange={setCreateMore}
-              />
-              <label htmlFor="create-more" className="text-sm text-muted-foreground">
-                Create more
-              </label>
-            </div>
             <Button 
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={handleSave}
