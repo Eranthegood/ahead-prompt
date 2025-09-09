@@ -9,6 +9,10 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom", "vite/client", "node"],
     "noImplicitAny": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,
