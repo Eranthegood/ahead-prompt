@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { LinearDropdown } from './linear-dropdown';
+import { ProductIcon } from './product-icon';
 import { 
   Circle, 
   Clock, 
@@ -102,14 +103,14 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
     ...products.map(product => ({
       id: product.id,
       label: product.name,
-      icon: Folder,
+      icon: () => <ProductIcon className="w-4 h-4" />,
       color: product.color,
       onClick: () => onProductChange(product.id),
     })),
     ...(onCreateProduct ? [{
       id: 'create-new',
       label: 'Create new product',
-      icon: Folder,
+      icon: () => <ProductIcon className="w-4 h-4" />,
       onClick: onCreateProduct,
     }] : [])
   ];
@@ -197,7 +198,7 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
             size="sm" 
             className="h-8 px-3 text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60"
           >
-            <Folder className="w-4 h-4" />
+            <ProductIcon className="w-4 h-4" />
             <span className="ml-2 text-sm">
               {selectedProductData?.name || 'Product'}
             </span>

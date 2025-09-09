@@ -30,6 +30,7 @@ import {
   FileText,
   Plus
 } from 'lucide-react';
+import { ProductIcon } from '@/components/ui/product-icon';
 import { Workspace, Product, Epic } from '@/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AdaptiveTitle } from './ui/adaptive-title';
@@ -187,8 +188,8 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
           <SidebarGroupContent>
             <SidebarMenu>
               {productsWithData.length === 0 ? (
-                <div className="px-2 py-4 text-center">
-                  <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <div className="px-2 py-4 text-center">
+                  <ProductIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm text-muted-foreground">No products yet</p>
                   {!collapsed && (
                     <Button size="sm" variant="outline" className="mt-2" onClick={() => console.log('Create product')}>
@@ -221,7 +222,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                               />
                               {!collapsed && (
                                 <>
-                                  <Package className="h-4 w-4 flex-shrink-0" />
+                                  <ProductIcon className="h-4 w-4 flex-shrink-0" />
                                   <AdaptiveTitle 
                                     reservedSpace={50}
                                     minSize={12}

@@ -39,6 +39,7 @@ import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
 import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library } from 'lucide-react';
+import { ProductIcon } from '@/components/ui/product-icon';
 import { Workspace, Product } from '@/types';
 
 
@@ -643,7 +644,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                                 onClick={() => setIsCreateProductOpen(true)}
                                 aria-label="No products - Click to add"
                               >
-                                <Package className="h-4 w-4 text-muted-foreground" />
+                                <ProductIcon className="h-4 w-4 text-muted-foreground" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="right">
@@ -738,7 +739,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
+              <ProductIcon className="w-5 h-5" />
               New Product
             </DialogTitle>
           </DialogHeader>
@@ -984,7 +985,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
+              <ProductIcon className="w-5 h-5" />
               Edit Product
             </DialogTitle>
           </DialogHeader>

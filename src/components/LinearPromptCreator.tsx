@@ -4,6 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Expand, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
+import { ProductIcon } from '@/components/ui/product-icon';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -240,7 +241,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         {/* Header with breadcrumb */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2 text-sm">
-            <Folder className="w-4 h-4 text-primary" />
+            <ProductIcon className="w-4 h-4 text-primary" />
             <span className="text-muted-foreground">Workspace</span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
             <span className="text-foreground">New Prompt</span>
