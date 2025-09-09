@@ -299,7 +299,8 @@ export function LinearPromptItem({
       {/* Title - Flexible column with consistent height */}
       <div className="flex-1 min-w-0 mr-4 py-1">
         <div 
-          className="font-medium text-gray-900 dark:text-gray-100 text-sm leading-tight line-clamp-1 h-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          className="font-inter-variable font-medium text-gray-900 dark:text-gray-100 leading-tight line-clamp-1 h-4 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          style={{ fontSize: '13px' }}
           onClick={(e) => {
             e.stopPropagation();
             // Handle title click - could open prompt details or edit title

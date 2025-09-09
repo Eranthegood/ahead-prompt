@@ -20,6 +20,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'apple-system': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'system-ui', 'sans-serif'],
+				'inter-variable': ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
