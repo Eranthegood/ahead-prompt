@@ -93,7 +93,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
             </div>
             
             <Button variant="ghost" size="sm" className="group">
-              Lire la suite
+              Read more
               <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -125,7 +125,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
                 {post.reading_time_minutes && (
                   <span>{post.reading_time_minutes} min</span>
                 )}
-                <span>{post.view_count} vues</span>
+                <span>{post.view_count} views</span>
               </div>
             </div>
           </div>

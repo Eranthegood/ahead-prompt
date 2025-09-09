@@ -150,14 +150,14 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
 
   if (!loading && posts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-muted-foreground">
-          {searchQuery || selectedCategory 
-            ? "Aucun article trouvé pour ces critères"
-            : "Aucun article publié pour le moment"
-          }
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">
+            {searchQuery || selectedCategory 
+              ? "No articles found for these criteria"
+              : "No published articles yet"
+            }
+          </div>
         </div>
-      </div>
     );
   }
 
@@ -170,7 +170,7 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher des articles..."
+                placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
@@ -189,7 +189,7 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
               className="cursor-pointer"
               onClick={() => handleCategoryFilter('')}
             >
-              Tous
+              All
             </Badge>
             {categories.map((category) => (
               <Badge
@@ -230,7 +230,7 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
             variant="outline"
             size="lg"
           >
-            {loading ? "Chargement..." : "Voir plus d'articles"}
+            {loading ? "Loading..." : "Load more articles"}
           </Button>
         </div>
       )}

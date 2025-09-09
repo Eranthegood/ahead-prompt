@@ -110,8 +110,8 @@ export default function BlogPostPage() {
       }
     } catch (error: any) {
       toast({
-        title: "Erreur",
-        description: "Article non trouvé",
+        title: "Error",
+        description: "Article not found",
         variant: "destructive"
       });
       navigate('/blog');
@@ -136,14 +136,14 @@ export default function BlogPostPage() {
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
         break;
       case 'copy':
-        try {
-          await navigator.clipboard.writeText(url);
-          toast({ title: "Lien copié", description: "Le lien a été copié dans le presse-papiers" });
-          return;
-        } catch (error) {
-          toast({ title: "Erreur", description: "Impossible de copier le lien", variant: "destructive" });
-          return;
-        }
+          try {
+            await navigator.clipboard.writeText(url);
+            toast({ title: "Link copied", description: "The link has been copied to clipboard" });
+            return;
+          } catch (error) {
+            toast({ title: "Error", description: "Unable to copy link", variant: "destructive" });
+            return;
+          }
     }
     
     if (shareUrl) {
@@ -174,8 +174,8 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Article non trouvé</h1>
-          <Button onClick={() => navigate('/blog')}>Retour au blog</Button>
+          <h1 className="text-2xl font-bold mb-4">Article not found</h1>
+          <Button onClick={() => navigate('/blog')}>Back to Blog</Button>
         </div>
       </div>
     );
@@ -191,7 +191,7 @@ export default function BlogPostPage() {
           className="mb-8 flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Retour au blog
+          Back to Blog
         </Button>
 
         {/* Header */}
@@ -234,12 +234,12 @@ export default function BlogPostPage() {
               {post.reading_time_minutes && (
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  <span>{post.reading_time_minutes} min de lecture</span>
+                  <span>{post.reading_time_minutes} min read</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4" />
-                <span>{post.view_count + 1} vues</span>
+                <span>{post.view_count + 1} views</span>
               </div>
             </div>
 
@@ -306,10 +306,10 @@ export default function BlogPostPage() {
               )}
               <div>
                 <h4 className="font-semibold text-lg">
-                  {post.author.full_name || 'Auteur'}
+                  {post.author.full_name || 'Author'}
                 </h4>
                 <p className="text-muted-foreground">
-                  Contributeur du blog
+                  Blog contributor
                 </p>
               </div>
             </div>
@@ -321,7 +321,7 @@ export default function BlogPostPage() {
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <section>
-            <h3 className="text-2xl font-bold mb-8">Articles similaires</h3>
+            <h3 className="text-2xl font-bold mb-8">Related Articles</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {relatedPosts.map((relatedPost) => (
                 <BlogPostCard
