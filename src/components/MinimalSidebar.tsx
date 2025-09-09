@@ -38,7 +38,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library, X } from 'lucide-react';
 import { ProductIcon } from '@/components/ui/product-icon';
 import { Workspace, Product } from '@/types';
 
@@ -735,48 +735,59 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       </Sidebar>
 
       {/* Create Product Dialog */}
-      <Dialog open={isCreateProductOpen} onOpenChange={setIsCreateProductOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ProductIcon className="w-5 h-5" />
-              New Product
-            </DialogTitle>
-          </DialogHeader>
+      {isCreateProductOpen && (
+        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div 
+            className="border border-border rounded-lg w-full max-w-4xl mx-auto shadow-lg max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: '#16161c' }}
+          >
+            {/* Header with breadcrumb */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-2 text-sm">
+                <ProductIcon className="w-4 h-4 text-primary" />
+                <span className="text-muted-foreground">Workspace</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <span className="text-foreground">New Product</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setIsCreateProductOpen(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="product-name">Product name</Label>
-              <Input
-                id="product-name"
+            {/* Main content */}
+            <div className="p-6 space-y-6">
+              {/* Product name input */}
+              <input 
+                type="text" 
+                placeholder="Product name"
                 value={newProductData.name}
                 onChange={(e) => setNewProductData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="e.g. Mobile App, Website..."
-                className="mt-1"
+                className="text-2xl font-medium bg-transparent border-none outline-none text-foreground placeholder-muted-foreground w-full"
+                autoFocus
               />
-            </div>
-
-            <div>
-              <Label htmlFor="product-description">Description (optional)</Label>
-              <Textarea
-                id="product-description"
-                value={newProductData.description}
-                onChange={(e) => setNewProductData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Briefly describe this product..."
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label>Icon & Color</Label>
               
-              {/* Icon Selector */}
-
-              {/* Color Selector */}
-              <div>
-                <Label className="text-sm text-muted-foreground">Choose a color</Label>
-                <div className="flex items-center gap-3 mt-2">
+              {/* Description input */}
+              <div className="space-y-2">
+                <textarea 
+                  placeholder="Description (optional)"
+                  value={newProductData.description}
+                  onChange={(e) => setNewProductData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground resize-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:border-transparent"
+                  rows={3}
+                />
+              </div>
+              
+              {/* Color selection */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-foreground">Color</label>
+                <div className="flex items-center gap-3">
                   {/* Preset Colors */}
                   <div className="flex items-center gap-2">
                     {PRODUCT_COLORS.map((color) => (
@@ -816,7 +827,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
+            {/* Footer actions */}
+            <div className="flex items-center justify-end p-4 border-t border-border">
+              <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
                   onClick={() => setIsCreateProductOpen(false)}
@@ -825,15 +838,17 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   Cancel
                 </Button>
                 <Button
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={handleCreateProduct}
                   disabled={!newProductData.name.trim() || isCreating}
                 >
-                  {isCreating ? 'Creating...' : 'Create'}
+                  {isCreating ? 'Creating...' : 'Create product'}
                 </Button>
+              </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
 
       {/* Create Epic Dialog */}
       <Dialog open={isCreateEpicOpen} onOpenChange={setIsCreateEpicOpen}>
