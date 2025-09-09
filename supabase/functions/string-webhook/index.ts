@@ -9,7 +9,8 @@ const corsHeaders = {
 interface StringArticle {
   id: string
   title: string
-  content: string
+  content?: string
+  html_content?: string
   meta_description?: string
   keywords?: string[]
   url?: string
@@ -67,10 +68,11 @@ serve(async (req) => {
         const externalId = article.id || `string-${Date.now()}-${article.title.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 50)}`
         
         // Store article in knowledge base or dedicated table
+        const content = article.html_content || article.content || ''
         const articleData = {
           external_id: externalId,
           title: article.title,
-          content: article.content || article.html_content,
+          content: content,
           meta_description: article.meta_description,
           keywords: article.keywords || [],
           url: article.url,
@@ -92,30 +94,55 @@ serve(async (req) => {
             ignoreDuplicates: false 
           })
           .select()
-          .single()
+          .maybeSingle()
 
         if (seoError) {
           console.error('Error storing SEO article:', seoError)
           throw seoError
         }
 
-        // Auto-create blog post from SEO article if it's published
-        if (article.status === 'published' && seoArticle) {
-          // Get or create default workspace (you might want to customize this)
-          const { data: workspaces } = await supabase
+        console.log('SEO article stored successfully:', seoArticle?.id)
+
+        // Auto-create blog post from SEO article (always create, not just for published)
+        if (seoArticle) {
+          // Get the first available workspace
+          const { data: workspaces, error: workspaceError } = await supabase
             .from('workspaces')
             .select('*')
             .limit(1)
 
-          if (workspaces && workspaces.length > 0) {
-            const workspace = workspaces[0]
+          let workspace = workspaces?.[0]
+
+          // If no workspace exists, create a default one (this should rarely happen)
+          if (!workspace) {
+            console.log('No workspace found, creating default workspace')
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('id')
+              .limit(1)
+
+            if (profiles?.[0]) {
+              const { data: newWorkspace } = await supabase
+                .from('workspaces')
+                .insert({
+                  name: 'Default Workspace',
+                  owner_id: profiles[0].id
+                })
+                .select()
+                .single()
+              
+              workspace = newWorkspace
+            }
+          }
+
+          if (workspace) {
             
             // Create blog post
             const blogPostData = {
               title: article.title,
               slug: null, // Will be auto-generated
-              excerpt: article.meta_description,
-              content: article.content,
+              excerpt: article.meta_description || `Article SEO importé depuis String.com`,
+              content: content,
               featured_image_url: null,
               meta_description: article.meta_description,
               keywords: article.keywords || [],
@@ -125,6 +152,13 @@ serve(async (req) => {
               workspace_id: workspace.id
             }
 
+            console.log('Creating blog post with data:', { 
+              title: blogPostData.title, 
+              workspace_id: blogPostData.workspace_id,
+              author_id: blogPostData.author_id,
+              seo_article_id: blogPostData.seo_article_id
+            })
+
             const { data: blogPost, error: blogError } = await supabase
               .from('blog_posts')
               .upsert(blogPostData, {
@@ -132,31 +166,58 @@ serve(async (req) => {
                 ignoreDuplicates: false
               })
               .select()
-              .single()
+              .maybeSingle()
 
             if (blogError) {
               console.error('Error creating blog post:', blogError)
               // Don't throw here, SEO article creation was successful
-            } else {
-              console.log(`Blog post created: ${blogPost.title}`)
+            } else if (blogPost) {
+              console.log(`Blog post created successfully: ${blogPost.title} (ID: ${blogPost.id})`)
               
-              // Try to assign to a "SEO" category if it exists
-              const { data: seoCategory } = await supabase
+              // Try to assign to a "SEO" category if it exists, or create it
+              let { data: seoCategory } = await supabase
                 .from('blog_categories')
                 .select('id')
                 .eq('slug', 'seo')
                 .eq('workspace_id', workspace.id)
-                .single()
+                .maybeSingle()
 
+              // Create SEO category if it doesn't exist
+              if (!seoCategory) {
+                const { data: newCategory } = await supabase
+                  .from('blog_categories')
+                  .insert({
+                    name: 'SEO',
+                    slug: 'seo',
+                    description: 'Articles SEO importés depuis String.com',
+                    color: '#10B981',
+                    workspace_id: workspace.id
+                  })
+                  .select()
+                  .single()
+                
+                seoCategory = newCategory
+              }
+
+              // Assign blog post to SEO category
               if (seoCategory) {
                 await supabase
                   .from('blog_post_categories')
                   .upsert({
                     post_id: blogPost.id,
                     category_id: seoCategory.id
+                  }, {
+                    onConflict: 'post_id,category_id',
+                    ignoreDuplicates: true
                   })
+                
+                console.log(`Blog post assigned to SEO category`)
               }
+            } else {
+              console.log('Blog post upsert returned no data (possibly already exists)')
             }
+          } else {
+            console.error('No workspace available for blog post creation')
           }
         }
 
