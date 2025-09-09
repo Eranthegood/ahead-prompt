@@ -209,11 +209,7 @@ export function PromptCard({
         onUpdate={() => {}}
       >
         <Card 
-          className={`group hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 ${
-            priority === 1 ? 'border-l-destructive' : 
-            priority === 2 ? 'border-l-orange-500' : 
-            'border-l-muted'
-          } ${
+          className={`group hover:shadow-md transition-all duration-200 cursor-pointer ${
             isHovered ? 'ring-2 ring-primary/30 shadow-lg' : ''
           } ${!isUsable ? 'opacity-60' : ''} ${isSliding ? 'animate-slide-out-right' : ''}`}
           onMouseEnter={() => onHover?.(prompt.id)}
