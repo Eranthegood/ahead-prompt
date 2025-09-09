@@ -5,7 +5,8 @@ import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, T
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
-import { lazy, Suspense } from "react";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { lazy, Suspense, useState, useEffect } from "react";
 
 const InteractivePromptCardsLazy = lazy(() => import("@/components/InteractivePromptCards").then(m => ({ default: m.InteractivePromptCards })));
 const CollaborativeRepoAnimationLazy = lazy(() => import("@/components/CollaborativeRepoAnimation"));
@@ -37,6 +38,21 @@ export default function LandingPage() {
   const {
     user
   } = useAuth();
+  const [supademoLoaded, setSupademoLoaded] = useState(false);
+  
+  // Check if Supademo script is loaded
+  useEffect(() => {
+    const checkSupademo = () => {
+      if (typeof window !== 'undefined' && document.querySelector('script[src*="supademo"]')) {
+        setSupademoLoaded(true);
+      }
+    };
+    
+    checkSupademo();
+    // Recheck after a delay in case script loads later
+    const timer = setTimeout(checkSupademo, 2000);
+    return () => clearTimeout(timer);
+  }, []);
   const handleSignIn = () => {
     navigate('/build');
   };
@@ -142,9 +158,11 @@ export default function LandingPage() {
              </div>
              
               <div className="flex items-center justify-center min-h-[600px]">
-                <Suspense fallback={<div className=\"min-h-[600px] w-full bg-muted/30 rounded-lg\" />}> 
+              <ErrorBoundary>
+                <Suspense fallback={<div className="min-h-[600px] w-full bg-muted/30 rounded-lg" />}>
                   <InteractivePromptCardsLazy />
                 </Suspense>
+              </ErrorBoundary>
               </div>
            </div>
          </div>
@@ -170,22 +188,35 @@ export default function LandingPage() {
               </Button>
             </div>
             
-            <div style={{
-            position: 'relative',
-            boxSizing: 'content-box',
-            maxHeight: '80vh',
-            width: '100%',
-            aspectRatio: '2.1068032187271397',
-            padding: '40px 0 40px 0'
-          }}>
-              <iframe src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" loading="lazy" title="Task creation demo" allow="clipboard-write" style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }} allowFullScreen />
-            </div>
+            {supademoLoaded ? (
+              <div style={{
+                position: 'relative',
+                boxSizing: 'content-box',
+                maxHeight: '80vh',
+                width: '100%',
+                aspectRatio: '2.1068032187271397',
+                padding: '40px 0 40px 0'
+              }}>
+                <iframe 
+                  src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
+                  loading="lazy" 
+                  title="Task creation demo" 
+                  allow="clipboard-write" 
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%'
+                  }} 
+                  allowFullScreen 
+                />
+              </div>
+            ) : (
+              <div className="h-[400px] w-full bg-muted/30 rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground">Loading demo...</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -347,9 +378,11 @@ export default function LandingPage() {
             
             {/* Collaborative Animation */}
             <div className="flex justify-center items-center">
-              <Suspense fallback={<div className=\"h-[500px] w-full bg-muted/30 rounded-lg\" />}> 
+            <ErrorBoundary>
+              <Suspense fallback={<div className="h-[500px] w-full bg-muted/30 rounded-lg" />}>
                 <CollaborativeRepoAnimationLazy />
               </Suspense>
+            </ErrorBoundary>
             </div>
           </div>
         </div>
