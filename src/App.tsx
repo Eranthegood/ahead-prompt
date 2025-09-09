@@ -30,6 +30,7 @@ import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
 import PromptManagement from "./pages/PromptManagement";
+import StringIntegration from "./pages/StringIntegration";
 import AIAgents from "./pages/AIAgents";
 
 import FeedbackBubble from "./components/FeedbackBubble";
@@ -111,6 +112,11 @@ function App() {
                      <Route path="/integrations/figma" element={
                        <ProtectedRoute>
                          <FigmaIntegration />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/integrations/string" element={
+                       <ProtectedRoute>
+                         <StringIntegration />
                        </ProtectedRoute>
                      } />
                      <Route path="/settings/repository-mapping" element={
