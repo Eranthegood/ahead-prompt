@@ -776,7 +776,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               {/* Description input */}
               <div className="space-y-2">
                 <textarea 
-                  placeholder="Description (optional)"
+                  placeholder="Write a description or project brief to feed the knowledge of the project"
                   value={newProductData.description}
                   onChange={(e) => setNewProductData(prev => ({ ...prev, description: e.target.value }))}
                   className="w-full bg-transparent border border-border rounded-md p-3 text-foreground placeholder-muted-foreground resize-none focus:border-transparent"
