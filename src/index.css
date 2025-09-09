@@ -49,22 +49,22 @@
     --status-todo-foreground: 0 0% 30%;
     --status-generating: 244 85% 70%; /* Violet clair pour génération */
     --status-generating-foreground: 0 0% 15%;
-    --status-progress: 41 94% 61%;  /* Orange #FAB83E */
-    --status-progress-foreground: 0 0% 15%;
+    --status-progress: 211 100% 50%;  /* Bleu au lieu d'orange */
+    --status-progress-foreground: 0 0% 98%;
     --status-done: 120 52% 73%;     /* Vert clair #99DD93 */
     --status-done-foreground: 0 0% 15%;
 
     /* Generic status tokens used by animations */
-    --warning: 41 94% 61%;
-    --warning-foreground: 0 0% 15%;
+    --warning: 344 100% 64%;        /* Rouge au lieu d'orange */
+    --warning-foreground: 0 0% 98%;
     --success: 120 52% 40%;
     --success-foreground: 0 0% 98%;
 
     /* Couleurs d'epic personnalisées */
     --epic-purple: 344 100% 64%;    /* Rose vif */
-    --epic-blue: 41 94% 61%;        /* Orange */
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
     --epic-green: 120 52% 73%;      /* Vert clair */
-    --epic-orange: 41 94% 61%;      /* Orange */
+    --epic-orange: 344 100% 64%;    /* Rose au lieu d'orange */
     --epic-pink: 344 100% 64%;      /* Rose vif */
 
     /* Sidebar avec la nouvelle palette */
@@ -105,7 +105,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 70%; /* Improved from 65% for better contrast */
 
-    --accent: 41 90% 55%;           /* Orange plus sombre */
+    --accent: 211 100% 50%;         /* Bleu au lieu d'orange */
     --accent-foreground: 0 0% 95%;
 
     --destructive: 344 85% 58%;
@@ -118,22 +118,22 @@
     /* États en mode sombre */
     --status-todo: 0 0% 20%;
     --status-todo-foreground: 0 0% 80%;
-    --status-progress: 41 90% 55%;
+    --status-progress: 211 100% 50%;    /* Bleu au lieu d'orange */
     --status-progress-foreground: 0 0% 95%;
     --status-done: 120 45% 65%;
     --status-done-foreground: 0 0% 95%;
 
     /* Generic status tokens used by animations (dark) */
-    --warning: 41 90% 55%;
+    --warning: 344 85% 58%;         /* Rouge au lieu d'orange */
     --warning-foreground: 0 0% 95%;
     --success: 120 45% 55%;
     --success-foreground: 0 0% 95%;
 
     /* Epic colors pour le mode sombre */
     --epic-purple: 344 85% 58%;
-    --epic-blue: 41 90% 55%;
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
     --epic-green: 120 45% 65%;
-    --epic-orange: 41 90% 55%;
+    --epic-orange: 344 85% 58%;     /* Rose au lieu d'orange */
     --epic-pink: 344 85% 58%;
 
     --sidebar-background: 0 0% 8%;
