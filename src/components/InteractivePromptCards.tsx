@@ -227,9 +227,6 @@ export function InteractivePromptCards() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <p className="text-muted-foreground text-xs sm:text-sm px-4">
-          Click the buttons to see how prompts flow through your development process
-        </p>
       </motion.div>
 
       {/* Interactive Cards */}
