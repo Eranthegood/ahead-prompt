@@ -646,15 +646,15 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
-  // Delete prompt with optimistic update
+  // Delete prompt with optimistic update (enhanced for immediate UI response)
   const deletePrompt = async (promptId: string): Promise<void> => {
     const promptToDelete = prompts.find(p => p.id === promptId);
 
     try {
       await withOptimisticUpdate(
-        // Optimistic update - remove immediately
+        // Optimistic update - remove immediately for instant UI feedback
         prev => prev.filter(p => p.id !== promptId),
-        // Database operation
+        // Database operation (async, doesn't block UI)
         async () => {
           const { error } = await supabase
             .from('prompts')
@@ -662,10 +662,11 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             .eq('id', promptId);
           if (error) throw error;
         },
-        // Rollback - restore deleted prompt
+        // Rollback - restore deleted prompt only if DB operation fails
         prev => promptToDelete ? [promptToDelete, ...prev] : prev
       );
 
+      // Show success toast after optimistic update (non-blocking)
       toast({
         title: 'Prompt supprimé',
         description: 'Le prompt a été supprimé'

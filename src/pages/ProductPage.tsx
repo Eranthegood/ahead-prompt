@@ -139,19 +139,8 @@ const ProductPage = () => {
   };
 
   const handleDelete = async (prompt: Prompt) => {
-    try {
-      await deletePrompt(prompt.id);
-      toast({
-        title: 'Success',
-        description: 'Prompt deleted successfully'
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete prompt',
-        variant: 'destructive'
-      });
-    }
+    // The hook already handles toasts and error states
+    await deletePrompt(prompt.id);
   };
 
   const handleCopy = async (prompt: Prompt) => {

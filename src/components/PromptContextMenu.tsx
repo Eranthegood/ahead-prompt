@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Copy, Trash2, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { usePromptsContext } from '@/context/PromptsContext';
 import { Prompt, PromptStatus } from '@/types';
 
 interface PromptContextMenuProps {
@@ -21,6 +22,8 @@ const statusOptions = [
 
 export function PromptContextMenu({ prompt, children, onEdit, onUpdate }: PromptContextMenuProps) {
   const { toast } = useToast();
+  const promptsContext = usePromptsContext();
+  const { deletePrompt } = promptsContext || {};
 
   const handleStatusChange = async (newStatus: PromptStatus) => {
     if (newStatus === prompt.status) return;
@@ -86,27 +89,10 @@ export function PromptContextMenu({ prompt, children, onEdit, onUpdate }: Prompt
   };
 
   const handleDelete = async () => {
-    try {
-      const { error } = await supabase
-        .from('prompts')
-        .delete()
-        .eq('id', prompt.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Prompt deleted',
-        description: 'The prompt has been removed'
-      });
-
-      onUpdate();
-    } catch (error) {
-      console.error('Error deleting prompt:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete prompt',
-        variant: 'destructive'
-      });
+    if (deletePrompt) {
+      // Use the optimized deletion from context (has optimistic updates)
+      await deletePrompt(prompt.id);
+      onUpdate(); // Still call onUpdate for any parent-specific logic
     }
   };
 
