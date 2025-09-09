@@ -78,13 +78,17 @@ export function MinimalPromptList({
     return undefined;
   }, [selectedProductId, selectedEpicId, epics]);
 
+  // Track prompts that are in completion animation
+  const [completingPrompts, setCompletingPrompts] = useState<Set<string>>(new Set());
+
   // Enhanced search with fuzzy matching and multi-field search
   const searchResults = useMemo(() => {
     // First apply basic filters (product/epic/completion status)
     const basicFilteredPrompts = prompts.filter(prompt => {
       const matchesProduct = !selectedProductId || selectedProductId === 'all' || prompt.product_id === selectedProductId;
       const matchesEpic = !selectedEpicId || prompt.epic_id === selectedEpicId;
-      const includeByCompletion = showCompletedItems ? true : prompt.status !== 'done';
+      // Keep prompts that are animating completion temporarily visible
+      const includeByCompletion = showCompletedItems ? true : (prompt.status !== 'done' || completingPrompts.has(prompt.id));
       return matchesProduct && matchesEpic && includeByCompletion;
     });
 
@@ -198,6 +202,20 @@ export function MinimalPromptList({
   // Wrapper functions to match PromptCard interface
   const handleStatusChangeWrapper = (prompt: Prompt, newStatus: PromptStatus) => {
     if (newStatus === prompt.status) return;
+    
+    if (newStatus === 'done') {
+      // Add to completing prompts to keep visible during animation
+      setCompletingPrompts(prev => new Set(prev).add(prompt.id));
+      // Remove from completing prompts after animation completes
+      setTimeout(() => {
+        setCompletingPrompts(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(prompt.id);
+          return newSet;
+        });
+      }, 600); // Total animation time (300ms slide + 200ms fade + buffer)
+    }
+    
     updatePromptStatus(prompt.id, newStatus);
   };
 

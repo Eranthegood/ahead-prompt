@@ -48,6 +48,7 @@ export function LinearPromptItem({
 }: LinearPromptItemProps) {
   const [justCopied, setJustCopied] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
   
   // Live status stream from Agent Status Service keyed by Cursor agent id
   const { latest: liveStatus } = useAgentStatusStream(prompt.cursor_agent_id || undefined);
@@ -68,13 +69,18 @@ export function LinearPromptItem({
 
   const handleStatusChange = (newStatus: PromptStatus) => {
     if (newStatus === 'done') {
+      setIsCompleting(true);
       setIsSliding(true);
-      // Give animation time to complete before calling the actual status change
+      // Start fade after slide completes
       setTimeout(() => {
-        if (onStatusChange) {
-          onStatusChange(prompt, newStatus);
-        }
-      }, 300); // Match the slide-out-right animation duration
+        setIsSliding(false);
+        // Call status change after both animations
+        setTimeout(() => {
+          if (onStatusChange) {
+            onStatusChange(prompt, newStatus);
+          }
+        }, 200); // Fade duration
+      }, 300); // Slide duration
     } else {
       if (onStatusChange) {
         onStatusChange(prompt, newStatus);
@@ -121,7 +127,7 @@ export function LinearPromptItem({
         isHovered ? 'bg-gray-50 dark:bg-gray-800/50' : ''
       } ${!isUsable ? 'opacity-60' : ''} ${
         isSliding ? 'animate-slide-out-right' : ''
-      }`}
+      } ${isCompleting && !isSliding ? 'animate-fade-out' : ''}`}
       onMouseEnter={() => onHover?.(prompt.id)}
       onMouseLeave={() => onHover?.(null)}
       onClick={() => onPromptClick(prompt)}

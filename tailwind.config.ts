@@ -169,6 +169,14 @@ export default {
 						transform: 'translateX(100%)',
 						opacity: '0'
 					}
+				},
+				'fade-out': {
+					'0%': {
+						opacity: '1'
+					},
+					'100%': {
+						opacity: '0'
+					}
 				}
 			},
 			animation: {
@@ -178,7 +186,8 @@ export default {
 				'progress-fill': 'progress-fill 0.8s ease-out',
 				'level-glow': 'level-glow 1.5s ease-in-out',
 				'celebration': 'celebration 2s ease-in-out',
-				'slide-out-right': 'slide-out-right 0.3s ease-in-out forwards'
+				'slide-out-right': 'slide-out-right 0.3s ease-in-out forwards',
+				'fade-out': 'fade-out 0.2s ease-out forwards'
 			}
 		}
 	},
