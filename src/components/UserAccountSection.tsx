@@ -206,40 +206,7 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-
-          {/* Theme Switch */}
-          <div className="flex items-center justify-between py-2 px-2 mt-2">
-            <div className="flex items-center gap-3">
-              {resolvedTheme === 'dark' ? (
-                <Moon className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <Sun className="h-4 w-4 text-muted-foreground" />
-              )}
-              <div className="flex flex-col">
-                <span className="text-sm">Dark Mode</span>
-                {!isDarkModeUnlocked && (
-                  <div className="flex items-center gap-1">
-                    <Lock className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      Level {requiredLevel} required
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            <Switch 
-              checked={resolvedTheme === 'dark'}
-              disabled={!isDarkModeUnlocked}
-              onCheckedChange={(checked) => {
-                if (isDarkModeUnlocked) {
-                  setTheme(checked ? 'dark' : 'light');
-                }
-              }}
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
-          
-          <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
           
           <DropdownMenuItem 
             onClick={signOut}

@@ -1,38 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
 
 export const useTheme = () => {
-  const { preferences, saveThemePreference, loading: prefsLoading } = useUserPreferences();
-  const { hasUnlockedFeature, stats, loading: gamificationLoading } = useGamification();
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const { preferences, loading: prefsLoading } = useUserPreferences();
+  const [resolvedTheme, setResolvedTheme] = useState<'dark'>('dark');
 
-  // Check if dark mode is unlocked (always unlocked if gamification is disabled)
-  const isDarkModeUnlocked = hasUnlockedFeature('DARK_MODE');
-
-  // Get effective theme considering level restrictions and loading states
-  const getEffectiveTheme = (): 'light' | 'dark' | 'system' => {
-    // Force light mode during loading to prevent black interface
-    if (prefsLoading || gamificationLoading) {
-      return 'light';
-    }
-    
-    // If dark mode is not unlocked, force light theme regardless of preference
-    if (!isDarkModeUnlocked && (preferences.theme === 'dark' || preferences.theme === 'system')) {
-      return 'light';
-    }
-    
-    return preferences.theme;
+  // Always force dark mode
+  const getEffectiveTheme = (): 'dark' => {
+    return 'dark';
   };
 
   const effectiveTheme = getEffectiveTheme();
-  const isLoading = prefsLoading || gamificationLoading;
+  const isLoading = prefsLoading;
 
-  // Update theme class on document with enhanced contrast detection
+  // Update theme class on document - always apply dark mode
   useEffect(() => {
     const root = window.document.documentElement;
     
-    const applyTheme = (theme: 'light' | 'dark') => {
+    const applyTheme = (theme: 'dark') => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
@@ -45,64 +30,28 @@ export const useTheme = () => {
         root.classList.remove('high-contrast');
       }
       
-      console.log(`Theme applied: ${theme}, loading: ${isLoading}, unlocked: ${isDarkModeUnlocked}, high-contrast: ${prefersHighContrast}`);
+      console.log(`Theme applied: ${theme}, loading: ${isLoading}`);
     };
 
-    // Always start with light theme during loading
-    if (isLoading) {
-      applyTheme('light');
-      return;
-    }
+    // Always apply dark theme
+    applyTheme('dark');
+  }, [isLoading]);
 
-    if (effectiveTheme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const contrastQuery = window.matchMedia('(prefers-contrast: high)');
-      
-      const handleChange = () => {
-        const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-        const finalTheme = (systemTheme === 'dark' && !isDarkModeUnlocked) ? 'light' : systemTheme;
-        applyTheme(finalTheme);
-      };
-
-      handleChange();
-      mediaQuery.addEventListener('change', handleChange);
-      contrastQuery.addEventListener('change', handleChange);
-      
-      return () => {
-        mediaQuery.removeEventListener('change', handleChange);
-        contrastQuery.removeEventListener('change', handleChange);
-      };
-    } else {
-      applyTheme(effectiveTheme);
-    }
-  }, [effectiveTheme, isDarkModeUnlocked, isLoading]);
-
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
-    // Prevent setting dark mode or system theme if not unlocked
-    if ((theme === 'dark' || theme === 'system') && !isDarkModeUnlocked) {
-      console.log(`Theme ${theme} blocked - dark mode not unlocked`);
-      return;
-    }
-    saveThemePreference(theme);
-  };
-
-  // Calculate XP needed to unlock dark mode
-  const getXPNeededForDarkMode = (): number => {
-    if (isDarkModeUnlocked || !stats) return 0;
-    const requiredLevel = PREMIUM_FEATURES.DARK_MODE;
-    const requiredXP = (requiredLevel - 1) * 100;
-    return Math.max(0, requiredXP - stats.total_xp);
+  // Theme setting is disabled - always dark
+  const setTheme = (theme: 'dark') => {
+    // Always dark mode, ignore any theme changes
+    console.log('Theme changes are disabled - staying in dark mode');
   };
 
   return {
-    theme: preferences.theme,
-    resolvedTheme,
-    effectiveTheme,
+    theme: 'dark' as const,
+    resolvedTheme: 'dark' as const,
+    effectiveTheme: 'dark' as const,
     setTheme,
-    isDarkModeUnlocked,
-    xpNeededForDarkMode: getXPNeededForDarkMode(),
-    currentLevel: stats?.current_level || 1,
-    requiredLevel: PREMIUM_FEATURES.DARK_MODE,
+    isDarkModeUnlocked: true, // Always unlocked since it's the only mode
+    xpNeededForDarkMode: 0,
+    currentLevel: 1,
+    requiredLevel: 1,
     isLoading,
   };
 };

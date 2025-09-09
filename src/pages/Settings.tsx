@@ -6,22 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, Moon, Sun, Monitor, Crown, Lock } from 'lucide-react';
+import { ArrowLeft, Moon, Crown, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/hooks/useTheme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGamification, PREMIUM_FEATURES } from '@/hooks/useGamification';
 import { PremiumFeatureCard } from '@/components/PremiumFeatureCard';
 export default function Settings() {
   const navigate = useNavigate();
-  const {
-    theme,
-    setTheme,
-    isDarkModeUnlocked,
-    xpNeededForDarkMode,
-    currentLevel,
-    requiredLevel
-  } = useTheme();
   const {
     preferences,
     saveCompletedItemsPreference,
@@ -50,40 +41,6 @@ export default function Settings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Theme</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Choose your preferred theme
-                  </p>
-                </div>
-                <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => setTheme(value)}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">
-                      <div className="flex items-center">
-                        <Sun className="mr-2 h-4 w-4" />
-                        Light
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="dark">
-                      <div className="flex items-center">
-                        <Moon className="mr-2 h-4 w-4" />
-                        Dark
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="system">
-                      <div className="flex items-center">
-                        <Monitor className="mr-2 h-4 w-4" />
-                        System
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Compact Mode</Label>
