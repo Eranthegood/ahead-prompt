@@ -54,6 +54,12 @@
     --status-done: 120 52% 73%;     /* Vert clair #99DD93 */
     --status-done-foreground: 0 0% 15%;
 
+    /* Generic status tokens used by animations */
+    --warning: 41 94% 61%;
+    --warning-foreground: 0 0% 15%;
+    --success: 120 52% 40%;
+    --success-foreground: 0 0% 98%;
+
     /* Couleurs d'epic personnalisées */
     --epic-purple: 344 100% 64%;    /* Rose vif */
     --epic-blue: 41 94% 61%;        /* Orange */
@@ -116,6 +122,12 @@
     --status-progress-foreground: 0 0% 95%;
     --status-done: 120 45% 65%;
     --status-done-foreground: 0 0% 95%;
+
+    /* Generic status tokens used by animations (dark) */
+    --warning: 41 90% 55%;
+    --warning-foreground: 0 0% 95%;
+    --success: 120 45% 55%;
+    --success-foreground: 0 0% 95%;
 
     /* Epic colors pour le mode sombre */
     --epic-purple: 344 85% 58%;

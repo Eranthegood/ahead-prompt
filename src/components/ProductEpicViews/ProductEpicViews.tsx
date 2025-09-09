@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Package, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Product, Epic } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface ProductEpicViewsProps {
   onProductCreate?: () => void;
@@ -32,6 +33,7 @@ export function ProductEpicViews({
   const { products, loading: productsLoading, deleteProduct } = useProducts(workspace?.id);
   const { epics, loading: epicsLoading, deleteEpic, updateEpic } = useEpics(workspace?.id);
   const { prompts, loading: promptsLoading } = usePrompts(workspace?.id);
+  const navigate = useNavigate();
 
   const viewConfig: ViewManagerConfig = {
     enabledViews: ['list', 'kanban'],
@@ -95,7 +97,7 @@ export function ProductEpicViews({
   // Event handlers
   const handleProductClick = (product: Product) => {
     // Navigate to product page or open details
-    window.location.href = `/product/${product.id}`;
+    navigate(`/product/${product.id}`);
   };
 
   const handleEpicClick = (epic: Epic) => {

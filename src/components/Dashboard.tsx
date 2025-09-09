@@ -14,6 +14,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Declare Supademo global function
 declare global {
@@ -38,6 +39,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
+  const navigate = useNavigate();
   const {
     workspace,
     loading
@@ -191,7 +193,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
         onOpenChange={setCommandPaletteOpen} 
         injectedQuery={searchQuery} 
         onSetSearchQuery={setSearchQuery} 
-        onNavigate={(path: string) => window.location.href = path} 
+        onNavigate={(path: string) => navigate(path)} 
       />
 
       <DebugConsole isOpen={debugConsoleOpen} onClose={() => setDebugConsoleOpen(false)} workspace={workspace} />

@@ -4,9 +4,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
-import { InteractivePromptCards } from "@/components/InteractivePromptCards";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
-import CollaborativeRepoAnimation from "@/components/CollaborativeRepoAnimation";
+import { lazy, Suspense } from "react";
+
+const InteractivePromptCardsLazy = lazy(() => import("@/components/InteractivePromptCards").then(m => ({ default: m.InteractivePromptCards })));
+const CollaborativeRepoAnimationLazy = lazy(() => import("@/components/CollaborativeRepoAnimation"));
 // Logo components
 const CursorLogo = ({
   className
@@ -140,7 +142,9 @@ export default function LandingPage() {
              </div>
              
               <div className="flex items-center justify-center min-h-[600px]">
-                <InteractivePromptCards />
+                <Suspense fallback={<div className=\"min-h-[600px] w-full bg-muted/30 rounded-lg\" />}> 
+                  <InteractivePromptCardsLazy />
+                </Suspense>
               </div>
            </div>
          </div>
@@ -343,7 +347,9 @@ export default function LandingPage() {
             
             {/* Collaborative Animation */}
             <div className="flex justify-center items-center">
-              <CollaborativeRepoAnimation />
+              <Suspense fallback={<div className=\"h-[500px] w-full bg-muted/30 rounded-lg\" />}> 
+                <CollaborativeRepoAnimationLazy />
+              </Suspense>
             </div>
           </div>
         </div>
