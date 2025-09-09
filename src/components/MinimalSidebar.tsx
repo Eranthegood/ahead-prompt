@@ -428,7 +428,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   onClick={() => navigate('/')}
                 >
                   <div className="flex items-center gap-2">
-                    <Zap className="w-6 h-6 text-primary" />
                     <h2 className="text-base sm:text-lg font-medium text-foreground truncate">
                       <span>Ahead</span>
                     </h2>
