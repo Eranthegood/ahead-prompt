@@ -417,7 +417,10 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     <TooltipProvider>
       <Sidebar className="border-r shrink-0" collapsible="icon">
         
-        <SidebarContent className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-4 sm:p-5'} flex flex-col min-h-full bg-gradient-to-b from-background to-muted/20`}>
+        <SidebarContent 
+          className={`${isCollapsed ? 'px-2 py-3 sm:py-4' : 'p-4 sm:p-5'} flex flex-col min-h-full`}
+          style={{ backgroundColor: '#1d1e27' }}
+        >
           {/* Logo and Brand */}
           {!isCollapsed ? (
             <div className="mb-6 pb-4 border-b border-border/50">
