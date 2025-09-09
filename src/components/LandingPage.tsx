@@ -65,18 +65,18 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
           <div className="space-y-4 sm:space-y-6">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-              Stay <span className="text-primary">3 moves ahead</span>
+              Turn Trips
               <br />
-              while AI generates your code
+              Into Memories
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
-              Queue your next prompts while AI works
+              Book exceptional stays that blend comfort, beauty, and great locations to make every moment unique.
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <Button size="lg" onClick={handleSignIn} className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium group w-full sm:w-auto">
-              {user ? "Build" : "Get Ahead - Free"}
+              Discover Your Spot
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
