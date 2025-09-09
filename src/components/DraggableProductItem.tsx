@@ -7,25 +7,23 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
-import { Hash, Package, ChevronRight, BookOpen, Trash2, GripVertical, FileText, Plus, Settings, User, Trophy, Sparkles, TrendingUp, BarChart3, Github, Zap, GitBranch } from 'lucide-react';
+import { Hash, Package, ChevronRight, BookOpen, Trash2, GripVertical, FileText, Plus, Settings, User, Trophy, Sparkles, TrendingUp, BarChart3, Github } from 'lucide-react';
 import type { Product } from '@/types';
 
 // Helper function to get the icon component from icon name
 const getIconComponent = (iconName?: string) => {
   const iconMap = {
     Package,
-    Zap,
-    Sparkles,
-    Trophy,
-    BookOpen,
-    GitBranch,
-    BarChart3,
-    TrendingUp,
     Hash,
     FileText,
     Plus,
     Settings,
     User,
+    Trophy,
+    BookOpen,
+    Sparkles,
+    TrendingUp,
+    BarChart3,
     Github
   };
   
@@ -110,7 +108,7 @@ export function DraggableProductItem({
                       style={{ backgroundColor: product.color || '#6B7280' }}
                     >
                       {(() => {
-                        const IconComponent = getIconComponent((product as any).icon);
+                        const IconComponent = getIconComponent();
                         return <IconComponent className="w-4 h-4 text-white" />;
                       })()}
                     </div>
@@ -223,9 +221,9 @@ export function DraggableProductItem({
                 >
                    <div className="flex items-center gap-2 min-w-0 flex-1">
                      {(() => {
-                        const IconComponent = getIconComponent((product as any).icon);
-                        return <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: product.color || '#6B7280' }} />;
-                      })()}
+                       const IconComponent = getIconComponent();
+                       return <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: product.color || '#6B7280' }} />;
+                     })()}
                      <span className="truncate text-sm font-medium">
                        {product.name}
                      </span>
