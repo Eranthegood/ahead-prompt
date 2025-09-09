@@ -188,12 +188,9 @@ export interface Product {
   name: string;
   description: string | null;
   color: string;
-  price?: number | null;
-  inventory_count?: number | null;
   github_repo_url?: string | null;
   default_branch?: string;
   cursor_enabled?: boolean;
-  order_index?: number;
   created_at: string;
   updated_at: string;
 }
