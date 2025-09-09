@@ -494,25 +494,79 @@ export function MinimalPromptList({
             );
           })
         ) : (
-          /* Single List View */
+          /* Single List View with Status Groups */
           <div className="space-y-px">
-            {promptsWithInfo.map((prompt) => (
-              <LinearPromptItem
-                key={prompt.id}
-                prompt={prompt}
-                onPromptClick={handlePromptClick}
-                onCopyGenerated={handleCopyGenerated}
-                onShowCursorDialog={() => {
-                  setCursorPrompt(prompt);
-                  setShowCursorDialog(true);
-                }}
-                onPriorityChange={handlePriorityChangeWrapper}
-                onStatusChange={handleStatusChangeWrapper}
-                onMoreActions={handleMoreActions}
-                isHovered={hoveredPromptId === prompt.id}
-                onHover={onPromptHover}
-              />
-            ))}
+            {(() => {
+              // Group prompts by status category
+              const cursorWorkflowStatuses = ['sent_to_cursor', 'cursor_working', 'pr_created', 'pr_review', 'pr_ready', 'pr_merged'];
+              const inProgressPrompts = promptsWithInfo.filter(p => p.status === 'in_progress');
+              const todoPrompts = promptsWithInfo.filter(p => p.status === 'todo');
+              const cursorPrompts = promptsWithInfo.filter(p => cursorWorkflowStatuses.includes(p.status));
+              const otherPrompts = promptsWithInfo.filter(p => 
+                !cursorWorkflowStatuses.includes(p.status) && 
+                p.status !== 'in_progress' && 
+                p.status !== 'todo'
+              );
+
+              const groups = [];
+              
+              // Add cursor workflow prompts first
+              if (cursorPrompts.length > 0) {
+                groups.push(...cursorPrompts);
+              }
+              
+              // Add in progress prompts
+              if (inProgressPrompts.length > 0) {
+                if (groups.length > 0) {
+                  groups.push({ type: 'separator', key: 'cursor-inprogress-separator' });
+                }
+                groups.push(...inProgressPrompts);
+              }
+              
+              // Add separator and todo prompts if both in_progress and todo exist
+              if (todoPrompts.length > 0) {
+                if (inProgressPrompts.length > 0 || cursorPrompts.length > 0) {
+                  groups.push({ type: 'separator', key: 'inprogress-todo-separator' });
+                }
+                groups.push(...todoPrompts);
+              }
+              
+              // Add other prompts
+              if (otherPrompts.length > 0) {
+                if (groups.length > 0) {
+                  groups.push({ type: 'separator', key: 'other-separator' });
+                }
+                groups.push(...otherPrompts);
+              }
+
+              return groups.map((item, index) => {
+                if (item.type === 'separator') {
+                  return (
+                    <div key={item.key} className="py-2">
+                      <div className="w-full h-px bg-gray-200 dark:bg-gray-700" />
+                    </div>
+                  );
+                }
+                
+                return (
+                  <LinearPromptItem
+                    key={item.id}
+                    prompt={item}
+                    onPromptClick={handlePromptClick}
+                    onCopyGenerated={handleCopyGenerated}
+                    onShowCursorDialog={() => {
+                      setCursorPrompt(item);
+                      setShowCursorDialog(true);
+                    }}
+                    onPriorityChange={handlePriorityChangeWrapper}
+                    onStatusChange={handleStatusChangeWrapper}
+                    onMoreActions={handleMoreActions}
+                    isHovered={hoveredPromptId === item.id}
+                    onHover={onPromptHover}
+                  />
+                );
+              });
+            })()}
           </div>
         )}
       </div>
