@@ -8,7 +8,8 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { usePrompts } from '@/hooks/usePrompts';
 import { Prompt, Product, Epic, PRIORITY_OPTIONS } from '@/types';
-import { Copy, FileText, Sparkles } from 'lucide-react';
+import { Copy, FileText, Sparkles, RotateCcw } from 'lucide-react';
+import { PromptTransformService } from '@/services/promptTransformService';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -30,6 +31,7 @@ export function PromptDetailDialog({
   const [priority, setPriority] = useState<number>(3);
   const [description, setDescription] = useState<string>('');
   const [saving, setSaving] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
@@ -88,6 +90,42 @@ export function PromptDetailDialog({
           variant: 'destructive'
         });
       }
+    }
+  };
+
+  const handleRegeneratePrompt = async () => {
+    if (!prompt || !description.trim()) return;
+    
+    setRegenerating(true);
+    try {
+      const response = await PromptTransformService.transformPrompt(description.trim());
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      if (response.transformedPrompt) {
+        // Update the prompt with the new generated content
+        await updatePrompt(prompt.id, {
+          generated_prompt: response.transformedPrompt
+        });
+
+        toast({
+          title: 'Regenerated!',
+          description: 'New AI-enhanced prompt has been generated'
+        });
+      } else {
+        throw new Error('No generated prompt received');
+      }
+    } catch (error) {
+      console.error('Error regenerating prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to regenerate prompt. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -190,17 +228,29 @@ export function PromptDetailDialog({
                 <Sparkles className="h-4 w-4 text-primary" />
                 <Label className="text-sm font-medium">Generated Prompt</Label>
               </div>
-              {prompt?.generated_prompt && (
+              <div className="flex items-center gap-2">
+                {prompt?.generated_prompt && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyGeneratedPrompt}
+                    className="h-8 px-3"
+                  >
+                    <Copy className="h-3 w-3 mr-1" />
+                    Copy
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleCopyGeneratedPrompt}
+                  onClick={handleRegeneratePrompt}
+                  disabled={regenerating || !description.trim()}
                   className="h-8 px-3"
                 >
-                  <Copy className="h-3 w-3 mr-1" />
-                  Copy
+                  <RotateCcw className={`h-3 w-3 mr-1 ${regenerating ? 'animate-spin' : ''}`} />
+                  {regenerating ? 'Regenerating...' : 'Regenerate'}
                 </Button>
-              )}
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto">
