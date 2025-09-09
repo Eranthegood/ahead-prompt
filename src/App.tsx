@@ -35,6 +35,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
+import ClickToCloseDemoPage from "./pages/ClickToCloseDemo";
 
 import FeedbackBubble from "./components/FeedbackBubble";
 
@@ -145,13 +146,17 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
-                     <Route path="/ai-agents" element={
-                       <ProtectedRoute>
-                         <AIAgents />
-                       </ProtectedRoute>
-                     } />
-                     
-                     <Route path="*" element={<NotFound />} />
+                      <Route path="/ai-agents" element={
+                        <ProtectedRoute>
+                          <AIAgents />
+                        </ProtectedRoute>
+                      } />
+                      
+                      <Route path="/click-to-close-demo" element={
+                        <ClickToCloseDemoPage />
+                      } />
+                      
+                      <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
               </MixpanelProvider>
