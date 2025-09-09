@@ -285,11 +285,6 @@ export function LinearPromptItem({
         >
           {prompt.title}
         </div>
-        {prompt.description && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1 h-3">
-            {prompt.description}
-          </div>
-        )}
       </div>
 
       {/* Epic/Product context - Fixed 120px column, aligned */}
