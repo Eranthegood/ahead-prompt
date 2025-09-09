@@ -30,7 +30,6 @@ import Achievements from "./pages/Achievements";
 import ThemeDemo from "./pages/ThemeDemo";
 import MixpanelAdmin from "./pages/MixpanelAdmin";
 import PromptManagement from "./pages/PromptManagement";
-import StringIntegration from "./pages/StringIntegration";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
@@ -115,11 +114,6 @@ function App() {
                      <Route path="/integrations/figma" element={
                        <ProtectedRoute>
                          <FigmaIntegration />
-                       </ProtectedRoute>
-                     } />
-                     <Route path="/integrations/string" element={
-                       <ProtectedRoute>
-                         <StringIntegration />
                        </ProtectedRoute>
                      } />
                      <Route path="/blog" element={<Blog />} />

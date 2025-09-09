@@ -42,13 +42,6 @@ const INTEGRATIONS_CONFIG = [
     configPath: '/integrations/figma'
   },
   {
-    id: 'string',
-    name: 'String.com Integration',
-    description: 'Automatisez la récupération d\'articles SEO depuis String.com via webhook pour enrichir votre base de connaissances.',
-    icon: Zap,
-    configPath: '/integrations/string'
-  },
-  {
     id: 'slack',
     name: 'Slack Notifications',
     description: 'Receive Slack notifications when your Cursor agents complete their tasks.',
