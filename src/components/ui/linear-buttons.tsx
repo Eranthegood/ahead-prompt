@@ -10,6 +10,8 @@ import {
   AlertTriangle, 
   Zap, 
   Flag,
+  Flame,
+  Minus,
   User,
   Folder,
   GitBranch,
@@ -66,10 +68,10 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
   
   const getPriorityIcon = () => {
     switch (priority) {
-      case 3: return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 2: return <Zap className="w-4 h-4 text-orange-500" />;
-      case 1: return <Flag className="w-4 h-4 text-blue-500" />;
-      default: return <Flag className="w-4 h-4 text-muted-foreground" />;
+      case 1: return <Flame className="w-4 h-4 text-red-500" />;
+      case 2: return <Minus className="w-4 h-4 text-orange-500" />;
+      case 3: return <Clock className="w-4 h-4 text-muted-foreground" />;
+      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -90,9 +92,9 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
   const priorityOptions = PRIORITY_OPTIONS.map(option => ({
     id: option.value.toString(),
     label: option.label,
-    icon: option.value === 3 ? AlertTriangle : 
-          option.value === 2 ? Zap : 
-          option.value === 1 ? Flag : Flag,
+    icon: option.value === 1 ? Flame : 
+          option.value === 2 ? Minus : 
+          option.value === 3 ? Clock : Clock,
     onClick: () => onPriorityChange(option.value),
   }));
 

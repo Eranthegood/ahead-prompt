@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Flame, Zap, AlertCircle } from 'lucide-react';
+import { Plus, Flame, Minus, Clock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateTitleFromContent } from '@/lib/titleUtils';
 import { ProductEpicSelector } from '@/components/ProductEpicSelector';
@@ -46,9 +46,9 @@ interface MobilePromptDrawerProps {
 }
 
 const PRIORITY_ICONS = {
-  1: AlertCircle,
-  2: Flame,
-  3: Zap,
+  1: Flame,
+  2: Minus, 
+  3: Clock,
 } as const;
 
 const PRIORITY_COLORS = {
