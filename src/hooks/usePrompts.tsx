@@ -515,6 +515,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   // Update prompt status with optimistic update
   const updatePromptStatus = async (promptId: string, status: PromptStatus): Promise<void> => {
     const updateData = { status, updated_at: new Date().toISOString() };
+    const previousPrompt = prompts.find(p => p.id === promptId);
 
     try {
       await withOptimisticUpdate(
@@ -528,8 +529,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             .eq('id', promptId);
           if (error) throw error;
         },
-        // Rollback - refetch all data
-        () => { fetchPrompts(); return []; }
+        // Rollback - restore previous prompt state
+        prev => previousPrompt ? prev.map(p => p.id === promptId ? previousPrompt : p) : prev
       );
 
       // Award XP for completing a prompt
@@ -556,6 +557,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   // Update prompt priority with optimistic update
   const updatePromptPriority = async (promptId: string, priority: number): Promise<void> => {
     const updateData = { priority, updated_at: new Date().toISOString() };
+    const previousPrompt = prompts.find(p => p.id === promptId);
 
     try {
       await withOptimisticUpdate(
@@ -569,8 +571,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             .eq('id', promptId);
           if (error) throw error;
         },
-        // Rollback - refetch all data
-        () => { fetchPrompts(); return []; }
+        // Rollback - restore previous prompt state
+        prev => previousPrompt ? prev.map(p => p.id === promptId ? previousPrompt : p) : prev
       );
 
       toast({
@@ -694,6 +696,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
 
     const updateData = { ...finalUpdates, updated_at: new Date().toISOString() };
+    const previousPrompt = existing;
 
     try {
       await withOptimisticUpdate(
@@ -707,8 +710,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             .eq('id', promptId);
           if (error) throw error;
         },
-        // Rollback - refetch all data
-        () => { fetchPrompts(); return []; }
+        // Rollback - restore previous prompt state
+        prev => previousPrompt ? prev.map(p => p.id === promptId ? previousPrompt : p) : prev
       );
     } catch (error) {
       console.error('Error updating prompt silently:', error);
@@ -733,6 +736,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
 
     const updateData = { ...finalUpdates, updated_at: new Date().toISOString() };
+    const previousPrompt = existing;
 
     try {
       await withOptimisticUpdate(
@@ -746,8 +750,8 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
             .eq('id', promptId);
           if (error) throw error;
         },
-        // Rollback - refetch all data
-        () => { fetchPrompts(); return []; }
+        // Rollback - restore previous prompt state
+        prev => previousPrompt ? prev.map(p => p.id === promptId ? previousPrompt : p) : prev
       );
 
       // Auto-generate prompt if description was updated and has sufficient content
