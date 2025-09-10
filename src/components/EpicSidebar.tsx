@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import { toast } from '@/hooks/use-toast';
+import {
   Sidebar, 
   SidebarContent, 
   SidebarGroup, 
@@ -140,6 +141,16 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
     navigate('/settings/git-cursor');
   };
 
+  const handleToggleEpicComplete = async (epic: Epic) => {
+    // TODO: Implement epic completion toggle when DB schema is updated
+    // For now, show a toast message
+    toast({
+      title: "Fonctionnalité à venir",
+      description: "La clôture d'epics sera bientôt disponible.",
+    });
+    console.log('Toggle epic completion:', epic);
+  };
+
   if (productsLoading || epicsLoading || promptsLoading) {
     return (
       <Sidebar className="border-r">
@@ -259,13 +270,14 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                   open={expandedEpics.has(epic.id)}
                                   onOpenChange={() => toggleEpicExpansion(epic.id)}
                                 >
-                                  <EpicContextMenu
-                                    epic={epic}
-                                    onAddPrompt={handleAddPrompt}
-                                    onEditEpic={handleEditEpic}
-                                    onDeleteEpic={handleDeleteEpic}
-                                    onConfigureGit={handleConfigureGit}
-                                  >
+                                   <EpicContextMenu
+                                     epic={epic}
+                                     onAddPrompt={handleAddPrompt}
+                                     onEditEpic={handleEditEpic}
+                                     onDeleteEpic={handleDeleteEpic}
+                                     onConfigureGit={handleConfigureGit}
+                                     onToggleComplete={handleToggleEpicComplete}
+                                   >
                                     <CollapsibleTrigger asChild>
                                       <SidebarMenuButton className="w-full justify-between">
                                         <div className="flex items-center gap-2 min-w-0 flex-1">

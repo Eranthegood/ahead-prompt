@@ -12,7 +12,9 @@ import {
   Trash2, 
   FileText,
   Github,
-  GitBranch
+  GitBranch,
+  CheckCircle,
+  RotateCcw
 } from 'lucide-react';
 import { Epic } from '@/types';
 
@@ -23,6 +25,7 @@ interface EpicContextMenuProps {
   onEditEpic: (epic: Epic) => void;
   onDeleteEpic: (epic: Epic) => void;
   onConfigureGit?: (epicId: string) => void;
+  onToggleComplete?: (epic: Epic) => void;
 }
 
 export function EpicContextMenu({
@@ -32,7 +35,11 @@ export function EpicContextMenu({
   onEditEpic,
   onDeleteEpic,
   onConfigureGit,
+  onToggleComplete,
 }: EpicContextMenuProps) {
+  // For now, we'll use a simple approach since Epic doesn't have status in DB yet
+  // This can be extended when status field is added to the epics table
+  const isCompleted = false; // TODO: Replace with epic.status === 'completed' when DB is updated
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
@@ -62,6 +69,29 @@ export function EpicContextMenu({
             Git Settings
           </ContextMenuItem>
         )}
+        
+        {onToggleComplete && (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem 
+              onClick={() => onToggleComplete(epic)}
+              className="flex items-center gap-2"
+            >
+              {isCompleted ? (
+                <>
+                  <RotateCcw className="h-4 w-4" />
+                  Rouvrir l'epic
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  Clôturer l'epic
+                </>
+              )}
+            </ContextMenuItem>
+          </>
+        )}
+        
         <ContextMenuSeparator />
         <ContextMenuItem 
           onClick={() => onDeleteEpic(epic)}
