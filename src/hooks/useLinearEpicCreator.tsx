@@ -27,7 +27,7 @@ export const useLinearEpicCreator = ({
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('#8B5CF6');
   const [selectedProduct, setSelectedProduct] = useState<string | undefined>(selectedProductId);
-  const [priority, setPriority] = useState<number>(3);
+  const [priority, setPriority] = useState<number>(2);
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [tags, setTags] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -42,7 +42,7 @@ export const useLinearEpicCreator = ({
     setDescription('');
     setColor('#8B5CF6');
     setSelectedProduct(selectedProductId);
-    setPriority(3);
+    setPriority(2);
     setDueDate(undefined);
     setTags([]);
     setIsExpanded(false);
