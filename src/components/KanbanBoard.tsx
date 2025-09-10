@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PromptCard } from '@/components/PromptCard';
+import { StatusIcon } from '@/components/ui/status-icon';
 import { usePrompts } from '@/hooks/usePrompts';
 import { Workspace, PromptStatus } from '@/types';
 import { Plus, MoreHorizontal } from 'lucide-react';
@@ -66,6 +67,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ workspace, selectedPro
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
+                    <StatusIcon status={column.status} size="sm" />
                     <h3 className="font-semibold text-foreground">{column.title}</h3>
                     <Badge variant="secondary" className="text-xs">
                       {getStatusCount(column.status)}

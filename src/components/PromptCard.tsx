@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge, Circle, CircleDot, CheckCircle } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -331,15 +331,15 @@ export function PromptCard({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="todo" className="flex items-center gap-2">
-                          <Circle className="w-3 h-3 text-muted-foreground" />
+                          <StatusIcon status="todo" size="sm" />
                           Todo
                         </SelectItem>
                         <SelectItem value="in_progress" className="flex items-center gap-2">
-                          <CircleDot className="w-3 h-3 text-blue-500" />
+                          <StatusIcon status="in_progress" size="sm" />
                           In Progress
                         </SelectItem>
                         <SelectItem value="done" className="flex items-center gap-2">
-                          <CheckCircle className="w-3 h-3 text-green-500 fill-green-500" />
+                          <StatusIcon status="done" size="sm" />
                           Done
                         </SelectItem>
                       </SelectContent>
