@@ -179,7 +179,7 @@ export default function LandingPage() {
                 <img 
                   src="/lovable-uploads/1759cd6a-21b8-4c30-98f6-0cbf4a99193e.png" 
                   alt="Ahead.love dashboard showing organized prompts in a dark interface with sidebar navigation and kanban-style layout"
-                  className="w-full max-w-2xl rounded-lg shadow-2xl border border-border"
+                  className="w-full max-w-4xl rounded-lg shadow-2xl border border-border"
                 />
               </div>
           </div>
