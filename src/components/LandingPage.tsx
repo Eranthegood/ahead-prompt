@@ -174,9 +174,17 @@ export default function LandingPage() {
                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                </Button>
               </div>
-           </div>
-         </div>
-       </section>
+              
+              <div className="flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/1759cd6a-21b8-4c30-98f6-0cbf4a99193e.png" 
+                  alt="Ahead.love dashboard showing organized prompts in a dark interface with sidebar navigation and kanban-style layout"
+                  className="w-full max-w-2xl rounded-lg shadow-2xl border border-border"
+                />
+              </div>
+          </div>
+        </div>
+      </section>
 
 
       {/* Feature Demo Section */}
