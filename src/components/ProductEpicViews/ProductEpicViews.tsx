@@ -6,6 +6,7 @@ import { usePrompts } from "@/hooks/usePrompts";
 import { useViewManager, ViewManagerConfig } from "@/hooks/useViewManager";
 import { ViewToolbar } from "./ViewToolbar";
 import { ListView } from "./ListView/ListView";
+import { LinearEpicCreator } from "@/components/LinearEpicCreator";
 import { KanbanView, KanbanColumnData } from "./KanbanView/KanbanView";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,6 +35,8 @@ export function ProductEpicViews({
   const { epics, loading: epicsLoading, deleteEpic, updateEpic } = useEpics(workspace?.id);
   const { prompts, loading: promptsLoading } = usePrompts(workspace?.id);
   const navigate = useNavigate();
+  const [showCreateEpic, setShowCreateEpic] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<string | undefined>();
 
   const viewConfig: ViewManagerConfig = {
     enabledViews: ['list', 'kanban'],
@@ -211,6 +214,13 @@ export function ProductEpicViews({
             onCreateEpic={onEpicCreate}
           />
         )}
+
+        <LinearEpicCreator
+          isOpen={showCreateEpic}
+          onClose={() => setShowCreateEpic(false)}
+          selectedProductId={selectedProduct}
+          products={products}
+        />
       </div>
     </div>
   );
