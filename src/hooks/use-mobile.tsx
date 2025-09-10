@@ -1,20 +1,37 @@
 import * as React from "react"
 
-const MOBILE_BREAKPOINT = 640 // Reduced from 768 to better match actual mobile devices
+const MOBILE_BREAKPOINT = 900 // Increased to include tablets and touch devices
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const widthQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const touchQuery = window.matchMedia('(pointer: coarse)')
+    
     const onChange = () => {
-      const newIsMobile = window.innerWidth < MOBILE_BREAKPOINT
+      const isNarrowScreen = window.innerWidth < MOBILE_BREAKPOINT
+      const isTouchDevice = touchQuery.matches
+      const newIsMobile = isNarrowScreen || isTouchDevice
+      
       setIsMobile(newIsMobile)
-      console.log('useIsMobile:', { windowWidth: window.innerWidth, isMobile: newIsMobile, breakpoint: MOBILE_BREAKPOINT })
+      console.log('useIsMobile:', { 
+        windowWidth: window.innerWidth, 
+        isMobile: newIsMobile, 
+        breakpoint: MOBILE_BREAKPOINT,
+        isNarrowScreen,
+        isTouchDevice 
+      })
     }
-    mql.addEventListener("change", onChange)
+    
+    widthQuery.addEventListener("change", onChange)
+    touchQuery.addEventListener("change", onChange)
     onChange() // Call immediately to set initial state
-    return () => mql.removeEventListener("change", onChange)
+    
+    return () => {
+      widthQuery.removeEventListener("change", onChange)
+      touchQuery.removeEventListener("change", onChange)
+    }
   }, [])
 
   return !!isMobile

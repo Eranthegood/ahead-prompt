@@ -57,7 +57,7 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
   return (
     <div
       className={cn(
-        "fixed bottom-6 right-6 z-50 transition-all duration-300 ease-in-out",
+        "fixed bottom-6 right-6 z-[100] transition-all duration-300 ease-in-out",
         isVisible 
           ? "translate-y-0 opacity-100 scale-100" 
           : "translate-y-16 opacity-0 scale-95"

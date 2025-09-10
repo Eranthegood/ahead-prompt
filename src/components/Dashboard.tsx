@@ -7,6 +7,7 @@ import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { PromptLibrary } from '@/components/PromptLibrary';
 import { PromptLibraryCreateDialog } from '@/components/PromptLibraryCreateDialog';
+import { NotesDialog } from '@/components/NotesDialog';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useEpics } from '@/hooks/useEpics';
@@ -37,6 +38,8 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
   const [promptLibraryOpen, setPromptLibraryOpen] = useState(false);
   const [promptLibraryCreateOpen, setPromptLibraryCreateOpen] = useState(false);
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [creatingNote, setCreatingNote] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
@@ -110,6 +113,11 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     't': () => setDebugConsoleOpen(true),
     'l': () => window.dispatchEvent(new CustomEvent('open-prompt-library')),
     'll': () => window.dispatchEvent(new CustomEvent('open-prompt-library-create')),
+    'n': () => setNotesDialogOpen(true),
+    'j': () => {
+      setCreatingNote(true);
+      setNotesDialogOpen(true);
+    },
     'c': async () => {
       // If hovering over a prompt, copy its generated prompt
       if (hoveredPromptId) {
@@ -208,6 +216,16 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
       <PromptLibraryCreateDialog
         open={promptLibraryCreateOpen}
         onOpenChange={setPromptLibraryCreateOpen}
+      />
+      
+      <NotesDialog
+        open={notesDialogOpen}
+        onOpenChange={(open) => {
+          setNotesDialogOpen(open);
+          if (!open) setCreatingNote(false);
+        }}
+        selectedProductId={selectedProductId}
+        selectedEpicId={selectedEpicId}
       />
     </>
   );
