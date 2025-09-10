@@ -212,52 +212,21 @@ export function LinearPromptItem({
           </TooltipProvider>
         )}
 
-        {/* More actions dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => e.stopPropagation()}
-              className="h-7 w-7 p-0 hover:bg-muted flex-shrink-0"
-              aria-label="More actions"
-            >
-              <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit?.(prompt);
-              }}
-              className="flex items-center gap-2 text-xs"
-            >
-              <Edit className="h-3.5 w-3.5" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDuplicate?.(prompt);
-              }}
-              className="flex items-center gap-2 text-xs"
-            >
-              <CopyIcon className="h-3.5 w-3.5" />
-              Duplicate
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.(prompt);
-              }}
-              className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* More actions */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onMoreActions) {
+              onMoreActions(prompt);
+            }
+          }}
+          className="h-7 w-7 p-0 hover:bg-muted flex-shrink-0"
+          aria-label="More actions"
+        >
+          <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
+        </Button>
       </div>
 
       {/* Status - Fixed 80px column, aligned */}
