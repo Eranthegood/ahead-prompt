@@ -765,6 +765,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notes: {
+        Row: {
+          content: string
+          created_at: string
+          epic_id: string | null
+          id: string
+          is_favorite: boolean
+          product_id: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          epic_id?: string | null
+          id?: string
+          is_favorite?: boolean
+          product_id?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          epic_id?: string | null
+          id?: string
+          is_favorite?: boolean
+          product_id?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       pricing_feedback: {
         Row: {
           created_at: string
