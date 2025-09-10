@@ -345,8 +345,8 @@ export function MinimalPromptList({
       <div className="space-y-4 sm:space-y-5">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex items-center py-2 px-3">
-            <div className="w-8 h-8 flex-shrink-0 mr-3">
-              <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+            <div className="w-4 h-4 flex-shrink-0 mr-3">
+              <div className="w-3 h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
             </div>
             <div className="flex-1 min-w-0 mr-4">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" style={{width: `${60 + i * 8}%`}} />
