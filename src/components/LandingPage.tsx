@@ -10,6 +10,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 
 const InteractivePromptCardsLazy = lazy(() => import("@/components/InteractivePromptCards").then(m => ({ default: m.InteractivePromptCards })));
 const CollaborativeRepoAnimationLazy = lazy(() => import("@/components/CollaborativeRepoAnimation"));
+const TaskKanbanMotionLazy = lazy(() => import("@/components/TaskKanbanMotion"));
 // Logo components
 const CursorLogo = ({
   className
@@ -173,10 +174,18 @@ export default function LandingPage() {
                  {user ? "Build" : "Try Free Now"}
                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                </Button>
-              </div>
-           </div>
-         </div>
-       </section>
+            </div>
+            {/* Right-side motion design */}
+            <div className="flex items-center justify-center mt-8 lg:mt-0">
+              <ErrorBoundary>
+                <Suspense fallback={<div className="h-[460px] w-full bg-muted/30 rounded-lg" />}> 
+                  <TaskKanbanMotionLazy />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          </div>
+        </div>
+      </section>
 
 
       {/* Feature Demo Section */}
