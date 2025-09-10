@@ -27,6 +27,12 @@ export async function copyText(text: string): Promise<boolean> {
     isClipboardWriteAllowed
   });
 
+  // In sandboxed iframe environments, avoid using Clipboard API entirely
+  if (inIframe) {
+    console.debug('Clipboard: In iframe - using manual fallback');
+    return manualCopy(text);
+  }
+
   // Primary method: modern clipboard API (only if not explicitly disallowed)
   if (hasClipboard && isSecure && isClipboardWriteAllowed !== false) {
     try {
