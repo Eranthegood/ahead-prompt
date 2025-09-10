@@ -59,11 +59,11 @@ export function NoteEditor({
       ListItem,
     ],
     content: note?.content || '',
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
+      editorProps: {
+        attributes: {
+          class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[500px] p-6',
+        },
       },
-    },
   });
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export function NoteEditor({
   if (!editor) return null;
 
   return (
-    <Card className={cn("w-full max-w-4xl mx-auto", className)}>
+    <Card className={cn("w-full mx-auto", className)}>
       <CardHeader className="space-y-4">
         <div className="flex items-center justify-between">
           <Input
@@ -266,7 +266,7 @@ export function NoteEditor({
 
       <CardContent className="space-y-4">
         {/* Editor */}
-        <div className="border rounded-lg min-h-[200px]">
+        <div className="border rounded-lg min-h-[500px] bg-background/50">
           <EditorContent editor={editor} />
         </div>
 
