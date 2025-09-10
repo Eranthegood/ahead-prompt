@@ -10,6 +10,7 @@ import { usePrompts } from '@/hooks/usePrompts';
 import { Prompt, Product, Epic, PRIORITY_OPTIONS } from '@/types';
 import { Copy, FileText, Sparkles, RotateCcw } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
+import { copyText } from '@/lib/clipboard';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -78,7 +79,9 @@ export function PromptDetailDialog({
   const handleCopyGeneratedPrompt = async () => {
     if (prompt?.generated_prompt) {
       try {
-        await navigator.clipboard.writeText(prompt.generated_prompt);
+        const ok = await copyText(prompt.generated_prompt);
+        if (!ok) throw new Error('Clipboard copy failed');
+        
         toast({
           title: 'Copied!',
           description: 'Generated prompt copied to clipboard'

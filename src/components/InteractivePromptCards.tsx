@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, ExternalLink, Check, Hash, Package, Calendar, Flame, Sparkles } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { copyText } from '@/lib/clipboard';
 
 interface DemoPrompt {
   id: string;
@@ -94,10 +95,12 @@ export function InteractivePromptCards() {
     }
   };
 
-  const handleCopy = (prompt: DemoPrompt) => {
-    setCopiedId(prompt.id);
-    navigator.clipboard.writeText(`${prompt.title}\n\n${prompt.description}`);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopy = async (prompt: DemoPrompt) => {
+    const ok = await copyText(`${prompt.title}\n\n${prompt.description}`);
+    if (ok) {
+      setCopiedId(prompt.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
   };
 
   const handleSendToCursor = (prompt: DemoPrompt) => {

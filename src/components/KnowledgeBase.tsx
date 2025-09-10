@@ -12,6 +12,7 @@ import { QuickKnowledgeForm } from "./QuickKnowledgeForm";
 import { format } from "date-fns";
 import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/useKnowledge";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
+import { copyText } from '@/lib/clipboard';
 
 interface KnowledgeBaseProps {
   workspace: Workspace;
@@ -39,8 +40,12 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
   const copyToClipboard = async (item: KnowledgeItem) => {
     try {
       const textToCopy = `${item.title}\n\n${item.content}`;
-      await navigator.clipboard.writeText(textToCopy);
-      toast.success("Copied to clipboard");
+      const ok = await copyText(textToCopy);
+      if (ok) {
+        toast.success("Copied to clipboard");
+      } else {
+        toast.error("Failed to copy to clipboard");
+      }
     } catch (error) {
       console.error("Error copying to clipboard:", error);
       toast.error("Failed to copy to clipboard");

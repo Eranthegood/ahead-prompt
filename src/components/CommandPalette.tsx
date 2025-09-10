@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Workspace, Prompt, Epic, KnowledgeItem, Product } from '@/types';
+import { copyText } from '@/lib/clipboard';
 import { 
   Search, 
   Plus, 
@@ -187,26 +188,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     }
   };
 
-  const copyPromptForLovable = (prompt: Prompt) => {
+  const copyPromptForLovable = async (prompt: Prompt) => {
     const promptText = `${prompt.title}${prompt.description ? '\n\n' + prompt.description : ''}`;
-    navigator.clipboard.writeText(promptText);
+    const ok = await copyText(promptText);
     
-    toast({
-      title: 'Copied to clipboard',
-      description: 'Paste this prompt into Lovable chat!'
-    });
+    if (ok) {
+      toast({
+        title: 'Copied to clipboard',
+        description: 'Paste this prompt into Lovable chat!'
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Copy failed',
+        description: 'Failed to copy prompt to clipboard'
+      });
+    }
     
     onOpenChange(false);
   };
 
-  const copyKnowledgeForLovable = (item: KnowledgeItem) => {
+  const copyKnowledgeForLovable = async (item: KnowledgeItem) => {
     const knowledgeText = `Knowledge Context: ${item.title}\n\n${item.content}`;
-    navigator.clipboard.writeText(knowledgeText);
+    const ok = await copyText(knowledgeText);
     
-    toast({
-      title: 'Knowledge copied',
-      description: 'Use this as context in your Lovable prompts!'
-    });
+    if (ok) {
+      toast({
+        title: 'Knowledge copied',
+        description: 'Use this as context in your Lovable prompts!'
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Copy failed',
+        description: 'Failed to copy knowledge to clipboard'
+      });
+    }
     
     onOpenChange(false);
   };

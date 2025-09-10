@@ -7,6 +7,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { copyText } from '@/lib/clipboard';
 import { 
   Search, 
   Plus,
@@ -141,29 +142,53 @@ export function EnhancedCommandPalette({
 
   const copyPromptForLovable = async (prompt: Prompt) => {
     const content = `Title: ${prompt.title}\n\nDescription: ${prompt.description || ''}\n\nPriority: ${prompt.priority}\nStatus: ${prompt.status}`;
-    await navigator.clipboard.writeText(content);
-    toast({
-      title: "Copié dans le presse-papiers",
-      description: "Le prompt a été copié pour utilisation dans Lovable."
-    });
+    const ok = await copyText(content);
+    if (ok) {
+      toast({
+        title: "Copié dans le presse-papiers",
+        description: "Le prompt a été copié pour utilisation dans Lovable."
+      });
+    } else {
+      toast({
+        title: "Erreur de copie",
+        description: "Impossible de copier le prompt.",
+        variant: "destructive"
+      });
+    }
   };
 
   const copyKnowledgeForLovable = async (item: KnowledgeItem) => {
     const content = `Knowledge: ${item.title}\n\n${item.content}${item.tags && item.tags.length > 0 ? `\n\nTags: ${item.tags.join(', ')}` : ''}`;
-    await navigator.clipboard.writeText(content);
-    toast({
-      title: "Copié dans le presse-papiers", 
-      description: "L'élément de connaissance a été copié."
-    });
+    const ok = await copyText(content);
+    if (ok) {
+      toast({
+        title: "Copié dans le presse-papiers", 
+        description: "L'élément de connaissance a été copié."
+      });
+    } else {
+      toast({
+        title: "Erreur de copie",
+        description: "Impossible de copier l'élément.",
+        variant: "destructive"
+      });
+    }
   };
 
   const copyPromptLibraryForLovable = async (item: PromptLibraryItem) => {
     const content = `Template: ${item.title}\n\n${item.body}${item.tags && item.tags.length > 0 ? `\n\nTags: ${item.tags.join(', ')}` : ''}${item.category ? `\nCategory: ${item.category}` : ''}`;
-    await navigator.clipboard.writeText(content);
-    toast({
-      title: "Copié dans le presse-papiers", 
-      description: "Le template a été copié."
-    });
+    const ok = await copyText(content);
+    if (ok) {
+      toast({
+        title: "Copié dans le presse-papiers", 
+        description: "Le template a été copié."
+      });
+    } else {
+      toast({
+        title: "Erreur de copie",
+        description: "Impossible de copier le template.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

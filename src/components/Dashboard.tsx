@@ -15,6 +15,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { copyText } from '@/lib/clipboard';
 
 // Declare Supademo global function
 declare global {
@@ -85,7 +86,8 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     try {
       // If prompt exists, use its generated prompt
       if (prompt.generated_prompt) {
-        await navigator.clipboard.writeText(prompt.generated_prompt);
+        const ok = await copyText(prompt.generated_prompt);
+        if (!ok) throw new Error('Clipboard copy failed');
 
         // Using a simple console log instead of toast to avoid dependency issues
         console.log('Prompt copied via keyboard shortcut');

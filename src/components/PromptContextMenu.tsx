@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { Prompt, PromptStatus } from '@/types';
+import { copyText } from '@/lib/clipboard';
 
 interface PromptContextMenuProps {
   prompt: Prompt;
@@ -99,7 +100,8 @@ export function PromptContextMenu({ prompt, children, onEdit, onUpdate }: Prompt
   const handleCopy = async () => {
     try {
       const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
-      await navigator.clipboard.writeText(content);
+      const ok = await copyText(content);
+      if (!ok) throw new Error('Clipboard copy failed');
       
       // Auto-change status from todo to in_progress when copied
       if (prompt.status === 'todo') {
