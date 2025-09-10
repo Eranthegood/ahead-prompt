@@ -176,9 +176,9 @@ export default function LandingPage() {
                </Button>
             </div>
             {/* Right-side motion design */}
-            <div className="flex items-center justify-center mt-8 lg:mt-0">
+            <div className="flex items-center justify-center mt-8 lg:mt-0 w-full">
               <ErrorBoundary>
-                <Suspense fallback={<div className="h-[460px] w-full bg-muted/30 rounded-lg" />}> 
+                <Suspense fallback={<div className="h-[460px] lg:h-[520px] w-full bg-muted/30 rounded-lg animate-pulse" />}> 
                   <TaskKanbanMotionLazy />
                 </Suspense>
               </ErrorBoundary>
