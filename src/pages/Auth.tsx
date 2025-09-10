@@ -69,8 +69,7 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-glow">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center gap-4 mb-6">
-            <div className="flex items-center justify-center gap-3">
-              <Zap className="w-16 h-16 text-primary" />
+            <div className="flex items-center justify-center">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                 Ahead
               </h1>
