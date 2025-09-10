@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { copyText } from '@/lib/clipboard';
 
 export default function BlogPostPage() {
   const { slug } = useParams();
@@ -137,7 +138,8 @@ export default function BlogPostPage() {
         break;
       case 'copy':
           try {
-            await navigator.clipboard.writeText(url);
+            const ok = await copyText(url);
+            if (!ok) throw new Error('manual-copy');
             toast({ title: "Link copied", description: "The link has been copied to clipboard" });
             return;
           } catch (error) {

@@ -23,6 +23,7 @@ import { Epic, Product } from "@/types";
 import { format } from "date-fns";
 import { EpicContextMenu } from "@/components/EpicContextMenu";
 import { toast } from "@/hooks/use-toast";
+import { copyText } from '@/lib/clipboard';
 
 interface EpicItemProps {
   epic: Epic;
@@ -61,7 +62,7 @@ export function EpicItem({
   const copyEpicInfo = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const text = `Epic: ${epic.name}\n${epic.description || ''}`;
-    await navigator.clipboard.writeText(text);
+    await copyText(text);
   };
 
   const handleAddPromptContext = () => {

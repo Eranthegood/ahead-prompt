@@ -7,6 +7,7 @@ import { PromptHistory, PromptTransformService } from '@/services/promptTransfor
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { copyText } from '@/lib/clipboard';
 
 interface PromptHistoryPanelProps {
   history: PromptHistory[];
@@ -23,7 +24,8 @@ export const PromptHistoryPanel: React.FC<PromptHistoryPanelProps> = ({
 
   const handleCopy = async (prompt: string) => {
     try {
-      await navigator.clipboard.writeText(prompt);
+      const ok = await copyText(prompt);
+      if (!ok) throw new Error('manual-copy');
       onCopyPrompt(prompt);
       toast({
         title: "Copié !",

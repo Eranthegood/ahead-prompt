@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Bug, Copy, Loader2, AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Workspace } from '@/types';
+import { copyText } from '@/lib/clipboard';
 
 interface DebugError {
   id: string;
@@ -85,7 +86,8 @@ export function DebugConsole({ isOpen, onClose, workspace }: DebugConsoleProps) 
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      const ok = await copyText(text);
+      if (!ok) throw new Error('manual-copy');
       toast({
         title: "Copied!",
         description: `${label} copied to clipboard`,

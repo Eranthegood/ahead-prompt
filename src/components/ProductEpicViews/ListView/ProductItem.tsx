@@ -22,6 +22,7 @@ import {
 import { Product } from "@/types";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { copyText } from '@/lib/clipboard';
 
 interface ProductItemProps {
   product: Product;
@@ -60,7 +61,7 @@ export function ProductItem({
   const copyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}/product/${product.id}`;
-    await navigator.clipboard.writeText(url);
+    await copyText(url);
   };
 
   return (

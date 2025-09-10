@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Copy, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { copyText } from '@/lib/clipboard';
 
 interface TruncatedTitleProps {
   title: string;
@@ -34,7 +35,8 @@ export function TruncatedTitle({
     e.stopPropagation();
     
     try {
-      await navigator.clipboard.writeText(title);
+      const ok = await copyText(title);
+      if (!ok) throw new Error('manual-copy');
       toast({
         title: 'Copié',
         description: 'Le titre a été copié dans le presse-papiers'

@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
 import type { PromptLibraryItem } from '@/types/prompt-library';
 import { PROMPT_CATEGORIES } from '@/types/prompt-library';
+import { copyText } from '@/lib/clipboard';
 
 interface PromptLibraryProps {
   open: boolean;
@@ -98,7 +99,8 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
 
   const handleCopyPrompt = async (item: PromptLibraryItem) => {
     try {
-      await navigator.clipboard.writeText(item.body);
+      const ok = await copyText(item.body);
+      if (!ok) throw new Error('manual-copy');
       await incrementUsage(item.id);
       toast({
         title: 'Prompt copied',
@@ -467,14 +469,21 @@ TODO:
               </Button>
               
               <Button
-                onClick={() => {
-                  // Copy task template to clipboard
-                  navigator.clipboard.writeText(taskTemplate);
-                  toast({
-                    title: 'Task template copied',
-                    description: 'The task template has been copied to your clipboard.',
-                  });
-                  setShowTaskDialog(false);
+                onClick={async () => {
+                  const ok = await copyText(taskTemplate);
+                  if (ok) {
+                    toast({
+                      title: 'Task template copied',
+                      description: 'The task template has been copied to your clipboard.',
+                    });
+                    setShowTaskDialog(false);
+                  } else {
+                    toast({
+                      variant: 'destructive',
+                      title: 'Failed to copy',
+                      description: 'Could not copy task template to clipboard.',
+                    });
+                  }
                 }}
                 className="gap-2"
               >
