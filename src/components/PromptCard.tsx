@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge, Circle, CircleDot, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -20,6 +20,7 @@ import { CursorConfigDialog } from '@/components/CursorConfigDialog';
 import { CursorWorkflowProgress } from '@/components/CursorWorkflowProgress';
 import { CursorAgentModal } from '@/components/CursorAgentModal';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
+import { StatusIcon } from '@/components/ui/status-icon';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
@@ -323,18 +324,24 @@ export function PromptCard({
                         onClick={stopEventPropagation}
                       >
                         <SelectValue asChild>
-                          <Badge 
-                            variant={prompt.status === 'done' ? 'success' : prompt.status === 'in_progress' ? 'secondary' : 'outline'}
-                            className="text-xs px-1.5 py-0 cursor-pointer"
-                          >
-                            {prompt.status === 'in_progress' ? 'In Progress' : prompt.status === 'done' ? 'Done' : 'Todo'}
-                          </Badge>
+                          <div className="cursor-pointer">
+                            <StatusIcon status={prompt.status} size="sm" />
+                          </div>
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="todo">Todo</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="todo" className="flex items-center gap-2">
+                          <Circle className="w-3 h-3 text-muted-foreground" />
+                          Todo
+                        </SelectItem>
+                        <SelectItem value="in_progress" className="flex items-center gap-2">
+                          <CircleDot className="w-3 h-3 text-blue-500" />
+                          In Progress
+                        </SelectItem>
+                        <SelectItem value="done" className="flex items-center gap-2">
+                          <CheckCircle className="w-3 h-3 text-green-500 fill-green-500" />
+                          Done
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}

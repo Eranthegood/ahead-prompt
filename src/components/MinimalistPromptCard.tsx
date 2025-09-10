@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Copy, Check, ExternalLink, Flame, Minus, Clock } from 'lucide-react';
+import { StatusIcon } from '@/components/ui/status-icon';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
@@ -134,13 +135,17 @@ export function MinimalistPromptCard({
               <AgentWorkingIndicator size="sm" />
             )}
             
-            {/* Status Badge */}
-            <Badge 
-              variant={getStatusVariant()}
-              className="text-xs px-2 py-1"
-            >
-              {getStatusLabel()}
-            </Badge>
+            {/* Status Icon */}
+            {['sending_to_cursor','sent_to_cursor','cursor_working','pr_created','pr_review','pr_ready','pr_merged','error'].includes(prompt.status) ? (
+              <Badge 
+                variant={getStatusVariant()}
+                className="text-xs px-2 py-1"
+              >
+                {getStatusLabel()}
+              </Badge>
+            ) : (
+              <StatusIcon status={prompt.status} size="sm" />
+            )}
 
             {/* Action Buttons - Show on hover */}
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

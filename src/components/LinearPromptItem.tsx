@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon, Circle, CircleDot, CheckCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
@@ -10,6 +10,7 @@ import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
 import { useAgentStatusStream } from '@/hooks/useAgentStatusStream';
+import { StatusIcon } from '@/components/ui/status-icon';
 
 interface LinearPromptItemProps {
   prompt: Prompt & {
@@ -229,9 +230,7 @@ export function LinearPromptItem({
                 className="h-auto p-2 -mx-2 justify-start hover:bg-gray-100 dark:hover:bg-gray-700 text-xs font-medium w-full"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className={`${getStatusColor()} line-clamp-1`}>
-                  {getStatusLabel()}
-                </div>
+                <StatusIcon status={prompt.status} size="sm" />
                 <ChevronDown className="h-3 w-3 ml-1 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -247,8 +246,9 @@ export function LinearPromptItem({
                     handleStatusChange('todo');
                   }
                 }}
-                className={`${prompt.status === 'todo' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+                className={`${prompt.status === 'todo' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
               >
+                <Circle className="w-3 h-3 text-muted-foreground" />
                 To do
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -258,8 +258,9 @@ export function LinearPromptItem({
                     handleStatusChange('in_progress');
                   }
                 }}
-                className={`${prompt.status === 'in_progress' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+                className={`${prompt.status === 'in_progress' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
               >
+                <CircleDot className="w-3 h-3 text-blue-500" />
                 In progress
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -269,8 +270,9 @@ export function LinearPromptItem({
                     handleStatusChange('done');
                   }
                 }}
-                className={`${prompt.status === 'done' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700`}
+                className={`${prompt.status === 'done' ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
               >
+                <CheckCircle className="w-3 h-3 text-green-500 fill-green-500" />
                 Done
               </DropdownMenuItem>
             </DropdownMenuContent>
