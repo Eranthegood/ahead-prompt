@@ -29,7 +29,8 @@ class MixpanelService {
         }
       });
     } catch (error) {
-      console.error('Error initializing Mixpanel:', error);
+      console.debug('Mixpanel initialization blocked:', error);
+      this.initialized = false;
     }
   }
 
@@ -93,25 +94,25 @@ class MixpanelService {
   track(eventName: string, properties?: Record<string, any>) {
     if (!this.initialized) return;
     
-    // Check if current user is excluded from tracking
-    const currentUserId = mixpanel.get_distinct_id();
-    if (currentUserId && this.isUserExcluded(currentUserId)) {
-      console.log('Event tracking skipped for excluded user:', currentUserId);
-      return;
-    }
-    
     try {
+      // Check if current user is excluded from tracking
+      const currentUserId = mixpanel.get_distinct_id();
+      if (currentUserId && this.isUserExcluded(currentUserId)) {
+        console.log('Event tracking skipped for excluded user:', currentUserId);
+        return;
+      }
+      
       mixpanel.track(eventName, {
         timestamp: new Date().toISOString(),
         ...properties
       });
       
       // Log pour le développement
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_env === 'development') {
         console.log('Mixpanel event tracked:', eventName, properties);
       }
     } catch (error) {
-      console.error('Error tracking event in Mixpanel:', error);
+      console.debug('Mixpanel tracking blocked or failed:', error);
     }
   }
 

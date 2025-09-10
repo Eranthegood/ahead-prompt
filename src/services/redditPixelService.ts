@@ -41,18 +41,18 @@ export class RedditPixelService {
         window.rdt('track', 'PageVisit');
         
         this.initialized = true;
-        console.log('[Reddit Pixel] Initialized with ID:', REDDIT_PIXEL_ID);
+        console.debug('[Reddit Pixel] Initialized with ID:', REDDIT_PIXEL_ID);
       } else {
-        console.warn('[Reddit Pixel] Please configure your Reddit Pixel ID in src/services/redditPixelService.ts');
+        console.debug('[Reddit Pixel] Script not loaded or blocked');
       }
     } catch (error) {
-      console.error('[Reddit Pixel] Initialization failed:', error);
+      console.debug('[Reddit Pixel] Initialization blocked or failed:', error);
     }
   }
 
   static trackConversion(eventName: string, data?: Record<string, any>) {
     if (!this.initialized || typeof window === 'undefined' || !window.rdt) {
-      console.warn('[Reddit Pixel] Not initialized, skipping conversion tracking');
+      console.debug('[Reddit Pixel] Not initialized or blocked, skipping conversion tracking');
       return;
     }
 
@@ -63,9 +63,9 @@ export class RedditPixelService {
         window.rdt('track', eventName);
       }
       
-      console.log('[Reddit Pixel] Conversion tracked:', eventName, data);
+      console.debug('[Reddit Pixel] Conversion tracked:', eventName, data);
     } catch (error) {
-      console.error('[Reddit Pixel] Conversion tracking failed:', error);
+      console.debug('[Reddit Pixel] Conversion tracking blocked or failed:', error);
     }
   }
 
