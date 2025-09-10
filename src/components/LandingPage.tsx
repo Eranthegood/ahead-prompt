@@ -156,7 +156,7 @@ export default function LandingPage() {
                    <div className="flex items-start gap-3">
                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold mt-0.5">2</span>
                      <div>
-                       <span><strong>Organize your prompts.</strong> We'll store them by product, feature, and priority.</span>
+                       <span><strong>Organize and queue your prompts.</strong> We'll store them by product, feature, and priority.</span>
                      </div>
                    </div>
                    <div className="flex items-start gap-3">
