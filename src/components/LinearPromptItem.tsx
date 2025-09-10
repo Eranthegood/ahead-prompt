@@ -307,7 +307,7 @@ export function LinearPromptItem({
         )}
       </div>
 
-    </div>
+      </div>
       </ContextMenuTrigger>
       
       <ContextMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
