@@ -144,18 +144,27 @@ export default function LandingPage() {
                  Centralize the chaos. Your ready to develop prompts workspace that moves at brain speed.
                </p>
                 
-               <div className="space-y-3">
-                 <div className="flex items-center gap-3">
-                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                   <span><strong>Queue tasks in seconds</strong> - Never wait idle again</span>
-                 </div>
-                 <div className="flex items-center gap-3">
-                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                   <span><strong>Maintain creative flow</strong> - Zero momentum loss</span>
-                 </div>
-                 <div className="flex items-center gap-3">
-                   <span className="w-2 h-2 rounded-full bg-primary"></span>
-                   <span><strong>Always ready</strong> - Next prompt waits for you</span>
+               <div className="space-y-4">
+                 <p className="text-lg font-medium">Tired of juggling Notion blocks?</p>
+                 <div className="space-y-3">
+                   <div className="flex items-start gap-3">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold mt-0.5">1</span>
+                     <div>
+                       <span><strong>Store your idea.</strong> We'll craft enhanced prompts, ready to use.</span>
+                     </div>
+                   </div>
+                   <div className="flex items-start gap-3">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold mt-0.5">2</span>
+                     <div>
+                       <span><strong>Organize your prompts.</strong> We'll store them by product, feature, and priority.</span>
+                     </div>
+                   </div>
+                   <div className="flex items-start gap-3">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold mt-0.5">3</span>
+                     <div>
+                       <span><strong>Deploy your prompts.</strong> Ship them effortlessly to any development platform with a single click.</span>
+                     </div>
+                   </div>
                  </div>
                </div>
                  
