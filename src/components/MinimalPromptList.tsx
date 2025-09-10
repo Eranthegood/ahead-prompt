@@ -18,6 +18,7 @@ import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } fr
 import { isPromptUsable } from '@/lib/utils';
 import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { copyText } from '@/lib/clipboard';
 
 interface MinimalPromptListProps {
   workspace: Workspace;
@@ -235,7 +236,8 @@ export function MinimalPromptList({
   const handleCopy = async (prompt: Prompt) => {
     try {
       const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
-      await navigator.clipboard.writeText(content);
+      const ok = await copyText(content);
+      if (!ok) throw new Error('Clipboard copy failed');
       
       // Auto-change status from todo to in_progress when copied
       if (prompt.status === 'todo') {
@@ -272,7 +274,8 @@ export function MinimalPromptList({
 
       // If a generated prompt already exists, use it directly
       if (prompt.generated_prompt) {
-        await navigator.clipboard.writeText(prompt.generated_prompt);
+        const ok = await copyText(prompt.generated_prompt);
+        if (!ok) throw new Error('Clipboard copy failed');
         
         // Auto-change status from todo to in_progress when copied
         if (prompt.status === 'todo') {
@@ -301,7 +304,8 @@ export function MinimalPromptList({
       }
 
       if (response.transformedPrompt) {
-        await navigator.clipboard.writeText(response.transformedPrompt);
+        const ok = await copyText(response.transformedPrompt);
+        if (!ok) throw new Error('Clipboard copy failed');
         
         // Auto-change status from todo to in_progress when copied
         if (prompt.status === 'todo') {
@@ -326,10 +330,8 @@ export function MinimalPromptList({
       // Fallback to copying original content
       try {
         const content = `${prompt.title}\n\n${prompt.description || ''}`.trim();
-        await navigator.clipboard.writeText(content);
-        
-        // Auto-change status from todo to in_progress when copied (even in fallback)
-        if (prompt.status === 'todo') {
+        const ok = await copyText(content);
+        if (ok && prompt.status === 'todo') {
           await updatePromptStatus(prompt.id, 'in_progress');
         }
       } catch (fallbackError) {

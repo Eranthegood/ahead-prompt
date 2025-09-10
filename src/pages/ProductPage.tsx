@@ -17,6 +17,7 @@ import { Loader2, Package, Link2, BookOpen, Hash, ArrowLeft } from 'lucide-react
 import { Link } from 'react-router-dom';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { copyText } from '@/lib/clipboard';
 
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -145,7 +146,8 @@ const ProductPage = () => {
 
   const handleCopy = async (prompt: Prompt) => {
     try {
-      await navigator.clipboard.writeText(prompt.description || '');
+      const ok = await copyText(prompt.description || '');
+      if (!ok) throw new Error('Clipboard copy failed');
       toast({
         title: 'Copied',
         description: 'Prompt content copied to clipboard'
@@ -162,7 +164,8 @@ const ProductPage = () => {
   const handleCopyGenerated = async (prompt: Prompt) => {
     try {
       const textToCopy = prompt.generated_prompt || prompt.description || '';
-      await navigator.clipboard.writeText(textToCopy);
+      const ok = await copyText(textToCopy);
+      if (!ok) throw new Error('Clipboard copy failed');
       
       // Update status to in_progress if copying generated prompt
       if (prompt.status === 'todo') {
