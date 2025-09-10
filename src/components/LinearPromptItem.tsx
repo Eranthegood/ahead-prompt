@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, MoreHorizontal, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
@@ -21,7 +21,6 @@ interface LinearPromptItemProps {
   onShowCursorDialog: () => void;
   onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
   onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
-  onMoreActions?: (prompt: Prompt) => void;
   onDuplicate?: (prompt: Prompt) => void;
   onDelete?: (prompt: Prompt) => void;
   onEdit?: (prompt: Prompt) => void;
@@ -47,7 +46,6 @@ export function LinearPromptItem({
   onShowCursorDialog,
   onPriorityChange,
   onStatusChange,
-  onMoreActions,
   onDuplicate,
   onDelete,
   onEdit,
@@ -165,7 +163,7 @@ export function LinearPromptItem({
       </div>
 
       {/* Actions - Fixed width, show on hover */}
-      <div className="flex items-center gap-1 w-24 transition-opacity duration-150 mr-3">
+      <div className="flex items-center gap-1 w-16 transition-opacity duration-150 mr-3">
         {/* Copy Button */}
         <Button
           variant="ghost"
@@ -211,22 +209,6 @@ export function LinearPromptItem({
             </Tooltip>
           </TooltipProvider>
         )}
-
-        {/* More actions */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onMoreActions) {
-              onMoreActions(prompt);
-            }
-          }}
-          className="h-7 w-7 p-0 hover:bg-muted flex-shrink-0"
-          aria-label="More actions"
-        >
-          <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
-        </Button>
       </div>
 
       {/* Status - Fixed 80px column, aligned */}

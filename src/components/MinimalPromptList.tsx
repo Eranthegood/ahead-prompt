@@ -484,7 +484,6 @@ export function MinimalPromptList({
                     }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
-                    onMoreActions={handleMoreActions}
                     onEdit={handleEdit}
                     onDuplicate={handleDuplicate}
                     onDelete={handleDelete}
@@ -563,7 +562,6 @@ export function MinimalPromptList({
                     }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
-                    onMoreActions={handleMoreActions}
                     onEdit={handleEdit}
                     onDuplicate={handleDuplicate}
                     onDelete={handleDelete}
