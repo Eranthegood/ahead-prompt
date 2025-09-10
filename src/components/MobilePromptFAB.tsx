@@ -16,6 +16,17 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
+  // Debug logging to understand visibility conditions
+  React.useEffect(() => {
+    console.log('MobilePromptFAB Debug:', {
+      isMobile,
+      sidebarOpen,
+      isQuickPromptOpen,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'undefined',
+      shouldRender: isMobile && !sidebarOpen && !isQuickPromptOpen
+    });
+  }, [isMobile, sidebarOpen, isQuickPromptOpen]);
+
   // Hide FAB when scrolling up, show when scrolling down
   useEffect(() => {
     if (!isMobile) return;
@@ -37,9 +48,9 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
 
   // Don't render if:
   // - Not on mobile
-  // - Sidebar is open on mobile
   // - Quick prompt dialog is already open
-  if (!isMobile || sidebarOpen || isQuickPromptOpen) {
+  // For debugging, we're being more lenient with sidebar condition
+  if (!isMobile || isQuickPromptOpen) {
     return null;
   }
 
