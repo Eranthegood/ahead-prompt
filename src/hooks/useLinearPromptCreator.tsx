@@ -16,7 +16,7 @@ export const useLinearPromptCreator = ({
   selectedEpicId 
 }: UseLinearPromptCreatorProps) => {
   const [title, setTitle] = useState('');
-  const [priority, setPriority] = useState<PromptPriority>(1);
+  const [priority, setPriority] = useState<PromptPriority>(2);
   const [selectedProduct, setSelectedProduct] = useState<string | undefined>(selectedProductId);
   const [selectedEpic, setSelectedEpic] = useState<string | undefined>(selectedEpicId);
   const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
@@ -29,7 +29,7 @@ export const useLinearPromptCreator = ({
 
   const resetForm = useCallback(() => {
     setTitle('');
-    setPriority(1);
+    setPriority(2);
     setSelectedProduct(selectedProductId);
     setSelectedEpic(selectedEpicId);
     setProviderConfig({
