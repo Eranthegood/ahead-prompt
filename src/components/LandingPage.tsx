@@ -7,8 +7,9 @@ import { Footer } from "@/components/ui/footer";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { lazy, Suspense, useState, useEffect } from "react";
-
-const InteractivePromptCardsLazy = lazy(() => import("@/components/InteractivePromptCards").then(m => ({ default: m.InteractivePromptCards })));
+const InteractivePromptCardsLazy = lazy(() => import("@/components/InteractivePromptCards").then(m => ({
+  default: m.InteractivePromptCards
+})));
 const CollaborativeRepoAnimationLazy = lazy(() => import("@/components/CollaborativeRepoAnimation"));
 // Logo components
 const CursorLogo = ({
@@ -39,7 +40,7 @@ export default function LandingPage() {
     user
   } = useAuth();
   const [supademoLoaded, setSupademoLoaded] = useState(false);
-  
+
   // Check if Supademo script is loaded
   useEffect(() => {
     const checkSupademo = () => {
@@ -47,7 +48,6 @@ export default function LandingPage() {
         setSupademoLoaded(true);
       }
     };
-    
     checkSupademo();
     // Recheck after a delay in case script loads later
     const timer = setTimeout(checkSupademo, 2000);
@@ -171,56 +171,7 @@ export default function LandingPage() {
 
 
       {/* Feature Demo Section */}
-      <section className="py-16 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Capture Ideas While AI Works
-              </h2>
-              
-              <p className="text-muted-foreground text-lg">
-                Don't lose brilliant ideas during AI wait times. Capture, organize, and queue your next moves instantly.
-              </p>
-                
-              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
-                {user ? "Build" : "Try it now"}
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-            
-            {supademoLoaded ? (
-              <div style={{
-                position: 'relative',
-                boxSizing: 'content-box',
-                maxHeight: '80vh',
-                width: '100%',
-                aspectRatio: '2.1068032187271397',
-                padding: '40px 0 40px 0'
-              }}>
-                <iframe 
-                  src="https://app.supademo.com/embed/cmf22hezn02kh39oz59xqgr7y?embed_v=2&utm_source=embed" 
-                  loading="lazy" 
-                  title="Task creation demo" 
-                  allow="clipboard-write" 
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%'
-                  }} 
-                  allowFullScreen 
-                />
-              </div>
-            ) : (
-              <div className="h-[400px] w-full bg-muted/30 rounded-lg flex items-center justify-center">
-                <p className="text-muted-foreground">Loading demo...</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Prompt Enhancement & CLEAR Principle Section */}
       <section className="py-16 px-6 bg-background">
