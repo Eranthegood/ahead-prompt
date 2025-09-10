@@ -37,8 +37,6 @@ import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
 import ClickToCloseDemoPage from "./pages/ClickToCloseDemo";
 
-import FeedbackBubble from "./components/FeedbackBubble";
-
 const queryClient = new QueryClient();
 
 function App() {
@@ -161,7 +159,6 @@ function App() {
                 </AppLayout>
               </MixpanelProvider>
             </BrowserRouter>
-            <FeedbackBubble />
           </TooltipProvider>
         </ThemeInitializer>
       </AuthProvider>
