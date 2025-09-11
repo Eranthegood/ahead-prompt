@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { SlashCommandExtension } from '@/extensions/SlashCommandExtension';
+import { useSlashCommands } from '@/hooks/useSlashCommands';
 import { Expand, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
 import { ProductIcon } from '@/components/ui/product-icon';
 import { useToast } from '@/hooks/use-toast';
@@ -80,16 +82,29 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Initialize slash commands hook
+  const { commands, onTemplateSelect } = useSlashCommands({
+    workspaceId: workspace.id,
+    selectedProductId: selectedProduct,
+    selectedEpicId: selectedEpic,
+  });
+
   // Rich text editor for expanded mode
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      SlashCommandExtension.configure({
+        items: commands,
+        onSelect: onTemplateSelect,
+      }),
+    ],
     content: '',
     editorProps: {
       attributes: {
         class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
       },
     },
-  });
+  }, [commands]); // Recreate editor when commands change
 
   // Auto-save functionality  
   const { clearDraft } = useAutoSave({
