@@ -6,41 +6,41 @@
 
 @layer base {
   :root {
-    /* Palette personnalisée basée sur l'image fournie */
-    --background: 0 0% 100%;        /* Blanc #FFFFFF */
-    --foreground: 0 0% 15%;
+    /* Mercury White & Nordic Grey Light Mode */
+    --background: 225 13% 96%;        /* Mercury White #F4F5F8 */
+    --foreground: 240 7% 14%;         /* Nordic Grey #222326 */
 
-    --card: 0 0% 100%;              /* Blanc #FFFFFF */
-    --card-foreground: 0 0% 15%;
+    --card: 225 13% 96%;              /* Mercury White #F4F5F8 */
+    --card-foreground: 240 7% 14%;    /* Nordic Grey #222326 */
 
-    --popover: 0 0% 100%;           /* Blanc #FFFFFF */
-    --popover-foreground: 0 0% 15%;
+    --popover: 225 13% 96%;           /* Mercury White #F4F5F8 */
+    --popover-foreground: 240 7% 14%; /* Nordic Grey #222326 */
 
-    /* Linear-inspired color system */
-    --primary: 220 13% 18%;            /* Linear's dark blue-gray #1d2125 */
+    /* CTA and Primary Colors */
+    --primary: 192 68% 37%;             /* CTA Color #1F89A1 */
     --primary-foreground: 0 0% 98%;
-    --primary-muted: 220 13% 85%;
-    --primary-glow: 220 13% 75%;
+    --primary-muted: 192 30% 85%;
+    --primary-glow: 192 50% 55%;
 
-    /* Linear's subtle grays */
-    --secondary: 220 9% 96%;            /* Very light gray #f6f8fa */
-    --secondary-foreground: 220 13% 18%;
+    /* Light mode grays */
+    --secondary: 225 13% 92%;           /* Lighter Mercury White */
+    --secondary-foreground: 240 7% 14%; /* Nordic Grey */
 
-    /* Linear's accent blue */
-    --accent: 211 100% 50%;             /* Linear blue #0969da */
+    /* Accent using CTA color */
+    --accent: 192 68% 37%;              /* CTA Color #1F89A1 */
     --accent-foreground: 0 0% 98%;
 
-    /* Linear's muted system */
-    --muted: 220 14% 96%;               /* #f6f8fa */
-    --muted-foreground: 220 9% 46%;     /* #656d76 */
+    /* Muted colors */
+    --muted: 225 13% 90%;               /* Light gray */
+    --muted-foreground: 240 7% 40%;     /* Lighter Nordic Grey */
 
-    /* Destructive reste sur la couleur primaire */
+    /* Keep destructive as is */
     --destructive: 344 100% 64%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 91%;              /* #e1e4e8 */
+    --border: 225 13% 85%;              /* Light border */
     --input: 0 0% 100%;                 /* Pure white */
-    --ring: 211 100% 50%;
+    --ring: 192 68% 37%;                /* CTA Color #1F89A1 */
 
     --radius: 0.5rem;
 

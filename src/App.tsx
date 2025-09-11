@@ -14,7 +14,6 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import Dashboard from "./components/Dashboard";
-import { BuildThemeWrapper } from "./components/BuildThemeWrapper";
 import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -60,9 +59,7 @@ function App() {
                     <Route path="/cursor-multi-agent" element={<CursorMultiAgentLanding />} />
                     <Route path="/build" element={
                       <ProtectedRoute>
-                        <BuildThemeWrapper>
-                          <Dashboard />
-                        </BuildThemeWrapper>
+                        <Dashboard />
                       </ProtectedRoute>
                     } />
                     <Route path="/product/:productId" element={
