@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useMixpanel } from '@/hooks/useMixpanel';
 import { useLocation } from 'react-router-dom';
+import { isSafeMode } from '@/lib/safeMode';
+import { mixpanelService } from '@/services/mixpanelService';
 
 interface MixpanelContextType {
   trackEvent: (eventName: string, properties?: Record<string, any>) => void;
@@ -21,7 +23,15 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
   const mixpanel = useMixpanel();
   const location = useLocation();
 
-  // Suivre automatiquement les changements de page
+  // Initialize Mixpanel lazily to avoid SES crashes
+  useEffect(() => {
+    if (!isSafeMode()) {
+      // Fire and forget
+      void mixpanelService.init();
+    }
+  }, []);
+
+  // Auto track page views
   useEffect(() => {
     const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.replace('/', '');
     mixpanel.trackPageView(pageName, {
