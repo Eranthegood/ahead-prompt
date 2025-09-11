@@ -1,41 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useLocation } from 'react-router-dom';
 
 export const useTheme = () => {
-  const { preferences, loading: prefsLoading, saveThemePreference } = useUserPreferences();
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
-  const location = useLocation();
+  const { preferences, loading: prefsLoading } = useUserPreferences();
+  const [resolvedTheme, setResolvedTheme] = useState<'dark'>('dark');
 
-  // Pages that should always be dark mode
-  const darkModeOnlyPages = ['/', '/blog', '/pricing'];
-  const isDarkModeOnlyPage = darkModeOnlyPages.some(page => 
-    page === '/' ? location.pathname === '/' : location.pathname.startsWith(page)
-  );
-
-  // Get effective theme based on preferences and page restrictions
-  const getEffectiveTheme = (): 'light' | 'dark' => {
-    // Force dark mode on specific pages
-    if (isDarkModeOnlyPage) {
-      return 'dark';
-    }
-    
-    // Use user preference for other pages
-    if (preferences.theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    
-    return preferences.theme as 'light' | 'dark';
+  // Always force dark mode
+  const getEffectiveTheme = (): 'dark' => {
+    return 'dark';
   };
 
   const effectiveTheme = getEffectiveTheme();
   const isLoading = prefsLoading;
 
-  // Update theme class on document
+  // Update theme class on document - always apply dark mode
   useEffect(() => {
     const root = window.document.documentElement;
     
-    const applyTheme = (theme: 'light' | 'dark') => {
+    const applyTheme = (theme: 'dark') => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
@@ -48,30 +30,28 @@ export const useTheme = () => {
         root.classList.remove('high-contrast');
       }
       
-      console.log(`Theme applied: ${theme}, page: ${location.pathname}, loading: ${isLoading}`);
+      console.log(`Theme applied: ${theme}, loading: ${isLoading}`);
     };
 
-    if (!isLoading) {
-      applyTheme(effectiveTheme);
-    }
-  }, [effectiveTheme, isLoading, location.pathname]);
+    // Always apply dark theme
+    applyTheme('dark');
+  }, [isLoading]);
 
-  // Set theme with page restrictions
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
-    if (isDarkModeOnlyPage && theme !== 'dark') {
-      console.log('Cannot change theme on dark-mode-only pages');
-      return;
-    }
-    saveThemePreference(theme);
+  // Theme setting is disabled - always dark
+  const setTheme = (theme: 'dark') => {
+    // Always dark mode, ignore any theme changes
+    console.log('Theme changes are disabled - staying in dark mode');
   };
 
   return {
-    theme: preferences.theme,
-    resolvedTheme,
-    effectiveTheme,
+    theme: 'dark' as const,
+    resolvedTheme: 'dark' as const,
+    effectiveTheme: 'dark' as const,
     setTheme,
-    isDarkModeOnlyPage,
-    canChangeTheme: !isDarkModeOnlyPage,
+    isDarkModeUnlocked: true, // Always unlocked since it's the only mode
+    xpNeededForDarkMode: 0,
+    currentLevel: 1,
+    requiredLevel: 1,
     isLoading,
   };
 };

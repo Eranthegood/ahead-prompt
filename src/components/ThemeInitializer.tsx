@@ -4,37 +4,27 @@ import { useTheme } from '@/hooks/useTheme';
 
 export const ThemeInitializer = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  const { resolvedTheme, isLoading, effectiveTheme } = useTheme();
+  const { resolvedTheme, isLoading } = useTheme();
   
-  // Apply theme immediately on mount with smooth transition
+  // Ensure dark mode is applied immediately on mount
   useEffect(() => {
     const root = document.documentElement;
-    
-    // Add transition for smooth theme changes
-    root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-    
-    // Apply initial theme
-    if (!isLoading && effectiveTheme) {
-      root.classList.remove('light', 'dark');
-      root.classList.add(effectiveTheme);
-      console.log(`ThemeInitializer: Applied ${effectiveTheme} theme`);
+    if (!root.classList.contains('dark')) {
+      root.classList.remove('light');
+      root.classList.add('dark');
+      console.log('ThemeInitializer: Applied default dark theme');
     }
-    
-    // Cleanup transition after animation
-    const timer = setTimeout(() => {
-      root.style.transition = '';
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [effectiveTheme, isLoading]);
+  }, []);
   
-  // Set data attribute for additional styling hooks
+  // The useTheme hook handles all theme initialization automatically
+  // This component ensures the theme system is active when the user is authenticated
   useEffect(() => {
-    if (!isLoading && resolvedTheme) {
+    if (user && resolvedTheme && !isLoading) {
+      // Theme system is now active and working
       document.documentElement.setAttribute('data-theme', resolvedTheme);
       console.log(`ThemeInitializer: Set data-theme to ${resolvedTheme}`);
     }
-  }, [resolvedTheme, isLoading]);
+  }, [user, resolvedTheme, isLoading]);
   
   return <>{children}</>;
 };

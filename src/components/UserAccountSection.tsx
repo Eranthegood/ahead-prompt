@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { PromptLibrary } from './PromptLibrary';
-import { ThemeToggle } from './ThemeToggle';
 
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
@@ -21,7 +20,10 @@ export function UserAccountSection() {
     theme, 
     setTheme, 
     resolvedTheme, 
-    canChangeTheme 
+    isDarkModeUnlocked,
+    xpNeededForDarkMode,
+    currentLevel,
+    requiredLevel 
   } = useTheme();
   const navigate = useNavigate();
   const { state } = useSidebar();
@@ -83,14 +85,6 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-            {canChangeTheme && (
-              <div className="px-2 py-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Theme</span>
-                  <ThemeToggle />
-                </div>
-              </div>
-            )}
             
             <DropdownMenuSeparator />
             
@@ -201,15 +195,6 @@ export function UserAccountSection() {
               <Library className="mr-2 h-4 w-4" />
               <span>Prompt Library</span>
             </DropdownMenuItem>
-            
-            {canChangeTheme && (
-              <div className="px-2 py-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Theme</span>
-                  <ThemeToggle />
-                </div>
-              </div>
-            )}
             
             <DropdownMenuSeparator />
           
