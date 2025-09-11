@@ -22,16 +22,35 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
+    <script>
+      (function(){
+        try {
+          var params = new URLSearchParams(window.location.search);
+          // Expose a global flag to gate 3rd-party scripts
+          // Safe mode if ?safe=1 or &mode=safe
+          // @ts-ignore
+          window.__SAFE_MODE__ = params.has('safe') || params.get('mode') === 'safe';
+        } catch(e) { 
+          // @ts-ignore
+          window.__SAFE_MODE__ = false; 
+        }
+      })();
+    </script>
     <!-- Supademo SDK -->
     <script>
       try {
-        const script = document.createElement('script');
-        script.src = 'https://script.supademo.com/script.js';
-        script.async = true;
-        script.onerror = function() {
-          console.debug('Supademo SDK blocked or failed to load');
-        };
-        document.head.appendChild(script);
+        // @ts-ignore
+        if (window.__SAFE_MODE__) {
+          console.debug('Safe mode: skipping Supademo SDK');
+        } else {
+          const script = document.createElement('script');
+          script.src = 'https://script.supademo.com/script.js';
+          script.async = true;
+          script.onerror = function() {
+            console.debug('Supademo SDK blocked or failed to load');
+          };
+          document.head.appendChild(script);
+        }
       } catch (error) {
         console.debug('Supademo SDK blocked:', error);
       }
@@ -40,15 +59,22 @@
     <!-- Reddit Pixel -->
     <script>
       try {
-        !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
-        // Initialize with placeholder - will be configured in the app
-        if (window.REDDIT_PIXEL_ID) {
-          rdt('init', window.REDDIT_PIXEL_ID, {
-            optOut: false,
-            useDecimalCurrencyValues: true,
-            debug: false
-          });
-          rdt('track', 'PageVisit');
+        // @ts-ignore
+        if (!window.__SAFE_MODE__) {
+          !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+          // Initialize with placeholder - will be configured in the app
+          if (window.REDDIT_PIXEL_ID) {
+            // @ts-ignore
+            rdt('init', window.REDDIT_PIXEL_ID, {
+              optOut: false,
+              useDecimalCurrencyValues: true,
+              debug: false
+            });
+            // @ts-ignore
+            rdt('track', 'PageVisit');
+          }
+        } else {
+          console.debug('Safe mode: skipping Reddit Pixel');
         }
       } catch (error) {
         // Reddit Pixel blocked or failed - continue silently
@@ -58,15 +84,24 @@
     
     <!-- Crisp Chat -->
     <script type="text/javascript">
-      window.$crisp=[];
-      window.CRISP_WEBSITE_ID="2ec91fb6-c77e-495a-973c-9e02300aa658";
-      (function(){
-        d=document;
-        s=d.createElement("script");
-        s.src="https://client.crisp.chat/l.js";
-        s.async=1;
-        d.getElementsByTagName("head")[0].appendChild(s);
-      })();
+      try {
+        // @ts-ignore
+        if (!window.__SAFE_MODE__) {
+          window.$crisp=[];
+          window.CRISP_WEBSITE_ID="2ec91fb6-c77e-495a-973c-9e02300aa658";
+          (function(){
+            var d=document;
+            var s=d.createElement("script");
+            s.src="https://client.crisp.chat/l.js";
+            s.async=1;
+            d.getElementsByTagName("head")[0].appendChild(s);
+          })();
+        } else {
+          console.debug('Safe mode: skipping Crisp Chat');
+        }
+      } catch (e) {
+        console.debug('Crisp Chat blocked or failed to load:', e);
+      }
     </script>
   </head>
 
