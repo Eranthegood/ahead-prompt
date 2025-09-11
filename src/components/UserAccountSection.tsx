@@ -80,11 +80,6 @@ export function UserAccountSection() {
               <span>Keyboard Shortcuts</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => navigate('/achievements')}>
-              <Trophy className="mr-2 h-4 w-4" />
-              <span>Achievements</span>
-            </DropdownMenuItem>
-            
             <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
               <Library className="mr-2 h-4 w-4" />
               <span>Prompt Library</span>
@@ -196,11 +191,6 @@ export function UserAccountSection() {
             <span>Keyboard Shortcuts</span>
           </DropdownMenuItem>
           
-            <DropdownMenuItem onClick={() => navigate('/achievements')}>
-              <Trophy className="mr-2 h-4 w-4" />
-              <span>Achievements</span>
-            </DropdownMenuItem>
-            
             <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
               <Library className="mr-2 h-4 w-4" />
               <span>Prompt Library</span>
