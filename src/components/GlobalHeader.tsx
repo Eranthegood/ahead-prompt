@@ -17,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
 import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 
 interface GlobalHeaderProps {
@@ -105,6 +106,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             
             {/* Always show Pricing CTA */}
             <div className="hidden md:flex items-center gap-2">
+              <ThemeToggle />
               <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
                 Pricing
               </Button>
