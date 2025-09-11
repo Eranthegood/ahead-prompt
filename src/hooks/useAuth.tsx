@@ -24,22 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    let initialSessionHandled = false;
-    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth event:', event, 'Session:', !!session);
-        
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Only set loading to false for initial session or if we haven't handled it yet
-        if (event === 'INITIAL_SESSION' || !initialSessionHandled) {
-          console.log('Setting loading to false for:', event);
-          setLoading(false);
-          initialSessionHandled = true;
-        }
+        setLoading(false);
         
         // Track login events
         if (event === 'SIGNED_IN' && session?.user) {
@@ -60,19 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // THEN check for existing session as fallback
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('GetSession result:', !!session);
-      
       setSession(session);
       setUser(session?.user ?? null);
-      
-      // Only set loading false if not already handled by INITIAL_SESSION event
-      if (!initialSessionHandled) {
-        console.log('Setting loading to false from getSession fallback');
-        setLoading(false);
-        initialSessionHandled = true;
-      }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();

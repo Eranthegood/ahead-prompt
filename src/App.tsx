@@ -44,11 +44,11 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ThemeInitializer>
+        <ThemeInitializer>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
               <MixpanelProvider>
                 <AppLayout>
                   <Routes>
@@ -158,9 +158,9 @@ function App() {
                   </Routes>
                 </AppLayout>
               </MixpanelProvider>
-            </ThemeInitializer>
-          </BrowserRouter>
-        </TooltipProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeInitializer>
       </AuthProvider>
     </QueryClientProvider>
     </ErrorBoundary>
