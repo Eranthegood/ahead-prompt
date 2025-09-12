@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useCrispDetection } from '@/hooks/useCrispDetection';
 import { cn } from '@/lib/utils';
 
 interface MobilePromptFABProps {
@@ -13,6 +14,7 @@ interface MobilePromptFABProps {
 export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromptFABProps) {
   const isMobile = useIsMobile();
   const { open: sidebarOpen } = useSidebar();
+  const crispDetection = useCrispDetection();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -22,10 +24,11 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
       isMobile,
       sidebarOpen,
       isQuickPromptOpen,
+      crispState: crispDetection,
       windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'undefined',
       shouldRender: isMobile && !sidebarOpen && !isQuickPromptOpen
     });
-  }, [isMobile, sidebarOpen, isQuickPromptOpen]);
+  }, [isMobile, sidebarOpen, isQuickPromptOpen, crispDetection]);
 
   // Hide FAB when scrolling up, show when scrolling down
   useEffect(() => {
@@ -57,7 +60,9 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
   return (
     <div
       className={cn(
-        "fixed bottom-6 right-6 z-[100] transition-all duration-300 ease-in-out",
+        "fixed z-[60] transition-all duration-500 ease-in-out",
+        crispDetection.position.bottom,
+        crispDetection.position.horizontal,
         isVisible 
           ? "translate-y-0 opacity-100 scale-100" 
           : "translate-y-16 opacity-0 scale-95"
@@ -76,7 +81,7 @@ export function MobilePromptFAB({ onOpenPrompt, isQuickPromptOpen }: MobilePromp
           "hover:shadow-2xl hover:shadow-primary/40 hover:scale-105"
         )}
         onClick={onOpenPrompt}
-        aria-label="Create new prompt - Tap to capture your next AI idea"
+        aria-label={`Create new prompt - Tap to capture your next AI idea (${crispDetection.position.side} side to avoid Crisp chat)`}
       >
         <Plus 
           size={28} 
