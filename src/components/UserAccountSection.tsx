@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Sparkles, Moon, Sun, Lock, Crown, Bell, Users, UserPlus, HelpCircle, Plug, Library } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Sparkles, Moon, Sun, Lock, Crown, Bell, Users, UserPlus, HelpCircle, Plug, Library, Monitor } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { PromptLibrary } from './PromptLibrary';
+import { ThemeToggle } from './ui/theme-toggle';
 
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
@@ -85,6 +86,11 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
+            <DropdownMenuSeparator />
+            
+            <div className="px-2 py-1">
+              <ThemeToggle />
+            </div>
             
             <DropdownMenuSeparator />
             
@@ -195,6 +201,12 @@ export function UserAccountSection() {
               <Library className="mr-2 h-4 w-4" />
               <span>Prompt Library</span>
             </DropdownMenuItem>
+            
+            <DropdownMenuSeparator />
+            
+            <div className="px-2 py-1">
+              <ThemeToggle />
+            </div>
             
             <DropdownMenuSeparator />
           

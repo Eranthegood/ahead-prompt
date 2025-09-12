@@ -6,12 +6,12 @@ export const ThemeInitializer = ({ children }: { children: React.ReactNode }) =>
   const { user } = useAuth();
   const { resolvedTheme, isLoading } = useTheme();
   
-  // Ensure dark mode is applied immediately on mount
+  // Ensure theme is applied on mount
   useEffect(() => {
     const root = document.documentElement;
-    if (!root.classList.contains('dark')) {
-      root.classList.remove('light');
-      root.classList.add('dark');
+    // Only apply default if no theme is set
+    if (!root.classList.contains('dark') && !root.classList.contains('light')) {
+      root.classList.add('dark'); // Default to dark
       console.log('ThemeInitializer: Applied default dark theme');
     }
   }, []);
