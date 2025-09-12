@@ -7,10 +7,10 @@
 @layer base {
   :root {
     /* Palette personnalisée basée sur l'image fournie */
-    --background: 0 0% 100%;        /* Blanc #FFFFFF */
+    --background: 220 17% 96%;        /* #F4F5F8 */
     --foreground: 0 0% 15%;
 
-    --card: 0 0% 100%;              /* Blanc #FFFFFF */
+    --card: 0 0% 100%;              /* Blanc #FFFFFF pour contraste */
     --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;           /* Blanc #FFFFFF */
