@@ -6,49 +6,36 @@ interface ShortcutMap {
 
 export function useGlobalShortcuts(shortcuts: ShortcutMap) {
   useEffect(() => {
+    let awaitingL = false;
+    let resetTimer: number | undefined;
+
+    const resetAwaiting = () => {
+      awaitingL = false;
+      if (resetTimer) window.clearTimeout(resetTimer);
+      resetTimer = undefined;
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const isInInput = event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement ||
         (event.target instanceof HTMLElement && event.target.contentEditable === 'true');
 
-      // Handle /L shortcut specially - allow it even in input fields
-      if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
-        // Start listening for the 'L' key after '/'
-        const handleL = (nextEvent: KeyboardEvent) => {
-          if (nextEvent.key.toLowerCase() === 'l') {
-            const callback = shortcuts['/l'];
-            if (callback) {
-              nextEvent.preventDefault();
-              // If we're in an input field, prevent the '/l' from being typed
-              if (isInInput && event.target instanceof HTMLInputElement) {
-                const input = event.target as HTMLInputElement;
-                const currentValue = input.value;
-                const cursorPos = input.selectionStart || 0;
-                // Remove the '/' that was just typed
-                if (currentValue.charAt(cursorPos - 1) === '/') {
-                  input.value = currentValue.slice(0, cursorPos - 1) + currentValue.slice(cursorPos);
-                  input.setSelectionRange(cursorPos - 1, cursorPos - 1);
-                }
-              } else if (isInInput && event.target instanceof HTMLTextAreaElement) {
-                const textarea = event.target as HTMLTextAreaElement;
-                const currentValue = textarea.value;
-                const cursorPos = textarea.selectionStart || 0;
-                // Remove the '/' that was just typed
-                if (currentValue.charAt(cursorPos - 1) === '/') {
-                  textarea.value = currentValue.slice(0, cursorPos - 1) + currentValue.slice(cursorPos);
-                  textarea.setSelectionRange(cursorPos - 1, cursorPos - 1);
-                }
-              }
-              callback();
-            }
-          }
-          document.removeEventListener('keydown', handleL);
-        };
-        
-        setTimeout(() => {
-          document.addEventListener('keydown', handleL);
-          setTimeout(() => document.removeEventListener('keydown', handleL), 1000);
-        }, 10);
+      // Start /L sequence on '/'
+      if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        awaitingL = true;
+        // prevent '/' from being inserted in editable fields
+        if (isInInput) event.preventDefault();
+        if (resetTimer) window.clearTimeout(resetTimer);
+        resetTimer = window.setTimeout(() => { awaitingL = false; }, 1000);
+        return;
+      }
+
+      // Complete /L sequence
+      if (awaitingL && event.key.toLowerCase() === 'l') {
+        event.preventDefault();
+        const callback = shortcuts['/l'];
+        if (callback) callback();
+        resetAwaiting();
         return;
       }
 
@@ -88,6 +75,9 @@ export function useGlobalShortcuts(shortcuts: ShortcutMap) {
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      resetAwaiting();
+    };
   }, [shortcuts]);
 }

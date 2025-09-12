@@ -167,18 +167,18 @@ TODO:
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-[#1a1b23] border-[#2a2b35]">
-          {/* Linear-style Header */}
-          <DialogHeader className="px-6 py-4 border-b border-[#2a2b35]">
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-background">
+          {/* Header */}
+          <DialogHeader className="px-6 py-4 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {openedViaShortcut && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <kbd className="px-2 py-1 text-xs font-mono bg-[#2a2b35] text-white/80 rounded border border-[#3a3b45]">/L</kbd>
-                    <span className="text-white/60">Quick search</span>
+                    <kbd className="px-2 py-1 text-xs font-mono bg-muted text-muted-foreground rounded border border-border">/L</kbd>
+                    <span className="text-muted-foreground">Quick search</span>
                   </div>
                 )}
-                <DialogTitle className={`text-lg font-medium ${openedViaShortcut ? 'text-white/80' : 'text-white'}`}>
+                <DialogTitle className="text-lg font-medium text-foreground">
                   {openedViaShortcut ? '' : 'Prompt Library'}
                 </DialogTitle>
               </div>
@@ -191,12 +191,12 @@ TODO:
           {/* Linear-style Search Bar */}
           <div className="px-6 py-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search prompts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 border-0 bg-[#2a2b35] text-white placeholder:text-white/50 focus:bg-[#34353f] transition-colors h-11 text-base"
+                className="pl-10 border-0 bg-muted/30 text-foreground placeholder:text-muted-foreground focus:bg-muted/50 transition-colors h-11 text-base"
                 autoFocus={openedViaShortcut}
               />
             </div>
@@ -265,7 +265,7 @@ TODO:
                   {filteredItems.map(item => (
                     <div
                       key={item.id}
-                      className="group flex items-center gap-4 px-4 py-3 rounded-md hover:bg-[#2a2b35] transition-all duration-150 cursor-pointer border border-transparent hover:border-[#3a3b45]"
+                      className="group flex items-center gap-4 px-4 py-3 rounded-md hover:bg-muted/30 transition-all duration-150 cursor-pointer border border-transparent hover:border-border/50"
                       onClick={() => setViewingItem(item)}
                     >
                       {/* Icon */}
