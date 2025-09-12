@@ -300,10 +300,10 @@ export function PromptDetailDialog({
             <div className="flex-1 overflow-y-auto">
               {editedGeneratedPrompt ? (
                 <Textarea
-                  value={formatTextWithParagraphs(editedGeneratedPrompt)}
+                  value={editedGeneratedPrompt}
                   onChange={(e) => handleGeneratedPromptChange(e.target.value)}
                   placeholder="AI-generated prompt will appear here..."
-                  className="min-h-[300px] resize-none border-none bg-muted/30 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm leading-relaxed"
+                  className="min-h-[300px] resize-none border-none bg-muted/30 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm leading-relaxed whitespace-pre-wrap"
                   style={{ 
                     lineHeight: '1.6',
                     letterSpacing: '0.01em'
