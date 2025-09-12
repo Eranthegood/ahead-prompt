@@ -170,21 +170,16 @@ TODO:
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-background">
           {/* Header */}
           <DialogHeader className="px-6 py-4 border-b border-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {openedViaShortcut && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <kbd className="px-2 py-1 text-xs font-mono bg-muted text-muted-foreground rounded border border-border">/L</kbd>
-                    <span className="text-muted-foreground">Quick search</span>
-                  </div>
-                )}
-                <DialogTitle className="text-lg font-medium text-foreground">
-                  {openedViaShortcut ? '' : 'Prompt Library'}
-                </DialogTitle>
-              </div>
-              <DialogClose className="opacity-70 hover:opacity-100 transition-opacity">
-                <X className="h-4 w-4" />
-              </DialogClose>
+            <div className="flex items-center gap-3">
+              {openedViaShortcut && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <kbd className="px-2 py-1 text-xs font-mono bg-muted text-muted-foreground rounded border border-border">/L</kbd>
+                  <span className="text-muted-foreground">Quick search</span>
+                </div>
+              )}
+              <DialogTitle className="text-lg font-medium text-foreground">
+                {openedViaShortcut ? '' : 'Prompt Library'}
+              </DialogTitle>
             </div>
           </DialogHeader>
 
