@@ -30,9 +30,10 @@ import { copyText } from '@/lib/clipboard';
 interface PromptLibraryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  autoFocus?: boolean;
 }
 
-export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
+export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptLibraryProps) {
   const { items, loading, deleteItem, toggleFavorite, incrementUsage } = usePromptLibrary();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -41,7 +42,28 @@ export function PromptLibrary({ open, onOpenChange }: PromptLibraryProps) {
   const [viewingItem, setViewingItem] = useState<PromptLibraryItem | null>(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [taskTemplate, setTaskTemplate] = useState('');
+  const [openedViaShortcut, setOpenedViaShortcut] = useState(false);
   const { toast } = useToast();
+
+  // Handle opening via shortcut and auto-focus
+  useEffect(() => {
+    if (open) {
+      // Clear search when opening via shortcut for fresh start
+      if (autoFocus) {
+        setSearchQuery('');
+        setSelectedCategory('all');
+        setOpenedViaShortcut(true);
+        
+        // Auto-focus the search input
+        setTimeout(() => {
+          const searchInput = document.querySelector('[placeholder*="Search"]') as HTMLInputElement;
+          searchInput?.focus();
+        }, 100);
+      }
+    } else {
+      setOpenedViaShortcut(false);
+    }
+  }, [open, autoFocus]);
 
   // Add keyboard shortcut for creating prompt when library is open
   useEffect(() => {
@@ -145,28 +167,37 @@ TODO:
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-background">
-          {/* Minimal Header */}
-          <DialogHeader className="px-6 py-3 border-b border-border/20">
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-[#1a1b23] border-[#2a2b35]">
+          {/* Linear-style Header */}
+          <DialogHeader className="px-6 py-4 border-b border-[#2a2b35]">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-base font-normal text-muted-foreground">
-                Prompt Library
-              </DialogTitle>
-              <div className="flex items-center gap-2">
-                <kbd className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded border">⌘K</kbd>
+              <div className="flex items-center gap-3">
+                {openedViaShortcut && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <kbd className="px-2 py-1 text-xs font-mono bg-[#2a2b35] text-white/80 rounded border border-[#3a3b45]">/L</kbd>
+                    <span className="text-white/60">Quick search</span>
+                  </div>
+                )}
+                <DialogTitle className={`text-lg font-medium ${openedViaShortcut ? 'text-white/80' : 'text-white'}`}>
+                  {openedViaShortcut ? '' : 'Prompt Library'}
+                </DialogTitle>
               </div>
+              <DialogClose className="opacity-70 hover:opacity-100 transition-opacity">
+                <X className="h-4 w-4" />
+              </DialogClose>
             </div>
           </DialogHeader>
 
-          {/* Search Bar */}
+          {/* Linear-style Search Bar */}
           <div className="px-6 py-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
               <Input
-                placeholder="Recherchez ou tapez un"
+                placeholder="Search prompts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 border-0 bg-muted/30 focus:bg-muted/50 transition-colors h-10"
+                className="pl-10 border-0 bg-[#2a2b35] text-white placeholder:text-white/50 focus:bg-[#34353f] transition-colors h-11 text-base"
+                autoFocus={openedViaShortcut}
               />
             </div>
           </div>
@@ -234,7 +265,7 @@ TODO:
                   {filteredItems.map(item => (
                     <div
                       key={item.id}
-                      className="group flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-muted/30 transition-all duration-150 cursor-pointer"
+                      className="group flex items-center gap-4 px-4 py-3 rounded-md hover:bg-[#2a2b35] transition-all duration-150 cursor-pointer border border-transparent hover:border-[#3a3b45]"
                       onClick={() => setViewingItem(item)}
                     >
                       {/* Icon */}

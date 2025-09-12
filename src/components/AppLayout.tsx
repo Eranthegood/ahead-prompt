@@ -6,6 +6,7 @@ import { MinimalSidebar } from './MinimalSidebar';
 import { LinearPromptCreator } from './LinearPromptCreator';
 import { MobilePromptFAB } from './MobilePromptFAB';
 import { MobilePromptDrawer } from './MobilePromptDrawer';
+import { PromptLibrary } from './PromptLibrary';
 import Dashboard from './Dashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -14,6 +15,7 @@ import { useEpics } from '@/hooks/useEpics';
 import { PromptsProvider, usePromptsContext } from '@/context/PromptsContext';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -30,6 +32,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
+  const [promptLibraryOpen, setPromptLibraryOpen] = useState(false);
   
   // Pages qui n'ont pas besoin du header - now only auth page 
   const noHeaderPages = ['/auth'];
@@ -53,6 +56,11 @@ export function AppLayout({ children }: AppLayoutProps) {
   const handleQuickAdd = () => {
     setQuickPromptOpen(true);
   };
+
+  // Global keyboard shortcuts
+  useGlobalShortcuts({
+    '/l': () => setPromptLibraryOpen(true),
+  });
 
   // Global keyboard shortcut handler for quick prompt creation
   useEffect(() => {
@@ -84,6 +92,8 @@ export function AppLayout({ children }: AppLayoutProps) {
           handleToggleCompletedItems={handleToggleCompletedItems}
           quickPromptOpen={quickPromptOpen}
           setQuickPromptOpen={setQuickPromptOpen}
+          promptLibraryOpen={promptLibraryOpen}
+          setPromptLibraryOpen={setPromptLibraryOpen}
           shouldShowHeader={shouldShowHeader}
           shouldShowSearch={shouldShowSearch}
           shouldShowSidebar={shouldShowSidebar}
@@ -101,6 +111,12 @@ export function AppLayout({ children }: AppLayoutProps) {
       <main className={shouldShowHeader ? '' : 'min-h-screen'}>
         {children}
       </main>
+      
+      <PromptLibrary 
+        open={promptLibraryOpen}
+        onOpenChange={setPromptLibraryOpen}
+        autoFocus={true}
+      />
     </div>
   );
 }
@@ -115,6 +131,8 @@ function SidebarWithContent({
   handleToggleCompletedItems,
   quickPromptOpen,
   setQuickPromptOpen,
+  promptLibraryOpen,
+  setPromptLibraryOpen,
   shouldShowHeader,
   shouldShowSearch,
   shouldShowSidebar,
@@ -130,6 +148,8 @@ function SidebarWithContent({
   handleToggleCompletedItems: (show: boolean) => void;
   quickPromptOpen: boolean;
   setQuickPromptOpen: (open: boolean) => void;
+  promptLibraryOpen: boolean;
+  setPromptLibraryOpen: (open: boolean) => void;
   shouldShowHeader: boolean;
   shouldShowSearch: boolean;
   shouldShowSidebar: boolean;
@@ -213,6 +233,12 @@ function SidebarWithContent({
         <MobilePromptFAB 
           onOpenPrompt={() => setQuickPromptOpen(true)}
           isQuickPromptOpen={quickPromptOpen}
+        />
+        
+        <PromptLibrary 
+          open={promptLibraryOpen}
+          onOpenChange={setPromptLibraryOpen}
+          autoFocus={true}
         />
       </div>
     </SidebarProvider>

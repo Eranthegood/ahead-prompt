@@ -13,11 +13,51 @@ export function useGlobalShortcuts(shortcuts: ShortcutMap) {
         event.target instanceof HTMLTextAreaElement ||
         (event.target instanceof HTMLElement && event.target.contentEditable === 'true')
       ) {
+        // Allow /L shortcut even in input fields for quick access
+        if (event.key === '/' && event.shiftKey === false) {
+          // Start listening for the 'L' key after '/'
+          const handleL = (nextEvent: KeyboardEvent) => {
+            if (nextEvent.key.toLowerCase() === 'l') {
+              const callback = shortcuts['/l'];
+              if (callback) {
+                nextEvent.preventDefault();
+                callback();
+              }
+            }
+            document.removeEventListener('keydown', handleL);
+          };
+          
+          setTimeout(() => {
+            document.addEventListener('keydown', handleL);
+            setTimeout(() => document.removeEventListener('keydown', handleL), 1000);
+          }, 10);
+        }
         return;
       }
 
       const isCtrl = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
+
+      // Handle /L shortcut (slash + L)
+      if (event.key === '/' && !isCtrl && !event.altKey && !event.shiftKey) {
+        // Start listening for the 'L' key after '/'
+        const handleL = (nextEvent: KeyboardEvent) => {
+          if (nextEvent.key.toLowerCase() === 'l') {
+            const callback = shortcuts['/l'];
+            if (callback) {
+              nextEvent.preventDefault();
+              callback();
+            }
+          }
+          document.removeEventListener('keydown', handleL);
+        };
+        
+        setTimeout(() => {
+          document.addEventListener('keydown', handleL);
+          setTimeout(() => document.removeEventListener('keydown', handleL), 1000);
+        }, 10);
+        return;
+      }
 
       // Build shortcut string
       let shortcutString = '';
