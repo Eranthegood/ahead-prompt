@@ -13,8 +13,6 @@ export function ThemeToggle() {
 
   const getThemeIcon = () => {
     switch (theme) {
-      case 'light':
-        return <Sun className="h-4 w-4" />;
       case 'dark':
         return <Moon className="h-4 w-4" />;
       case 'system':
@@ -26,8 +24,6 @@ export function ThemeToggle() {
 
   const getThemeLabel = () => {
     switch (theme) {
-      case 'light':
-        return 'Light';
       case 'dark':
         return 'Dark';
       case 'system':
@@ -46,10 +42,6 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="right" className="w-40">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          <Sun className="mr-2 h-4 w-4" />
-          Light
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('dark')}>
           <Moon className="mr-2 h-4 w-4" />
           Dark
