@@ -618,11 +618,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                    <FileText className="mr-3 h-4 w-4 text-foreground/70" />
                    <span className="text-foreground">All Prompts</span>
                  </div>
-                 <Badge 
-                   className="bg-primary/80 text-primary-foreground border border-primary/20 text-xs px-2 py-0.5"
-                 >
-                   {activePromptsCount}
-                 </Badge>
                </Button>
              )}
           </div>
