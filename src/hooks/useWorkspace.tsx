@@ -17,7 +17,7 @@ export function useWorkspace() {
     }
 
     fetchOrCreateWorkspace();
-  }, [user]);
+  }, [user]); // fetchOrCreateWorkspace is stable, no need to add as dependency
 
   const fetchOrCreateWorkspace = async () => {
     if (!user) return;
