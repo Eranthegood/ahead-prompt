@@ -205,17 +205,18 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   // Get active prompts count for "All Prompts" - shows To do and In progress prompts
   const activePromptsCount = prompts.filter(p => p.status === 'todo' || p.status === 'in_progress').length;
 
-  // Organization with epic hierarchy and filtered counts
+  // Organization with epic hierarchy - show total workspace prompts for all items
   const productsWithData = products.map(product => {
     const productEpics = getFilteredEpics(product.id);
     const directPrompts = getVisiblePrompts(product.id).filter(p => !p.epic_id);
     
     const epicsWithCounts = productEpics.map(epic => ({
       ...epic,
-      promptCount: getVisiblePrompts(product.id, epic.id).length
+      promptCount: activePromptsCount // Show total workspace prompts instead of filtered
     }));
 
-    const totalVisiblePrompts = getVisiblePrompts(product.id).length;
+    // Show total workspace prompts instead of filtered count
+    const totalVisiblePrompts = activePromptsCount;
     
     return {
       ...product,
