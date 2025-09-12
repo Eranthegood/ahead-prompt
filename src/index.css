@@ -6,41 +6,41 @@
 
 @layer base {
   :root {
-    /* Palette personnalisée basée sur l'image fournie */
-    --background: 0 0% 100%;        /* Blanc #FFFFFF */
-    --foreground: 0 0% 15%;
+    /* Palette améliorée pour une meilleure lisibilité */
+    --background: 0 0% 100%;        /* Blanc pur */
+    --foreground: 0 0% 9%;          /* Noir plus doux pour meilleur contraste */
 
-    --card: 0 0% 100%;              /* Blanc #FFFFFF */
-    --card-foreground: 0 0% 15%;
+    --card: 0 0% 98%;               /* Blanc cassé pour distinction */
+    --card-foreground: 0 0% 9%;     /* Noir doux */
 
-    --popover: 0 0% 100%;           /* Blanc #FFFFFF */
-    --popover-foreground: 0 0% 15%;
+    --popover: 0 0% 100%;           /* Blanc pur */
+    --popover-foreground: 0 0% 9%;  /* Noir doux */
 
-    /* Linear-inspired color system */
-    --primary: 220 13% 18%;            /* Linear's dark blue-gray #1d2125 */
-    --primary-foreground: 0 0% 98%;
-    --primary-muted: 220 13% 85%;
-    --primary-glow: 220 13% 75%;
+    /* Système de couleurs amélioré */
+    --primary: 220 100% 35%;        /* Bleu plus saturé et lisible */
+    --primary-foreground: 0 0% 100%;
+    --primary-muted: 220 50% 90%;
+    --primary-glow: 220 70% 70%;
 
-    /* Linear's subtle grays */
-    --secondary: 220 9% 96%;            /* Very light gray #f6f8fa */
-    --secondary-foreground: 220 13% 18%;
+    /* Arrière-plans et textes secondaires */
+    --secondary: 220 15% 95%;       /* Gris très clair */
+    --secondary-foreground: 0 0% 9%;
 
-    /* Linear's accent blue */
-    --accent: 211 100% 50%;             /* Linear blue #0969da */
-    --accent-foreground: 0 0% 98%;
+    /* Accent plus visible */
+    --accent: 211 100% 45%;         /* Bleu accent plus sombre */
+    --accent-foreground: 0 0% 100%;
 
-    /* Linear's muted system */
-    --muted: 220 14% 96%;               /* #f6f8fa */
-    --muted-foreground: 220 9% 46%;     /* #656d76 */
+    /* Système muted amélioré */
+    --muted: 220 15% 94%;           /* Arrière-plan muted plus distinct */
+    --muted-foreground: 0 0% 35%;   /* Texte muted plus lisible */
 
-    /* Destructive reste sur la couleur primaire */
-    --destructive: 344 100% 64%;
-    --destructive-foreground: 0 0% 98%;
+    /* Destructive */
+    --destructive: 0 75% 50%;       /* Rouge plus classique */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;              /* #e1e4e8 */
-    --input: 0 0% 100%;                 /* Pure white */
-    --ring: 211 100% 50%;
+    --border: 220 15% 85%;          /* Bordures plus visibles */
+    --input: 0 0% 100%;             /* Input blanc pur */
+    --ring: 211 100% 45%;
 
     --radius: 0.5rem;
 
