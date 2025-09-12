@@ -11,6 +11,7 @@ import { Prompt, Product, Epic, PRIORITY_OPTIONS } from '@/types';
 import { Copy, FileText, Sparkles, RotateCcw } from 'lucide-react';
 import { PromptTransformService } from '@/services/promptTransformService';
 import { copyText } from '@/lib/clipboard';
+import { ProviderSelector } from '@/components/ProviderSelector';
 
 interface PromptDetailDialogProps {
   prompt: Prompt | null;
@@ -33,6 +34,7 @@ export function PromptDetailDialog({
   const [description, setDescription] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [providerConfig, setProviderConfig] = useState({ provider: 'openai' as 'openai' | 'claude', model: 'gpt-5-2025-08-07' });
 
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
@@ -101,7 +103,12 @@ export function PromptDetailDialog({
     
     setRegenerating(true);
     try {
-      const response = await PromptTransformService.transformPrompt(description.trim());
+      const response = await PromptTransformService.transformPrompt(
+        description.trim(),
+        undefined,
+        providerConfig.provider,
+        providerConfig.model
+      );
       
       if (response.error) {
         throw new Error(response.error);
@@ -115,7 +122,7 @@ export function PromptDetailDialog({
 
         toast({
           title: 'Regenerated!',
-          description: 'New AI-enhanced prompt has been generated'
+          description: `New AI-enhanced prompt generated with ${providerConfig.provider.toUpperCase()}`
         });
       } else {
         throw new Error('No generated prompt received');
@@ -226,33 +233,43 @@ export function PromptDetailDialog({
 
           {/* Generated Prompt Side Panel */}
           <div className="hidden lg:flex flex-col border-l border-border pl-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <Label className="text-sm font-medium">Generated Prompt</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                {prompt?.generated_prompt && (
+            <div className="flex flex-col gap-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <Label className="text-sm font-medium">Generated Prompt</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  {prompt?.generated_prompt && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyGeneratedPrompt}
+                      className="h-8 px-3"
+                    >
+                      <Copy className="h-3 w-3 mr-1" />
+                      Copy
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={handleCopyGeneratedPrompt}
+                    onClick={handleRegeneratePrompt}
+                    disabled={regenerating || !description.trim()}
                     className="h-8 px-3"
                   >
-                    <Copy className="h-3 w-3 mr-1" />
-                    Copy
+                    <RotateCcw className={`h-3 w-3 mr-1 ${regenerating ? 'animate-spin' : ''}`} />
+                    {regenerating ? 'Regenerating...' : 'Regenerate'}
                   </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRegeneratePrompt}
-                  disabled={regenerating || !description.trim()}
-                  className="h-8 px-3"
-                >
-                  <RotateCcw className={`h-3 w-3 mr-1 ${regenerating ? 'animate-spin' : ''}`} />
-                  {regenerating ? 'Regenerating...' : 'Regenerate'}
-                </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">AI Provider</Label>
+                <ProviderSelector
+                  value={providerConfig}
+                  onChange={setProviderConfig}
+                />
               </div>
             </div>
 
