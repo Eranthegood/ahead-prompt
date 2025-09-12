@@ -1,23 +1,30 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export const useTheme = () => {
-  const { preferences, loading: prefsLoading } = useUserPreferences();
-  const [resolvedTheme, setResolvedTheme] = useState<'dark'>('dark');
+  const { preferences, loading: prefsLoading, saveThemePreference } = useUserPreferences();
+  const location = useLocation();
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
 
-  // Always force dark mode
-  const getEffectiveTheme = (): 'dark' => {
-    return 'dark';
+  const isBuildRoute = location.pathname === '/build';
+
+  // Get effective theme based on route and preferences
+  const getEffectiveTheme = (): 'light' | 'dark' => {
+    if (!isBuildRoute) {
+      return 'dark'; // Force dark mode outside /build
+    }
+    return preferences.theme === 'light' ? 'light' : 'dark';
   };
 
   const effectiveTheme = getEffectiveTheme();
   const isLoading = prefsLoading;
 
-  // Update theme class on document - always apply dark mode
+  // Update theme class on document
   useEffect(() => {
     const root = window.document.documentElement;
     
-    const applyTheme = (theme: 'dark') => {
+    const applyTheme = (theme: 'light' | 'dark') => {
       root.classList.remove('light', 'dark');
       root.classList.add(theme);
       setResolvedTheme(theme);
@@ -30,25 +37,28 @@ export const useTheme = () => {
         root.classList.remove('high-contrast');
       }
       
-      console.log(`Theme applied: ${theme}, loading: ${isLoading}`);
+      console.log(`Theme applied: ${theme}, route: ${location.pathname}`);
     };
 
-    // Always apply dark theme
-    applyTheme('dark');
-  }, [isLoading]);
+    applyTheme(effectiveTheme);
+  }, [effectiveTheme, location.pathname]);
 
-  // Theme setting is disabled - always dark
-  const setTheme = (theme: 'dark') => {
-    // Always dark mode, ignore any theme changes
-    console.log('Theme changes are disabled - staying in dark mode');
+  // Set theme (only works on /build route)
+  const setTheme = (theme: 'light' | 'dark') => {
+    if (!isBuildRoute) {
+      console.log('Theme changes only allowed on /build route');
+      return;
+    }
+    saveThemePreference(theme);
   };
 
   return {
-    theme: 'dark' as const,
-    resolvedTheme: 'dark' as const,
-    effectiveTheme: 'dark' as const,
+    theme: preferences.theme,
+    resolvedTheme,
+    effectiveTheme,
     setTheme,
-    isDarkModeUnlocked: true, // Always unlocked since it's the only mode
+    canChangeTheme: isBuildRoute,
+    isDarkModeUnlocked: true,
     xpNeededForDarkMode: 0,
     currentLevel: 1,
     requiredLevel: 1,
