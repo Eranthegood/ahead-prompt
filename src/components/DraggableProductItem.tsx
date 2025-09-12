@@ -228,12 +228,6 @@ export function DraggableProductItem({
                        {product.name}
                      </span>
                    </div>
-                   <Badge 
-                     variant="outline"
-                     className="ml-2 text-xs flex-shrink-0"
-                   >
-                     {product.promptCount}
-                   </Badge>
                 </SidebarMenuButton>
               </ContextMenuTrigger>
               <ContextMenuContent className="w-48">
