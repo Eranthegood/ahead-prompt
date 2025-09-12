@@ -32,6 +32,8 @@ export function PromptDetailDialog({
   const [epicId, setEpicId] = useState<string>('none');
   const [priority, setPriority] = useState<number>(3);
   const [description, setDescription] = useState<string>('');
+  const [editedGeneratedPrompt, setEditedGeneratedPrompt] = useState<string>('');
+  const [hasUnsavedGeneratedChanges, setHasUnsavedGeneratedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [providerConfig, setProviderConfig] = useState({ provider: 'openai' as 'openai' | 'claude', model: 'gpt-5-2025-08-07' });
@@ -46,25 +48,40 @@ export function PromptDetailDialog({
       setEpicId(prompt.epic_id || 'none');
       setPriority(prompt.priority || 3);
       setDescription(prompt.description || prompt.original_description || '');
+      setEditedGeneratedPrompt(prompt.generated_prompt || '');
+      setHasUnsavedGeneratedChanges(false);
     }
   }, [prompt]);
+
+  // Format text with proper paragraph spacing
+  const formatTextWithParagraphs = (text: string) => {
+    return text.replace(/\n\n/g, '\n\n\n');
+  };
 
   const handleSave = async () => {
     if (!prompt || !description.trim()) return;
     
     setSaving(true);
     try {
-      await updatePrompt(prompt.id, {
+      const updateData: any = {
         description: description.trim(),
         product_id: productId === 'none' ? null : productId,
         epic_id: epicId === 'none' ? null : epicId,
         priority
-      });
+      };
+
+      // Save edited generated prompt if it has changes
+      if (hasUnsavedGeneratedChanges) {
+        updateData.generated_prompt = editedGeneratedPrompt;
+      }
+
+      await updatePrompt(prompt.id, updateData);
 
       toast({
         title: 'Saved',
         description: 'Your changes have been saved successfully'
       });
+      setHasUnsavedGeneratedChanges(false);
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating prompt:', error);
@@ -78,10 +95,15 @@ export function PromptDetailDialog({
     }
   };
 
+  const handleGeneratedPromptChange = (value: string) => {
+    setEditedGeneratedPrompt(value);
+    setHasUnsavedGeneratedChanges(value !== (prompt?.generated_prompt || ''));
+  };
+
   const handleCopyGeneratedPrompt = async () => {
-    if (prompt?.generated_prompt) {
+    if (editedGeneratedPrompt) {
       try {
-        const ok = await copyText(prompt.generated_prompt);
+        const ok = await copyText(editedGeneratedPrompt);
         if (!ok) throw new Error('Clipboard copy failed');
         
         toast({
@@ -115,14 +137,13 @@ export function PromptDetailDialog({
       }
 
       if (response.transformedPrompt) {
-        // Update the prompt with the new generated content
-        await updatePrompt(prompt.id, {
-          generated_prompt: response.transformedPrompt
-        });
+        // Update the local state and mark as changed
+        setEditedGeneratedPrompt(response.transformedPrompt);
+        setHasUnsavedGeneratedChanges(true);
 
         toast({
           title: 'Regenerated!',
-          description: `New AI-enhanced prompt generated with ${providerConfig.provider.toUpperCase()}`
+          description: `New AI-enhanced prompt generated with ${providerConfig.provider.toUpperCase()}. Don't forget to save!`
         });
       } else {
         throw new Error('No generated prompt received');
@@ -238,9 +259,12 @@ export function PromptDetailDialog({
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-primary" />
                   <Label className="text-sm font-medium">Generated Prompt</Label>
+                  {hasUnsavedGeneratedChanges && (
+                    <span className="text-xs text-amber-600 dark:text-amber-400">• Unsaved changes</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {prompt?.generated_prompt && (
+                  {editedGeneratedPrompt && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -274,10 +298,17 @@ export function PromptDetailDialog({
             </div>
 
             <div className="flex-1 overflow-y-auto">
-              {prompt?.generated_prompt ? (
-                <div className="bg-muted/30 rounded-lg p-4 text-sm whitespace-pre-wrap font-mono">
-                  {prompt.generated_prompt}
-                </div>
+              {editedGeneratedPrompt ? (
+                <Textarea
+                  value={formatTextWithParagraphs(editedGeneratedPrompt)}
+                  onChange={(e) => handleGeneratedPromptChange(e.target.value)}
+                  placeholder="AI-generated prompt will appear here..."
+                  className="min-h-[300px] resize-none border-none bg-muted/30 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm leading-relaxed"
+                  style={{ 
+                    lineHeight: '1.6',
+                    letterSpacing: '0.01em'
+                  }}
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                   <FileText className="h-8 w-8 mb-3 opacity-50" />
@@ -300,7 +331,7 @@ export function PromptDetailDialog({
             onClick={handleSave} 
             disabled={saving || !description.trim()}
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Saving...' : hasUnsavedGeneratedChanges ? 'Save Changes' : 'Save'}
           </Button>
         </div>
       </DialogContent>
