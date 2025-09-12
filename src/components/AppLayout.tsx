@@ -92,7 +92,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : shouldShowSidebar ? (
-              // Active sidebar when ready
+              // Single PromptsProvider wrapping everything when ready
               <PromptsProvider 
                 workspaceId={workspace.id}
                 selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
@@ -123,12 +123,18 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
                 ) : shouldShowSidebar ? (
-                  React.isValidElement(children) && children.type === Dashboard 
-                    ? React.cloneElement(children as React.ReactElement<any>, {
-                        selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
-                        selectedEpicId: selectedEpicId
-                      })
-                    : children
+                  <PromptsProvider 
+                    workspaceId={workspace.id}
+                    selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+                    selectedEpicId={selectedEpicId}
+                  >
+                    {React.isValidElement(children) && children.type === Dashboard 
+                      ? React.cloneElement(children as React.ReactElement<any>, {
+                          selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
+                          selectedEpicId: selectedEpicId
+                        })
+                      : children}
+                  </PromptsProvider>
                 ) : children}
               </main>
             </div>
