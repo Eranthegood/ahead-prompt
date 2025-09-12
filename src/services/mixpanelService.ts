@@ -85,22 +85,30 @@ class MixpanelService {
   }
 
   track(eventName: string, properties?: Record<string, any>) {
-    if (!this.initialized || !this.mixpanel) return;
+    if (!this.initialized || !this.mixpanel) {
+      console.debug(`[MixpanelService] Tracking skipped - not initialized: ${eventName}`);
+      return;
+    }
+    
     try {
       const currentUserId = this.mixpanel.get_distinct_id?.();
       if (currentUserId && this.isUserExcluded(currentUserId)) {
         console.log('Event tracking skipped for excluded user:', currentUserId);
         return;
       }
+      
+      console.log(`[MixpanelService] Tracking event: ${eventName}`);
       this.mixpanel.track(eventName, {
         timestamp: new Date().toISOString(),
         ...properties
       });
+      
       if (process.env.NODE_env === 'development') {
-        console.log('Mixpanel event tracked:', eventName, properties);
+        console.log('Mixpanel event tracked successfully:', eventName, properties);
       }
     } catch (error) {
-      console.debug('Mixpanel tracking blocked or failed:', error);
+      console.error(`[MixpanelService] Tracking failed for event ${eventName}:`, error);
+      // Important: Don't throw errors from tracking to prevent breaking the app
     }
   }
 
@@ -130,10 +138,16 @@ class MixpanelService {
     promptId: string; 
     completionTime?: number;
   }) {
-    this.track('Prompt Completed', {
-      prompt_id: promptData.promptId,
-      completion_time_minutes: promptData.completionTime
-    });
+    try {
+      console.log(`[MixpanelService] Tracking prompt completion for ${promptData.promptId}`);
+      this.track('Prompt Completed', {
+        prompt_id: promptData.promptId,
+        completion_time_minutes: promptData.completionTime
+      });
+    } catch (error) {
+      console.error(`[MixpanelService] Error tracking prompt completion:`, error);
+      // Don't throw - tracking errors shouldn't break the application
+    }
   }
 
   trackEpicCreated(epicData: { 

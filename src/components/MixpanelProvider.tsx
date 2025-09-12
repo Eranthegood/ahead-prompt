@@ -26,18 +26,37 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
   // Initialize Mixpanel lazily to avoid SES crashes
   useEffect(() => {
     if (!isSafeMode()) {
-      // Fire and forget
-      void mixpanelService.init();
+      // Fire and forget with error isolation
+      try {
+        void mixpanelService.init();
+      } catch (error) {
+        console.error('[MixpanelProvider] Initialization error:', error);
+        // Don't break the app if Mixpanel fails to initialize
+      }
     }
   }, []);
 
-  // Auto track page views
+  // Auto track page views with error isolation
   useEffect(() => {
-    const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.replace('/', '');
-    mixpanel.trackPageView(pageName, {
-      pathname: location.pathname,
-      search: location.search
-    });
+    try {
+      const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.replace('/', '');
+      console.log(`[MixpanelProvider] Tracking page view: ${pageName}`);
+      
+      // Use setTimeout to prevent blocking navigation
+      setTimeout(() => {
+        try {
+          mixpanel.trackPageView(pageName, {
+            pathname: location.pathname,
+            search: location.search
+          });
+        } catch (error) {
+          console.error('[MixpanelProvider] Page view tracking error:', error);
+          // Don't break navigation if tracking fails
+        }
+      }, 0);
+    } catch (error) {
+      console.error('[MixpanelProvider] Page view setup error:', error);
+    }
   }, [location, mixpanel]);
 
   return (

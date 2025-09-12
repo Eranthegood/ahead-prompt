@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
+import { useSafeGamification } from '@/hooks/useSafeGamification';
+import { emitStatusUpdateEvent } from '@/components/DebugPromptStatusUpdater';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { useAuth } from '@/hooks/useAuth';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
@@ -29,7 +31,7 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { awardXP } = useGamification();
+  const { awardXP } = useSafeGamification();
   const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
   const { trackPromptCreated, trackPromptCompleted } = useMixpanelContext();
   const { user } = useAuth();
@@ -512,10 +514,12 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
     }
   };
 
-  // Update prompt status with optimistic update
+  // Update prompt status with optimistic update and safe side effects
   const updatePromptStatus = async (promptId: string, status: PromptStatus): Promise<void> => {
     const updateData = { status, updated_at: new Date().toISOString() };
     const previousPrompt = prompts.find(p => p.id === promptId);
+
+    console.log(`[UpdatePromptStatus] Starting status update for prompt ${promptId}: ${status}`);
 
     try {
       await withOptimisticUpdate(
@@ -523,34 +527,65 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
         prev => prev.map(p => p.id === promptId ? { ...p, ...updateData } : p),
         // Database operation
         async () => {
+          console.log(`[UpdatePromptStatus] Updating database for prompt ${promptId}`);
           const { error } = await supabase
             .from('prompts')
             .update({ status })
             .eq('id', promptId);
-          if (error) throw error;
+          if (error) {
+            console.error(`[UpdatePromptStatus] Database error for prompt ${promptId}:`, error);
+            throw error;
+          }
+          console.log(`[UpdatePromptStatus] Database update successful for prompt ${promptId}`);
         },
         // Rollback - restore previous prompt state
         prev => previousPrompt ? prev.map(p => p.id === promptId ? previousPrompt : p) : prev
       );
 
-      // Award XP for completing a prompt
+      // Handle completion side effects safely and independently
       if (status === 'done') {
-        awardXP('PROMPT_COMPLETE');
+        console.log(`[UpdatePromptStatus] Processing completion side effects for prompt ${promptId}`);
         
-        // Track prompt completion
-        const prompt = prompts.find(p => p.id === promptId);
-        if (prompt) {
-          trackPromptCompleted({
-            promptId: promptId,
-            completionTime: prompt.created_at ? 
-              Math.round((new Date().getTime() - new Date(prompt.created_at).getTime()) / (1000 * 60)) : 
-              undefined
-          });
-        }
+        // Use setTimeout to decouple side effects from the main update flow
+        setTimeout(async () => {
+          try {
+            // Award XP with error isolation
+            console.log(`[UpdatePromptStatus] Awarding XP for prompt completion: ${promptId}`);
+            awardXP('PROMPT_COMPLETE');
+            console.log(`[UpdatePromptStatus] XP awarded successfully for prompt ${promptId}`);
+          } catch (xpError) {
+            console.error(`[UpdatePromptStatus] XP awarding failed for prompt ${promptId}:`, xpError);
+            // Don't propagate XP errors - they shouldn't break the main flow
+          }
+
+          try {
+            // Track prompt completion with error isolation
+            const prompt = prompts.find(p => p.id === promptId);
+            if (prompt) {
+              console.log(`[UpdatePromptStatus] Tracking completion for prompt ${promptId}`);
+              trackPromptCompleted({
+                promptId: promptId,
+                completionTime: prompt.created_at ? 
+                  Math.round((new Date().getTime() - new Date(prompt.created_at).getTime()) / (1000 * 60)) : 
+                  undefined
+              });
+              console.log(`[UpdatePromptStatus] Completion tracking successful for prompt ${promptId}`);
+            }
+          } catch (trackingError) {
+            console.error(`[UpdatePromptStatus] Completion tracking failed for prompt ${promptId}:`, trackingError);
+            // Don't propagate tracking errors - they shouldn't break the main flow
+          }
+        }, 0);
       }
+
+      console.log(`[UpdatePromptStatus] Status update completed successfully for prompt ${promptId}`);
+      
+      // Emit debug event to monitor for issues
+      emitStatusUpdateEvent(promptId, status);
     } catch (error) {
-      console.error('Error updating prompt status:', error);
+      console.error(`[UpdatePromptStatus] Error updating prompt status for ${promptId}:`, error);
       showErrorToast(error, 'mettre à jour le statut');
+      throw error;
     }
   };
 

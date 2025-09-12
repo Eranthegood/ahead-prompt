@@ -35,6 +35,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
+import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 import ClickToCloseDemoPage from "./pages/ClickToCloseDemo";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ function App() {
             <Sonner />
             <BrowserRouter>
               <MixpanelProvider>
+                <DebugPromptStatusUpdater />
                 <AppLayout>
                   <Routes>
                     <Route path="/auth" element={<Auth />} />
