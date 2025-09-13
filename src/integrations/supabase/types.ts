@@ -1537,6 +1537,10 @@ export type Database = {
         Args: { content: string }
         Returns: number
       }
+      can_access_workspace: {
+        Args: { user_uuid?: string; workspace_uuid: string }
+        Returns: boolean
+      }
       ensure_user_stats: {
         Args: { p_user_id: string }
         Returns: undefined
