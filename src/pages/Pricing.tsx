@@ -107,6 +107,44 @@ export default function Pricing() {
           </BlurFade>
 
 
+          {/* Feedback Section */}
+          <div className="mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 mb-12">
+            <div className="text-center space-y-6">
+              <h2 className="text-3xl font-bold text-foreground">
+                Would you pay for this?
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Help us shape the perfect pricing by choosing the plan you'd actually use. 
+                Once ready, we'll send you a special offer to thank you for your feedback!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Button 
+                  variant="outline" 
+                  className="bg-background/50 hover:bg-background/80"
+                  onClick={() => toast.success("Thank you! We'll contact you with a special Free plan offer 🎉")}
+                >
+                  <Gift className="w-4 h-4 mr-2" />
+                  I'd use Free
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="bg-background/50 hover:bg-background/80"
+                  onClick={() => toast.success("Thank you! We'll contact you with a special Basic plan offer 🎉")}
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  I'd pay for Basic
+                </Button>
+                <Button 
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={() => toast.success("Thank you! We'll contact you with a special Pro plan offer 🎉")}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  I'd pay for Pro
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Pricing Toggle */}
           <BlurFade delay={0.6} inView>
             <div className="flex items-center justify-center gap-4 mb-12">
@@ -164,46 +202,6 @@ export default function Pricing() {
                   </CardFooter>
                 </Card>
               ))}
-            </div>
-          </BlurFade>
-
-          {/* Feedback Section */}
-          <BlurFade delay={1.0} inView>
-            <div className="mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
-              <div className="text-center space-y-6">
-                <h2 className="text-3xl font-bold text-foreground">
-                  Would you pay for this?
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Help us shape the perfect pricing by choosing the plan you'd actually use. 
-                  Once ready, we'll send you a special offer to thank you for your feedback!
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="bg-background/50 hover:bg-background/80"
-                    onClick={() => toast.success("Thank you! We'll contact you with a special Free plan offer 🎉")}
-                  >
-                    <Gift className="w-4 h-4 mr-2" />
-                    I'd use Free
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="bg-background/50 hover:bg-background/80"
-                    onClick={() => toast.success("Thank you! We'll contact you with a special Basic plan offer 🎉")}
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    I'd pay for Basic
-                  </Button>
-                  <Button 
-                    className="bg-primary hover:bg-primary/90"
-                    onClick={() => toast.success("Thank you! We'll contact you with a special Pro plan offer 🎉")}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    I'd pay for Pro
-                  </Button>
-                </div>
-              </div>
             </div>
           </BlurFade>
         </div>
