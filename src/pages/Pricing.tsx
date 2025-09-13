@@ -8,33 +8,29 @@ import { toast } from "sonner";
 import { useState } from "react";
 export default function Pricing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  
   const handleGetStarted = () => {
     navigate('/build');
   };
-  
   const handlePricingFeedback = async (pricePoint: string) => {
     if (submitting) return;
-    
     setSubmitting(true);
     setSelectedPrice(pricePoint);
-    
     try {
-      const { error } = await supabase
-        .from('pricing_feedback')
-        .insert({
-          user_id: user?.id || null,
-          email: user?.email || null,
-          price_point: pricePoint,
-          feedback_type: 'pricing_interest',
-          user_agent: navigator.userAgent,
-        });
-
+      const {
+        error
+      } = await supabase.from('pricing_feedback').insert({
+        user_id: user?.id || null,
+        email: user?.email || null,
+        price_point: pricePoint,
+        feedback_type: 'pricing_interest',
+        user_agent: navigator.userAgent
+      });
       if (error) throw error;
-
       toast.success(`Thanks for your feedback! We've noted your interest in ${pricePoint}`);
     } catch (error) {
       console.error('Error submitting pricing feedback:', error);
@@ -80,41 +76,21 @@ export default function Pricing() {
           <BlurFade delay={0.8} inView>
             <div className="max-w-2xl mx-auto mt-16 p-8 border border-border rounded-lg bg-card/50">
               <div className="text-center space-y-6">
-                <h3 className="text-xl font-semibold">Ready to buy to support?</h3>
+                
                 <p className="text-muted-foreground">
                   Give us some hint for the most fair pricing you&apos;re ready to buy
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-                  <Button 
-                    variant={selectedPrice === "$5/mo" ? "default" : "outline"} 
-                    className="h-12"
-                    onClick={() => handlePricingFeedback("$5/mo")}
-                    disabled={submitting}
-                  >
+                  <Button variant={selectedPrice === "$5/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$5/mo")} disabled={submitting}>
                     $5/mo
                   </Button>
-                  <Button 
-                    variant={selectedPrice === "$10/mo" ? "default" : "outline"} 
-                    className="h-12"
-                    onClick={() => handlePricingFeedback("$10/mo")}
-                    disabled={submitting}
-                  >
+                  <Button variant={selectedPrice === "$10/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$10/mo")} disabled={submitting}>
                     $10/mo
                   </Button>
-                  <Button 
-                    variant={selectedPrice === "$15/mo" ? "default" : "outline"} 
-                    className="h-12"
-                    onClick={() => handlePricingFeedback("$15/mo")}
-                    disabled={submitting}
-                  >
+                  <Button variant={selectedPrice === "$15/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$15/mo")} disabled={submitting}>
                     $15/mo
                   </Button>
-                  <Button 
-                    variant={selectedPrice === "$25/mo" ? "default" : "outline"} 
-                    className="h-12"
-                    onClick={() => handlePricingFeedback("$25/mo")}
-                    disabled={submitting}
-                  >
+                  <Button variant={selectedPrice === "$25/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$25/mo")} disabled={submitting}>
                     $25/mo
                   </Button>
                 </div>
