@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
-import { usePrompts } from '@/hooks/usePrompts';
+import { usePromptsContext } from '@/context/PromptsContext';
 import { useAuth } from '@/hooks/useAuth';
 import { ProductContextMenu } from '@/components/ProductContextMenu';
 import { EpicContextMenu } from '@/components/EpicContextMenu';
@@ -50,7 +50,8 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
   
   const { products, loading: productsLoading, deleteProduct } = useProducts(workspace.id);
   const { epics, loading: epicsLoading, createEpic, deleteEpic } = useEpics(workspace.id);
-  const { prompts, loading: promptsLoading, createPrompt } = usePrompts(workspace.id);
+  const promptsContext = usePromptsContext();
+  const { prompts = [], loading: promptsLoading, createPrompt = async () => null } = promptsContext || {};
   
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [expandedEpics, setExpandedEpics] = useState<Set<string>>(new Set());
