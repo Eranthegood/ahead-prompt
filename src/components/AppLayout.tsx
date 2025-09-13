@@ -85,19 +85,19 @@ export function AppLayout({ children }: AppLayoutProps) {
       {canShowSidebar ? (
         // Render sidebar layout structure always for sidebar pages
         <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
-          <div className="min-h-screen w-full bg-background flex">
-            {isLoading ? (
-              // Loading state with consistent structure
-              <div className="w-64 border-r border-border bg-sidebar flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : shouldShowSidebar ? (
-              // Single PromptsProvider wrapping everything when ready
-              <PromptsProvider 
-                workspaceId={workspace.id}
-                selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-                selectedEpicId={selectedEpicId}
-              >
+          {/* Single PromptsProvider for entire sidebar layout to ensure shared state */}
+          <PromptsProvider 
+            workspaceId={workspace?.id}
+            selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+            selectedEpicId={selectedEpicId}
+          >
+            <div className="min-h-screen w-full bg-background flex">
+              {isLoading ? (
+                // Loading state with consistent structure
+                <div className="w-64 border-r border-border bg-sidebar flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : shouldShowSidebar ? (
                 <MinimalSidebar 
                   workspace={workspace}
                   selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
@@ -109,42 +109,30 @@ export function AppLayout({ children }: AppLayoutProps) {
                   onQuickAdd={() => setQuickPromptOpen(true)}
                   searchQuery=""
                 />
-              </PromptsProvider>
-            ) : null}
-            
-            <div className="flex-1 flex flex-col min-w-0">
-              {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
-              <main 
-                className="flex-1" 
-                style={{ backgroundColor: '#191a23' }}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : shouldShowSidebar ? (
-                  <PromptsProvider 
-                    workspaceId={workspace.id}
-                    selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-                    selectedEpicId={selectedEpicId}
-                  >
-                    {React.isValidElement(children) && children.type === Dashboard 
+              ) : null}
+              
+              <div className="flex-1 flex flex-col min-w-0">
+                {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
+                <main 
+                  className="flex-1" 
+                  style={{ backgroundColor: '#191a23' }}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : shouldShowSidebar ? (
+                    React.isValidElement(children) && children.type === Dashboard 
                       ? React.cloneElement(children as React.ReactElement<any>, {
                           selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
                           selectedEpicId: selectedEpicId
                         })
-                      : children}
-                  </PromptsProvider>
-                ) : children}
-              </main>
-            </div>
+                      : children
+                  ) : children}
+                </main>
+              </div>
 
-            {!isLoading && shouldShowSidebar && (
-              <PromptsProvider 
-                workspaceId={workspace.id}
-                selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-                selectedEpicId={selectedEpicId}
-              >
+              {!isLoading && shouldShowSidebar && (
                 <SidebarPromptComponents
                   workspace={workspace}
                   selectedProductId={selectedProductId}
@@ -152,9 +140,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                   quickPromptOpen={quickPromptOpen}
                   setQuickPromptOpen={setQuickPromptOpen}
                 />
-              </PromptsProvider>
-            )}
-          </div>
+              )}
+            </div>
+          </PromptsProvider>
         </SidebarProvider>
       ) : (
         // Non-sidebar pages
