@@ -35,7 +35,6 @@ import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
-import ClickToCloseDemoPage from "./pages/ClickToCloseDemo";
 
 const queryClient = new QueryClient();
 
@@ -144,10 +143,6 @@ function App() {
                         <ProtectedRoute>
                           <AIAgents />
                         </ProtectedRoute>
-                      } />
-                      
-                      <Route path="/click-to-close-demo" element={
-                        <ClickToCloseDemoPage />
                       } />
                       
                       <Route path="*" element={<NotFound />} />
