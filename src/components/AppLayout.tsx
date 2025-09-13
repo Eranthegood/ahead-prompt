@@ -85,7 +85,19 @@ export function AppLayout({ children }: AppLayoutProps) {
       {canShowSidebar ? (
         // Render sidebar layout structure always for sidebar pages
         <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
-          {/* Single PromptsProvider for entire sidebar layout to ensure shared state */}
+          {/* 
+            ⚠️ CRITICAL ARCHITECTURE - DO NOT MODIFY ⚠️
+            
+            This single PromptsProvider MUST wrap the entire sidebar layout to ensure:
+            1. MinimalSidebar and SidebarPromptComponents share the same prompts state
+            2. When a prompt is created, it appears INSTANTLY in MinimalPromptList
+            3. No state synchronization issues between components
+            
+            NEVER add additional PromptsProvider instances inside this tree!
+            NEVER move this provider to a more nested position!
+            
+            If you need to access prompt state elsewhere, use usePromptsContext()
+          */}
           <PromptsProvider 
             workspaceId={workspace?.id}
             selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
@@ -163,6 +175,15 @@ export function AppLayout({ children }: AppLayoutProps) {
   );
 }
 
+/**
+ * ⚠️ CRITICAL COMPONENT - Handles prompt creation within shared PromptsProvider context
+ * 
+ * This component MUST be rendered inside the PromptsProvider tree to ensure:
+ * - usePromptsContext() returns the same state as MinimalSidebar
+ * - Prompt creation updates are immediately visible in the sidebar
+ * 
+ * DO NOT move this component outside the PromptsProvider wrapper!
+ */
 function SidebarPromptComponents({ 
   workspace,
   selectedProductId,
@@ -180,6 +201,8 @@ function SidebarPromptComponents({
   const navigate = useNavigate();
   const { products } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
+  
+  // ⚠️ CRITICAL: This hook MUST return the same context as MinimalSidebar
   const promptsContext = usePromptsContext();
 
   const handleSavePrompt = async (promptData: any) => {
