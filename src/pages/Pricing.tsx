@@ -26,48 +26,52 @@ export default function Pricing() {
       yearlyPrice: 0,
       features: [
         "Unlimited prompts",
-        "1 workspace",
+        "1 product",
+        "3 epics total",
+        "10 prompts in library",
         "Basic AI generation",
-        "Community support",
-        "Export data"
+        "Community support"
       ],
-      cta: "Get Started",
+      cta: "Get Started Free",
       popular: false
     },
     {
       name: "Basic",
-      description: "For solo developers",
+      description: "For growing projects",
       monthlyPrice: 5,
-      yearlyPrice: 48, // 5 * 12 * 0.8
+      yearlyPrice: 48, // 5 * 12 * 0.8 (20% discount)
       features: [
         "Unlimited prompts", 
-        "3 workspaces",
-        "Advanced AI generation",
-        "GitHub integration",
-        "Priority support",
-        "Keyboard shortcuts",
-        "Knowledge base"
+        "3 products",
+        "3 epics per product",
+        "50 prompts in library",
+        "Knowledge base access",
+        "Advanced AI models",
+        "Cursor integration",
+        "Priority support"
       ],
       cta: "Upgrade to Basic", 
-      popular: false
+      popular: true
     },
     {
       name: "Pro",
-      description: "For power users & teams",
+      description: "For teams & power users",
       monthlyPrice: 15,
-      yearlyPrice: 144, // 15 * 12 * 0.8
+      yearlyPrice: 144, // 15 * 12 * 0.8 (20% discount)
       features: [
         "Unlimited prompts",
-        "Unlimited workspaces", 
-        "All AI features",
-        "All integrations",
-        "Team collaboration",
-        "Advanced analytics",
-        "Custom templates",
+        "Unlimited products", 
+        "Unlimited epics",
+        "Unlimited prompt library",
+        "Knowledge base access",
+        "Advanced AI models",
+        "Cursor integration",
+        "Prompt enhancer (coming soon)",
+        "2 collaboration seats",
         "Premium support"
       ],
       cta: "Upgrade to Pro",
-      popular: true
+      popular: false
     }
   ];
 
@@ -160,6 +164,46 @@ export default function Pricing() {
                   </CardFooter>
                 </Card>
               ))}
+            </div>
+          </BlurFade>
+
+          {/* Feedback Section */}
+          <BlurFade delay={1.0} inView>
+            <div className="mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
+              <div className="text-center space-y-6">
+                <h2 className="text-3xl font-bold text-foreground">
+                  Would you pay for this?
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Help us shape the perfect pricing by choosing the plan you'd actually use. 
+                  Once ready, we'll send you a special offer to thank you for your feedback!
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="bg-background/50 hover:bg-background/80"
+                    onClick={() => toast.success("Thank you! We'll contact you with a special Free plan offer 🎉")}
+                  >
+                    <Gift className="w-4 h-4 mr-2" />
+                    I'd use Free
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="bg-background/50 hover:bg-background/80"
+                    onClick={() => toast.success("Thank you! We'll contact you with a special Basic plan offer 🎉")}
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    I'd pay for Basic
+                  </Button>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={() => toast.success("Thank you! We'll contact you with a special Pro plan offer 🎉")}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    I'd pay for Pro
+                  </Button>
+                </div>
+              </div>
             </div>
           </BlurFade>
         </div>
