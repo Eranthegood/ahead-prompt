@@ -77,7 +77,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const navigate = useNavigate();
   const { user } = useAuth();
   const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
-  const { epics, createEpic, updateEpic } = useEpics(workspace.id);
+  const { epics, createEpic, updateEpic, deleteEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats, isGamificationEnabled } = useGamification();
@@ -311,6 +311,16 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       // If the deleted product was selected, reset selection
       if (selectedProductId === productId) {
         onProductSelect('all');
+        onEpicSelect(undefined);
+      }
+    }
+  };
+
+  const handleDeleteEpic = async (epicId: string) => {
+    if (confirm('Are you sure you want to delete this epic? This action is irreversible.')) {
+      await deleteEpic(epicId);
+      // If the deleted epic was selected, reset epic selection
+      if (selectedEpicId === epicId) {
         onEpicSelect(undefined);
       }
     }
@@ -722,6 +732,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                             setSelectedProductForEpic(product.id);
                             setIsCreateEpicOpen(true);
                           }}
+                          onDeleteEpic={handleDeleteEpic}
                         />
                       ))
                     )}

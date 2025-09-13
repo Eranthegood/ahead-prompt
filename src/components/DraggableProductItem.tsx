@@ -47,6 +47,7 @@ interface DraggableProductItemProps {
   onDeleteProduct: () => void;
   onOpenKnowledge: () => void;
   onCreateEpic: () => void;
+  onDeleteEpic: (epicId: string) => void;
 }
 
 export function DraggableProductItem({
@@ -61,7 +62,8 @@ export function DraggableProductItem({
   onEpicSelect,
   onDeleteProduct,
   onOpenKnowledge,
-  onCreateEpic
+  onCreateEpic,
+  onDeleteEpic
 }: DraggableProductItemProps) {
   const {
     attributes,
@@ -278,32 +280,44 @@ export function DraggableProductItem({
               )
             ) : (
               product.epics.map((epic) => (
-                <SidebarMenuButton
-                  key={epic.id}
-                  size="sm"
-                  className="text-xs justify-between"
-                  onClick={() => {
-                    onProductSelect();
-                    onEpicSelect(epic.id);
-                  }}
-                  isActive={selectedEpicId === epic.id}
-                >
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <Hash className="w-2 h-2 flex-shrink-0" />
-                    <div 
-                      className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
-                      style={{ backgroundColor: epic.color || '#8B5CF6' }}
-                    />
-                    <span className="truncate">
-                      {epic.name}
-                    </span>
-                  </div>
-                  {epic.promptCount > 0 && (
-                    <Badge variant="outline" className="text-xs h-4 px-1">
-                      {epic.promptCount}
-                    </Badge>
-                  )}
-                </SidebarMenuButton>
+                <ContextMenu key={epic.id}>
+                  <ContextMenuTrigger asChild>
+                    <SidebarMenuButton
+                      size="sm"
+                      className="text-xs justify-between"
+                      onClick={() => {
+                        onProductSelect();
+                        onEpicSelect(epic.id);
+                      }}
+                      isActive={selectedEpicId === epic.id}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Hash className="w-2 h-2 flex-shrink-0" />
+                        <div 
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
+                          style={{ backgroundColor: epic.color || '#8B5CF6' }}
+                        />
+                        <span className="truncate">
+                          {epic.name}
+                        </span>
+                      </div>
+                      {epic.promptCount > 0 && (
+                        <Badge variant="outline" className="text-xs h-4 px-1">
+                          {epic.promptCount}
+                        </Badge>
+                      )}
+                    </SidebarMenuButton>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-48">
+                    <ContextMenuItem 
+                      onClick={() => onDeleteEpic(epic.id)}
+                      className="flex items-center gap-2 text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete Epic
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               ))
             )}
           </CollapsibleContent>
