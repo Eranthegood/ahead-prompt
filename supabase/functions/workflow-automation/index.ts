@@ -22,6 +22,26 @@ serve(async (req) => {
 
     console.log('Workflow Automation action:', { workspaceId, action, entityId, entityType });
 
+    // Validate required parameters
+    if (!workspaceId) {
+      throw new Error('workspaceId is required');
+    }
+
+    if (!action) {
+      throw new Error('action is required');
+    }
+
+    // Validate action-specific parameters
+    if ((action === 'auto_status_update' || action === 'task_automation') && (!entityId || !entityType)) {
+      console.log(`Skipping ${action} - missing entityId or entityType`);
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: `Skipped ${action} - missing required parameters` 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Find or create the workflow automation agent
     let { data: agent, error: agentError } = await supabase
       .from('ai_agents')
@@ -70,7 +90,7 @@ serve(async (req) => {
       case 'analyze_prompt_patterns':
         return await analyzePromptPatterns(workspaceId, agent.id, startTime);
       default:
-        throw new Error('Unknown action');
+        throw new Error(`Unknown action: ${action}`);
     }
 
   } catch (error) {
