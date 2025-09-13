@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Sparkles, Moon, Sun, Lock, Crown, Bell, Users, UserPlus, HelpCircle, Plug, Library, Monitor } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Crown, Library, Plug, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
@@ -12,24 +11,18 @@ import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { PromptLibrary } from './PromptLibrary';
+import { WorkspaceMembersModal } from './WorkspaceMembersModal';
 import { ThemeToggle } from './ui/theme-toggle';
 
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
-  const { 
-    theme, 
-    setTheme, 
-    resolvedTheme, 
-    isDarkModeUnlocked,
-    xpNeededForDarkMode,
-    currentLevel,
-    requiredLevel 
-  } = useTheme();
+  const { theme, setTheme, resolvedTheme, isDarkModeUnlocked, xpNeededForDarkMode, currentLevel, requiredLevel } = useTheme();
   const navigate = useNavigate();
   const { state } = useSidebar();
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
+  const [showWorkspaceMembers, setShowWorkspaceMembers] = useState(false);
   
   const isCollapsed = state === 'collapsed';
 
@@ -40,8 +33,10 @@ export function UserAccountSection() {
   const getUserDisplayName = (email: string) => {
     return email.split('@')[0];
   };
+
   if (isCollapsed) {
-    return <div className="p-2 flex justify-start">
+    return (
+      <div className="p-2 flex justify-start">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
@@ -86,6 +81,11 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
+            <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
+              <Users className="mr-2 h-4 w-4" />
+              <span>People</span>
+            </DropdownMenuItem>
+            
             <DropdownMenuSeparator />
             
             <div className="px-2 py-1">
@@ -100,17 +100,37 @@ export function UserAccountSection() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>;
+        
+        <KeyboardShortcutsModal 
+          open={showShortcuts} 
+          onOpenChange={setShowShortcuts} 
+        />
+        
+        <PromptLibrary
+          open={showPromptLibrary}
+          onOpenChange={setShowPromptLibrary}
+        />
+        
+        <WorkspaceMembersModal 
+          open={showWorkspaceMembers} 
+          onOpenChange={setShowWorkspaceMembers} 
+        />
+      </div>
+    );
   }
-  return <div className="border-t pt-2 px-2 -mt-2">
+
+  return (
+    <div className="border-t pt-2 px-2 -mt-2">
       {/* XP Badge */}
-      {stats && <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full text-sm mb-3">
+      {stats && (
+        <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full text-sm mb-3">
           <Trophy className="w-4 h-4 text-yellow-500" />
           <span className="font-medium">{stats.total_xp} XP</span>
           <Badge variant="outline" className="text-xs">
             Lvl {stats.current_level}
           </Badge>
-        </div>}
+        </div>
+      )}
 
       {/* User Menu */}
       <DropdownMenu>
@@ -197,19 +217,24 @@ export function UserAccountSection() {
             <span>Keyboard Shortcuts</span>
           </DropdownMenuItem>
           
-            <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
-              <Library className="mr-2 h-4 w-4" />
-              <span>Prompt Library</span>
-            </DropdownMenuItem>
-            
-            <DropdownMenuSeparator />
-            
-            <div className="px-2 py-1">
-              <ThemeToggle />
-            </div>
-            
-            <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowPromptLibrary(true)}>
+            <Library className="mr-2 h-4 w-4" />
+            <span>Prompt Library</span>
+          </DropdownMenuItem>
           
+          <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
+            <Users className="mr-2 h-4 w-4" />
+            <span>People</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
+          <div className="px-2 py-1">
+            <ThemeToggle />
+          </div>
+          
+          <DropdownMenuSeparator />
+        
           <DropdownMenuItem 
             onClick={signOut}
             className="text-destructive hover:bg-destructive/10 hover:text-destructive"
@@ -233,5 +258,12 @@ export function UserAccountSection() {
         open={showPromptLibrary}
         onOpenChange={setShowPromptLibrary}
       />
-    </div>;
+      
+      {/* Workspace Members Modal */}
+      <WorkspaceMembersModal 
+        open={showWorkspaceMembers} 
+        onOpenChange={setShowWorkspaceMembers} 
+      />
+    </div>
+  );
 }
