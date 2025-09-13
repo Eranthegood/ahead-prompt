@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
+import { useTabVisibility } from '@/hooks/useTabVisibility';
 import type { Product } from '@/types';
 
 export interface CreateProductData {
@@ -16,6 +17,7 @@ export const useProducts = (workspaceId?: string) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { trackProductCreated } = useMixpanelContext();
+  const { onBecomeVisible } = useTabVisibility();
 
   // Fetch products
   const fetchProducts = async () => {
@@ -232,6 +234,16 @@ export const useProducts = (workspaceId?: string) => {
       supabase.removeChannel(channel);
     };
   }, [workspaceId]);
+
+  // Intelligent refetch when tab becomes visible after being hidden
+  useEffect(() => {
+    onBecomeVisible(() => {
+      if (workspaceId) {
+        console.log('Tab became visible, refreshing products data');
+        fetchProducts();
+      }
+    });
+  }, [workspaceId, onBecomeVisible]);
 
   return {
     products,

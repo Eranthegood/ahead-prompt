@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useTabVisibility } from '@/hooks/useTabVisibility';
 import { Workspace } from '@/types';
 
 export function useWorkspace() {
@@ -9,6 +10,7 @@ export function useWorkspace() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { onBecomeVisible } = useTabVisibility();
 
   useEffect(() => {
     if (!user) {
@@ -18,6 +20,16 @@ export function useWorkspace() {
 
     fetchOrCreateWorkspace();
   }, [user]); // fetchOrCreateWorkspace is stable, no need to add as dependency
+
+  // Intelligent refetch when tab becomes visible after being hidden
+  useEffect(() => {
+    onBecomeVisible(() => {
+      if (user && workspace) {
+        console.log('Tab became visible, refreshing workspace data');
+        fetchOrCreateWorkspace();
+      }
+    });
+  }, [user, workspace, onBecomeVisible]);
 
   const fetchOrCreateWorkspace = async () => {
     if (!user) return;

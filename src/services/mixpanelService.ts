@@ -17,7 +17,7 @@ class MixpanelService {
       const mod = await import('mixpanel-browser');
       this.mixpanel = mod.default;
       this.mixpanel.init(MIXPANEL_TOKEN, {
-        debug: process.env.NODE_ENV === 'development',
+        debug: import.meta.env.MODE === 'development',
         track_pageview: true,
         persistence: 'localStorage',
         api_host: 'https://api.mixpanel.com',
@@ -103,7 +103,7 @@ class MixpanelService {
         ...properties
       });
       
-      if (process.env.NODE_env === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.log('Mixpanel event tracked successfully:', eventName, properties);
       }
     } catch (error) {
