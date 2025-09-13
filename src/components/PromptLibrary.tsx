@@ -19,7 +19,9 @@ import {
   Library,
   Zap,
   Lightbulb,
-  X
+  X,
+  Crown,
+  Download
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
@@ -34,7 +36,7 @@ interface PromptLibraryProps {
 }
 
 export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptLibraryProps) {
-  const { items, loading, deleteItem, toggleFavorite, incrementUsage } = usePromptLibrary();
+  const { items, loading, deleteItem, toggleFavorite, incrementUsage, copySystemPrompt } = usePromptLibrary();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -111,12 +113,23 @@ export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptL
     if (selectedCategory !== 'all') {
       if (selectedCategory === 'favorites') {
         filtered = filtered.filter(item => item.is_favorite);
+      } else if (selectedCategory === 'system') {
+        filtered = filtered.filter(item => item.id.startsWith('system-'));
       } else {
         filtered = filtered.filter(item => item.category === selectedCategory);
       }
     }
 
-    return filtered;
+    // Sort: system prompts first, then user prompts
+    return filtered.sort((a, b) => {
+      const aIsSystem = a.id.startsWith('system-');
+      const bIsSystem = b.id.startsWith('system-');
+      
+      if (aIsSystem && !bIsSystem) return -1;
+      if (!aIsSystem && bIsSystem) return 1;
+      
+      return 0;
+    });
   }, [items, searchQuery, selectedCategory]);
 
   const handleCopyPrompt = async (item: PromptLibraryItem) => {
@@ -222,6 +235,17 @@ TODO:
                   <Star className="w-3 h-3" />
                   Favorites
                 </button>
+                <button
+                  onClick={() => setSelectedCategory('system')}
+                  className={`px-3 py-1 text-sm rounded-full transition-colors flex items-center gap-1 ${
+                    selectedCategory === 'system'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  <Crown className="w-3 h-3" />
+                  Templates
+                </button>
               </div>
             </div>
           )}
@@ -264,15 +288,28 @@ TODO:
                       onClick={() => setViewingItem(item)}
                     >
                       {/* Icon */}
-                      <div className="w-8 h-8 rounded-md bg-muted/50 flex items-center justify-center flex-shrink-0">
-                        <Lightbulb className="w-4 h-4 text-muted-foreground" />
+                      <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${
+                        item.id.startsWith('system-')
+                          ? 'bg-primary/10'
+                          : 'bg-muted/50'
+                      }`}>
+                        {item.id.startsWith('system-') ? (
+                          <Crown className="w-4 h-4 text-primary" />
+                        ) : (
+                          <Lightbulb className="w-4 h-4 text-muted-foreground" />
+                        )}
                       </div>
                       
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-foreground text-sm truncate">
+                          <h3 className="font-medium text-foreground text-sm truncate flex items-center gap-2">
                             {item.title}
+                            {item.id.startsWith('system-') && (
+                              <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 bg-primary/5 text-primary border-primary/20">
+                                System
+                              </Badge>
+                            )}
                           </h3>
                           {item.is_favorite && (
                             <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
@@ -308,32 +345,50 @@ TODO:
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(item.id);
-                          }}
-                          className="w-7 h-7 p-0 hover:bg-muted/60"
-                        >
-                          {item.is_favorite ? (
-                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                          ) : (
-                            <Star className="w-3.5 h-3.5" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteItem(item);
-                          }}
-                          className="w-7 h-7 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        
+                        {item.id.startsWith('system-') ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copySystemPrompt(item);
+                            }}
+                            className="w-7 h-7 p-0 hover:bg-muted/60"
+                            title="Copy to your library"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(item.id);
+                              }}
+                              className="w-7 h-7 p-0 hover:bg-muted/60"
+                            >
+                              {item.is_favorite ? (
+                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              ) : (
+                                <Star className="w-3.5 h-3.5" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteItem(item);
+                              }}
+                              className="w-7 h-7 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                       
                       {/* Usage count */}
@@ -416,22 +471,37 @@ TODO:
           
           <div className="px-6 py-4 border-t bg-muted/10">
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (viewingItem) toggleFavorite(viewingItem.id);
-                }}
-                className="gap-2"
-              >
-                {viewingItem?.is_favorite ? (
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ) : (
-                  <Star className="w-4 h-4" />
-                )}
-                {viewingItem?.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
-              </Button>
+              {viewingItem?.id.startsWith('system-') ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (viewingItem) copySystemPrompt(viewingItem);
+                  }}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Copy to Library
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (viewingItem) toggleFavorite(viewingItem.id);
+                  }}
+                  className="gap-2"
+                >
+                  {viewingItem?.is_favorite ? (
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ) : (
+                    <Star className="w-4 h-4" />
+                  )}
+                  {viewingItem?.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                </Button>
+              )}
               
               <Button
                 variant="ghost"

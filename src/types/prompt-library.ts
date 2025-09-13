@@ -21,6 +21,11 @@ export interface CreatePromptLibraryItemData {
   category?: string;
 }
 
+export interface SystemPromptTemplate extends Omit<PromptLibraryItem, 'id' | 'workspace_id' | 'user_id' | 'created_at' | 'updated_at' | 'usage_count' | 'is_favorite'> {
+  id: string;
+  is_system: true;
+}
+
 export type AIModel = 'openai-gpt-4' | 'openai-gpt-3.5' | 'claude-3.5-sonnet' | 'claude-3-haiku' | 'gemini-pro';
 
 export const AI_MODELS: { value: AIModel; label: string }[] = [

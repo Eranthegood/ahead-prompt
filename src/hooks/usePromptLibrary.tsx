@@ -1,16 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useToast } from '@/hooks/use-toast';
 import type { PromptLibraryItem, CreatePromptLibraryItemData } from '@/types/prompt-library';
+import { SYSTEM_PROMPTS } from '@/constants/systemPrompts';
 
 export function usePromptLibrary() {
-  const [items, setItems] = useState<PromptLibraryItem[]>([]);
+  const [userItems, setUserItems] = useState<PromptLibraryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+
+  // Combine user items with system prompts
+  const items = useMemo(() => {
+    const systemPromptItems: PromptLibraryItem[] = SYSTEM_PROMPTS.map(systemPrompt => ({
+      ...systemPrompt,
+      workspace_id: workspace?.id || '',
+      user_id: user?.id || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      usage_count: 0,
+      is_favorite: false,
+    }));
+
+    return [...systemPromptItems, ...userItems];
+  }, [userItems, workspace?.id, user?.id]);
 
   const fetchItems = async () => {
     if (!user || !workspace) return;
@@ -25,7 +41,7 @@ export function usePromptLibrary() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setItems((data || []) as unknown as PromptLibraryItem[]);
+      setUserItems((data || []) as unknown as PromptLibraryItem[]);
     } catch (error: any) {
       console.error('Error fetching prompt library:', error);
       toast({
@@ -60,7 +76,7 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => [newItem as unknown as PromptLibraryItem, ...prev]);
+      setUserItems(prev => [newItem as unknown as PromptLibraryItem, ...prev]);
       toast({
         title: 'Prompt saved to library',
         description: `"${data.title}" has been added to your prompt library.`,
@@ -79,6 +95,16 @@ export function usePromptLibrary() {
   };
 
   const updateItem = async (id: string, updates: Partial<PromptLibraryItem>): Promise<void> => {
+    // Don't allow updating system prompts
+    if (id.startsWith('system-')) {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot edit system prompts',
+        description: 'System prompts cannot be modified. Copy it to your library to customize.',
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('prompt_library' as any)
@@ -87,7 +113,7 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => prev.map(item => 
+      setUserItems(prev => prev.map(item => 
         item.id === id ? { ...item, ...updates } : item
       ));
 
@@ -106,6 +132,16 @@ export function usePromptLibrary() {
   };
 
   const deleteItem = async (id: string): Promise<void> => {
+    // Don't allow deleting system prompts
+    if (id.startsWith('system-')) {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot delete system prompts',
+        description: 'System prompts are built-in and cannot be deleted.',
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('prompt_library' as any)
@@ -114,7 +150,7 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => prev.filter(item => item.id !== id));
+      setUserItems(prev => prev.filter(item => item.id !== id));
       toast({
         title: 'Prompt deleted',
         description: 'The prompt has been removed from your library.',
@@ -130,8 +166,13 @@ export function usePromptLibrary() {
   };
 
   const incrementUsage = async (id: string): Promise<void> => {
+    // Don't track usage for system prompts in database
+    if (id.startsWith('system-')) {
+      return;
+    }
+
     try {
-      const item = items.find(i => i.id === id);
+      const item = userItems.find(i => i.id === id);
       if (!item) return;
 
       const { error } = await supabase
@@ -141,7 +182,7 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => prev.map(item => 
+      setUserItems(prev => prev.map(item => 
         item.id === id ? { ...item, usage_count: item.usage_count + 1 } : item
       ));
     } catch (error: any) {
@@ -150,8 +191,18 @@ export function usePromptLibrary() {
   };
 
   const toggleFavorite = async (id: string): Promise<void> => {
+    // Don't allow favoriting system prompts
+    if (id.startsWith('system-')) {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot favorite system prompts',
+        description: 'Copy the system prompt to your library to favorite it.',
+      });
+      return;
+    }
+
     try {
-      const item = items.find(i => i.id === id);
+      const item = userItems.find(i => i.id === id);
       if (!item) return;
 
       const { error } = await supabase
@@ -161,7 +212,7 @@ export function usePromptLibrary() {
 
       if (error) throw error;
 
-      setItems(prev => prev.map(item => 
+      setUserItems(prev => prev.map(item => 
         item.id === id ? { ...item, is_favorite: !item.is_favorite } : item
       ));
     } catch (error: any) {
@@ -172,6 +223,19 @@ export function usePromptLibrary() {
         description: error.message,
       });
     }
+  };
+
+  // Copy system prompt to user library
+  const copySystemPrompt = async (systemPrompt: PromptLibraryItem): Promise<void> => {
+    const data: CreatePromptLibraryItemData = {
+      title: `${systemPrompt.title} (Copy)`,
+      body: systemPrompt.body,
+      ai_model: systemPrompt.ai_model,
+      tags: systemPrompt.tags,
+      category: systemPrompt.category,
+    };
+
+    await createItem(data);
   };
 
   useEffect(() => {
@@ -186,6 +250,7 @@ export function usePromptLibrary() {
     deleteItem,
     incrementUsage,
     toggleFavorite,
+    copySystemPrompt,
     refetch: fetchItems,
   };
 }
