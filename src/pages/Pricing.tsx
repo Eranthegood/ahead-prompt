@@ -6,40 +6,71 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 export default function Pricing() {
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
-  const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
+  const [isAnnual, setIsAnnual] = useState(false);
+  
   const handleGetStarted = () => {
     navigate('/build');
   };
-  const handlePricingFeedback = async (pricePoint: string) => {
-    if (submitting) return;
-    setSubmitting(true);
-    setSelectedPrice(pricePoint);
-    try {
-      const {
-        error
-      } = await supabase.from('pricing_feedback').insert({
-        user_id: user?.id || null,
-        email: user?.email || null,
-        price_point: pricePoint,
-        feedback_type: 'pricing_interest',
-        user_agent: navigator.userAgent
-      });
-      if (error) throw error;
-      toast.success(`Thanks for your feedback! We've noted your interest in ${pricePoint}`);
-    } catch (error) {
-      console.error('Error submitting pricing feedback:', error);
-      toast.error('Failed to submit feedback. Please try again.');
-      setSelectedPrice(null);
-    } finally {
-      setSubmitting(false);
+
+  const pricingTiers = [
+    {
+      name: "Free",
+      description: "Perfect for getting started",
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      features: [
+        "10 prompts per month",
+        "1 workspace",
+        "Basic AI generation",
+        "Community support",
+        "Export data"
+      ],
+      cta: "Get Started",
+      popular: false
+    },
+    {
+      name: "Basic",
+      description: "For solo developers",
+      monthlyPrice: 5,
+      yearlyPrice: 48, // 5 * 12 * 0.8
+      features: [
+        "100 prompts per month", 
+        "3 workspaces",
+        "Advanced AI generation",
+        "GitHub integration",
+        "Priority support",
+        "Keyboard shortcuts",
+        "Knowledge base"
+      ],
+      cta: "Upgrade to Basic", 
+      popular: false
+    },
+    {
+      name: "Pro",
+      description: "For power users & teams",
+      monthlyPrice: 15,
+      yearlyPrice: 144, // 15 * 12 * 0.8
+      features: [
+        "Unlimited prompts",
+        "Unlimited workspaces", 
+        "All AI features",
+        "All integrations",
+        "Team collaboration",
+        "Advanced analytics",
+        "Custom templates",
+        "Premium support"
+      ],
+      cta: "Upgrade to Pro",
+      popular: true
     }
-  };
+  ];
+
   const features = ["Unlimited prompt storage", "Smart AI prompt generation", "One-click copy to any AI tool", "Kanban workflow organization", "Keyboard shortcuts for speed", "Multi-product organization", "Knowledge base integration", "GitHub & Cursor integration", "Dark/light theme support", "Export your data anytime"];
   return <div className="min-h-screen bg-background">
       {/* Header */}
@@ -72,33 +103,63 @@ export default function Pricing() {
           </BlurFade>
 
 
-          {/* Pricing Feedback Section */}
-          <BlurFade delay={0.8} inView>
-            <div className="max-w-2xl mx-auto mt-16 p-8 border border-border rounded-lg bg-card/50">
-              <div className="text-center space-y-6">
-                
-                <p className="text-muted-foreground">
-                  Give us some hint for the most fair pricing you&apos;re ready to buy
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-                  <Button variant={selectedPrice === "$5/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$5/mo")} disabled={submitting}>
-                    $5/mo
-                  </Button>
-                  
-                  <Button variant={selectedPrice === "$15/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$15/mo")} disabled={submitting}>
-                    $15/mo
-                  </Button>
+          {/* Pricing Toggle */}
+          <BlurFade delay={0.6} inView>
+            <div className="flex items-center justify-center gap-4 mb-12">
+              <span className={!isAnnual ? "text-foreground font-medium" : "text-muted-foreground"}>Monthly</span>
+              <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
+              <span className={isAnnual ? "text-foreground font-medium" : "text-muted-foreground"}>
+                Annual <Badge variant="secondary" className="ml-2">-20%</Badge>
+              </span>
+            </div>
+          </BlurFade>
 
-                  <Button variant={selectedPrice === "$15/mo Pro Advance" ? "default" : "outline"} className="h-12 flex flex-col items-center justify-center" onClick={() => handlePricingFeedback("$15/mo Pro Advance")} disabled={submitting}>
-                    <span className="text-sm font-semibold">$15/mo</span>
-                    <span className="text-xs text-muted-foreground">Pro Advance</span>
-                  </Button>
-                  
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  And once ready, you will receive a special offer
-                </p>
-              </div>
+          {/* Pricing Cards */}
+          <BlurFade delay={0.8} inView>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {pricingTiers.map((tier, index) => (
+                <Card key={tier.name} className={`relative ${tier.popular ? 'ring-2 ring-primary scale-105' : ''}`}>
+                  {tier.popular && (
+                    <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
+                      Most Popular
+                    </Badge>
+                  )}
+                  <CardHeader className="text-center pb-2">
+                    <CardTitle className="text-xl">{tier.name}</CardTitle>
+                    <CardDescription>{tier.description}</CardDescription>
+                    <div className="py-4">
+                      <div className="text-3xl font-bold">
+                        €{isAnnual ? Math.floor(tier.yearlyPrice / 12) : tier.monthlyPrice}
+                        <span className="text-base font-normal text-muted-foreground">/mo</span>
+                      </div>
+                      {isAnnual && tier.yearlyPrice > 0 && (
+                        <div className="text-sm text-muted-foreground">
+                          €{tier.yearlyPrice}/year (save 20%)
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {tier.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-primary" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full" 
+                      variant={tier.popular ? "default" : "outline"}
+                      onClick={() => tier.name === "Free" ? handleGetStarted() : toast.info("Payment integration coming soon!")}
+                    >
+                      {tier.cta}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
             </div>
           </BlurFade>
         </div>
