@@ -174,12 +174,12 @@ export default function Pricing() {
                     <CardDescription>{tier.description}</CardDescription>
                     <div className="py-4">
                       <div className="text-3xl font-bold">
-                        €{isAnnual ? Math.floor(tier.yearlyPrice / 12) : tier.monthlyPrice}
+                        ${isAnnual ? Math.floor(tier.yearlyPrice / 12) : tier.monthlyPrice}
                         <span className="text-base font-normal text-muted-foreground">/mo</span>
                       </div>
                       {isAnnual && tier.yearlyPrice > 0 && (
                         <div className="text-sm text-muted-foreground">
-                          €{tier.yearlyPrice}/year (save 20%)
+                          ${tier.yearlyPrice}/year (save 20%)
                         </div>
                       )}
                     </div>
