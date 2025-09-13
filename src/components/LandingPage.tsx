@@ -54,7 +54,7 @@ export default function LandingPage() {
     return () => clearTimeout(timer);
   }, []);
   const handleSignIn = () => {
-    navigate('/build');
+    navigate('/auth');
   };
   const testimonials = [{
     img: "https://randomuser.me/api/portraits/women/65.jpg",
