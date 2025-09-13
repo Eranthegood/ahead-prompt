@@ -84,15 +84,11 @@ export default function Pricing() {
                   <Button variant={selectedPrice === "$5/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$5/mo")} disabled={submitting}>
                     $5/mo
                   </Button>
-                  <Button variant={selectedPrice === "$10/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$10/mo")} disabled={submitting}>
-                    $10/mo
-                  </Button>
+                  
                   <Button variant={selectedPrice === "$15/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$15/mo")} disabled={submitting}>
                     $15/mo
                   </Button>
-                  <Button variant={selectedPrice === "$25/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$25/mo")} disabled={submitting}>
-                    $25/mo
-                  </Button>
+                  
                 </div>
                 <p className="text-sm text-muted-foreground">
                   And once ready, you will receive a special offer
