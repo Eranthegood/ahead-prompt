@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Heart, Check, Zap, Sparkles, Gift } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { usePricingTracking } from "@/hooks/usePricingTracking";
 export default function Pricing() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
+  const { trackPricingInteraction, isTracking } = usePricingTracking();
   
   const handleGetStarted = () => {
     navigate('/build');
@@ -121,7 +121,8 @@ export default function Pricing() {
                 <Button 
                   variant="outline" 
                   className="bg-background/50 hover:bg-background/80"
-                  onClick={() => toast.success("Thank you! We'll contact you with a special Free plan offer 🎉")}
+                  onClick={() => trackPricingInteraction('free')}
+                  disabled={isTracking}
                 >
                   <Gift className="w-4 h-4 mr-2" />
                   I'd use Free
@@ -129,14 +130,16 @@ export default function Pricing() {
                 <Button 
                   variant="outline"
                   className="bg-background/50 hover:bg-background/80"
-                  onClick={() => toast.success("Thank you! We'll contact you with a special Basic plan offer 🎉")}
+                  onClick={() => trackPricingInteraction('basic')}
+                  disabled={isTracking}
                 >
                   <Zap className="w-4 h-4 mr-2" />
                   I'd pay for Basic
                 </Button>
                 <Button 
                   className="bg-primary hover:bg-primary/90"
-                  onClick={() => toast.success("Thank you! We'll contact you with a special Pro plan offer 🎉")}
+                  onClick={() => trackPricingInteraction('pro')}
+                  disabled={isTracking}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   I'd pay for Pro
@@ -195,7 +198,14 @@ export default function Pricing() {
                     <Button 
                       className="w-full" 
                       variant={tier.popular ? "default" : "outline"}
-                      onClick={() => tier.name === "Free" ? handleGetStarted() : toast.info("Payment integration coming soon!")}
+                      onClick={() => {
+                        if (tier.name === "Free") {
+                          handleGetStarted();
+                        } else {
+                          trackPricingInteraction(tier.name.toLowerCase());
+                        }
+                      }}
+                      disabled={tier.name !== "Free" && isTracking}
                     >
                       {tier.cta}
                     </Button>
