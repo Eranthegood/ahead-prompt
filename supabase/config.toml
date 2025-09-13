@@ -26,6 +26,3 @@ verify_jwt = false
 
 [functions.string-webhook]
 verify_jwt = false
-
-[functions.workflow-automation]
-verify_jwt = true

@@ -282,12 +282,6 @@ export class AIAgentManager {
   // Task Automation Methods
   static async executeTaskAutomation(workspaceId: string, entityId?: string, entityType?: string): Promise<any> {
     try {
-      // Only call if we have valid entity parameters
-      if (!entityId || !entityType) {
-        console.log('Skipping task automation - missing entityId or entityType');
-        return { success: true, message: 'Skipped - missing entity parameters' };
-      }
-
       const { data, error } = await supabase.functions.invoke('workflow-automation', {
         body: {
           workspaceId,
@@ -301,24 +295,6 @@ export class AIAgentManager {
       return data;
     } catch (error) {
       console.error('Task automation failed:', error);
-      throw error;
-    }
-  }
-
-  // Workspace-level automation methods
-  static async executeWorkspaceAutomation(workspaceId: string, action: string): Promise<any> {
-    try {
-      const { data, error } = await supabase.functions.invoke('workflow-automation', {
-        body: { 
-          workspaceId, 
-          action 
-        }
-      });
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Workspace automation failed:', error);
       throw error;
     }
   }
@@ -348,14 +324,14 @@ export class AIAgentManager {
   }
 
   static async adjustPriorities(workspaceId: string): Promise<void> {
-    return this.executeWorkspaceAutomation(workspaceId, 'priority_adjustment');
+    return this.executeWorkflowAutomation('', '', workspaceId, 'priority_adjustment');
   }
 
   static async organizeEpics(workspaceId: string): Promise<void> {
-    return this.executeWorkspaceAutomation(workspaceId, 'epic_organization');
+    return this.executeWorkflowAutomation('', '', workspaceId, 'epic_organization');
   }
 
   static async analyzePromptPatterns(workspaceId: string): Promise<void> {
-    return this.executeWorkspaceAutomation(workspaceId, 'analyze_prompt_patterns');
+    return this.executeWorkflowAutomation('', '', workspaceId, 'analyze_prompt_patterns');
   }
 }

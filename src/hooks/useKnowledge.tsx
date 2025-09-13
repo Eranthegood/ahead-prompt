@@ -147,7 +147,7 @@ export function useKnowledge(workspaceId: string, productId?: string) {
   useEffect(() => {
     fetchKnowledgeItems();
 
-    // Set up real-time subscription with optimized updates
+    // Set up real-time subscription
     const channel = supabase
       .channel("knowledge_items_changes")
       .on(
@@ -158,53 +158,8 @@ export function useKnowledge(workspaceId: string, productId?: string) {
           table: "knowledge_items",
           filter: `workspace_id=eq.${workspaceId}`,
         },
-        (payload) => {
-          const { eventType, new: newRecord, old: oldRecord } = payload;
-          
-          // Helper to check if item should be visible in current view
-          const shouldShowItem = (item: any) => {
-            if (!item) return false;
-            
-            if (productId) {
-              // For product-specific view: show product items + general workspace items
-              return item.product_id === productId || item.product_id === null;
-            } else {
-              // For workspace view: only show items without product_id
-              return item.product_id === null;
-            }
-          };
-          
-          switch (eventType) {
-            case 'INSERT':
-              if (shouldShowItem(newRecord)) {
-                setKnowledgeItems(prev => {
-                  // Prevent duplicates in case of race conditions
-                  const exists = prev.some(item => item.id === newRecord.id);
-                  if (exists) return prev;
-                  return [newRecord as KnowledgeItem, ...prev];
-                });
-              }
-              break;
-              
-            case 'UPDATE':
-              if (shouldShowItem(newRecord)) {
-                setKnowledgeItems(prev => 
-                  prev.map(item => 
-                    item.id === newRecord.id ? newRecord as KnowledgeItem : item
-                  )
-                );
-              } else {
-                // Item no longer matches view criteria, remove it
-                setKnowledgeItems(prev => prev.filter(item => item.id !== newRecord.id));
-              }
-              break;
-              
-            case 'DELETE':
-              if (oldRecord) {
-                setKnowledgeItems(prev => prev.filter(item => item.id !== oldRecord.id));
-              }
-              break;
-          }
+        () => {
+          fetchKnowledgeItems();
         }
       )
       .subscribe();

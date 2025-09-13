@@ -7,7 +7,6 @@ import { emitStatusUpdateEvent } from '@/components/DebugPromptStatusUpdater';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { useAuth } from '@/hooks/useAuth';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
-import { useTabVisibility } from '@/hooks/useTabVisibility';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { useAgentAutomation } from '@/hooks/useAgentAutomation';
@@ -37,7 +36,6 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
   const { trackPromptCreated, trackPromptCompleted } = useMixpanelContext();
   const { user } = useAuth();
   const { triggerWorkflowAutomation } = useAgentAutomation();
-  const { onBecomeVisible } = useTabVisibility();
 
   // Helper function to handle optimistic updates with rollback capability
   const withOptimisticUpdate = async <T,>(
@@ -882,16 +880,6 @@ export const usePrompts = (workspaceId?: string, selectedProductId?: string, sel
       supabase.removeChannel(channel);
     };
   }, [workspaceId, selectedProductId, selectedEpicId]);
-
-  // Intelligent refetch when tab becomes visible after being hidden
-  useEffect(() => {
-    onBecomeVisible(() => {
-      if (workspaceId) {
-        console.log('Tab became visible, refreshing prompts data');
-        fetchPrompts();
-      }
-    });
-  }, [workspaceId, selectedProductId, selectedEpicId, onBecomeVisible]);
 
   return {
     prompts,

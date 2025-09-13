@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
-import { useTabVisibility } from '@/hooks/useTabVisibility';
 import type { Epic } from '@/types';
 
 interface CreateEpicData {
@@ -19,7 +18,6 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   const { toast } = useToast();
   const { awardXP } = useGamification();
   const { trackEpicCreated } = useMixpanelContext();
-  const { onBecomeVisible } = useTabVisibility();
 
   // Fetch epics
   const fetchEpics = async () => {
@@ -237,16 +235,6 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
       supabase.removeChannel(channel);
     };
   }, [workspaceId, selectedProductId]);
-
-  // Intelligent refetch when tab becomes visible after being hidden
-  useEffect(() => {
-    onBecomeVisible(() => {
-      if (workspaceId) {
-        console.log('Tab became visible, refreshing epics data');
-        fetchEpics();
-      }
-    });
-  }, [workspaceId, selectedProductId, onBecomeVisible]);
 
   return {
     epics,
