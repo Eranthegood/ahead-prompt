@@ -25,7 +25,7 @@ export default function Pricing() {
       monthlyPrice: 0,
       yearlyPrice: 0,
       features: [
-        "10 prompts per month",
+        "Unlimited prompts",
         "1 workspace",
         "Basic AI generation",
         "Community support",
@@ -40,7 +40,7 @@ export default function Pricing() {
       monthlyPrice: 5,
       yearlyPrice: 48, // 5 * 12 * 0.8
       features: [
-        "100 prompts per month", 
+        "Unlimited prompts", 
         "3 workspaces",
         "Advanced AI generation",
         "GitHub integration",
