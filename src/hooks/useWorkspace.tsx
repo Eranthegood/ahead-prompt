@@ -10,9 +10,13 @@ interface FetchOptions {
   minIntervalMs?: number;
 }
 
+// Module-level cache to avoid loader flicker between route changes
+let cachedWorkspace: Workspace | null = null;
+let cachedUserId: string | null = null;
+
 export function useWorkspace() {
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [workspace, setWorkspace] = useState<Workspace | null>(cachedWorkspace);
+  const [loading, setLoading] = useState(!cachedWorkspace);
   const { user } = useAuth();
   const { toast } = useToast();
   const { onBecomeVisible } = useTabVisibility();
@@ -20,11 +24,24 @@ export function useWorkspace() {
 
   useEffect(() => {
     if (!user) {
+      setWorkspace(null);
       setLoading(false);
+      cachedWorkspace = null;
+      cachedUserId = null;
       return;
     }
 
-    fetchOrCreateWorkspace();
+    const hasValidCache = cachedWorkspace && cachedUserId === user.id;
+    if (hasValidCache) {
+      // Use cached value immediately to avoid flicker
+      setWorkspace(cachedWorkspace);
+      setLoading(false);
+      // Refresh silently in background
+      fetchOrCreateWorkspace({ background: true });
+    } else {
+      // No cache available for this user — perform initial load
+      fetchOrCreateWorkspace();
+    }
   }, [user]); // fetchOrCreateWorkspace is stable, no need to add as dependency
 
   // Intelligent refetch when tab becomes visible after being hidden
@@ -66,7 +83,10 @@ export function useWorkspace() {
       if (fetchError) throw fetchError;
 
       if (workspaces && workspaces.length > 0) {
-        setWorkspace(workspaces[0]);
+        const ws = workspaces[0] as Workspace;
+        setWorkspace(ws);
+        cachedWorkspace = ws;
+        cachedUserId = user.id;
       } else {
         // Create default workspace
         const { data: newWorkspace, error: createError } = await supabase
@@ -82,6 +102,8 @@ export function useWorkspace() {
         if (createError) throw createError;
         
         setWorkspace(newWorkspace);
+        cachedWorkspace = newWorkspace as Workspace;
+        cachedUserId = user.id;
         
         // Only show toast for initial loads, not background refetches
         if (!background) {
