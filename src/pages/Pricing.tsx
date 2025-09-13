@@ -88,6 +88,11 @@ export default function Pricing() {
                   <Button variant={selectedPrice === "$15/mo" ? "default" : "outline"} className="h-12" onClick={() => handlePricingFeedback("$15/mo")} disabled={submitting}>
                     $15/mo
                   </Button>
+
+                  <Button variant={selectedPrice === "$15/mo Pro Advance" ? "default" : "outline"} className="h-12 flex flex-col items-center justify-center" onClick={() => handlePricingFeedback("$15/mo Pro Advance")} disabled={submitting}>
+                    <span className="text-sm font-semibold">$15/mo</span>
+                    <span className="text-xs text-muted-foreground">Pro Advance</span>
+                  </Button>
                   
                 </div>
                 <p className="text-sm text-muted-foreground">
