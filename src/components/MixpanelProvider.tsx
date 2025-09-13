@@ -36,28 +36,34 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Auto track page views with error isolation
+  // Auto track page views with debouncing and authentication awareness
   useEffect(() => {
-    try {
-      const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.replace('/', '');
-      console.log(`[MixpanelProvider] Tracking page view: ${pageName}`);
-      
-      // Use setTimeout to prevent blocking navigation
-      setTimeout(() => {
-        try {
-          mixpanel.trackPageView(pageName, {
-            pathname: location.pathname,
-            search: location.search
-          });
-        } catch (error) {
-          console.error('[MixpanelProvider] Page view tracking error:', error);
-          // Don't break navigation if tracking fails
+    const trackPageView = () => {
+      try {
+        // Skip tracking during auth transitions
+        if (location.pathname === '/auth') {
+          console.log(`[MixpanelProvider] Skipping tracking for auth page`);
+          return;
         }
-      }, 0);
-    } catch (error) {
-      console.error('[MixpanelProvider] Page view setup error:', error);
-    }
-  }, [location, mixpanel]);
+        
+        const pageName = location.pathname === '/' ? 'Dashboard' : location.pathname.replace('/', '');
+        console.log(`[MixpanelProvider] Tracking page view: ${pageName}`);
+        
+        mixpanel.trackPageView(pageName, {
+          pathname: location.pathname,
+          search: location.search
+        });
+      } catch (error) {
+        console.error('[MixpanelProvider] Page view tracking error:', error);
+        // Don't break navigation if tracking fails
+      }
+    };
+
+    // Debounce page view tracking to prevent excessive calls
+    const timeoutId = setTimeout(trackPageView, 200);
+    
+    return () => clearTimeout(timeoutId);
+  }, [location.pathname, location.search, mixpanel]);
 
   return (
     <MixpanelContext.Provider value={{

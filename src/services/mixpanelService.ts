@@ -16,19 +16,26 @@ class MixpanelService {
     try {
       const mod = await import('mixpanel-browser');
       this.mixpanel = mod.default;
+      
+      const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+      
       this.mixpanel.init(MIXPANEL_TOKEN, {
-        debug: process.env.NODE_ENV === 'development',
-        track_pageview: true,
+        debug: isDev,
+        track_pageview: false, // Handle manually to prevent conflicts
         persistence: 'localStorage',
         api_host: 'https://api.mixpanel.com',
         loaded: () => {
           console.log('Mixpanel loaded successfully');
           this.initialized = true;
+        },
+        error: (error: any) => {
+          console.error('Mixpanel initialization error:', error);
+          this.initialized = false;
         }
       });
 
       // Load exclusions after init and refresh periodically
-      this.loadExcludedUsers();
+      await this.loadExcludedUsers();
       this.excludeRefreshTimer = window.setInterval(() => this.loadExcludedUsers(), 5 * 60 * 1000);
     } catch (error) {
       console.debug('Mixpanel dynamic import/init blocked:', error);
@@ -103,7 +110,7 @@ class MixpanelService {
         ...properties
       });
       
-      if (process.env.NODE_env === 'development') {
+      if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
         console.log('Mixpanel event tracked successfully:', eventName, properties);
       }
     } catch (error) {
@@ -203,9 +210,17 @@ class MixpanelService {
   reset() {
     if (!this.initialized || !this.mixpanel) return;
     try {
+      console.log('[MixpanelService] Resetting Mixpanel session');
       this.mixpanel.reset();
+      
+      // Clear exclusions timer if exists
+      if (this.excludeRefreshTimer) {
+        clearInterval(this.excludeRefreshTimer);
+        this.excludeRefreshTimer = null;
+      }
     } catch (error) {
       console.error('Error resetting Mixpanel:', error);
+      // Don't throw - reset errors shouldn't break logout
     }
   }
 }

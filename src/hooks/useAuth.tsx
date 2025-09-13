@@ -21,30 +21,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authStateStable, setAuthStateStable] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
+    let stableTimer: number;
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log(`[AuthProvider] Auth state change: ${event}`, session?.user?.id || 'no user');
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Track login events
+        // Stabilize auth state to prevent rapid changes
+        setAuthStateStable(false);
+        clearTimeout(stableTimer);
+        stableTimer = window.setTimeout(() => {
+          setAuthStateStable(true);
+        }, 100);
+        
+        // Track login events (with error isolation)
         if (event === 'SIGNED_IN' && session?.user) {
-          const provider = session.user.app_metadata?.provider || 'email';
-          
-          mixpanelService.trackUserLogin({
-            userId: session.user.id,
-            provider: provider
-          });
-          
-          // Track Reddit Pixel signup for new Google users
-          if (provider === 'google') {
+          try {
+            const provider = session.user.app_metadata?.provider || 'email';
+            
+            // Use setTimeout to prevent blocking auth flow
             setTimeout(() => {
-              RedditPixelService.trackSignUp(session.user.id, session.user.email);
+              try {
+                mixpanelService.trackUserLogin({
+                  userId: session.user.id,
+                  provider: provider
+                });
+                
+                // Track Reddit Pixel signup for new Google users
+                if (provider === 'google') {
+                  RedditPixelService.trackSignUp(session.user.id, session.user.email);
+                }
+              } catch (error) {
+                console.error('[AuthProvider] Tracking error during login:', error);
+              }
             }, 0);
+          } catch (error) {
+            console.error('[AuthProvider] Login tracking setup error:', error);
+          }
+        }
+        
+        // Clean up tracking on logout
+        if (event === 'SIGNED_OUT') {
+          try {
+            setTimeout(() => {
+              mixpanelService.reset();
+            }, 0);
+          } catch (error) {
+            console.error('[AuthProvider] Logout cleanup error:', error);
           }
         }
       }
@@ -53,7 +85,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Initial session is handled by onAuthStateChange
     // Remove redundant getSession call to prevent double initialization
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(stableTimer);
+    };
   }, []);
 
   const signUp = async (email: string, password: string) => {
@@ -160,23 +195,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log('[AuthProvider] Starting logout process');
+      setLoading(true);
+      
+      // Clean up Mixpanel before auth logout
+      try {
+        mixpanelService.reset();
+      } catch (error) {
+        console.error('[AuthProvider] Mixpanel cleanup error during logout:', error);
+      }
+      
       await supabase.auth.signOut();
+      
+      // Force clear auth state
+      setSession(null);
+      setUser(null);
+      setAuthStateStable(true);
+      
       toast({
         title: "Signed out successfully"
       });
+      
+      console.log('[AuthProvider] Logout completed');
     } catch (error: any) {
+      console.error('[AuthProvider] Logout error:', error);
       toast({
         variant: "destructive",
         title: "Sign out failed",
         description: error?.message || "An unexpected error occurred"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const value = {
     user,
     session,
-    loading,
+    loading: loading || !authStateStable,
     signUp,
     signIn,
     signInWithGoogle,
