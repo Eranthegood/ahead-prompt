@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTabVisibility } from '@/hooks/useTabVisibility';
 import { Workspace } from '@/types';
+
+interface FetchOptions {
+  background?: boolean;
+  minIntervalMs?: number;
+}
 
 export function useWorkspace() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -11,6 +16,7 @@ export function useWorkspace() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { onBecomeVisible } = useTabVisibility();
+  const lastFetchRef = useRef<number>(0);
 
   useEffect(() => {
     if (!user) {
@@ -26,16 +32,29 @@ export function useWorkspace() {
     onBecomeVisible(() => {
       if (user && workspace) {
         console.log('Tab became visible, refreshing workspace data');
-        fetchOrCreateWorkspace();
+        fetchOrCreateWorkspace({ background: true });
       }
     });
   }, [user, workspace, onBecomeVisible]);
 
-  const fetchOrCreateWorkspace = async () => {
+  const fetchOrCreateWorkspace = async (options: FetchOptions = {}) => {
     if (!user) return;
 
+    const { background = false, minIntervalMs = 15000 } = options;
+    const now = Date.now();
+
+    // Throttle background fetches
+    if (background && now - lastFetchRef.current < minIntervalMs) {
+      return;
+    }
+
+    lastFetchRef.current = now;
+
     try {
-      setLoading(true);
+      // Only show loading for initial (non-background) fetches
+      if (!background) {
+        setLoading(true);
+      }
       
       // Try to get existing workspace
       const { data: workspaces, error: fetchError } = await supabase
@@ -63,20 +82,31 @@ export function useWorkspace() {
         if (createError) throw createError;
         
         setWorkspace(newWorkspace);
-        toast({
-          title: 'Workspace created',
-          description: 'Your workspace is ready for prompt planning!'
-        });
+        
+        // Only show toast for initial loads, not background refetches
+        if (!background) {
+          toast({
+            title: 'Workspace created',
+            description: 'Your workspace is ready for prompt planning!'
+          });
+        }
       }
     } catch (error: any) {
       console.error('Workspace error:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error loading workspace',
-        description: error?.message || 'Failed to load workspace'
-      });
+      
+      // Only show toast for initial loads, not background refetches
+      if (!background) {
+        toast({
+          variant: 'destructive',
+          title: 'Error loading workspace',
+          description: error?.message || 'Failed to load workspace'
+        });
+      }
     } finally {
-      setLoading(false);
+      // Only update loading state for initial (non-background) fetches
+      if (!background) {
+        setLoading(false);
+      }
     }
   };
 
