@@ -84,19 +84,26 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           
           {/* Search Bar - Aligned with "All prompts" text below */}
           {showSearch && workspace && user && (
-            <div className="absolute left-4 sm:left-6 w-80" style={{ marginLeft: showSidebarTrigger ? '60px' : '0' }}>
-              <form onSubmit={handleSearch}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search everything... (Ctrl+K)"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setShowCommandPalette(true)}
-                    className="pl-10 bg-muted/50 border-border"
-                  />
-                </div>
-              </form>
+            <div className="flex items-center gap-3">
+              <div className="absolute left-4 sm:left-6 w-80" style={{ marginLeft: showSidebarTrigger ? '60px' : '0' }}>
+                <form onSubmit={handleSearch}>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search everything... (Ctrl+K)"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setShowCommandPalette(true)}
+                      className="pl-10 bg-muted/50 border-border"
+                    />
+                  </div>
+                </form>
+              </div>
+              
+              {/* Notification message */}
+              <div className="hidden lg:block absolute left-96 ml-4 text-xs text-muted-foreground bg-muted/30 px-3 py-1 rounded-md border border-border/50">
+                Due to high traffic, we are experiencing some trouble in prompt generation. We are working on it right now!
+              </div>
             </div>
           )}
 
