@@ -24,7 +24,6 @@ import CursorIntegration from "./pages/CursorIntegration";
 import CursorMultiAgentLanding from "./pages/CursorMultiAgentLanding";
 import GitHubIntegration from "./pages/GitHubIntegration";
 import LovableIntegration from "./pages/LovableIntegration";
-import BoltIntegration from "./pages/BoltIntegration";
 import FigmaIntegration from "./pages/FigmaIntegration";
 import RepositoryMapping from "./pages/RepositoryMapping";
 import Achievements from "./pages/Achievements";
@@ -107,11 +106,6 @@ function App() {
                      <Route path="/integrations/lovable" element={
                        <ProtectedRoute>
                          <LovableIntegration />
-                       </ProtectedRoute>
-                     } />
-                     <Route path="/integrations/bolt" element={
-                       <ProtectedRoute>
-                         <BoltIntegration />
                        </ProtectedRoute>
                      } />
                      <Route path="/integrations/figma" element={
