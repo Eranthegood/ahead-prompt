@@ -25,6 +25,7 @@ export function UserAccountSection() {
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   const [showWorkspaceMembers, setShowWorkspaceMembers] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsSection, setSettingsSection] = useState('account');
   
   const isCollapsed = state === 'collapsed';
 
@@ -83,7 +84,10 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
+            <DropdownMenuItem onClick={() => {
+              setSettingsSection('team');
+              setShowSettings(true);
+            }}>
               <Users className="mr-2 h-4 w-4" />
               <span>Team</span>
             </DropdownMenuItem>
@@ -236,7 +240,10 @@ export function UserAccountSection() {
             <span>Prompt Library</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
+          <DropdownMenuItem onClick={() => {
+            setSettingsSection('team');
+            setShowSettings(true);
+          }}>
             <Users className="mr-2 h-4 w-4" />
             <span>Team</span>
           </DropdownMenuItem>
@@ -288,6 +295,7 @@ export function UserAccountSection() {
       <SettingsModal 
         open={showSettings}
         onOpenChange={setShowSettings}
+        defaultSection={settingsSection}
       />
     </div>
   );
