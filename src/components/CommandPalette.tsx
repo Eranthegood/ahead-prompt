@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   CommandDialog,
   CommandEmpty,
@@ -63,6 +64,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Local, fuzzy prompt search aligned with list view
   const promptsContext = usePromptsContext();
@@ -299,11 +301,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               <Plus className="mr-2 h-4 w-4" />
               Create new prompt
             </CommandItem>
-            <CommandItem onSelect={() => window.open('/settings', '_self')}>
+            <CommandItem onSelect={() => {
+              console.log('CommandPalette: Navigating to settings');
+              navigate('/settings');
+              onOpenChange(false);
+            }}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </CommandItem>
-            <CommandItem onSelect={() => window.open('/profile', '_self')}>
+            <CommandItem onSelect={() => {
+              console.log('CommandPalette: Navigating to profile');
+              navigate('/profile');
+              onOpenChange(false);
+            }}>
               <User className="mr-2 h-4 w-4" />
               Profile
             </CommandItem>
