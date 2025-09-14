@@ -34,7 +34,6 @@ import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
-import DesignSystem from "./pages/DesignSystem";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
 const queryClient = new QueryClient();
@@ -134,14 +133,13 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
-                       <Route path="/ai-agents" element={
-                         <ProtectedRoute>
-                           <AIAgents />
-                         </ProtectedRoute>
-                       } />
-                       <Route path="/design-system" element={<DesignSystem />} />
-                       
-                       <Route path="*" element={<NotFound />} />
+                      <Route path="/ai-agents" element={
+                        <ProtectedRoute>
+                          <AIAgents />
+                        </ProtectedRoute>
+                      } />
+                      
+                      <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
               </MixpanelProvider>

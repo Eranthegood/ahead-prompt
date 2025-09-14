@@ -2,168 +2,155 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Get It Done Design System - Todoist Inspired */
+/* Minimalist Design System - Todoist Inspired */
 
 @layer base {
   :root {
-    /* Core neutral palette - Todoist inspired clean grays */
-    --background: 0 0% 99%;              /* Pure clean background #FCFCFC */
-    --foreground: 0 0% 13%;              /* High contrast text #212121 */
+    /* Palette personnalisée basée sur l'image fournie */
+    --background: 220 17% 96%;        /* #F4F5F8 */
+    --foreground: 0 0% 15%;
 
-    --card: 0 0% 100%;                   /* Pure white cards */
-    --card-foreground: 0 0% 13%;         /* High contrast on cards */
+    --card: 0 0% 100%;              /* Blanc #FFFFFF pour contraste */
+    --card-foreground: 0 0% 15%;
 
-    --popover: 0 0% 100%;                /* Pure white popovers */
-    --popover-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;           /* Blanc #FFFFFF */
+    --popover-foreground: 0 0% 15%;
 
-    /* Primary action color - Todoist red for key actions */
-    --primary: 4 90% 58%;                /* Todoist red #E44332 */
-    --primary-foreground: 0 0% 100%;     /* White text on red */
-    --primary-muted: 4 45% 88%;          /* Very light red tint */
-    --primary-glow: 4 60% 75%;           /* Softer red for glows */
+    /* Linear-inspired color system */
+    --primary: 220 13% 18%;            /* Linear's dark blue-gray #1d2125 */
+    --primary-foreground: 0 0% 98%;
+    --primary-muted: 220 13% 85%;
+    --primary-glow: 220 13% 75%;
 
-    /* Subtle secondary colors */
-    --secondary: 0 0% 96%;               /* Very light gray #F5F5F5 */
-    --secondary-foreground: 0 0% 25%;    /* Dark gray text */
+    /* Linear's subtle grays */
+    --secondary: 220 9% 96%;            /* Very light gray #f6f8fa */
+    --secondary-foreground: 220 13% 18%;
 
-    /* Muted colors - 25% gray philosophy */
-    --muted: 0 0% 96%;                   /* Light gray backgrounds #F5F5F5 */
-    --muted-foreground: 0 0% 45%;        /* Medium gray text #737373 */
+    /* Linear's accent blue */
+    --accent: 211 100% 50%;             /* Linear blue #0969da */
+    --accent-foreground: 0 0% 98%;
 
-    /* Accent for hovers and interactions */
-    --accent: 0 0% 93%;                  /* Slightly darker gray for hovers #EDEDED */
-    --accent-foreground: 0 0% 13%;
+    /* Linear's muted system */
+    --muted: 220 14% 96%;               /* #f6f8fa */
+    --muted-foreground: 220 9% 46%;     /* #656d76 */
 
-    /* Status colors - minimal and purposeful */
-    --destructive: 4 90% 58%;            /* Same as primary red */
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive reste sur la couleur primaire */
+    --destructive: 344 100% 64%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Borders and inputs */
-    --border: 0 0% 89%;                  /* Soft gray borders #E3E3E3 */
-    --input: 0 0% 100%;                  /* Pure white inputs */
-    --ring: 4 90% 58%;                   /* Red focus rings */
+    --border: 220 13% 91%;              /* #e1e4e8 */
+    --input: 0 0% 100%;                 /* Pure white */
+    --ring: 211 100% 50%;
 
-    /* Design tokens */
-    --radius: 0.375rem;                  /* Slightly smaller radius for clean look */
+    --radius: 0.5rem;
 
-    /* Task status colors - minimal approach */
-    --status-todo: 0 0% 93%;             /* Light gray for todo #EDEDED */
-    --status-todo-foreground: 0 0% 25%;
-    --status-generating: 217 91% 60%;    /* Subtle blue for processing #3B82F6 */
-    --status-generating-foreground: 0 0% 100%;
-    --status-progress: 38 92% 50%;       /* Warm orange for in progress #F59E0B */
-    --status-progress-foreground: 0 0% 100%;
-    --status-done: 142 71% 45%;          /* Clean green for completion #22C55E */
-    --status-done-foreground: 0 0% 100%;
+    /* Couleurs de statut personnalisées */
+    --status-todo: 0 0% 90%;        /* Gris clair */
+    --status-todo-foreground: 0 0% 30%;
+    --status-generating: 244 85% 70%; /* Violet clair pour génération */
+    --status-generating-foreground: 0 0% 15%;
+    --status-progress: 211 100% 50%;  /* Bleu au lieu d'orange */
+    --status-progress-foreground: 0 0% 98%;
+    --status-done: 120 52% 73%;     /* Vert clair #99DD93 */
+    --status-done-foreground: 0 0% 15%;
 
-    /* Warning and success states */
-    --warning: 38 92% 50%;               /* Orange #F59E0B */
-    --warning-foreground: 0 0% 100%;
-    --success: 142 71% 45%;              /* Green #22C55E */
-    --success-foreground: 0 0% 100%;
+    /* Generic status tokens used by animations */
+    --warning: 344 100% 64%;        /* Rouge au lieu d'orange */
+    --warning-foreground: 0 0% 98%;
+    --success: 120 52% 40%;
+    --success-foreground: 0 0% 98%;
 
-    /* Epic colors - subtle and tasteful */
-    --epic-purple: 262 83% 58%;          /* Subtle purple #8B5CF6 */
-    --epic-blue: 217 91% 60%;            /* Clean blue #3B82F6 */
-    --epic-green: 142 71% 45%;           /* Fresh green #22C55E */
-    --epic-orange: 38 92% 50%;           /* Warm orange #F59E0B */
-    --epic-pink: 328 86% 70%;            /* Soft pink #F472B6 */
+    /* Couleurs d'epic personnalisées */
+    --epic-purple: 344 100% 64%;    /* Rose vif */
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
+    --epic-green: 120 52% 73%;      /* Vert clair */
+    --epic-orange: 344 100% 64%;    /* Rose au lieu d'orange */
+    --epic-pink: 344 100% 64%;      /* Rose vif */
 
-    /* Sidebar - clean and minimal */
-    --sidebar-background: 0 0% 98%;      /* Slightly off-white #FAFAFA */
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 4 90% 58%;        /* Red accent */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 93%;          /* Hover states */
-    --sidebar-accent-foreground: 0 0% 13%;
-    --sidebar-border: 0 0% 91%;          /* Subtle borders #E8E8E8 */
-    --sidebar-ring: 4 90% 58%;
+    /* Sidebar avec la nouvelle palette */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 344 100% 64%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 344 100% 64%;
 
-    /* Illustration colors - harmonious palette */
-    --illustration-1: 4 90% 58%;         /* Primary red */
-    --illustration-2: 217 91% 60%;       /* Blue */
-    --illustration-3: 142 71% 45%;       /* Green */
-    --illustration-4: 38 92% 50%;        /* Orange */
-    --illustration-5: 262 83% 58%;       /* Purple */
+    /* Illustration colors */
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 
   .dark {
-    /* Dark mode - high contrast with WCAG AA+ compliance */
-    --background: 0 0% 9%;               /* Very dark background #171717 */
-    --foreground: 0 0% 98%;              /* High contrast white text */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
-    --card: 0 0% 12%;                    /* Dark cards with good contrast #1F1F1F */
-    --card-foreground: 0 0% 98%;         /* High contrast text on cards */
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
-    --popover: 0 0% 12%;                 /* Dark popovers */
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
-    /* Primary red - adjusted for dark mode */
-    --primary: 4 84% 60%;                /* Slightly lighter red for dark mode */
-    --primary-foreground: 0 0% 100%;
-    --primary-muted: 4 30% 25%;          /* Dark red tint */
-    --primary-glow: 4 60% 70%;
+    /* Couleurs adaptées pour le mode sombre */
+    --primary: 344 85% 58%;         /* Rose plus sombre */
+    --primary-foreground: 0 0% 98%;
 
-    /* Secondary colors for dark mode */
-    --secondary: 0 0% 18%;               /* Dark gray #2D2D2D */
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    /* Muted colors - maintaining hierarchy */
-    --muted: 0 0% 18%;                   /* Dark backgrounds */
-    --muted-foreground: 0 0% 65%;        /* Medium contrast gray text */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%; /* Improved from 65% for better contrast */
 
-    /* Accent for dark mode interactions */
-    --accent: 0 0% 22%;                  /* Hover states */
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 20%;             /* Gris clair pour les hovers */
+    --accent-foreground: 0 0% 95%;
 
-    /* Destructive in dark mode */
-    --destructive: 4 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 344 85% 58%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Borders and inputs for dark mode */
-    --border: 0 0% 25%;                  /* Visible borders in dark mode */
-    --input: 0 0% 15%;                   /* Dark input backgrounds */
-    --ring: 4 84% 60%;
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
+    --ring: 344 85% 58%;
 
-    /* Task status - dark mode optimized */
-    --status-todo: 0 0% 22%;
-    --status-todo-foreground: 0 0% 75%;
-    --status-generating: 217 91% 65%;    /* Brighter blue for visibility */
-    --status-generating-foreground: 0 0% 100%;
-    --status-progress: 38 92% 55%;       /* Brighter orange */
-    --status-progress-foreground: 0 0% 100%;
-    --status-done: 142 69% 58%;          /* Brighter green */
-    --status-done-foreground: 0 0% 100%;
+    /* États en mode sombre */
+    --status-todo: 0 0% 20%;
+    --status-todo-foreground: 0 0% 80%;
+    --status-progress: 211 100% 50%;    /* Bleu au lieu d'orange */
+    --status-progress-foreground: 0 0% 95%;
+    --status-done: 120 45% 65%;
+    --status-done-foreground: 0 0% 95%;
 
-    /* Warning and success for dark mode */
-    --warning: 38 92% 55%;
-    --warning-foreground: 0 0% 100%;
-    --success: 142 69% 58%;
-    --success-foreground: 0 0% 100%;
+    /* Generic status tokens used by animations (dark) */
+    --warning: 344 85% 58%;         /* Rouge au lieu d'orange */
+    --warning-foreground: 0 0% 95%;
+    --success: 120 45% 55%;
+    --success-foreground: 0 0% 95%;
 
-    /* Epic colors - dark mode adjusted */
-    --epic-purple: 262 83% 68%;          /* Brighter purple */
-    --epic-blue: 217 91% 65%;            /* Brighter blue */
-    --epic-green: 142 69% 58%;           /* Brighter green */
-    --epic-orange: 38 92% 55%;           /* Brighter orange */
-    --epic-pink: 328 86% 75%;            /* Brighter pink */
+    /* Epic colors pour le mode sombre */
+    --epic-purple: 344 85% 58%;
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
+    --epic-green: 120 45% 65%;
+    --epic-orange: 344 85% 58%;     /* Rose au lieu d'orange */
+    --epic-pink: 344 85% 58%;
 
-    /* Sidebar for dark mode */
-    --sidebar-background: 0 0% 9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 4 84% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 22%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 4 84% 60%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 344 85% 58%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 20%;     /* Gris clair pour les hovers */
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 344 85% 58%;
 
-    /* Illustration colors - consistent across modes */
-    --illustration-1: 4 84% 60%;         /* Primary red */
-    --illustration-2: 217 91% 65%;       /* Blue */
-    --illustration-3: 142 69% 58%;       /* Green */
-    --illustration-4: 38 92% 55%;        /* Orange */
-    --illustration-5: 262 83% 68%;       /* Purple */
+    /* Illustration colors (same in dark mode) */
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 }
 
@@ -173,72 +160,26 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    letter-spacing: -0.01em;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Touch targets - minimum 44px for mobile accessibility */
-  button, 
-  a,
-  [role="button"],
-  input[type="button"],
-  input[type="submit"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Generous spacing and clear hierarchy */
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: -0.025em;
-  }
-
-  h1 { font-size: 1.875rem; margin-bottom: 1.5rem; }
-  h2 { font-size: 1.5rem; margin-bottom: 1.25rem; }
-  h3 { font-size: 1.25rem; margin-bottom: 1rem; }
-  h4 { font-size: 1.125rem; margin-bottom: 0.75rem; }
-
-  /* Paragraph spacing for readability */
-  p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-
-  /* Focus states with high contrast */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-    border-radius: 0.25rem;
-  }
-
-  /* Custom scrollbar - clean Todoist-style */
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: hsl(var(--muted));
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.2);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.4);
-  }
-
-  /* Clean scrollbar for Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+    background: hsl(var(--muted-foreground) / 0.5);
   }
   
   /* Typography Styles for TipTap Editor - Enhanced Dark Mode Support */
@@ -415,67 +356,13 @@
     @apply italic text-foreground;
   }
 
-  /* Get It Done Design System Utilities */
-  
-  /* Spacing utilities - generous spacing philosophy */
-  .spacing-xs { padding: 0.5rem; }
-  .spacing-sm { padding: 0.75rem; }
-  .spacing-md { padding: 1rem; }
-  .spacing-lg { padding: 1.5rem; }
-  .spacing-xl { padding: 2rem; }
-
-  /* Card elevations - subtle shadows */
-  .elevation-1 { 
-    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.05);
-  }
-  .elevation-2 { 
-    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.08), 0 4px 6px hsl(var(--foreground) / 0.03);
-  }
-  .elevation-3 { 
-    box-shadow: 0 4px 6px hsl(var(--foreground) / 0.07), 0 10px 15px hsl(var(--foreground) / 0.04);
+  /* Gradients */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
   }
 
-  /* Interactive states */
-  .interactive-element {
-    transition: all 0.15s ease;
-    border-radius: var(--radius);
-  }
-
-  .interactive-element:hover {
-    background: hsl(var(--accent));
-    transform: translateY(-1px);
-  }
-
-  .interactive-element:active {
-    transform: translateY(0);
-  }
-
-  /* Status indicators */
-  .status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: calc(var(--radius) - 2px);
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-  }
-
-  .status-todo { 
-    background: hsl(var(--status-todo));
-    color: hsl(var(--status-todo-foreground));
-  }
-  
-  .status-progress { 
-    background: hsl(var(--status-progress));
-    color: hsl(var(--status-progress-foreground));
-  }
-  
-  .status-done { 
-    background: hsl(var(--status-done));
-    color: hsl(var(--status-done-foreground));
+  .bg-gradient-subtle {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.5));
   }
 
   /* Illustration color classes */
