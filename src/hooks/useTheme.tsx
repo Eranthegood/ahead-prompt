@@ -5,19 +5,18 @@ export const useTheme = () => {
   const { preferences, loading: prefsLoading, saveThemePreference } = useUserPreferences();
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
 
-  // Get effective theme based on user preference - force dark for now
+  // Get effective theme based on user preference
   const getEffectiveTheme = (): 'light' | 'dark' => {
-    if (prefsLoading) return 'dark'; // Default while loading
+    if (prefsLoading) return 'light'; // Default to light while loading
     
     const userTheme = preferences.theme;
     
     if (userTheme === 'system') {
-      // Force dark mode even for system preference until light theme is ready
-      return 'dark';
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return systemPrefersDark ? 'dark' : 'light';
     }
     
-    // Force dark mode for any theme until light theme is ready
-    return 'dark';
+    return userTheme === 'dark' ? 'dark' : 'light';
   };
 
   const effectiveTheme = getEffectiveTheme();
@@ -64,8 +63,8 @@ export const useTheme = () => {
     }
   }, [preferences.theme]);
 
-  // Set theme and persist preference - only allow dark and system for now
-  const setTheme = (theme: 'dark' | 'system') => {
+  // Set theme and persist preference
+  const setTheme = (theme: 'light' | 'dark' | 'system') => {
     saveThemePreference(theme);
   };
 

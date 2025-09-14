@@ -11,8 +11,8 @@ export const ThemeInitializer = ({ children }: { children: React.ReactNode }) =>
     const root = document.documentElement;
     // Only apply default if no theme is set
     if (!root.classList.contains('dark') && !root.classList.contains('light')) {
-      root.classList.add('dark'); // Default to dark
-      console.log('ThemeInitializer: Applied default dark theme');
+      root.classList.add('light'); // Default to light
+      console.log('ThemeInitializer: Applied default light theme');
     }
   }, []);
   
