@@ -34,8 +34,8 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
-import Contact from "./pages/Contact";
 import JoinWorkspace from "./pages/JoinWorkspace";
+import Contact from "./pages/Contact";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
 const queryClient = new QueryClient();
