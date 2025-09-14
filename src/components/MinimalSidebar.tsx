@@ -720,9 +720,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                             console.log('Product clicked:', product.name, product.id);
                             setOpenMobile?.(false);
                             
-                            // If not on /build route, redirect to product page
+                            // If not on /build route, redirect to build with selected product
                             if (location.pathname !== '/build') {
-                              navigate(`/product/${product.id}`);
+                              navigate(`/build?product=${product.id}`);
                             } else {
                               // On /build route, use the existing selection behavior
                               onProductSelect(product.id);
