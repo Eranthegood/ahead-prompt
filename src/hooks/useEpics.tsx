@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
+import { useSubscription, canCreateEpic } from '@/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
+import { ToastAction } from '@/components/ui/toast';
 import type { Epic } from '@/types';
 
 interface CreateEpicData {
@@ -18,6 +21,8 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   const { toast } = useToast();
   const { awardXP } = useGamification();
   const { trackEpicCreated } = useMixpanelContext();
+  const { tier } = useSubscription();
+  const navigate = useNavigate();
 
   // Fetch epics
   const fetchEpics = async () => {
@@ -53,6 +58,30 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   // Create epic with optimistic update
   const createEpic = async (epicData: CreateEpicData): Promise<Epic | null> => {
     if (!workspaceId) return null;
+
+    // ⚠️ Check subscription limits before creating
+    const productEpicCount = epicData.product_id 
+      ? epics.filter(epic => epic.product_id === epicData.product_id).length
+      : 0;
+    
+    const canCreate = canCreateEpic(tier, productEpicCount);
+    if (!canCreate) {
+      console.error('[useEpics] Epic creation blocked: limit reached for plan', tier);
+      toast({
+        title: "Epic limit reached",
+        description: `You've reached the maximum number of epics per product for the ${tier} plan.`,
+        variant: "destructive",
+        action: (
+          <ToastAction 
+            altText="Upgrade plan"
+            onClick={() => navigate('/pricing')}
+          >
+            Upgrade
+          </ToastAction>
+        )
+      });
+      throw new Error(`You've reached the maximum number of epics per product for the ${tier} plan. Upgrade to create more epics.`);
+    }
 
     // 🚀 1. Optimistic update - immediate UI response
     const optimisticEpic: Epic = {
