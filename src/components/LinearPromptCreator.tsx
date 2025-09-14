@@ -6,7 +6,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Expand, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
 import { ProductIcon } from '@/components/ui/product-icon';
 import { useToast } from '@/hooks/use-toast';
-import { generateTitleFromContent } from '@/lib/titleUtils';
+import { generateTitleFromContent, extractTextFromHTML } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
@@ -122,10 +122,13 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
       }
     }
 
+    // Strip HTML from content for plain text description
+    const plainTextContent = extractTextFromHTML(content);
+
     return {
-      title: title.trim() || generateTitleFromContent(content),
-      description: content,
-      original_description: content,
+      title: title.trim() || generateTitleFromContent(plainTextContent),
+      description: plainTextContent,
+      original_description: plainTextContent,
       epic_id: actualEpic,
       product_id: finalProductId,
       priority,
