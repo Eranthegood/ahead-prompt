@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscription, canCreatePromptLibraryItem } from '@/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
+import { ToastAction } from '@/components/ui/toast';
 import type { PromptLibraryItem, CreatePromptLibraryItemData } from '@/types/prompt-library';
 import { SYSTEM_PROMPTS } from '@/constants/systemPrompts';
 
@@ -12,6 +15,8 @@ export function usePromptLibrary() {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const { tier } = useSubscription();
+  const navigate = useNavigate();
 
   // Combine user items with system prompts
   const items = useMemo(() => {
@@ -56,6 +61,26 @@ export function usePromptLibrary() {
 
   const createItem = async (data: CreatePromptLibraryItemData): Promise<PromptLibraryItem | null> => {
     if (!user || !workspace) return null;
+
+    // ⚠️ Check subscription limits before creating
+    const canCreate = canCreatePromptLibraryItem(tier, userItems.length);
+    if (!canCreate) {
+      console.error('[usePromptLibrary] Prompt library item creation blocked: limit reached for plan', tier);
+      toast({
+        title: "Prompt library limit reached",
+        description: `You've reached the maximum number of prompt library items for the ${tier} plan.`,
+        variant: "destructive",
+        action: (
+          <ToastAction 
+            altText="Upgrade plan"
+            onClick={() => navigate('/pricing')}
+          >
+            Upgrade
+          </ToastAction>
+        )
+      });
+      throw new Error(`You've reached the maximum number of prompt library items for the ${tier} plan. Upgrade to create more items.`);
+    }
 
     try {
       const { data: newItem, error } = await supabase
