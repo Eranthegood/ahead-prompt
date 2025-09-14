@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Crown, Library, Plug, Users, Mail } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Crown, Library, Plug, Users, Mail, Link } from 'lucide-react';
 import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
@@ -86,6 +86,11 @@ export function UserAccountSection() {
             <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
               <Users className="mr-2 h-4 w-4" />
               <span>People</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem disabled>
+              <Link className="mr-2 h-4 w-4" />
+              <span>Affiliate link (Soon)</span>
             </DropdownMenuItem>
             
             <DropdownMenuSeparator />
@@ -234,6 +239,11 @@ export function UserAccountSection() {
           <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
             <Users className="mr-2 h-4 w-4" />
             <span>People</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem disabled>
+            <Link className="mr-2 h-4 w-4" />
+            <span>Affiliate link (Soon)</span>
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />
