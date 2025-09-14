@@ -62,8 +62,8 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 overflow-hidden">
-        <div className="flex h-full min-h-[600px]">
+      <DialogContent className="max-w-6xl max-h-[90vh] p-0">
+        <div className="flex h-full min-h-[600px] max-h-[calc(90vh-2rem)]">
           {/* Sidebar */}
           <SettingsSidebar
             activeSection={activeSection}
