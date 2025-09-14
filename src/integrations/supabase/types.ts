@@ -1554,7 +1554,7 @@ export type Database = {
         Returns: boolean
       }
       is_workspace_admin: {
-        Args: { user_id?: string; workspace_id: string }
+        Args: { user_uuid?: string; workspace_uuid: string }
         Returns: boolean
       }
     }
