@@ -43,7 +43,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
