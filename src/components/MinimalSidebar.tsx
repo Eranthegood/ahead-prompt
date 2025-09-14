@@ -44,7 +44,7 @@ import { Workspace, Product } from '@/types';
 
 
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { CompactGamificationDisplay } from './gamification/CompactGamificationDisplay';
 import { UserAccountSection } from './UserAccountSection';
 
@@ -75,6 +75,7 @@ const PRODUCT_COLORS = [
 
 export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, onProductSelect, onEpicSelect, showCompletedItems, onToggleCompletedItems, onQuickAdd, searchQuery }: MinimalSidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
   const { epics, createEpic, updateEpic, deleteEpic } = useEpics(workspace.id);
@@ -718,8 +719,15 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                           onProductSelect={() => {
                             console.log('Product clicked:', product.name, product.id);
                             setOpenMobile?.(false);
-                            onProductSelect(product.id);
-                            onEpicSelect(undefined);
+                            
+                            // If not on /build route, redirect to product page
+                            if (location.pathname !== '/build') {
+                              navigate(`/product/${product.id}`);
+                            } else {
+                              // On /build route, use the existing selection behavior
+                              onProductSelect(product.id);
+                              onEpicSelect(undefined);
+                            }
                           }}
                           onEpicSelect={(epicId) => {
                             console.log('Epic clicked:', epicId);
