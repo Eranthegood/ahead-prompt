@@ -527,6 +527,36 @@ export type Database = {
           },
         ]
       }
+      favorite_links: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           created_at: string

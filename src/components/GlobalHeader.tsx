@@ -18,8 +18,10 @@ import {
   Trophy,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  Settings
 } from 'lucide-react';
+import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
@@ -40,6 +42,8 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
   const [searchQuery, setSearchQuery] = useState('');
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +132,10 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleNavigate('/contact')}>
                     Contact
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowSettings(true)}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Paramètres
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -220,6 +228,10 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           onNavigate={handleNavigate}
         />
       )}
+      <SettingsModal 
+        open={showSettings}
+        onOpenChange={setShowSettings}
+      />
     </>
   );
 }
