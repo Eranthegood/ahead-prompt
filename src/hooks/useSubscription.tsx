@@ -13,6 +13,9 @@ interface SubscriptionInfo {
   subscriptionEnd: string | null;
   productId: string | null;
   refreshSubscription: () => Promise<void>;
+  isRetrying: boolean;
+  retryAttempts: number;
+  retryWithIntelligentBackoff: (isPostPayment?: boolean) => Promise<boolean>;
 }
 
 // Plan limits configuration - now updated to match Stripe plans
@@ -46,6 +49,8 @@ export const useSubscription = (): SubscriptionInfo => {
   const [subscriptionStatus, setSubscriptionStatus] = useState('inactive');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [productId, setProductId] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryAttempts, setRetryAttempts] = useState(0);
 
   const checkSubscription = async () => {
     if (!user) {
@@ -55,7 +60,7 @@ export const useSubscription = (): SubscriptionInfo => {
       setSubscriptionEnd(null);
       setProductId(null);
       setLoading(false);
-      return;
+      return false; // Return success status
     }
 
     try {
@@ -88,20 +93,25 @@ export const useSubscription = (): SubscriptionInfo => {
           setSubscriptionEnd(profileData.current_period_end);
           setProductId(profileData.stripe_product_id);
           setSubscribed(profileData.subscription_status === 'active');
+          setError(null);
+          return profileData.subscription_status === 'active';
         } else {
           setTier('free');
           setSubscribed(false);
           setSubscriptionStatus('inactive');
           setSubscriptionEnd(null);
           setProductId(null);
+          return false;
         }
       } else {
+        const isActive = data.subscribed || false;
         setTier(data.subscription_tier || 'free');
-        setSubscribed(data.subscribed || false);
+        setSubscribed(isActive);
         setSubscriptionStatus(data.subscription_status || 'inactive');
         setSubscriptionEnd(data.subscription_end);
         setProductId(data.product_id);
         setError(null);
+        return isActive;
       }
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -111,12 +121,61 @@ export const useSubscription = (): SubscriptionInfo => {
       setSubscriptionStatus('inactive');
       setSubscriptionEnd(null);
       setProductId(null);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const retryWithIntelligentBackoff = async (isPostPayment = false) => {
+    if (isRetrying) return; // Prevent concurrent retries
+    
+    setIsRetrying(true);
+    setRetryAttempts(0);
+    
+    const maxAttempts = isPostPayment ? 8 : 3; // More attempts for post-payment
+    const baseDelay = isPostPayment ? 2000 : 5000; // Start with 2s for post-payment, 5s for regular
+    
+    try {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        setRetryAttempts(attempt);
+        
+        console.log(`Retry attempt ${attempt}/${maxAttempts}`);
+        
+        const isActive = await checkSubscription();
+        
+        // If we found an active subscription, we're done!
+        if (isActive) {
+          console.log('✅ Active subscription found!');
+          setIsRetrying(false);
+          setRetryAttempts(0);
+          return true;
+        }
+        
+        // If this is the last attempt, stop
+        if (attempt === maxAttempts) {
+          console.log('❌ Max retry attempts reached');
+          break;
+        }
+        
+        // Calculate exponential backoff: 2s, 4s, 8s, 15s, 30s, 60s, 120s, 240s
+        const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 240000);
+        console.log(`⏳ Waiting ${delay/1000}s before next attempt...`);
+        
+        await sleep(delay);
+      }
+      
+      return false;
+    } finally {
+      setIsRetrying(false);
+      setRetryAttempts(0);
+    }
+  };
+
   const refreshSubscription = async () => {
+    if (isRetrying) return; // Don't interrupt ongoing retry
     await checkSubscription();
   };
 
@@ -132,7 +191,10 @@ export const useSubscription = (): SubscriptionInfo => {
     subscriptionStatus, 
     subscriptionEnd, 
     productId, 
-    refreshSubscription 
+    refreshSubscription,
+    isRetrying,
+    retryAttempts,
+    retryWithIntelligentBackoff
   };
 };
 

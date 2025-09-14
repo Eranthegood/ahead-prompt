@@ -12,7 +12,7 @@ import { SUBSCRIPTION_PLANS, getPlanByProductId } from "@/constants/subscription
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function SubscriptionSection() {
-  const { tier, loading, subscribed, subscriptionStatus, subscriptionEnd, productId, refreshSubscription } = useSubscription();
+  const { tier, loading, subscribed, subscriptionStatus, subscriptionEnd, productId, refreshSubscription, isRetrying, retryAttempts, retryWithIntelligentBackoff } = useSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,13 +26,11 @@ export function SubscriptionSection() {
     
     if (success === 'true') {
       toast({
-        title: "Success!",
-        description: "Your subscription has been activated. It may take a few minutes to update.",
+        title: "Payment Successful!",
+        description: "Checking your subscription status... This may take a few minutes.",
       });
-      // Auto-refresh subscription status
-      setTimeout(() => {
-        refreshSubscription();
-      }, 2000);
+      // Auto-start intelligent retry for post-payment verification
+      retryWithIntelligentBackoff(true);
       // Clear the URL parameter
       setSearchParams(prev => {
         prev.delete('success');
@@ -52,7 +50,7 @@ export function SubscriptionSection() {
         return prev;
       });
     }
-  }, [searchParams, setSearchParams, toast, refreshSubscription]);
+  }, [searchParams, setSearchParams, toast, retryWithIntelligentBackoff]);
 
   const currentPlan = getPlanByProductId(productId || '') || SUBSCRIPTION_PLANS.find(p => p.id === tier);
   const planName = getPlanDisplayName(tier);
@@ -180,13 +178,43 @@ export function SubscriptionSection() {
           variant="outline" 
           size="sm" 
           onClick={handleRefresh}
-          disabled={refreshing}
+          disabled={refreshing || isRetrying}
           className="gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          Refresh
+          {refreshing || isRetrying ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+          {refreshing ? 'Refreshing...' : isRetrying ? 'Checking...' : 'Refresh Status'}
         </Button>
       </div>
+
+      {/* Intelligent Retry Status */}
+      {isRetrying && (
+        <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                    Verifying your subscription...
+                  </h4>
+                  <Badge variant="outline" className="text-xs">
+                    Attempt {retryAttempts}/8
+                  </Badge>
+                </div>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  We're checking with Stripe to confirm your payment. This usually takes 1-2 minutes.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Current Plan Card */}
       <Card>
