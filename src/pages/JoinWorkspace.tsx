@@ -27,6 +27,7 @@ export default function JoinWorkspace() {
     confirmPassword: ''
   });
   const [processing, setProcessing] = useState(false);
+  const [justAuthenticated, setJustAuthenticated] = useState(false);
 
   useEffect(() => {
     if (!invitationToken) {
@@ -37,11 +38,13 @@ export default function JoinWorkspace() {
     loadInvitation();
   }, [invitationToken]);
 
+  // Handle invitation acceptance after authentication
   useEffect(() => {
-    if (user && invitation) {
+    if (user && invitation && justAuthenticated) {
       handleAcceptInvitation();
+      setJustAuthenticated(false);
     }
-  }, [user, invitation]);
+  }, [user, invitation, justAuthenticated]);
 
   const loadInvitation = async () => {
     if (!invitationToken) return;
@@ -121,11 +124,14 @@ export default function JoinWorkspace() {
         
         toast({
           title: 'Account created!',
-          description: 'Please check your email to verify your account, then you\'ll be automatically added to the workspace'
+          description: 'Please check your email to verify your account, then return to complete joining the workspace'
         });
       } else {
         const { error } = await signIn(formData.email, formData.password);
         if (error) throw error;
+        
+        // Set flag to trigger invitation acceptance after auth state updates
+        setJustAuthenticated(true);
       }
     } catch (error: any) {
       toast({
