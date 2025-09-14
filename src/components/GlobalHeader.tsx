@@ -53,6 +53,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
   // Navigation items for authenticated users
   const navItems = [
     { label: 'Pricing', path: '/pricing', icon: Package },
+    { label: 'Contact', path: '/contact', icon: Package },
   ];
 
   return (
@@ -103,10 +104,13 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
             
-            {/* Always show Pricing CTA */}
+            {/* Always show Pricing and Contact CTAs */}
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
                 Pricing
+              </Button>
+              <Button variant="ghost" onClick={() => handleNavigate('/contact')}>
+                Contact
               </Button>
             </div>
 
@@ -159,6 +163,13 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 onClick={() => handleNavigate('/pricing')}
               >
                 Pricing
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => handleNavigate('/contact')}
+              >
+                Contact
               </Button>
               {!user ? (
                 <Button

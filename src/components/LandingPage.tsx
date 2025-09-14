@@ -370,6 +370,9 @@ export default function LandingPage() {
     }, {
       href: "/pricing",
       label: "Pricing"
+    }, {
+      href: "/contact",
+      label: "Contact"
     }]} legalLinks={[{
       href: "/privacy",
       label: "Privacy Policy"

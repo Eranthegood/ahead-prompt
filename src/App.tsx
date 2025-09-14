@@ -34,6 +34,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
+import Contact from "./pages/Contact";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
@@ -58,6 +59,7 @@ function App() {
                       <Route path="/blog" element={<Blog />} />
                       <Route path="/blog/:slug" element={<BlogPost />} />
                       <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/contact" element={<Contact />} />
                       <Route path="/join-workspace/:invitationToken" element={<JoinWorkspace />} />
                     <Route path="/prompt-management" element={<PromptManagement />} />
                     <Route path="/cursor-multi-agent" element={<CursorMultiAgentLanding />} />
