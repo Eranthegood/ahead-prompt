@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { useSessionManager } from '@/hooks/useSessionManager';
+import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
 import type { Product } from '@/types';
 
 export interface CreateProductData {
@@ -18,6 +19,7 @@ export const useProducts = (workspaceId?: string) => {
   const { toast } = useToast();
   const { trackProductCreated } = useMixpanelContext();
   const { ensureValidSession, isValid: sessionIsValid } = useSessionManager();
+  const { tier } = useSubscription();
 
   // Fetch products
   const fetchProducts = async () => {
@@ -59,6 +61,18 @@ export const useProducts = (workspaceId?: string) => {
         variant: 'destructive',
       });
       return null;
+    }
+
+    // ⚠️ Check subscription limits before creating
+    const canCreate = canCreateProduct(tier, products.length);
+    if (!canCreate) {
+      console.error('[useProducts] Product creation blocked: limit reached for plan', tier);
+      toast({
+        title: "Product limit reached",
+        description: `You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`,
+        variant: "destructive"
+      });
+      throw new Error(`You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`);
     }
 
     // 🚀 1. Optimistic update
