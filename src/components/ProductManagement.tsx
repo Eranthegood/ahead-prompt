@@ -105,19 +105,49 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
         });
         handleCloseDialog();
       } else {
+        console.log('[ProductManagement] Creating product:', formData.name);
+        
         const newProduct = await createProduct({
           name: formData.name.trim(),
           description: formData.description.trim() || undefined,
           color: formData.color,
         });
         
-        if (newProduct && createKnowledge) {
-          setCreatedProduct(newProduct);
-          setIsCreateDialogOpen(false);
-          setIsKnowledgeModalOpen(true);
+        if (newProduct) {
+          console.log('[ProductManagement] Product created successfully:', newProduct.id);
+          
+          if (createKnowledge) {
+            setCreatedProduct(newProduct);
+            setIsCreateDialogOpen(false);
+            setIsKnowledgeModalOpen(true);
+          } else {
+            handleCloseDialog();
+          }
         } else {
-          handleCloseDialog();
+          console.error('[ProductManagement] Product creation returned null');
+          toast({
+            title: 'Creation failed',
+            description: 'Failed to create product. Please check your connection and try again.',
+            variant: 'destructive',
+          });
         }
+      }
+    } catch (error: any) {
+      console.error('[ProductManagement] Error in handleSubmit:', error);
+      
+      // Handle specific authentication errors
+      if (error?.message?.includes('session') || error?.message?.includes('auth')) {
+        toast({
+          title: 'Authentication required',
+          description: 'Please sign in again to continue.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: error?.message || 'An unexpected error occurred while creating the product.',
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsSubmitting(false);

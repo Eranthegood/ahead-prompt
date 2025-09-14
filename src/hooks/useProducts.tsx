@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
+import { useSessionManager } from '@/hooks/useSessionManager';
 import type { Product } from '@/types';
 
 export interface CreateProductData {
@@ -16,6 +17,7 @@ export const useProducts = (workspaceId?: string) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { trackProductCreated } = useMixpanelContext();
+  const { ensureValidSession, isValid: sessionIsValid } = useSessionManager();
 
   // Fetch products
   const fetchProducts = async () => {
@@ -42,9 +44,22 @@ export const useProducts = (workspaceId?: string) => {
     }
   };
 
-  // Create product with optimistic update
+  // Create product with optimistic update and auth validation
   const createProduct = async (productData: CreateProductData): Promise<Product | null> => {
     if (!workspaceId) return null;
+
+    console.log('[useProducts] Creating product:', productData.name);
+
+    // Ensure valid session before operation
+    const sessionValid = await ensureValidSession();
+    if (!sessionValid) {
+      toast({
+        title: 'Authentication Error',
+        description: 'Please sign in again to create products.',
+        variant: 'destructive',
+      });
+      return null;
+    }
 
     // 🚀 1. Optimistic update
     const optimisticProduct: Product = {
@@ -67,6 +82,8 @@ export const useProducts = (workspaceId?: string) => {
         color: productData.color || '#3B82F6',
       };
 
+      console.log('[useProducts] Sending payload:', payload);
+      
       const { data, error } = await supabase
         .from('products')
         .insert(payload)
@@ -74,12 +91,53 @@ export const useProducts = (workspaceId?: string) => {
         .single();
 
       if (error) {
+        console.error('[useProducts] Database error:', error);
+        
+        // Handle 403 specifically
+        if (error.message?.includes('new row violates row-level security') || 
+            error.code === 'PGRST301' || 
+            error.details?.includes('policy')) {
+          
+          console.log('[useProducts] RLS/Auth error detected, attempting session refresh...');
+          
+          // Try to refresh session and retry once
+          const refreshed = await ensureValidSession();
+          if (refreshed) {
+            console.log('[useProducts] Session refreshed, retrying...');
+            
+            const { data: retryData, error: retryError } = await supabase
+              .from('products')
+              .insert(payload)
+              .select()
+              .single();
+            
+            if (retryError) {
+              throw retryError;
+            }
+            
+            // Success after retry
+            setProducts(prev => prev.map(p => p.id === optimisticProduct.id ? retryData : p));
+            
+            trackProductCreated({
+              productId: retryData.id,
+              color: retryData.color || undefined
+            });
+
+            toast({
+              title: 'Product created',
+              description: `"${productData.name}" has been created successfully`,
+            });
+
+            return retryData;
+          }
+        }
+        
         // Rollback on error
         setProducts(prev => prev.filter(p => p.id !== optimisticProduct.id));
         
         toast({
-        title: 'Error',
-        description: 'Unable to create product. Please try again.',
+          title: 'Error creating product',
+          description: error.message || 'Unable to create product. Please try again.',
           variant: 'destructive',
         });
         throw error;
