@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspaceInvitations } from '@/hooks/useWorkspaceInvitations';
 import { useToast } from '@/hooks/use-toast';
 import { WorkspaceInvitation } from '@/types/workspace';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function JoinWorkspace() {
   const { invitationToken } = useParams<{ invitationToken: string }>();
@@ -119,13 +120,34 @@ export default function JoinWorkspace() {
     setProcessing(true);
     try {
       if (isSignUp) {
-        const { error } = await signUp(formData.email, formData.password);
+        // For workspace invitations, we want immediate login without email confirmation
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/build`,
+            // Skip email confirmation for workspace invitations
+            data: {
+              email_confirm: false
+            }
+          }
+        });
+        
         if (error) throw error;
         
-        toast({
-          title: 'Account created!',
-          description: 'Please check your email to verify your account, then return to complete joining the workspace'
-        });
+        // Check if user was created and logged in immediately
+        if (data.user && data.session) {
+          setJustAuthenticated(true);
+          toast({
+            title: 'Account created!',
+            description: 'Welcome to Ahead! You\'re being added to the workspace...'
+          });
+        } else {
+          toast({
+            title: 'Account created!',
+            description: 'Please check your email to verify your account, then return to complete joining the workspace'
+          });
+        }
       } else {
         const { error } = await signIn(formData.email, formData.password);
         if (error) throw error;
