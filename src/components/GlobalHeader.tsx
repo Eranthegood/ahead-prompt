@@ -69,9 +69,9 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
       className="sticky top-0 z-50 h-14 border-b border-border backdrop-blur supports-[backdrop-filter]:bg-background/60"
       style={{ backgroundColor: '#191a23' }}
     >
-        <div className="flex h-full items-center justify-between px-4">
+        <div className="grid grid-cols-3 h-full items-center px-4 gap-4">
           {/* Left side - Logo and navigation */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 justify-start">
             {/* Sidebar Trigger for authenticated users */}
             {showSidebarTrigger && (
               <SidebarTrigger className="md:hidden" />
@@ -90,10 +90,10 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             )}
           </div>
           
-          {/* Search Bar - Aligned with "All prompts" text below */}
+          {/* Center - Search Bar (hidden on smaller screens) */}
           {showSearch && workspace && user && (
-            <div className="absolute left-4 sm:left-6 w-80" style={{ marginLeft: showSidebarTrigger ? '60px' : '0' }}>
-              <form onSubmit={handleSearch}>
+            <div className="hidden lg:flex justify-center">
+              <form onSubmit={handleSearch} className="w-full max-w-sm">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -101,7 +101,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setShowCommandPalette(true)}
-                    className="pl-10 bg-muted/50 border-border"
+                    className="pl-10 bg-muted/50 border-border w-full"
                   />
                 </div>
               </form>
@@ -109,7 +109,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           )}
 
           {/* Right side - Navigation and User actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-end">
             
             {/* Always show Pricing CTA */}
             <div className="hidden md:flex items-center gap-2">
