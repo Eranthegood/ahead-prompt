@@ -79,8 +79,8 @@ export function WorkspaceMembersModal({ open, onOpenChange }: WorkspaceMembersMo
     const link = `${window.location.origin}/join-workspace/${token}`;
     navigator.clipboard.writeText(link);
     toast({
-      title: 'Invitation link copied',
-      description: 'Share this link with the person you want to invite'
+      title: 'Lien d\'invitation généré',
+      description: 'Copiez-collez ce lien pour inviter cette personne'
     });
   };
 
@@ -248,35 +248,36 @@ export function WorkspaceMembersModal({ open, onOpenChange }: WorkspaceMembersMo
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      {invitation.role === 'admin' ? <Crown className="h-3 w-3" /> : <User className="h-3 w-3" />}
-                      {invitation.role}
-                    </Badge>
-                    
-                    {isAdmin && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => copyInvitationLink(invitation.invitation_token)}>
-                            <Copy className="h-4 w-4 mr-2" />
-                            Copy link
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => cancelInvitation(invitation.id)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Cancel
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => copyInvitationLink(invitation.invitation_token)}
+                        className="text-xs"
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copier le lien
+                      </Button>
+                      
+                      {isAdmin && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => cancelInvitation(invitation.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Annuler
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
                 </div>
               ))}
             </div>
