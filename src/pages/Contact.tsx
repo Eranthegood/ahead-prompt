@@ -34,7 +34,7 @@ const Contact = () => {
 
     try {
       // Insert contact message into Supabase
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('contact_messages')
         .insert({
           name: formData.name,
