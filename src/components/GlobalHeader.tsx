@@ -5,13 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
   Search, 
   Home, 
   Package, 
   Zap,
   Trophy,
   Menu,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -104,14 +111,26 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
             
-            {/* Always show Pricing and Contact CTAs */}
+            {/* Always show Pricing CTA and dropdown menu */}
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
                 Pricing
               </Button>
-              <Button variant="ghost" onClick={() => handleNavigate('/contact')}>
-                Contact
-              </Button>
+              
+              {/* Dropdown Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-1">
+                    More
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleNavigate('/contact')}>
+                    Contact
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Mobile menu toggle */}
