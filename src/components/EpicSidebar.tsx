@@ -138,7 +138,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
   };
 
   const handleConfigureGit = (itemId: string) => {
-    navigate('/settings/git-cursor');
+    navigate('/integrations');
   };
 
   const handleToggleEpicComplete = async (epic: Epic) => {

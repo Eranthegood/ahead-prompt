@@ -123,7 +123,8 @@ export function EnhancedCommandPalette({
           // Handle quick actions
           switch (item.id) {
             case 'settings':
-              onNavigate?.('/settings');
+              // Open settings modal instead of navigating
+              // This should be handled by the parent component
               break;
             case 'prompt-library':
               // Déclencher l'ouverture de la Prompt Library

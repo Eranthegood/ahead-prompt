@@ -171,7 +171,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
             )}
             
             {/* Build button for authenticated users */}
-            {user && !(['/build', '/settings', '/integrations'].some(path => location.pathname.startsWith(path))) && (
+            {user && !(['/build', '/integrations'].some(path => location.pathname.startsWith(path))) && (
               <Button onClick={() => handleNavigate('/build')} className="hidden md:flex">
                 Build
               </Button>
@@ -204,7 +204,7 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
                 >
                   Sign In
                 </Button>
-              ) : !(['/build', '/settings', '/integrations'].some(path => location.pathname.startsWith(path))) ? (
+              ) : !(['/build', '/integrations'].some(path => location.pathname.startsWith(path))) ? (
                 <Button
                   className="w-full"
                   onClick={() => handleNavigate('/build')}

@@ -302,8 +302,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               Create new prompt
             </CommandItem>
             <CommandItem onSelect={() => {
-              console.log('CommandPalette: Navigating to settings');
-              navigate('/settings');
+              console.log('CommandPalette: Opening settings modal');
+              // Settings modal should be opened by parent component
               onOpenChange(false);
             }}>
               <Settings className="mr-2 h-4 w-4" />

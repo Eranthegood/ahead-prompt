@@ -16,8 +16,6 @@ import Pricing from "./pages/Pricing";
 import Dashboard from "./components/Dashboard";
 import ProductPage from "./pages/ProductPage";
 import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import GitCursorSettings from "./pages/GitCursorSettings";
 import KeyboardShortcuts from "./pages/KeyboardShortcuts";
 import Integrations from "./pages/Integrations";
 import CursorIntegration from "./pages/CursorIntegration";
@@ -78,16 +76,6 @@ function App() {
                         <Profile />
                       </ProtectedRoute>
                     } />
-                    <Route path="/settings" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/settings/git-cursor" element={
-                      <ProtectedRoute>
-                        <GitCursorSettings />
-                      </ProtectedRoute>
-                    } />
                     <Route path="/shortcuts" element={
                       <ProtectedRoute>
                         <KeyboardShortcuts />
@@ -125,7 +113,7 @@ function App() {
                          <AdminBlog />
                        </ProtectedRoute>
                      } />
-                     <Route path="/settings/repository-mapping" element={
+                    <Route path="/settings/repository-mapping" element={
                        <ProtectedRoute>
                          <RepositoryMapping />
                        </ProtectedRoute>

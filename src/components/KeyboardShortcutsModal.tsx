@@ -30,7 +30,7 @@ const shortcuts = [
     items: [
       { keys: ['G', 'H'], description: 'Go to home' },
       { keys: ['G', 'P'], description: 'Go to products' },
-      { keys: ['G', 'S'], description: 'Go to settings' },
+      { keys: ['G', 'I'], description: 'Go to integrations' },
       { keys: ['↑', '↓'], description: 'Navigate prompts' },
     ]
   },

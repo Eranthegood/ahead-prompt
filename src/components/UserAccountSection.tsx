@@ -66,10 +66,10 @@ export function UserAccountSection() {
               <span>Profile</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => navigate('/shortcuts')}>
               <Keyboard className="mr-2 h-4 w-4" />
@@ -200,11 +200,6 @@ export function UserAccountSection() {
                 Lvl {stats.current_level}
               </Badge>
             )}
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => navigate('/settings')}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
           </DropdownMenuItem>
           
           <DropdownMenuItem onClick={() => navigate('/integrations')}>

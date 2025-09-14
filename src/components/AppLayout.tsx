@@ -39,14 +39,14 @@ export function AppLayout({ children }: AppLayoutProps) {
   const shouldShowHeader = !noHeaderPages.some(path => location.pathname.startsWith(path));
   
   // Pages that should show the sidebar
-  const allowedSidebarPages = ['/build', '/settings', '/integrations'];
+  const allowedSidebarPages = ['/build', '/integrations'];
   const canShowSidebar = allowedSidebarPages.some(path => location.pathname.startsWith(path));
   
   // Determine default collapsed state - collapsed on non-build pages
   const shouldBeCollapsedByDefault = location.pathname !== '/build';
   
   // Pages qui n'ont pas besoin de la barre de recherche
-  const noSearchPages = ['/settings', '/profile', '/shortcuts', '/achievements'];
+  const noSearchPages = ['/profile', '/shortcuts', '/achievements'];
   const shouldShowSearch = !noSearchPages.some(path => location.pathname.startsWith(path));
 
   const handleToggleCompletedItems = (show: boolean) => {
