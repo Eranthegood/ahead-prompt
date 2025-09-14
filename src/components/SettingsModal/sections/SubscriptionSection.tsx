@@ -257,7 +257,7 @@ export function SubscriptionSection() {
                     Unlock more features and remove limitations
                   </div>
                 </div>
-                <Button onClick={() => handleUpgrade('price_1S7AeZCwKhElNdgf7j9K0Tq8')} className="gap-2">
+                <Button onClick={() => navigate('/pricing')} className="gap-2">
                   View Plans
                   <ArrowUpRight className="h-4 w-4" />
                 </Button>

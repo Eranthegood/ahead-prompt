@@ -8,18 +8,69 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { usePricingTracking } from "@/hooks/usePricingTracking";
+import { getPriceId, getAnnualPrice } from "@/constants/subscriptionPlans";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 export default function Pricing() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { trackPricingInteraction, isTracking } = usePricingTracking();
   
   const handleGetStarted = () => {
     navigate('/build');
   };
 
+  const handleUpgrade = async (planId: string) => {
+    if (!user) {
+      toast.error("Please sign in to upgrade");
+      navigate('/auth');
+      return;
+    }
+
+    const priceId = getPriceId(planId, isAnnual);
+    if (!priceId) {
+      toast.error("Price not found for this plan");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data: authData } = await supabase.auth.getSession();
+      
+      if (!authData.session) {
+        throw new Error('No active session');
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId },
+        headers: {
+          Authorization: `Bearer ${authData.session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Track the action
+        await trackPricingInteraction(planId);
+        // Redirect to Stripe checkout
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error("Failed to start checkout process");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const pricingTiers = [
     {
+      planId: "pro",
       name: "Pro",
       description: "For teams & power users",
       monthlyPrice: 15,
@@ -40,6 +91,7 @@ export default function Pricing() {
       popular: true
     },
     {
+      planId: "free",
       name: "Free",
       description: "Perfect for getting started",
       monthlyPrice: 0,
@@ -56,6 +108,7 @@ export default function Pricing() {
       popular: false
     },
     {
+      planId: "basic",
       name: "Basic",
       description: "For growing projects",
       monthlyPrice: 5,
@@ -120,29 +173,47 @@ export default function Pricing() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Button 
                   className="bg-primary hover:bg-primary/90"
-                  onClick={() => trackPricingInteraction('pro')}
-                  disabled={isTracking}
+                  onClick={() => {
+                    if (user) {
+                      handleUpgrade('pro');
+                    } else {
+                      trackPricingInteraction('pro');
+                    }
+                  }}
+                  disabled={isTracking || isLoading}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  I'd pay for Pro
+                  {user ? "Upgrade to Pro" : "I'd pay for Pro"}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="bg-background/50 hover:bg-background/80"
-                  onClick={() => trackPricingInteraction('free')}
+                  onClick={() => {
+                    if (user) {
+                      handleGetStarted();
+                    } else {
+                      trackPricingInteraction('free');
+                    }
+                  }}
                   disabled={isTracking}
                 >
                   <Gift className="w-4 h-4 mr-2" />
-                  I'd use Free
+                  {user ? "Start Free" : "I'd use Free"}
                 </Button>
                 <Button 
                   variant="outline"
                   className="bg-background/50 hover:bg-background/80"
-                  onClick={() => trackPricingInteraction('basic')}
-                  disabled={isTracking}
+                  onClick={() => {
+                    if (user) {
+                      handleUpgrade('basic');
+                    } else {
+                      trackPricingInteraction('basic');
+                    }
+                  }}
+                  disabled={isTracking || isLoading}
                 >
                   <Zap className="w-4 h-4 mr-2" />
-                  I'd pay for Basic
+                  {user ? "Upgrade to Basic" : "I'd pay for Basic"}
                 </Button>
               </div>
             </div>
@@ -199,15 +270,15 @@ export default function Pricing() {
                       className="w-full" 
                       variant={tier.popular ? "default" : "outline"}
                       onClick={() => {
-                        if (tier.name === "Free") {
+                        if (tier.planId === "free") {
                           handleGetStarted();
                         } else {
-                          trackPricingInteraction(tier.name.toLowerCase());
+                          handleUpgrade(tier.planId);
                         }
                       }}
-                      disabled={tier.name !== "Free" && isTracking}
+                      disabled={tier.planId !== "free" && (isLoading || isTracking)}
                     >
-                      {tier.cta}
+                      {isLoading && tier.planId !== "free" ? "Loading..." : tier.cta}
                     </Button>
                   </CardFooter>
                 </Card>
