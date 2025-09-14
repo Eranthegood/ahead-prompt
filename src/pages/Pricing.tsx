@@ -20,6 +20,26 @@ export default function Pricing() {
 
   const pricingTiers = [
     {
+      name: "Pro",
+      description: "For teams & power users",
+      monthlyPrice: 15,
+      yearlyPrice: 144, // 15 * 12 * 0.8 (20% discount)
+      features: [
+        "Unlimited prompts",
+        "Unlimited products", 
+        "Unlimited epics",
+        "Unlimited prompt library",
+        "Knowledge base access",
+        "Advanced AI models",
+        "Cursor integration",
+        "Prompt enhancer (coming soon)",
+        "2 collaboration seats",
+        "Premium support"
+      ],
+      cta: "Upgrade to Pro",
+      popular: true
+    },
+    {
       name: "Free",
       description: "Perfect for getting started",
       monthlyPrice: 0,
@@ -51,26 +71,6 @@ export default function Pricing() {
         "Priority support"
       ],
       cta: "Upgrade to Basic", 
-      popular: true
-    },
-    {
-      name: "Pro",
-      description: "For teams & power users",
-      monthlyPrice: 15,
-      yearlyPrice: 144, // 15 * 12 * 0.8 (20% discount)
-      features: [
-        "Unlimited prompts",
-        "Unlimited products", 
-        "Unlimited epics",
-        "Unlimited prompt library",
-        "Knowledge base access",
-        "Advanced AI models",
-        "Cursor integration",
-        "Prompt enhancer (coming soon)",
-        "2 collaboration seats",
-        "Premium support"
-      ],
-      cta: "Upgrade to Pro",
       popular: false
     }
   ];
@@ -119,6 +119,14 @@ export default function Pricing() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button 
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={() => trackPricingInteraction('pro')}
+                  disabled={isTracking}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  I'd pay for Pro
+                </Button>
+                <Button 
                   variant="outline" 
                   className="bg-background/50 hover:bg-background/80"
                   onClick={() => trackPricingInteraction('free')}
@@ -135,14 +143,6 @@ export default function Pricing() {
                 >
                   <Zap className="w-4 h-4 mr-2" />
                   I'd pay for Basic
-                </Button>
-                <Button 
-                  className="bg-primary hover:bg-primary/90"
-                  onClick={() => trackPricingInteraction('pro')}
-                  disabled={isTracking}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  I'd pay for Pro
                 </Button>
               </div>
             </div>
