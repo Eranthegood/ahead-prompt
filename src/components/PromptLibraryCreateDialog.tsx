@@ -26,7 +26,7 @@ export function PromptLibraryCreateDialog({
   editItem,
   onEditComplete 
 }: PromptLibraryCreateDialogProps) {
-  const { createItem, updateItem, items } = usePromptLibrary();
+  const { createItem, updateItem, items, userItems } = usePromptLibrary();
   const { tier } = useSubscription();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -37,7 +37,7 @@ export function PromptLibraryCreateDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const canCreate = canCreatePromptLibraryItem(tier, items?.length || 0);
+  const canCreate = canCreatePromptLibraryItem(tier, userItems?.length || 0);
 
   const isEditing = !!editItem;
 

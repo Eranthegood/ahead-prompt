@@ -269,6 +269,7 @@ export function usePromptLibrary() {
 
   return {
     items,
+    userItems, // Exposer les userItems pour les vérifications de limites
     loading,
     createItem,
     updateItem,

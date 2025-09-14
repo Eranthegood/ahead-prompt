@@ -96,7 +96,7 @@ export function UsageLimitIndicator({ type, currentCount, className }: UsageLimi
 // Combined usage overview component
 export function UsageOverview({ className }: { className?: string }) {
   const { products } = useProducts();
-  const { items: libraryPrompts } = usePromptLibrary();
+  const { userItems: libraryPrompts } = usePromptLibrary();
   
   // For epics, we'd need to count epics per product, but for simplicity 
   // we'll show it in the product context where it's more relevant
