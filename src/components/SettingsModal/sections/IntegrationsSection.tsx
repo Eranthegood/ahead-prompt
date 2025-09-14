@@ -128,25 +128,6 @@ export function IntegrationsSection() {
           )}
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Webhooks</CardTitle>
-          <CardDescription>
-            Configurez des webhooks pour recevoir des notifications (bientôt disponible).
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 opacity-50">
-            <p className="text-muted-foreground mb-4">
-              La configuration des webhooks sera bientôt disponible.
-            </p>
-            <Button disabled variant="outline">
-              Ajouter un webhook
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
