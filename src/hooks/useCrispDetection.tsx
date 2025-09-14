@@ -86,11 +86,11 @@ export function useCrispDetection() {
   // Calculate recommended FAB position based on Crisp state
   const getRecommendedPosition = () => {
     if (crispState.isVisible) {
-      // If Crisp is visible, move our FAB to the left side
+      // If Crisp is visible, position FAB on right side but higher up
       return {
-        bottom: 'bottom-6',
-        horizontal: 'left-6',
-        side: 'left' as const
+        bottom: 'bottom-24', // Higher position to be above Crisp
+        horizontal: 'right-6',
+        side: 'right' as const
       };
     }
     
