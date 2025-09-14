@@ -53,8 +53,6 @@ export default function Pricing() {
       if (error) throw error;
       
       if (data?.url) {
-        // Track the action
-        await trackPricingInteraction(planId);
         // Redirect to Stripe checkout
         window.open(data.url, '_blank');
       } else {
