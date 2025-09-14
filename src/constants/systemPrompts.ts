@@ -93,4 +93,81 @@ export const SYSTEM_PROMPTS: SystemPromptTemplate[] = [
     category: 'Design',
     is_system: true,
   },
+  {
+    id: 'system-workspace-invitations',
+    title: 'Multi-User Workspace System - Complete Implementation',
+    body: `Build a complete multi-user workspace system with secure invitation flow:
+
+**DATABASE STRUCTURE:**
+Create these tables with proper relationships:
+- workspaces (id, name, created_by, subscription_tier, settings)
+- workspace_members (workspace_id, user_id, role, status, joined_at)
+- workspace_invitations (id, workspace_id, email, token, expires_at, status)
+
+**AUTHENTICATION & SECURITY:**
+- Row Level Security (RLS) on all workspace tables
+- Secure invitation acceptance via SECURITY DEFINER function
+- Email-based invitation validation
+- Automatic cleanup of expired invitations
+- Role-based access control (admin, member, viewer)
+
+**INVITATION WORKFLOW:**
+1. Admin creates invitation with unique token
+2. System sends invitation email with join link
+3. Recipient clicks link, validates token
+4. Auto-creates user account if needed
+5. Adds user to workspace with specified role
+6. Redirects to workspace dashboard
+
+**CORE FEATURES:**
+- Workspace creation and management
+- Member invitation and removal
+- Role management and permissions
+- Real-time member status updates
+- Invitation link generation and tracking
+- Automatic workspace switching
+
+**UI COMPONENTS:**
+- Workspace selector dropdown
+- Member management modal
+- Invitation creation form
+- Join workspace page
+- Member list with role badges
+- Invitation status indicators
+
+**TECHNICAL REQUIREMENTS:**
+- React hooks for workspace management
+- Supabase integration with RPC functions
+- Real-time subscriptions for member updates
+- Error handling for invitation failures
+- Loading states and user feedback
+- Mobile-responsive design
+
+**SECURITY CONSIDERATIONS:**
+- Token expiration (24-48 hours)
+- Single-use invitation tokens
+- Email domain validation
+- Rate limiting for invitations
+- Audit logging for workspace changes
+- Secure member removal process
+
+**DATABASE FUNCTIONS:**
+Create RPC functions for:
+- accept_workspace_invitation(token, user_id)
+- get_user_workspaces(user_id)
+- validate_invitation_token(token)
+- cleanup_expired_invitations()
+
+**REAL-TIME FEATURES:**
+- Live member status updates
+- Instant invitation acceptance
+- Real-time workspace activity
+- Collaborative workspace management
+
+This system ensures secure, scalable multi-user collaboration with proper access control and user experience.`,
+    ai_model: 'claude-3.5-sonnet',
+    tags: ['workspace', 'invitations', 'authentication', 'supabase', 'rls', 'collaboration', 'multi-user'],
+    category: 'Integration',
+    is_system: true,
+  },
 ];

@@ -44,6 +44,7 @@ export const PROMPT_CATEGORIES = [
   'Testing',
   'Performance',
   'Design',
+  'Integration',
   'General',
 ] as const;
 
