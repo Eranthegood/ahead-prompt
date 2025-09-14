@@ -6,172 +6,151 @@
 
 @layer base {
   :root {
-    /* Get It Done Design System - Todoist Inspired Light Theme */
-    
-    /* Backgrounds & Surfaces */
-    --background: 0 0% 100%;              /* Blanc pur */
-    --card: 0 0% 100%;                    /* Blanc pur */
-    --popover: 0 0% 100%;                 /* Blanc pur */
-    
-    /* Text Colors */
-    --foreground: 220 15% 25%;            /* Gris ardoise foncé */
-    --card-foreground: 220 15% 25%;       /* Gris ardoise foncé */
-    --popover-foreground: 220 15% 25%;    /* Gris ardoise foncé */
-    
-    /* Brand Colors */
-    --primary: 213 94% 68%;               /* Bleu vif électrique */
-    --primary-foreground: 0 0% 100%;      /* Blanc sur bleu */
-    
-    /* Secondary & Muted */
-    --secondary: 220 14% 96%;             /* Gris très clair, presque blanc */
-    --secondary-foreground: 220 15% 25%;  /* Texte sombre sur gris clair */
-    --muted: 220 14% 96%;                 /* Même gris très clair */
-    --muted-foreground: 220 10% 45%;      /* Gris moyen pour texte secondaire */
-    
-    /* Interactive Elements */
-    --accent: 220 13% 91%;                /* Gris clair pour hover */
-    --accent-foreground: 220 15% 25%;     /* Texte sombre */
-    
-    /* States */
-    --destructive: 0 65% 55%;             /* Rouge */
-    --destructive-foreground: 0 0% 100%;  /* Blanc sur rouge */
-    
-    /* Borders & Inputs */
-    --border: 220 13% 91%;                /* Gris clair pour bordures */
-    --input: 220 13% 91%;                 /* Même gris pour inputs */
-    --ring: 213 94% 68%;                  /* Bleu vif pour focus */
+    /* Palette personnalisée basée sur l'image fournie */
+    --background: 220 17% 96%;        /* #F4F5F8 */
+    --foreground: 0 0% 15%;
+
+    --card: 0 0% 100%;              /* Blanc #FFFFFF pour contraste */
+    --card-foreground: 0 0% 15%;
+
+    --popover: 0 0% 100%;           /* Blanc #FFFFFF */
+    --popover-foreground: 0 0% 15%;
+
+    /* Linear-inspired color system */
+    --primary: 220 13% 18%;            /* Linear's dark blue-gray #1d2125 */
+    --primary-foreground: 0 0% 98%;
+    --primary-muted: 220 13% 85%;
+    --primary-glow: 220 13% 75%;
+
+    /* Linear's subtle grays */
+    --secondary: 220 9% 96%;            /* Very light gray #f6f8fa */
+    --secondary-foreground: 220 13% 18%;
+
+    /* Linear's accent blue */
+    --accent: 211 100% 50%;             /* Linear blue #0969da */
+    --accent-foreground: 0 0% 98%;
+
+    /* Linear's muted system */
+    --muted: 220 14% 96%;               /* #f6f8fa */
+    --muted-foreground: 220 9% 46%;     /* #656d76 */
+
+    /* Destructive reste sur la couleur primaire */
+    --destructive: 344 100% 64%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%;              /* #e1e4e8 */
+    --input: 0 0% 100%;                 /* Pure white */
+    --ring: 211 100% 50%;
 
     --radius: 0.5rem;
 
-    /* États des tâches */
-    --status-todo: 240 5% 50%;            /* Gris neutre */
-    --status-todo-foreground: 0 0% 100%;
-    --status-in-progress: 217 91% 60%;    /* Bleu progression */
-    --status-progress: 217 91% 60%;       /* Alias pour compatibilité */
-    --status-progress-foreground: 0 0% 100%;
-    --status-blocked: 0 65% 55%;          /* Rouge bloqué */
-    --status-done: 142 71% 45%;           /* Vert terminé */
-    --status-done-foreground: 0 0% 100%;
-    
-    /* Interactions tâches */
-    --task-hover: 240 10% 97%;            /* Gris très subtil au hover */
-    
-    /* Priorités */
-    --priority-1: 0 65% 55%;              /* Rouge critique */
-    --priority-2: 25 95% 53%;             /* Orange élevée */
-    --priority-3: 217 91% 60%;            /* Bleu moyenne */
-    --priority-4: 240 5% 64%;             /* Gris basse */
+    /* Couleurs de statut personnalisées */
+    --status-todo: 0 0% 90%;        /* Gris clair */
+    --status-todo-foreground: 0 0% 30%;
+    --status-generating: 244 85% 70%; /* Violet clair pour génération */
+    --status-generating-foreground: 0 0% 15%;
+    --status-progress: 211 100% 50%;  /* Bleu au lieu d'orange */
+    --status-progress-foreground: 0 0% 98%;
+    --status-done: 120 52% 73%;     /* Vert clair #99DD93 */
+    --status-done-foreground: 0 0% 15%;
 
     /* Generic status tokens used by animations */
-    --warning: 25 95% 53%;                /* Orange */
-    --warning-foreground: 0 0% 100%;
-    --success: 142 71% 45%;               /* Vert */
-    --success-foreground: 0 0% 100%;
+    --warning: 344 100% 64%;        /* Rouge au lieu d'orange */
+    --warning-foreground: 0 0% 98%;
+    --success: 120 52% 40%;
+    --success-foreground: 0 0% 98%;
 
-    /* Couleurs sidebar dédiées */
-    --sidebar-background: 220 14% 96%;    /* Gris très clair */
-    --sidebar-foreground: 220 15% 25%;    /* Texte sombre */
-    --sidebar-primary: 213 94% 68%;       /* Bleu vif actif */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 91%;        /* Gris accent hover */
-    --sidebar-accent-foreground: 220 15% 25%;
-    --sidebar-border: 220 13% 91%;        /* Bordures sidebar */
-    --sidebar-ring: 213 94% 68%;          /* Focus bleu */
+    /* Couleurs d'epic personnalisées */
+    --epic-purple: 344 100% 64%;    /* Rose vif */
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
+    --epic-green: 120 52% 73%;      /* Vert clair */
+    --epic-orange: 344 100% 64%;    /* Rose au lieu d'orange */
+    --epic-pink: 344 100% 64%;      /* Rose vif */
 
-    /* Couleurs d'epic compatibilité */
-    --epic-purple: 270 95% 75%;
-    --epic-blue: 217 91% 60%;
-    --epic-green: 142 71% 45%;
-    --epic-orange: 25 95% 53%;
-    --epic-pink: 330 81% 60%;
+    /* Sidebar avec la nouvelle palette */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 344 100% 64%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 344 100% 64%;
 
     /* Illustration colors */
-    --illustration-1: 213 94% 68%;
-    --illustration-2: 217 91% 60%;
-    --illustration-3: 142 71% 45%;
-    --illustration-4: 25 95% 53%;
-    --illustration-5: 270 95% 75%;
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 
   .dark {
-    /* Get It Done Design System - Dark Mode */
     --background: 0 0% 8%;
-    --foreground: 0 0% 95%;
+    --foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
     --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
+    --card-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
     --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover-foreground: 0 0% 96%; /* Improved from 95% for better contrast */
 
-    /* Brand Colors pour le mode sombre */
-    --primary: 213 94% 68%;               /* Même bleu vif */
-    --primary-foreground: 0 0% 8%;        /* Texte sombre sur bleu */
+    /* Couleurs adaptées pour le mode sombre */
+    --primary: 344 85% 58%;         /* Rose plus sombre */
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 15%;                /* Gris sombre */
-    --secondary-foreground: 0 0% 95%;     /* Texte clair */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 15%;                    /* Gris sombre */
-    --muted-foreground: 0 0% 70%;         /* Gris moyen pour lisibilité */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%; /* Improved from 65% for better contrast */
 
-    --accent: 0 0% 20%;                   /* Gris pour hover */
-    --accent-foreground: 0 0% 95%;        /* Texte clair */
+    --accent: 0 0% 20%;             /* Gris clair pour les hovers */
+    --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 65% 55%;             /* Rouge */
-    --destructive-foreground: 0 0% 100%;  /* Blanc sur rouge */
+    --destructive: 344 85% 58%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 18%;                   /* Bordures sombres */
-    --input: 0 0% 15%;                    /* Inputs sombres */
-    --ring: 213 94% 68%;                  /* Focus bleu */
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
+    --ring: 344 85% 58%;
 
-    /* États des tâches - mode sombre */
-    --status-todo: 240 5% 50%;
-    --status-todo-foreground: 0 0% 100%;
-    --status-in-progress: 217 91% 60%;
-    --status-progress: 217 91% 60%;
-    --status-progress-foreground: 0 0% 100%;
-    --status-blocked: 0 65% 55%;
-    --status-done: 142 71% 45%;
-    --status-done-foreground: 0 0% 100%;
+    /* États en mode sombre */
+    --status-todo: 0 0% 20%;
+    --status-todo-foreground: 0 0% 80%;
+    --status-progress: 211 100% 50%;    /* Bleu au lieu d'orange */
+    --status-progress-foreground: 0 0% 95%;
+    --status-done: 120 45% 65%;
+    --status-done-foreground: 0 0% 95%;
 
-    /* Interactions tâches - mode sombre */
-    --task-hover: 0 0% 12%;               /* Gris très subtil */
+    /* Generic status tokens used by animations (dark) */
+    --warning: 344 85% 58%;         /* Rouge au lieu d'orange */
+    --warning-foreground: 0 0% 95%;
+    --success: 120 45% 55%;
+    --success-foreground: 0 0% 95%;
 
-    /* Priorités - mode sombre */
-    --priority-1: 0 65% 55%;
-    --priority-2: 25 95% 53%;
-    --priority-3: 217 91% 60%;
-    --priority-4: 240 5% 64%;
+    /* Epic colors pour le mode sombre */
+    --epic-purple: 344 85% 58%;
+    --epic-blue: 211 100% 50%;      /* Bleu au lieu d'orange */
+    --epic-green: 120 45% 65%;
+    --epic-orange: 344 85% 58%;     /* Rose au lieu d'orange */
+    --epic-pink: 344 85% 58%;
 
-    /* Generic status tokens */
-    --warning: 25 95% 53%;
-    --warning-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-
-    /* Sidebar - mode sombre */
     --sidebar-background: 0 0% 8%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 213 94% 68%;
-    --sidebar-primary-foreground: 0 0% 8%;
-    --sidebar-accent: 0 0% 20%;
+    --sidebar-primary: 344 85% 58%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 20%;     /* Gris clair pour les hovers */
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 213 94% 68%;
+    --sidebar-ring: 344 85% 58%;
 
-    /* Epic colors - mode sombre */
-    --epic-purple: 270 95% 75%;
-    --epic-blue: 217 91% 60%;
-    --epic-green: 142 71% 45%;
-    --epic-orange: 25 95% 53%;
-    --epic-pink: 330 81% 60%;
-
-    /* Illustration colors (consistent) */
-    --illustration-1: 213 94% 68%;
-    --illustration-2: 217 91% 60%;
-    --illustration-3: 142 71% 45%;
-    --illustration-4: 25 95% 53%;
-    --illustration-5: 270 95% 75%;
+    /* Illustration colors (same in dark mode) */
+    --illustration-1: 220 70% 50%;
+    --illustration-2: 200 65% 55%;
+    --illustration-3: 180 60% 60%;
+    --illustration-4: 160 55% 65%;
+    --illustration-5: 140 50% 70%;
   }
 }
 
@@ -181,28 +160,26 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Custom scrollbar - Get It Done Style */
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: hsl(var(--muted));
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.2);
+    background: hsl(var(--muted-foreground) / 0.3);
     border-radius: 3px;
-    transition: all 0.2s ease-out;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.4);
+    background: hsl(var(--muted-foreground) / 0.5);
   }
   
   /* Typography Styles for TipTap Editor - Enhanced Dark Mode Support */
@@ -413,63 +390,7 @@
     50% { transform: translate(-10px, -10px); }
   }
 
-  /* Get It Done Design System Utilities */
-  
-  /* Touch targets - minimum 44px for mobile */
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Task hover states */
-  .task-hover:hover {
-    background-color: hsl(var(--task-hover, var(--accent)));
-  }
-
-  /* Priority color utilities */
-  .priority-1 { color: hsl(var(--priority-1)); }
-  .priority-2 { color: hsl(var(--priority-2)); }
-  .priority-3 { color: hsl(var(--priority-3)); }
-  .priority-4 { color: hsl(var(--priority-4)); }
-
-  .bg-priority-1 { background-color: hsl(var(--priority-1)); }
-  .bg-priority-2 { background-color: hsl(var(--priority-2)); }
-  .bg-priority-3 { background-color: hsl(var(--priority-3)); }
-  .bg-priority-4 { background-color: hsl(var(--priority-4)); }
-
-  /* Status color utilities */
-  .status-todo { color: hsl(var(--status-todo)); }
-  .status-progress { color: hsl(var(--status-progress)); }
-  .status-done { color: hsl(var(--status-done)); }
-  .status-blocked { color: hsl(var(--status-blocked)); }
-
-  .bg-status-todo { background-color: hsl(var(--status-todo)); }
-  .bg-status-progress { background-color: hsl(var(--status-progress)); }
-  .bg-status-done { background-color: hsl(var(--status-done)); }
-  .bg-status-blocked { background-color: hsl(var(--status-blocked)); }
-
-  /* Smooth transitions - Get It Done signature */
-  .transition-get-it-done {
-    transition: all 0.2s ease-out;
-  }
-
-  /* Enhanced focus styles for accessibility */
-  .focus-get-it-done:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-    border-radius: calc(var(--radius) - 2px);
-  }
-
-  /* Mobile-first font sizes (16px+ to prevent zoom) */
-  .text-mobile {
-    font-size: 16px;
-  }
-
-  @media (min-width: 768px) {
-    .text-mobile {
-      font-size: 14px;
-    }
-  }
+  /* Line clamp utilities for text truncation */
   .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;
