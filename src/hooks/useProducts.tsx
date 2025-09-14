@@ -4,6 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
+import { ToastAction } from '@/components/ui/toast';
 import type { Product } from '@/types';
 
 export interface CreateProductData {
@@ -20,6 +22,7 @@ export const useProducts = (workspaceId?: string) => {
   const { trackProductCreated } = useMixpanelContext();
   const { ensureValidSession, isValid: sessionIsValid } = useSessionManager();
   const { tier } = useSubscription();
+  const navigate = useNavigate();
 
   // Fetch products
   const fetchProducts = async () => {
@@ -69,8 +72,16 @@ export const useProducts = (workspaceId?: string) => {
       console.error('[useProducts] Product creation blocked: limit reached for plan', tier);
       toast({
         title: "Product limit reached",
-        description: `You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`,
-        variant: "destructive"
+        description: `You've reached the maximum number of products for the ${tier} plan.`,
+        variant: "destructive",
+        action: (
+          <ToastAction 
+            altText="Upgrade plan"
+            onClick={() => navigate('/pricing')}
+          >
+            Upgrade
+          </ToastAction>
+        )
       });
       throw new Error(`You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`);
     }
