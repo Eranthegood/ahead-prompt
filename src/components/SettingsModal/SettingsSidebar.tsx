@@ -7,7 +7,6 @@ import {
   Settings, 
   Palette, 
   Keyboard, 
-  Heart, 
   Users, 
   Mail, 
   Plug, 
@@ -32,7 +31,6 @@ const menuSections = [
       { id: 'general', label: 'Général', icon: Settings },
       { id: 'appearance', label: 'Apparence', icon: Palette },
       { id: 'shortcuts', label: 'Raccourcis clavier', icon: Keyboard },
-      { id: 'favoriteLinks', label: 'Liens Favoris', icon: Heart },
     ],
   },
   {

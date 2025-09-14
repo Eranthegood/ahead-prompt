@@ -4,7 +4,6 @@ import { SettingsSidebar } from './SettingsSidebar';
 import { AccountSection } from './sections/AccountSection';
 import { AppearanceSection } from './sections/AppearanceSection';
 import { TeamSection } from './sections/TeamSection';
-import { FavoriteLinksSection } from './sections/FavoriteLinksSection';
 import { GeneralSection } from './sections/GeneralSection';
 import { ShortcutsSection } from './sections/ShortcutsSection';
 import { IntegrationsSection } from './sections/IntegrationsSection';
@@ -23,7 +22,6 @@ const sections = {
   general: { title: 'Général', description: 'Préférences générales de l\'application' },
   appearance: { title: 'Apparence', description: 'Personnalisez l\'apparence de l\'interface' },
   shortcuts: { title: 'Raccourcis clavier', description: 'Consultez et personnalisez les raccourcis' },
-  favoriteLinks: { title: 'Liens Favoris', description: 'Gérez vos liens et ressources favorites' },
   team: { title: 'Équipe', description: 'Gérez les membres et invitations de votre équipe' },
   integrations: { title: 'Intégrations', description: 'Connectez vos outils et services préférés' },
   help: { title: 'Aide', description: 'Documentation et support' },
@@ -45,8 +43,6 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
         return <AppearanceSection />;
       case 'shortcuts':
         return <ShortcutsSection />;
-      case 'favoriteLinks':
-        return <FavoriteLinksSection />;
       case 'team':
         return <TeamSection />;
       case 'integrations':
