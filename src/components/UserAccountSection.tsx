@@ -85,7 +85,7 @@ export function UserAccountSection() {
             
             <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
               <Users className="mr-2 h-4 w-4" />
-              <span>People</span>
+              <span>Team</span>
             </DropdownMenuItem>
             
             <DropdownMenuItem disabled>
@@ -238,7 +238,7 @@ export function UserAccountSection() {
           
           <DropdownMenuItem onClick={() => setShowWorkspaceMembers(true)}>
             <Users className="mr-2 h-4 w-4" />
-            <span>People</span>
+            <span>Team</span>
           </DropdownMenuItem>
           
           <DropdownMenuItem disabled>
