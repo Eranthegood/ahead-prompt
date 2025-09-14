@@ -8,9 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useProducts } from '@/hooks/useProducts';
-import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen } from 'lucide-react';
+import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
+import { UsageLimitIndicator } from '@/components/UsageLimitIndicator';
+import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen, Lock } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { KnowledgeModal } from '@/components/KnowledgeModal';
+import { useToast } from '@/hooks/use-toast';
 import type { Product, Workspace } from '@/types';
 
 interface ProductManagementProps {
@@ -28,8 +31,12 @@ const PRODUCT_COLORS = [
 
 export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace }) => {
   const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts(workspace.id);
+  const { tier } = useSubscription();
+  const { toast } = useToast();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  
+  const canCreate = canCreateProduct(tier, products?.length || 0);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -63,8 +70,30 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
     handleCloseDialog();
   };
 
+  const handleOpenCreate = () => {
+    if (!canCreate) {
+      toast({
+        title: "Product limit reached",
+        description: `You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    setIsCreateDialogOpen(true);
+  };
+
   const handleSubmit = async () => {
     if (!formData.name.trim()) return;
+
+    // Check limits again before creating (not editing)
+    if (!editingProduct && !canCreate) {
+      toast({
+        title: "Product limit reached",
+        description: `You've reached the maximum number of products for the ${tier} plan.`,
+        variant: "destructive"
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -128,11 +157,21 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
             Organize your prompts by product for better structure
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button onClick={handleOpenCreate} disabled={!canCreate}>
+          {canCreate ? (
+            <Plus className="w-4 h-4 mr-2" />
+          ) : (
+            <Lock className="w-4 h-4 mr-2" />
+          )}
           New Product
         </Button>
       </div>
+
+      <UsageLimitIndicator 
+        type="products" 
+        currentCount={products?.length || 0}
+        className="mb-6"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((product) => (
@@ -195,8 +234,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
               <p className="text-muted-foreground mb-4">
                 Create your first product to organize your prompts
               </p>
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={handleOpenCreate} disabled={!canCreate}>
+                {canCreate ? (
+                  <Plus className="w-4 h-4 mr-2" />
+                ) : (
+                  <Lock className="w-4 h-4 mr-2" />
+                )}
                 Create product
               </Button>
             </CardContent>

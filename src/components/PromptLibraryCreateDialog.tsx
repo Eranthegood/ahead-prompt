@@ -7,8 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { usePromptLibrary } from '@/hooks/usePromptLibrary';
+import { useSubscription, canCreatePromptLibraryItem } from '@/hooks/useSubscription';
+import { UsageLimitIndicator } from '@/components/UsageLimitIndicator';
 import { AI_MODELS, PROMPT_CATEGORIES, type PromptLibraryItem } from '@/types/prompt-library';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PromptLibraryCreateDialogProps {
@@ -24,7 +26,8 @@ export function PromptLibraryCreateDialog({
   editItem,
   onEditComplete 
 }: PromptLibraryCreateDialogProps) {
-  const { createItem, updateItem } = usePromptLibrary();
+  const { createItem, updateItem, items } = usePromptLibrary();
+  const { tier } = useSubscription();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [aiModel, setAiModel] = useState<string>(AI_MODELS[0].value);
@@ -33,6 +36,8 @@ export function PromptLibraryCreateDialog({
   const [newTag, setNewTag] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  const canCreate = canCreatePromptLibraryItem(tier, items?.length || 0);
 
   const isEditing = !!editItem;
 
@@ -76,6 +81,16 @@ export function PromptLibraryCreateDialog({
         variant: 'destructive',
         title: 'Missing information',
         description: 'Please provide both a title and body for your prompt.',
+      });
+      return;
+    }
+
+    // Check limits before creating (not editing)
+    if (!isEditing && !canCreate) {
+      toast({
+        title: "Prompt library limit reached",
+        description: `You've reached the maximum number of prompt library items for the ${tier} plan. Upgrade to create more items.`,
+        variant: "destructive"
       });
       return;
     }
@@ -124,6 +139,14 @@ export function PromptLibraryCreateDialog({
             {isEditing ? 'Edit Prompt' : 'Create New Prompt'}
           </DialogTitle>
         </DialogHeader>
+
+        {!isEditing && (
+          <UsageLimitIndicator 
+            type="promptLibrary" 
+            currentCount={items?.length || 0}
+            className="mb-4"
+          />
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
@@ -231,8 +254,14 @@ export function PromptLibraryCreateDialog({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : (isEditing ? 'Update Prompt' : 'Save Prompt')}
+            <Button type="submit" disabled={loading || (!isEditing && !canCreate)}>
+              {loading ? 'Saving...' : 
+               !isEditing && !canCreate ? (
+                 <div className="flex items-center gap-2">
+                   <Lock className="w-4 h-4" />
+                   Limit Reached
+                 </div>
+               ) : (isEditing ? 'Update Prompt' : 'Save Prompt')}
             </Button>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { MinimalPromptList } from '@/components/MinimalPromptList';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
 import { QuickPromptDialog as QPD_Keep } from '@/components/QuickPromptDialog';
+import { UsageOverviewDashboard } from '@/components/UsageOverviewDashboard';
 
 import { DebugConsole } from '@/components/debug/DebugConsole';
 import { PromptLibrary } from '@/components/PromptLibrary';
@@ -182,6 +183,9 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   return (
     <>
       <div className="flex-1 flex flex-col min-w-0">
+        
+        {/* Usage Overview - show at top */}
+        <UsageOverviewDashboard />
         
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics && <MetricsDashboard />}

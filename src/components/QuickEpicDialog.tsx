@@ -4,7 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Target, MoreHorizontal, Palette } from 'lucide-react';
+import { useSubscription, canCreateEpic } from '@/hooks/useSubscription';
+import { useEpics } from '@/hooks/useEpics';
+import { useToast } from '@/hooks/use-toast';
+import { Target, MoreHorizontal, Palette, Lock } from 'lucide-react';
 import type { Workspace, Product } from '@/types';
 
 interface CreateEpicData {
@@ -42,11 +45,20 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
   products = [],
   selectedProductId,
 }) => {
+  const { tier } = useSubscription();
+  const { toast } = useToast();
+  const { epics } = useEpics(workspace.id);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<string>('#8B5CF6');
   const [selectedProduct, setSelectedProduct] = useState<string>(selectedProductId || '');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get epic count for the selected product
+  const productEpicCount = selectedProduct 
+    ? epics?.filter(epic => epic.product_id === selectedProduct).length || 0
+    : 0;
+  const canCreate = canCreateEpic(tier, productEpicCount);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -81,6 +93,16 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
 
   const handleSave = async () => {
     if (!name.trim() || !selectedProduct) return;
+    
+    // Check limits before creating
+    if (!canCreate) {
+      toast({
+        title: "Epic limit reached",
+        description: `You've reached the maximum number of epics for this product on the ${tier} plan. Upgrade to create more epics.`,
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -232,13 +254,18 @@ export const QuickEpicDialog: React.FC<QuickEpicDialogProps> = ({
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={!name.trim() || !selectedProduct || isLoading}
+                disabled={!name.trim() || !selectedProduct || isLoading || !canCreate}
                 className="bg-primary hover:bg-primary/90"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                     Creating...
+                  </div>
+                ) : !canCreate ? (
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-3 h-3" />
+                    Limit Reached
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
