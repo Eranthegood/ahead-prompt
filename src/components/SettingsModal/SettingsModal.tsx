@@ -23,7 +23,7 @@ const sections = {
   general: { title: 'Général', description: 'Préférences générales de l\'application' },
   appearance: { title: 'Apparence', description: 'Personnalisez l\'apparence de l\'interface' },
   shortcuts: { title: 'Raccourcis clavier', description: 'Consultez et personnalisez les raccourcis' },
-  team: { title: 'Équipe', description: 'Gérez les membres et invitations de votre équipe' },
+  team: { title: 'Team', description: 'Manage your team members and invitations' },
   integrations: { title: 'Intégrations', description: 'Connectez vos outils et services préférés' },
   help: { title: 'Aide', description: 'Documentation et support' },
 };

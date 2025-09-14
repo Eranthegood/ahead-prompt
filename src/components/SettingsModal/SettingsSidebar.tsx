@@ -36,7 +36,7 @@ const menuSections = [
   {
     title: 'Collaboration',
     items: [
-      { id: 'team', label: 'Équipe', icon: Users },
+      { id: 'team', label: 'Team', icon: Users },
       { id: 'integrations', label: 'Intégrations', icon: Plug },
     ],
   },
