@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Keyboard, Trophy, LogOut, Crown, Library, Plug, Users } from 'lucide-react';
+import { User, Settings, Keyboard, Trophy, LogOut, Crown, Library, Plug, Users, Mail } from 'lucide-react';
+import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
@@ -23,6 +24,7 @@ export function UserAccountSection() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   const [showWorkspaceMembers, setShowWorkspaceMembers] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   
   const isCollapsed = state === 'collapsed';
 
@@ -202,6 +204,18 @@ export function UserAccountSection() {
             )}
           </DropdownMenuItem>
           
+          <DropdownMenuItem onClick={() => navigate('/contact')}>
+            <Mail className="mr-2 h-4 w-4" />
+            <span>Contact</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => setShowSettings(true)}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Paramètres</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
           <DropdownMenuItem onClick={() => navigate('/integrations')}>
             <Plug className="mr-2 h-4 w-4" />
             <span>Integrations</span>
@@ -258,6 +272,12 @@ export function UserAccountSection() {
       <WorkspaceMembersModal 
         open={showWorkspaceMembers} 
         onOpenChange={setShowWorkspaceMembers} 
+      />
+      
+      {/* Settings Modal */}
+      <SettingsModal 
+        open={showSettings}
+        onOpenChange={setShowSettings}
       />
     </div>
   );

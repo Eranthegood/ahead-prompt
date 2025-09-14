@@ -18,10 +18,8 @@ import {
   Trophy,
   Menu,
   X,
-  ChevronDown,
-  Settings
+  ChevronDown
 } from 'lucide-react';
-import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
@@ -42,7 +40,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
   const [searchQuery, setSearchQuery] = useState('');
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,30 +111,11 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2">
             
-            {/* Always show Pricing CTA and dropdown menu */}
+            {/* Always show Pricing CTA */}
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" onClick={() => handleNavigate('/pricing')}>
                 Pricing
               </Button>
-              
-              {/* Dropdown Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="gap-1">
-                    More
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleNavigate('/contact')}>
-                    Contact
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Paramètres
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             {/* Mobile menu toggle */}
@@ -227,10 +205,6 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
           onNavigate={handleNavigate}
         />
       )}
-      <SettingsModal 
-        open={showSettings}
-        onOpenChange={setShowSettings}
-      />
     </>
   );
 }
