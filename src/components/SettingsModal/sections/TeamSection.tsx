@@ -34,13 +34,25 @@ export function TeamSection() {
 
     try {
       setInviting(true);
-      await createInvitation(inviteEmail.trim(), inviteRole);
+      const invitation = await createInvitation(inviteEmail.trim(), inviteRole);
+      
+      // Copy the invitation link to clipboard
+      if (invitation?.invitation_token) {
+        const link = `${window.location.origin}/join-workspace?token=${invitation.invitation_token}`;
+        await navigator.clipboard.writeText(link);
+        toast({
+          title: "Link created and copied",
+          description: `Invitation link copied to clipboard for ${inviteEmail}`,
+        });
+      } else {
+        toast({
+          title: "Link created",
+          description: `Invitation created for ${inviteEmail}`,
+        });
+      }
+      
       setInviteEmail('');
       setInviteRole('user');
-      toast({
-        title: "Invitation envoyée",
-        description: `Une invitation a été envoyée à ${inviteEmail}`,
-      });
     } catch (error) {
       console.error('Error inviting member:', error);
       toast({
@@ -133,7 +145,7 @@ export function TeamSection() {
             disabled={!inviteEmail.trim() || inviting}
             className="w-full md:w-auto"
           >
-            {inviting ? 'Envoi...' : 'Envoyer l\'invitation'}
+            {inviting ? 'Creating...' : 'Create Link'}
           </Button>
         </CardContent>
       </Card>
