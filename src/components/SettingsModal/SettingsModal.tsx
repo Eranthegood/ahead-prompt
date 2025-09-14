@@ -9,6 +9,7 @@ import { ShortcutsSection } from './sections/ShortcutsSection';
 import { IntegrationsSection } from './sections/IntegrationsSection';
 import { HelpSection } from './sections/HelpSection';
 import { SubscriptionSection } from './sections/SubscriptionSection';
+import { useNavigate } from 'react-router-dom';
 
 export interface SettingsModalProps {
   open: boolean;
@@ -30,6 +31,17 @@ const sections = {
 export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }: SettingsModalProps) {
   const [activeSection, setActiveSection] = useState(defaultSection);
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  const handleSectionChange = (section: string) => {
+    if (section === 'integrations') {
+      // Close modal and navigate to integrations page
+      onOpenChange(false);
+      navigate('/integrations');
+    } else {
+      setActiveSection(section);
+    }
+  };
 
   const renderSectionContent = () => {
     switch (activeSection) {
@@ -63,7 +75,7 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
           {/* Sidebar */}
           <SettingsSidebar
             activeSection={activeSection}
-            onSectionChange={setActiveSection}
+            onSectionChange={handleSectionChange}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
           />
