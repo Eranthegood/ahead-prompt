@@ -16,7 +16,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { copyText } from '@/lib/clipboard';
 
 // Declare Supademo global function
@@ -45,6 +45,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const [hoveredPromptId, setHoveredPromptId] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     workspace,
     loading
@@ -184,8 +185,8 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     <>
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Usage Overview - show at top */}
-        <UsageOverviewDashboard />
+        {/* Usage Overview - show at top, but not on /build route */}
+        {location.pathname !== '/build' && <UsageOverviewDashboard />}
         
         {/* Metrics Dashboard - conditionally shown */}
         {showMetrics && <MetricsDashboard />}
