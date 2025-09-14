@@ -51,16 +51,16 @@ export function IntegrationsSection() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div>Chargement...</div>
-          ) : (
+          <div className="text-center py-8 opacity-50">
+            <p className="text-muted-foreground mb-4">
+              Les intégrations sont en cours de développement et seront bientôt disponibles.
+            </p>
             <div className="space-y-4">
               {availableIntegrations.map((integration) => {
                 const Icon = integration.icon;
-                const status = getIntegrationStatus(integration.id);
                 
                 return (
-                  <div key={integration.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={integration.id} className="flex items-center justify-between p-4 border rounded-lg opacity-50">
                     <div className="flex items-center gap-4">
                       <div className={`p-2 rounded-lg ${integration.color}`}>
                         <Icon className="h-5 w-5" />
@@ -68,64 +68,22 @@ export function IntegrationsSection() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{integration.name}</h3>
-                          {status.isConfigured && (
-                            <Badge variant={status.isEnabled ? 'default' : 'secondary'}>
-                              {status.isEnabled ? 'Activé' : 'Configuré'}
-                            </Badge>
-                          )}
+                          <Badge variant="secondary">Bientôt</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {integration.description}
                         </p>
-                        {status.lastTest && (
-                          <p className="text-xs text-muted-foreground">
-                            Dernier test: {status.lastTest}
-                          </p>
-                        )}
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      {status.isConfigured && (
-                        <Switch
-                          checked={status.isEnabled}
-                          onCheckedChange={() => {
-                            // TODO: Handle enable/disable
-                          }}
-                        />
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          // Navigate to integration configuration
-                          if (integration.id === 'github') {
-                            window.open('/integrations/github', '_blank');
-                          } else if (integration.id === 'figma') {
-                            window.open('/integrations/figma', '_blank');
-                          } else if (integration.id === 'cursor') {
-                            window.open('/integrations/cursor', '_blank');
-                          }
-                        }}
-                      >
-                        {status.isConfigured ? (
-                          <>
-                            <Settings className="mr-2 h-4 w-4" />
-                            Configurer
-                          </>
-                        ) : (
-                          <>
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            Connecter
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                    <Button disabled variant="outline" size="sm">
+                      Bientôt disponible
+                    </Button>
                   </div>
                 );
               })}
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
     </div>
