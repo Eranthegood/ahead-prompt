@@ -1549,6 +1549,18 @@ export type Database = {
         Args: { title: string }
         Returns: string
       }
+      get_user_workspaces: {
+        Args: { user_uuid?: string }
+        Returns: {
+          created_at: string
+          description: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+          user_role: string
+        }[]
+      }
       is_admin: {
         Args: { user_id?: string }
         Returns: boolean
