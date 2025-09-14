@@ -3,11 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Workspace } from '@/types';
+import { useSearchParams } from 'react-router-dom';
 
 export function useWorkspace() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -21,7 +23,7 @@ export function useWorkspace() {
     }
 
     fetchOrCreateWorkspace();
-  }, [user]);
+  }, [user, searchParams]);
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -31,7 +33,47 @@ export function useWorkspace() {
     try {
       setLoading(true);
       
-      console.log(`[useWorkspace] Fetching workspace for user: ${user.id}, attempt: ${retryCount + 1}`);
+      // Check if a specific workspace is requested via URL parameter
+      const requestedWorkspaceId = searchParams.get('workspace');
+      
+      if (requestedWorkspaceId) {
+        console.log(`[useWorkspace] Loading specific workspace: ${requestedWorkspaceId}`);
+        
+        // First check if user has access to this workspace via workspace_members
+        const { data: memberWorkspace, error: memberError } = await supabase
+          .from('workspace_members')
+          .select('workspaces(*)')
+          .eq('workspace_id', requestedWorkspaceId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (!memberError && memberWorkspace?.workspaces) {
+          console.log('[useWorkspace] Successfully loaded requested workspace via membership');
+          setWorkspace(memberWorkspace.workspaces as Workspace);
+          setRetryCount(0);
+          return;
+        }
+
+        // Fallback: check if user owns this workspace
+        const { data: ownedWorkspace, error: ownedError } = await supabase
+          .from('workspaces')
+          .select('*')
+          .eq('id', requestedWorkspaceId)
+          .eq('owner_id', user.id)
+          .single();
+
+        if (!ownedError && ownedWorkspace) {
+          console.log('[useWorkspace] Successfully loaded requested workspace via ownership');
+          setWorkspace(ownedWorkspace);
+          setRetryCount(0);
+          return;
+        }
+
+        // If neither worked, fall through to default workspace loading
+        console.log('[useWorkspace] User does not have access to requested workspace, loading default');
+      }
+      
+      console.log(`[useWorkspace] Fetching default workspace for user: ${user.id}, attempt: ${retryCount + 1}`);
       
       // Use the optimized function first
       try {
@@ -138,7 +180,7 @@ export function useWorkspace() {
     } finally {
       setLoading(false);
     }
-  }, [user, retryCount, toast]);
+  }, [user, retryCount, toast, searchParams]);
 
   return { 
     workspace, 

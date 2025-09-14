@@ -91,7 +91,7 @@ export default function JoinWorkspace() {
         description: `You've successfully joined ${invitation.workspaces?.name}`
       });
 
-      navigate('/build');
+      navigate(`/build?workspace=${workspaceId}`);
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
       toast({
