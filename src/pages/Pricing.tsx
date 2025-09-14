@@ -154,7 +154,7 @@ export default function Pricing() {
               <span className={!isAnnual ? "text-foreground font-medium" : "text-muted-foreground"}>Monthly</span>
               <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
               <span className={isAnnual ? "text-foreground font-medium" : "text-muted-foreground"}>
-                Annual <Badge variant="secondary" className="ml-2">-20%</Badge>
+                Annual {isAnnual && <span className="text-xs text-muted-foreground">(billed annually)</span>} <Badge variant="secondary" className="ml-2">-20%</Badge>
               </span>
             </div>
           </BlurFade>
