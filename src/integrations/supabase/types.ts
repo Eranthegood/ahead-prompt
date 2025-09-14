@@ -963,30 +963,45 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          current_period_end: string | null
           email: string | null
           full_name: string | null
           id: string
           provider: string | null
+          stripe_customer_id: string | null
+          stripe_product_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
           subscription_tier: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           provider?: string | null
+          stripe_customer_id?: string | null
+          stripe_product_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           subscription_tier?: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
           provider?: string | null
+          stripe_customer_id?: string | null
+          stripe_product_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           subscription_tier?: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at?: string
         }
@@ -1340,6 +1355,45 @@ export type Database = {
           updated_at?: string
           url?: string | null
           webhook_received_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          status: string
+          stripe_customer_id: string
+          stripe_product_id: string
+          stripe_subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end: string
+          current_period_start: string
+          id?: string
+          status: string
+          stripe_customer_id: string
+          stripe_product_id: string
+          stripe_subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_product_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
