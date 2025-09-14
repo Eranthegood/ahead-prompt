@@ -143,24 +143,65 @@ export function LinearPromptItem({
           onMouseLeave={() => onHover?.(null)}
           onClick={() => onPromptClick(prompt)}
         >
-      {/* Priority indicator - Fixed 32px column */}
-      <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mr-3">
-        <div 
-          className={`flex items-center justify-center w-6 h-6 rounded-full ${priorityDisplay.bg} transition-all cursor-pointer hover:scale-110 hover:shadow-sm ${
-            priority === 1 ? 'ring-2 ring-red-500/50 shadow-md' : ''
-          }`}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onPriorityChange) {
-              // Cycle through priorities: 1 (High) -> 2 (Normal) -> 3 (Low) -> 1
-              const currentPriority = prompt.priority || 3;
-              const nextPriority = currentPriority === 3 ? 1 : currentPriority + 1;
-              onPriorityChange(prompt, nextPriority);
-            }
-          }}
-        >
-          <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
-        </div>
+      {/* Priority dropdown - Fixed 32px column */}
+      <div className="w-8 flex-shrink-0 mr-3 flex items-center justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-auto p-1 justify-center hover:bg-muted"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PriorityIcon className={`h-4 w-4 ${priorityDisplay.color}`} />
+              <ChevronDown className="h-3 w-3 ml-1 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            className="w-28 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onPriorityChange && prompt.priority !== 1) {
+                  onPriorityChange(prompt, 1);
+                }
+              }}
+              className={`${prompt.priority === 1 ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
+            >
+              <Flame className="h-4 w-4 text-red-500" />
+              High
+              {prompt.priority === 1 && <Check className="h-3 w-3 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onPriorityChange && prompt.priority !== 2) {
+                  onPriorityChange(prompt, 2);
+                }
+              }}
+              className={`${prompt.priority === 2 ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
+            >
+              <Minus className="h-4 w-4 text-orange-500" />
+              Normal
+              {prompt.priority === 2 && <Check className="h-3 w-3 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onPriorityChange && prompt.priority !== 3) {
+                  onPriorityChange(prompt, 3);
+                }
+              }}
+              className={`${prompt.priority === 3 ? 'bg-gray-100 dark:bg-gray-700' : ''} text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2`}
+            >
+              <Clock className="h-4 w-4 text-gray-400" />
+              Low
+              {prompt.priority === 3 && <Check className="h-3 w-3 ml-auto" />}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Actions - Fixed width, show on hover */}
