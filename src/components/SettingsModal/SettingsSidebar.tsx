@@ -11,7 +11,8 @@ import {
   Users, 
   Mail, 
   Plug, 
-  HelpCircle 
+  HelpCircle,
+  CreditCard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +28,7 @@ const menuSections = [
     title: 'Paramètres',
     items: [
       { id: 'account', label: 'Compte', icon: User },
+      { id: 'subscription', label: 'Abonnement', icon: CreditCard },
       { id: 'general', label: 'Général', icon: Settings },
       { id: 'appearance', label: 'Apparence', icon: Palette },
       { id: 'shortcuts', label: 'Raccourcis clavier', icon: Keyboard },

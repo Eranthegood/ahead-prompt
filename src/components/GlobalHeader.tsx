@@ -24,6 +24,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useGamification } from '@/hooks/useGamification';
 import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
+import { PlanIndicator } from '@/components/PlanIndicator';
 
 
 interface GlobalHeaderProps {
@@ -110,6 +111,9 @@ export function GlobalHeader({ showSearch = true, showSidebarTrigger = false }: 
 
           {/* Right side - Navigation and User actions */}
           <div className="flex items-center gap-2 justify-end">
+            
+            {/* Plan Indicator for authenticated users */}
+            {user && <PlanIndicator size="sm" className="hidden md:flex" />}
             
             {/* Always show Pricing CTA */}
             <div className="hidden md:flex items-center gap-2">

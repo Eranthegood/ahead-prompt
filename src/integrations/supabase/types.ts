@@ -967,6 +967,7 @@ export type Database = {
           full_name: string | null
           id: string
           provider: string | null
+          subscription_tier: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at: string
         }
         Insert: {
@@ -976,6 +977,7 @@ export type Database = {
           full_name?: string | null
           id: string
           provider?: string | null
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at?: string
         }
         Update: {
@@ -985,6 +987,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           provider?: string | null
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier_type"]
           updated_at?: string
         }
         Relationships: []
@@ -1640,6 +1643,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       enhancer_type: "system" | "user"
+      subscription_tier_type: "free" | "basic" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1769,6 +1773,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       enhancer_type: ["system", "user"],
+      subscription_tier_type: ["free", "basic", "pro"],
     },
   },
 } as const

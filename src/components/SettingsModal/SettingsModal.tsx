@@ -9,6 +9,7 @@ import { GeneralSection } from './sections/GeneralSection';
 import { ShortcutsSection } from './sections/ShortcutsSection';
 import { IntegrationsSection } from './sections/IntegrationsSection';
 import { HelpSection } from './sections/HelpSection';
+import { SubscriptionSection } from './sections/SubscriptionSection';
 
 export interface SettingsModalProps {
   open: boolean;
@@ -18,6 +19,7 @@ export interface SettingsModalProps {
 
 const sections = {
   account: { title: 'Compte', description: 'Gérez vos informations personnelles et votre sécurité' },
+  subscription: { title: 'Abonnement', description: 'Gérez votre plan et facturation' },
   general: { title: 'Général', description: 'Préférences générales de l\'application' },
   appearance: { title: 'Apparence', description: 'Personnalisez l\'apparence de l\'interface' },
   shortcuts: { title: 'Raccourcis clavier', description: 'Consultez et personnalisez les raccourcis' },
@@ -35,6 +37,8 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
     switch (activeSection) {
       case 'account':
         return <AccountSection />;
+      case 'subscription':
+        return <SubscriptionSection />;
       case 'general':
         return <GeneralSection />;
       case 'appearance':
