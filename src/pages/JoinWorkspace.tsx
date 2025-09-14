@@ -189,16 +189,28 @@ export default function JoinWorkspace() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="h-6 w-6 text-primary" />
+      <div className="w-full max-w-md space-y-6">
+        {/* Ahead Branding */}
+        <div className="text-center space-y-2">
+          <div className="mx-auto mb-4 h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+            <span className="text-2xl font-bold text-white">A</span>
           </div>
-          <CardTitle>Join Workspace</CardTitle>
-          <CardDescription>
-            You've been invited to join <strong>{invitation.workspaces?.name}</strong>
-          </CardDescription>
-        </CardHeader>
+          <h1 className="text-2xl font-bold text-foreground">Welcome to Ahead</h1>
+          <p className="text-muted-foreground">
+            Create your account to join the <strong>{invitation.workspaces?.name}</strong> workspace
+          </p>
+        </div>
+
+        <Card className="w-full">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-lg">Join Workspace</CardTitle>
+            <CardDescription>
+              Complete your registration to access the workspace
+            </CardDescription>
+          </CardHeader>
         
         <CardContent className="space-y-4">
           {/* Invitation Details */}
@@ -275,7 +287,8 @@ export default function JoinWorkspace() {
             </div>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

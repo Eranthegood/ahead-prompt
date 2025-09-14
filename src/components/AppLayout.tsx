@@ -34,9 +34,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [quickPromptOpen, setQuickPromptOpen] = useState(false);
   const [promptLibraryOpen, setPromptLibraryOpen] = useState(false);
   
-  // Pages qui n'ont pas besoin du header - now only auth page 
-  const noHeaderPages = ['/auth'];
-  const shouldShowHeader = !noHeaderPages.includes(location.pathname);
+  // Pages qui n'ont pas besoin du header - auth and invitation pages 
+  const noHeaderPages = ['/auth', '/join-workspace'];
+  const shouldShowHeader = !noHeaderPages.some(path => location.pathname.startsWith(path));
   
   // Pages that should show the sidebar
   const allowedSidebarPages = ['/build', '/settings', '/integrations'];
