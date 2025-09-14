@@ -8,9 +8,14 @@ interface SubscriptionInfo {
   tier: SubscriptionTier;
   loading: boolean;
   error: string | null;
+  subscribed: boolean;
+  subscriptionStatus: string;
+  subscriptionEnd: string | null;
+  productId: string | null;
+  refreshSubscription: () => Promise<void>;
 }
 
-// Plan limits configuration
+// Plan limits configuration - now updated to match Stripe plans
 export const PLAN_LIMITS = {
   free: {
     products: 1,
@@ -20,7 +25,7 @@ export const PLAN_LIMITS = {
   },
   basic: {
     products: 3,
-    epicsPerProduct: 3,
+    epicsPerProduct: 10,
     promptLibraryItems: 50,
     features: ['Advanced AI models', 'Knowledge base access', 'Cursor integration', 'Priority support']
   },
@@ -37,42 +42,98 @@ export const useSubscription = (): SubscriptionInfo => {
   const [tier, setTier] = useState<SubscriptionTier>('free');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState('inactive');
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [productId, setProductId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchSubscriptionTier = async () => {
-      if (!user) {
-        setTier('free');
-        setLoading(false);
-        return;
+  const checkSubscription = async () => {
+    if (!user) {
+      setTier('free');
+      setSubscribed(false);
+      setSubscriptionStatus('inactive');
+      setSubscriptionEnd(null);
+      setProductId(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data: authData } = await supabase.auth.getSession();
+      
+      if (!authData.session) {
+        throw new Error('No active session');
       }
 
-      try {
-        const { data, error } = await supabase
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${authData.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error checking subscription:', error);
+        setError('Failed to check subscription');
+        // Fallback to profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('subscription_tier')
+          .select('subscription_tier, subscription_status, current_period_end, stripe_product_id')
           .eq('id', user.id)
           .single();
 
-        if (error) {
-          console.error('Error fetching subscription tier:', error);
-          setError('Failed to fetch subscription info');
-          setTier('free'); // Default to free on error
+        if (!profileError && profileData) {
+          setTier(profileData.subscription_tier || 'free');
+          setSubscriptionStatus(profileData.subscription_status || 'inactive');
+          setSubscriptionEnd(profileData.current_period_end);
+          setProductId(profileData.stripe_product_id);
+          setSubscribed(profileData.subscription_status === 'active');
         } else {
-          setTier(data?.subscription_tier || 'free');
+          setTier('free');
+          setSubscribed(false);
+          setSubscriptionStatus('inactive');
+          setSubscriptionEnd(null);
+          setProductId(null);
         }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-        setError('Unexpected error occurred');
-        setTier('free');
-      } finally {
-        setLoading(false);
+      } else {
+        setTier(data.subscription_tier || 'free');
+        setSubscribed(data.subscribed || false);
+        setSubscriptionStatus(data.subscription_status || 'inactive');
+        setSubscriptionEnd(data.subscription_end);
+        setProductId(data.product_id);
+        setError(null);
       }
-    };
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setError('Unexpected error occurred');
+      setTier('free');
+      setSubscribed(false);
+      setSubscriptionStatus('inactive');
+      setSubscriptionEnd(null);
+      setProductId(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchSubscriptionTier();
+  const refreshSubscription = async () => {
+    await checkSubscription();
+  };
+
+  useEffect(() => {
+    checkSubscription();
   }, [user]);
 
-  return { tier, loading, error };
+  return { 
+    tier, 
+    loading, 
+    error, 
+    subscribed, 
+    subscriptionStatus, 
+    subscriptionEnd, 
+    productId, 
+    refreshSubscription 
+  };
 };
 
 // Helper functions
