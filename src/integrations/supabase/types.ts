@@ -1529,6 +1529,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_workspace_invitation: {
+        Args: { invitation_token_param: string; user_id_param: string }
+        Returns: string
+      }
       calculate_level: {
         Args: { xp: number }
         Returns: number

@@ -28,7 +28,7 @@ export function useWorkspace() {
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const fetchOrCreateWorkspace = useCallback(async () => {
-    if (!user) return;
+    if (!user || workspace) return; // Prevent double creation if workspace already exists
 
     try {
       setLoading(true);

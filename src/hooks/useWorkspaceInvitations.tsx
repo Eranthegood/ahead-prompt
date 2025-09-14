@@ -41,16 +41,16 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       const invitationsWithData = await Promise.all(
         (invitationsData || []).map(async (invitation) => {
           const [workspaceData, profileData] = await Promise.all([
-            supabase
-              .from('workspaces')
-              .select('name')
-              .eq('id', invitation.workspace_id)
-              .single(),
-            supabase
-              .from('profiles')
-              .select('email, full_name')
-              .eq('id', invitation.invited_by)
-              .single()
+        supabase
+          .from('workspaces')
+          .select('name')
+          .eq('id', invitation.workspace_id)
+          .maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', invitation.invited_by)
+          .maybeSingle()
           ]);
 
           return {
@@ -177,12 +177,12 @@ export function useWorkspaceInvitations(workspaceId?: string) {
           .from('workspaces')
           .select('name')
           .eq('id', data.workspace_id)
-          .single(),
+          .maybeSingle(),
         supabase
           .from('profiles')
           .select('email, full_name')
           .eq('id', data.invited_by)
-          .single()
+          .maybeSingle()
       ]);
 
       return {
@@ -199,33 +199,16 @@ export function useWorkspaceInvitations(workspaceId?: string) {
 
   const acceptInvitation = async (token: string, userId: string) => {
     try {
-      // First get the invitation
-      const invitation = await getInvitationByToken(token);
-      if (!invitation) {
-        throw new Error('Invalid or expired invitation');
-      }
-
-      // Accept the invitation
-      const { error: updateError } = await supabase
-        .from('workspace_invitations')
-        .update({ accepted_at: new Date().toISOString() })
-        .eq('invitation_token', token);
-
-      if (updateError) throw updateError;
-
-      // Add user to workspace members
-      const { error: memberError } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: invitation.workspace_id,
-          user_id: userId,
-          role: invitation.role,
-          invited_by: invitation.invited_by
+      // Use the secure RPC function to handle invitation acceptance
+      const { data: workspaceId, error } = await supabase
+        .rpc('accept_workspace_invitation', {
+          invitation_token_param: token,
+          user_id_param: userId
         });
 
-      if (memberError) throw memberError;
+      if (error) throw error;
 
-      return invitation.workspace_id;
+      return workspaceId;
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
       throw error;
