@@ -77,7 +77,7 @@ export function PromptCard({
   const [showCursorDialog, setShowCursorDialog] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [priorityOpen, setPriorityOpen] = useState(false);
+  
   const { toast } = useToast();
   const { workspace } = useWorkspace();
   
@@ -215,36 +215,20 @@ export function PromptCard({
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Priority selector */}
                   <Select 
-                    open={priorityOpen}
-                    onOpenChange={setPriorityOpen}
                     value={prompt.priority?.toString() || "3"} 
-                    onValueChange={(value) => {
-                      onPriorityChange(prompt, parseInt(value));
-                      setPriorityOpen(false);
-                    }}
+                    onValueChange={(value) => onPriorityChange(prompt, parseInt(value))}
                   >
                     <SelectTrigger 
                       className={cn(
                         "h-7 gap-1.5 px-2 flex-shrink-0 w-auto border-0 bg-transparent hover:bg-muted/50",
                         priorityDisplay.color
                       )}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPriorityOpen(prev => !prev);
-                      }}
+                      onPointerDown={(e) => e.stopPropagation()}
                     >
                       <PriorityIcon className="h-3.5 w-3.5" />
                       <span className="text-xs">{PRIORITY_LABELS[prompt.priority as keyof typeof PRIORITY_LABELS] || 'Low'}</span>
                     </SelectTrigger>
-                    <SelectContent 
-                      className="z-[1000] bg-popover border border-border shadow-lg"
-                      position="popper"
-                      sideOffset={6}
-                    >
+                    <SelectContent>
                       {PRIORITY_OPTIONS.map(option => {
                         const optionDisplay = getPriorityDisplay(option.value);
                         const OptionIcon = optionDisplay.icon;
