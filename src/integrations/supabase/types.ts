@@ -317,6 +317,56 @@ export type Database = {
           },
         ]
       }
+      claude_sessions: {
+        Row: {
+          completed_at: string | null
+          config: Json | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          output_lines: string[] | null
+          prompt_id: string | null
+          session_id: string
+          status: Database["public"]["Enums"]["claude_session_status"] | null
+          updated_at: string | null
+          working_directory: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          output_lines?: string[] | null
+          prompt_id?: string | null
+          session_id: string
+          status?: Database["public"]["Enums"]["claude_session_status"] | null
+          updated_at?: string | null
+          working_directory?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          output_lines?: string[] | null
+          prompt_id?: string | null
+          session_id?: string
+          status?: Database["public"]["Enums"]["claude_session_status"] | null
+          updated_at?: string | null
+          working_directory?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claude_sessions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -1699,6 +1749,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      claude_session_status:
+        | "initializing"
+        | "cloning_repo"
+        | "executing_claude"
+        | "processing_files"
+        | "committing_changes"
+        | "creating_pr"
+        | "completed"
+        | "failed"
       enhancer_type: "system" | "user"
       subscription_tier_type: "free" | "basic" | "pro"
     }
@@ -1829,6 +1888,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      claude_session_status: [
+        "initializing",
+        "cloning_repo",
+        "executing_claude",
+        "processing_files",
+        "committing_changes",
+        "creating_pr",
+        "completed",
+        "failed",
+      ],
       enhancer_type: ["system", "user"],
       subscription_tier_type: ["free", "basic", "pro"],
     },
