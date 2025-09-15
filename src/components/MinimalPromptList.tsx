@@ -469,27 +469,48 @@ export function MinimalPromptList({
                 </div>
                 <div className="space-y-px">
                   {epicPrompts.map((prompt) => (
-                  <LinearPromptItem
-                    key={prompt.id}
-                    prompt={prompt}
-                    onPromptClick={handlePromptClick}
-                    onCopyGenerated={handleCopyGenerated}
-                    onShowCursorDrawer={() => {
-                      setDrawerPrompt(prompt);
-                      setDrawerType('cursor');
-                    }}
-                    onShowClaudeDrawer={() => {
-                      setDrawerPrompt(prompt);
-                      setDrawerType('claude');
-                    }}
-                    onPriorityChange={handlePriorityChangeWrapper}
-                    onStatusChange={handleStatusChangeWrapper}
-                    onEdit={handleEdit}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleDelete}
-                    isHovered={hoveredPromptId === prompt.id}
-                    onHover={onPromptHover}
-                  />
+                  <div key={prompt.id}>
+                    <LinearPromptItem
+                      prompt={prompt}
+                      onPromptClick={handlePromptClick}
+                      onCopyGenerated={handleCopyGenerated}
+                      onShowCursorDrawer={() => {
+                        console.log('[MinimalPromptList] Opening Cursor drawer for prompt:', prompt.id);
+                        setDrawerPrompt(prompt);
+                        setDrawerType('cursor');
+                      }}
+                      onShowClaudeDrawer={() => {
+                        console.log('[MinimalPromptList] Opening Claude drawer for prompt:', prompt.id);
+                        setDrawerPrompt(prompt);
+                        setDrawerType('claude');
+                      }}
+                      onPriorityChange={handlePriorityChangeWrapper}
+                      onStatusChange={handleStatusChangeWrapper}
+                      onEdit={handleEdit}
+                      onDuplicate={handleDuplicate}
+                      onDelete={handleDelete}
+                      isHovered={hoveredPromptId === prompt.id}
+                      onHover={onPromptHover}
+                    />
+                    
+                    {/* Drawer appears directly below this specific prompt */}
+                    {drawerPrompt?.id === prompt.id && drawerType && (
+                      <PromptActionDrawer
+                        isOpen={true}
+                        onClose={() => {
+                          setDrawerPrompt(null);
+                          setDrawerType(null);
+                        }}
+                        prompt={drawerPrompt}
+                        actionType={drawerType}
+                        onPromptUpdate={(promptId, updates) => {
+                          if (promptsContext?.updatePrompt) {
+                            promptsContext.updatePrompt(promptId, updates);
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
                   ))}
                 </div>
               </div>
@@ -551,27 +572,46 @@ export function MinimalPromptList({
                 }
                 
                 return (
-                  <LinearPromptItem
-                    key={item.id}
-                    prompt={item}
-                    onPromptClick={handlePromptClick}
-                    onCopyGenerated={handleCopyGenerated}
-                    onShowCursorDrawer={() => {
-                      setDrawerPrompt(item);
-                      setDrawerType('cursor');
-                    }}
-                    onShowClaudeDrawer={() => {
-                      setDrawerPrompt(item);
-                      setDrawerType('claude');
-                    }}
-                    onPriorityChange={handlePriorityChangeWrapper}
-                    onStatusChange={handleStatusChangeWrapper}
-                    onEdit={handleEdit}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleDelete}
-                    isHovered={hoveredPromptId === item.id}
-                    onHover={onPromptHover}
-                  />
+                  <div key={item.id}>
+                    <LinearPromptItem
+                      prompt={item}
+                      onPromptClick={handlePromptClick}
+                      onCopyGenerated={handleCopyGenerated}
+                      onShowCursorDrawer={() => {
+                        setDrawerPrompt(item);
+                        setDrawerType('cursor');
+                      }}
+                      onShowClaudeDrawer={() => {
+                        setDrawerPrompt(item);
+                        setDrawerType('claude');
+                      }}
+                      onPriorityChange={handlePriorityChangeWrapper}
+                      onStatusChange={handleStatusChangeWrapper}
+                      onEdit={handleEdit}
+                      onDuplicate={handleDuplicate}
+                      onDelete={handleDelete}
+                      isHovered={hoveredPromptId === item.id}
+                      onHover={onPromptHover}
+                    />
+                    
+                    {/* Drawer appears directly below this specific prompt */}
+                    {drawerPrompt?.id === item.id && drawerType && (
+                      <PromptActionDrawer
+                        isOpen={true}
+                        onClose={() => {
+                          setDrawerPrompt(null);
+                          setDrawerType(null);
+                        }}
+                        prompt={drawerPrompt}
+                        actionType={drawerType}
+                        onPromptUpdate={(promptId, updates) => {
+                          if (promptsContext?.updatePrompt) {
+                            promptsContext.updatePrompt(promptId, updates);
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
                 );
               });
             })()}
@@ -588,24 +628,7 @@ export function MinimalPromptList({
         epics={epics}
       />
 
-      {/* Action Drawer */}
-      {drawerPrompt && drawerType && (
-        <PromptActionDrawer
-          isOpen={true}
-          onClose={() => {
-            setDrawerPrompt(null);
-            setDrawerType(null);
-          }}
-          prompt={drawerPrompt}
-          actionType={drawerType}
-          onPromptUpdate={(promptId, updates) => {
-            // Update the prompt with the new status and workflow data
-            if (promptsContext?.updatePrompt) {
-              promptsContext.updatePrompt(promptId, updates);
-            }
-          }}
-        />
-      )}
+      {/* Action Drawer - removed from here as it's now inline with each prompt */}
     </div>
   );
 }

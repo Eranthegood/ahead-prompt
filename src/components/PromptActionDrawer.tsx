@@ -178,7 +178,12 @@ export function PromptActionDrawer({
     }
   };
 
-  if (!isOpen) return null;
+  console.log('[PromptActionDrawer] Render:', { isOpen, actionType, promptId: prompt.id });
+  
+  if (!isOpen) {
+    console.log('[PromptActionDrawer] Not rendering - isOpen is false');
+    return null;
+  }
 
   const models = actionType === 'cursor' ? CURSOR_MODELS : CLAUDE_MODELS;
   const IconComponent = actionType === 'cursor' ? ExternalLink : Code;
@@ -186,7 +191,7 @@ export function PromptActionDrawer({
   const handleAction = actionType === 'cursor' ? handleSendToCursor : handleSendToClaude;
 
   return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-4 mx-3 mt-2 animate-in slide-in-from-top-2 duration-200">
+    <div className="bg-background border border-border rounded-lg shadow-lg p-4 mx-3 mt-2 mb-2 animate-in slide-in-from-top-2 duration-200 relative z-10">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <IconComponent className="h-4 w-4 text-muted-foreground" />
