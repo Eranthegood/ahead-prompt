@@ -64,15 +64,13 @@ export function UserAccountSection() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             
-            <DropdownMenuItem onClick={() => navigate('/profile')}>
+            <DropdownMenuItem onClick={() => {
+              setSettingsSection('account');
+              setShowSettings(true);
+            }}>
               <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>Compte</span>
             </DropdownMenuItem>
-            
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => navigate('/shortcuts')}>
               <Keyboard className="mr-2 h-4 w-4" />
@@ -125,6 +123,12 @@ export function UserAccountSection() {
         <WorkspaceMembersModal 
           open={showWorkspaceMembers} 
           onOpenChange={setShowWorkspaceMembers} 
+        />
+        
+        <SettingsModal 
+          open={showSettings}
+          onOpenChange={setShowSettings}
+          defaultSection={settingsSection}
         />
       </div>
     );
@@ -203,9 +207,12 @@ export function UserAccountSection() {
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <DropdownMenuItem onClick={() => {
+            setSettingsSection('account');
+            setShowSettings(true);
+          }}>
             <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>Compte</span>
             {stats && (
               <Badge variant="secondary" className="ml-auto text-xs">
                 Lvl {stats.current_level}
