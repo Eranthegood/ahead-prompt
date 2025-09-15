@@ -123,10 +123,22 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const handleActionButton = () => {
     if (integration.isComingSoon) return;
     
+    // For Cursor and Claude, always allow reconfiguration if token test failed
+    if ((integration.id === 'cursor' || integration.id === 'claude') && 
+        integrationData.lastTestResult === 'error') {
+      setShowTokenField(true);
+      return;
+    }
+    
     if (!integrationData.isConfigured) {
       setShowTokenField(true);
     } else if (integrationData.isEnabled && integration.repositoryConfigPath) {
-      navigate(integration.repositoryConfigPath);
+      // For Cursor and Claude, always show token field first if not explicitly navigating to repo config
+      if (integration.id === 'cursor' || integration.id === 'claude') {
+        setShowTokenField(true);
+      } else {
+        navigate(integration.repositoryConfigPath);
+      }
     } else {
       testIntegration(integration.id);
     }
@@ -145,11 +157,17 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const getActionButtonText = () => {
     if (integration.isComingSoon) return null;
     
+    // Show "Reconfigure" if token test failed for Cursor/Claude
+    if ((integration.id === 'cursor' || integration.id === 'claude') && 
+        integrationData.lastTestResult === 'error') {
+      return 'Reconfigure';
+    }
+    
     if (!integrationData.isConfigured) return 'Configure';
     if (integrationData.isEnabled && integration.repositoryConfigPath) {
-      // For Claude and Cursor, show "Configure" instead of "Configure Repository" when repos aren't mapped
+      // For Claude and Cursor, always show "Configure API Key" instead of repository config
       if (integration.id === 'claude' || integration.id === 'cursor') {
-        return 'Configure';
+        return 'Configure API Key';
       }
       return 'Configure Repository';
     }
