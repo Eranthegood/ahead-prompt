@@ -107,21 +107,33 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
       const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       const openaiModel = model || 'gpt-4o';
       
+      // Check if it's a newer model that requires different parameters
+      const isNewerModel = openaiModel.includes('gpt-5') || openaiModel.includes('gpt-4.1') || openaiModel.includes('o3') || openaiModel.includes('o4');
+      
+      const requestBody: any = {
+        model: openaiModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: rawIdea }
+        ],
+      };
+
+      // Use appropriate token parameter based on model
+      if (isNewerModel) {
+        requestBody.max_completion_tokens = 800;
+        // Newer models don't support temperature parameter
+      } else {
+        requestBody.max_tokens = 800;
+        requestBody.temperature = 0.7;
+      }
+      
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: openaiModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: rawIdea }
-          ],
-          max_tokens: 800,
-          temperature: 0.7,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
