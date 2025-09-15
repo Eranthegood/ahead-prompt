@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon, Settings } from 'lucide-react';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
@@ -11,6 +11,7 @@ import { Prompt, PromptStatus, Product, Epic } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
 import { useAgentStatusStream } from '@/hooks/useAgentStatusStream';
+import { useIntegrations } from '@/hooks/useIntegrations';
 
 interface LinearPromptItemProps {
   prompt: Prompt & {
@@ -56,6 +57,11 @@ export function LinearPromptItem({
   const [justCopied, setJustCopied] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  
+  // Check Cursor integration status
+  const { integrations } = useIntegrations();
+  const cursorIntegration = integrations.find(int => int.id === 'cursor');
+  const isCursorConfigured = cursorIntegration?.isConfigured && cursorIntegration?.isEnabled;
   
   // Live status stream from Agent Status Service keyed by Cursor agent id
   const { latest: liveStatus } = useAgentStatusStream(prompt.cursor_agent_id || undefined);
@@ -236,17 +242,30 @@ export function LinearPromptItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    onShowCursorDialog();
+                    if (isCursorConfigured) {
+                      onShowCursorDialog();
+                    } else {
+                      // Navigate to integrations settings
+                      window.location.href = '/settings/integrations';
+                    }
                   }}
                   disabled={!isUsable}
-                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-muted flex-shrink-0"
-                  aria-label="Send to Cursor"
+                  className={`h-7 w-7 p-0 flex-shrink-0 ${
+                    isCursorConfigured 
+                      ? 'text-purple-500 hover:text-purple-600 hover:bg-muted' 
+                      : 'text-orange-500 hover:text-orange-600 hover:bg-muted'
+                  }`}
+                  aria-label={isCursorConfigured ? "Send to Cursor" : "Configure Cursor"}
                 >
-                  <Merge className="h-3.5 w-3.5" />
+                  {isCursorConfigured ? (
+                    <Merge className="h-3.5 w-3.5" />
+                  ) : (
+                    <Settings className="h-3.5 w-3.5" />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Send to Cursor</p>
+                <p>{isCursorConfigured ? 'Send to Cursor' : 'Configure Cursor Integration'}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
