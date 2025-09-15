@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
 
 const PROMO_CODE = 'Early';
-const END_DATE = new Date('2024-09-21T23:59:59');
+const END_DATE = new Date('2025-09-21T23:59:59');
 const DISMISSED_KEY = 'promo-banner-dismissed';
 
 export function PromoBanner() {
