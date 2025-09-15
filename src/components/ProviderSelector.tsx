@@ -13,13 +13,21 @@ interface ProviderSelectorProps {
 
 const PROVIDER_MODELS = {
   openai: [
-    { id: 'gpt-4o', name: 'GPT-4o' },
-    { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+    { id: 'gpt-5-2025-08-07', name: 'GPT-5 (Flagship)' },
+    { id: 'gpt-5-mini-2025-08-07', name: 'GPT-5 Mini (Fast)' },
+    { id: 'gpt-5-nano-2025-08-07', name: 'GPT-5 Nano (Fastest)' },
+    { id: 'gpt-4.1-2025-04-14', name: 'GPT-4.1' },
+    { id: 'o3-2025-04-16', name: 'O3 (Reasoning)' },
+    { id: 'o4-mini-2025-04-16', name: 'O4 Mini (Fast Reasoning)' },
+    { id: 'gpt-4o', name: 'GPT-4o (Legacy)' },
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Legacy)' },
   ],
   claude: [
-    { id: 'claude-sonnet-4-20250514', name: 'Claude 4 Sonnet' },
-    { id: 'claude-opus-4-20250514', name: 'Claude 4 Opus' },
-    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },
+    { id: 'claude-opus-4-1-20250805', name: 'Claude 4 Opus (Most Capable)' },
+    { id: 'claude-sonnet-4-20250514', name: 'Claude 4 Sonnet (High Performance)' },
+    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku (Fastest)' },
+    { id: 'claude-3-7-sonnet-20250219', name: 'Claude 3.7 Sonnet (Extended)' },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet (Previous)' },
   ]
 };
 

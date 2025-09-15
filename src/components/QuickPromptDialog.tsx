@@ -114,7 +114,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // AI Provider state
   const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
     provider: 'openai',
-    model: 'gpt-4o'
+    model: 'gpt-5-2025-08-07'
   });
   
   // Knowledge state
