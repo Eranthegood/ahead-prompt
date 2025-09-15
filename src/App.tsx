@@ -35,6 +35,7 @@ import AIAgents from "./pages/AIAgents";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
+import FAQ from "@/pages/FAQ";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ function App() {
                       <Route path="/blog/:slug" element={<BlogPost />} />
                       <Route path="/pricing" element={<Pricing />} />
                       <Route path="/refund-policy" element={<RefundPolicy />} />
+                      <Route path="/faq" element={<FAQ />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/join-workspace/:invitationToken" element={<JoinWorkspace />} />
                     <Route path="/prompt-management" element={<PromptManagement />} />
