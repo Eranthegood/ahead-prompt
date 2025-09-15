@@ -139,26 +139,7 @@ export function MinimalistPromptCard({
 
             {/* Action Buttons - Show on hover */}
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              {/* Copy Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCopy();
-                }}
-                disabled={!isUsable}
-                className="h-7 w-7 p-0"
-                aria-label="Copy prompt"
-              >
-                {justCopied ? (
-                  <Check className="h-3.5 w-3.5 text-green-600" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </Button>
-              
-              {/* Cursor Button */}
+              {/* Send Button */}
               {prompt.product?.github_repo_url && (
                 <Button
                   variant="ghost"
@@ -169,7 +150,7 @@ export function MinimalistPromptCard({
                     onShowCursorDrawer();
                   }}
                   disabled={!isUsable}
-                  className="h-7 w-7 p-0"
+                  className="h-7 w-7 p-0 text-purple-600 hover:text-purple-700"
                   aria-label="Send prompt"
                 >
                   <Send className="h-3.5 w-3.5" />
