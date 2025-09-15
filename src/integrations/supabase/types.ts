@@ -1718,6 +1718,10 @@ export type Database = {
         Args: { user_uuid?: string; workspace_uuid: string }
         Returns: boolean
       }
+      claim_workspace_ownership: {
+        Args: { workspace_uuid: string }
+        Returns: undefined
+      }
       ensure_user_stats: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -1757,6 +1761,10 @@ export type Database = {
       is_workspace_admin: {
         Args: { user_uuid?: string; workspace_uuid: string }
         Returns: boolean
+      }
+      transfer_workspace_ownership: {
+        Args: { new_owner_uuid: string; workspace_uuid: string }
+        Returns: undefined
       }
       validate_invitation_token: {
         Args: { token: string }
