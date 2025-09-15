@@ -1,525 +1,260 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { 
-  Settings, 
-  ChevronRight,
-  Code,
+  ArrowLeft,
   Github,
-  Zap,
+  Code,
+  Key,
   CheckCircle,
-  XCircle,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIntegrations } from '@/hooks/useIntegrations';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import { toast } from 'sonner';
 
-const INTEGRATIONS_CONFIG = [
-  {
-    id: 'cursor',
-    name: 'Cursor Background Agents',
-    description: 'Send your prompts directly to Cursor for autonomous code generation on your GitHub repos.',
-    icon: Code,
-    logo: '/lovable-uploads/5d5ed883-0303-4ec8-9358-b4b6043727a0.png',
-    configPath: '/integrations/cursor',
-    repositoryConfigPath: '/settings/repository-mapping'
-  },
-  {
-    id: 'claude',
-    name: 'Claude Code Integration',
-    description: 'Execute your prompts directly with Claude Code for autonomous development on your repositories.',
-    icon: Code,
-    logo: '/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png',
-    repositoryConfigPath: '/settings/repository-mapping'
-  },
-  {
-    id: 'github',
-    name: 'GitHub Integration',
-    description: 'Automatically sync your prompts with your GitHub repositories and create issues.',
-    icon: Github,
-    configPath: '/integrations/github'
-  },
-  {
-    id: 'figma',
-    name: 'Figma Integration',
-    description: 'Connect your Figma projects to enrich your Knowledge Base with designs, specs, and components for enhanced prompt context.',
-    icon: Code,
-    logo: '/lovable-uploads/ee087f3f-2f51-434e-97bc-91d8c2586b10.png',
-    configPath: '/integrations/figma'
-  },
-  {
-    id: 'slack',
-    name: 'Slack Notifications',
-    description: 'Receive Slack notifications when your Cursor agents complete their tasks.',
-    icon: Zap,
-    isComingSoon: true
-  }
-];
+interface TokenInputProps {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  onSave: () => void;
+  onTest?: () => void;
+  isLoading: boolean;
+  isConfigured: boolean;
+  isValid?: boolean | null;
+  icon: React.ReactNode;
+  description?: string;
+}
 
-const getStatusConfig = (integration: any, integrationData: any) => {
-  if (integration.isComingSoon) {
-    return {
-      label: 'Coming Soon',
-      variant: 'secondary' as const,
-      icon: AlertCircle,
-      color: 'text-muted-foreground'
-    };
-  }
-  
-  if (!integrationData.isConfigured) {
-    return {
-      label: 'Not Configured',
-      variant: 'outline' as const,
-      icon: AlertCircle,
-      color: 'text-orange-600'
-    };
-  }
-  
-  if (integrationData.isEnabled) {
-    return {
-      label: 'Connected',
-      variant: 'default' as const,
-      icon: CheckCircle,
-      color: 'text-green-600'
-    };
-  }
-  
-  return {
-    label: 'Disconnected',
-    variant: 'destructive' as const,
-    icon: XCircle,
-    color: 'text-red-600'
-  };
-};
+function TokenInput({ 
+  label, 
+  placeholder, 
+  value, 
+  onChange, 
+  onSave, 
+  onTest,
+  isLoading, 
+  isConfigured, 
+  isValid,
+  icon,
+  description 
+}: TokenInputProps) {
+  const [showToken, setShowToken] = useState(false);
 
-function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONFIG[0] }) {
-  const navigate = useNavigate();
-  const { integrations, isLoading, toggleIntegration, testIntegration, configureIntegration } = useIntegrations();
-  const [showTokenField, setShowTokenField] = useState(false);
-  const [token, setToken] = useState('');
-  
-  // Safe icon rendering with fallback
-  const Icon = integration.icon || Code;
-  
-  const integrationData = integrations.find(i => i.id === integration.id) || {
-    isConfigured: false,
-    isEnabled: false,
-    lastTestResult: null,
-    metadata: null
-  };
-  
-  const statusConfig = getStatusConfig(integration, integrationData);
-  const StatusIcon = statusConfig.icon;
-  
-  const handleSwitchToggle = async (checked: boolean) => {
-    if (!integrationData.isConfigured) {
-      setShowTokenField(true);
-      return;
+  const getStatusBadge = () => {
+    if (!isConfigured) {
+      return <Badge variant="outline" className="text-orange-600"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
     }
-    
-    await toggleIntegration(integration.id, checked);
-  };
-  
-  const handleActionButton = () => {
-    if (integration.isComingSoon) return;
-    
-    // For Cursor and Claude, always allow reconfiguration if token test failed
-    if ((integration.id === 'cursor' || integration.id === 'claude') && 
-        integrationData.lastTestResult === 'error') {
-      setShowTokenField(true);
-      return;
+    if (isValid === true) {
+      return <Badge variant="default" className="bg-green-600"><CheckCircle className="w-3 h-3 mr-1" />Valide</Badge>;
     }
-    
-    if (!integrationData.isConfigured) {
-      setShowTokenField(true);
-    } else if (integrationData.isEnabled && integration.repositoryConfigPath) {
-      // For Cursor and Claude, always show token field first if not explicitly navigating to repo config
-      if (integration.id === 'cursor' || integration.id === 'claude') {
-        setShowTokenField(true);
-      } else {
-        navigate(integration.repositoryConfigPath);
-      }
-    } else {
-      testIntegration(integration.id);
+    if (isValid === false) {
+      return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Invalide</Badge>;
     }
+    return <Badge variant="secondary">Configuré</Badge>;
   };
 
-  const handleTokenSubmit = async () => {
-    if (token.trim()) {
-      const success = await configureIntegration(integration.id, token);
-      if (success) {
-        setShowTokenField(false);
-        setToken('');
-      }
-    }
-  };
-  
-  const getActionButtonText = () => {
-    if (integration.isComingSoon) return null;
-    
-    // Show "Reconfigure" if token test failed for Cursor/Claude
-    if ((integration.id === 'cursor' || integration.id === 'claude') && 
-        integrationData.lastTestResult === 'error') {
-      return 'Reconfigure';
-    }
-    
-    if (!integrationData.isConfigured) return 'Configure';
-    if (integrationData.isEnabled && integration.repositoryConfigPath) {
-      // For Claude and Cursor, always show "Configure API Key" instead of repository config
-      if (integration.id === 'claude' || integration.id === 'cursor') {
-        return 'Configure API Key';
-      }
-      return 'Configure Repository';
-    }
-    return 'Test';
-  };
-  
-  const actionButtonText = getActionButtonText();
-  
   return (
-    <div className="border rounded-lg hover:bg-muted/30 transition-colors">
-      <div className="flex items-center justify-between p-4">
-        {/* Left section - Logo, Name, Description */}
-        <div className="flex items-center gap-4 flex-1">
-          <div className="p-3 rounded-lg bg-muted">
-            {integration.logo ? (
-              <img 
-                src={integration.logo} 
-                alt={`${integration.name} logo`}
-                className="h-8 w-8 object-contain"
-              />
-            ) : (
-              <Icon className="h-8 w-8" />
-            )}
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-muted">
+              {icon}
+            </div>
+            <div>
+              <CardTitle className="text-lg">{label}</CardTitle>
+              {description && (
+                <p className="text-sm text-muted-foreground mt-1">{description}</p>
+              )}
+            </div>
           </div>
-          
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg">{integration.name}</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              {integration.description}
-            </p>
+          {getStatusBadge()}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Token / Clé API</Label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                type={showToken ? "text" : "password"}
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowToken(!showToken)}
+              >
+                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
         </div>
         
-        {/* Right section - Status, Switch, Action Button */}
-        <div className="flex items-center gap-4">
-          {/* Status Badge */}
-          <div className="flex items-center gap-2">
-            <StatusIcon className={`h-4 w-4 ${statusConfig.color}`} />
-            <Badge variant={statusConfig.variant} className="text-xs">
-              {statusConfig.label}
-            </Badge>
-          </div>
-          
-          {/* Switch */}
-          {!integration.isComingSoon && (
-            <Switch
-              checked={integrationData.isEnabled}
-              onCheckedChange={handleSwitchToggle}
+        <div className="flex gap-2">
+          <Button 
+            onClick={onSave}
+            disabled={!value.trim() || isLoading}
+            className="flex-1"
+          >
+            <Key className="w-4 h-4 mr-2" />
+            {isConfigured ? 'Remplacer' : 'Configurer'}
+          </Button>
+          {onTest && isConfigured && (
+            <Button 
+              variant="outline"
+              onClick={onTest}
               disabled={isLoading}
-              className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-red-500"
-            />
-          )}
-          
-          {/* Action Button */}
-          {actionButtonText && (
-            <Button
-              variant={integrationData.isEnabled ? "default" : "outline"}
-              size="sm"
-              onClick={handleActionButton}
-              disabled={isLoading || integration.isComingSoon}
-              className="min-w-[120px]"
             >
-              {actionButtonText || 'Configure'}
+              Tester
             </Button>
           )}
         </div>
-      </div>
-      
-      {/* Token Configuration Field */}
-      {showTokenField && (
-        <div className="border-t bg-muted/20 p-4">
-          <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium">
-                {integration.id === 'github' ? 'Personal Access Token' : 
-                 integration.id === 'figma' ? 'Personal Access Token' :
-                 integration.id === 'claude' ? 'Anthropic API Key' :
-                 'API Token'}
-              </label>
-              <p className="text-xs text-muted-foreground">
-                {integration.id === 'github' 
-                  ? 'Enter your GitHub Personal Access Token'
-                  : integration.id === 'figma'
-                  ? 'Enter your Figma Personal Access Token from Account Settings > Personal Access Tokens'
-                  : integration.id === 'claude'
-                  ? 'Enter your Anthropic API Key from console.anthropic.com'
-                  : 'Enter your API token'
-                }
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                placeholder={
-                  integration.id === 'github' ? 'ghp_xxxxxxxxxxxx' : 
-                  integration.id === 'figma' ? 'figd_xxxxxxxxxxxx' :
-                  integration.id === 'claude' ? 'sk-ant-api03-xxxxxxxxxxxx' :
-                  'Token...'
-                }
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
-                onKeyDown={(e) => e.key === 'Enter' && handleTokenSubmit()}
-              />
-              <Button 
-                size="sm" 
-                onClick={handleTokenSubmit}
-                disabled={!token.trim() || isLoading}
-              >
-                Configure
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => {
-                  setShowTokenField(false);
-                  setToken('');
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Show configured GitHub user info */}
-      {'metadata' in integrationData && integrationData.metadata && integration.id === 'github' && integrationData.isConfigured && (
-        <div className="border-t bg-muted/20 p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <img 
-              src={integrationData.metadata.avatar_url} 
-              alt="GitHub Avatar" 
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="flex-1">
-              <div className="font-medium">{integrationData.metadata.name || integrationData.metadata.username}</div>
-              <div className="text-sm text-muted-foreground">@{integrationData.metadata.username}</div>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {integrationData.metadata.public_repos} public repos
-            </div>
-          </div>
-          {integrationData.metadata.repositories && integrationData.metadata.repositories.length > 0 && (
-            <div className="pt-3 border-t">
-              <div className="text-sm font-medium mb-2">Recent repositories:</div>
-              <div className="flex flex-wrap gap-2">
-                {integrationData.metadata.repositories.slice(0, 4).map((repo: any) => (
-                  <a 
-                    key={repo.name} 
-                    href={repo.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs bg-background hover:bg-muted/50 rounded px-2 py-1 border transition-colors"
-                  >
-                    {repo.name} {repo.private && '🔒'}
-                  </a>
-                ))}
-                {integrationData.metadata.repositories.length > 4 && (
-                  <span className="text-xs text-muted-foreground px-2 py-1">
-                    +{integrationData.metadata.repositories.length - 4} more
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Show configured Cursor user info */}
-      {'metadata' in integrationData && integrationData.metadata && integration.id === 'cursor' && integrationData.isConfigured && (
-        <div className="border-t bg-muted/20 p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">C</span>
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">{integrationData.metadata.username || 'Cursor User'}</div>
-              {integrationData.metadata.email && (
-                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
-              )}
-            </div>
-            <div className="text-sm text-green-600 font-medium">
-              Token configured ✓
-            </div>
-          </div>
-          <div className="pt-3 border-t">
-            <div className="text-sm font-medium mb-2">Available capabilities:</div>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="text-xs">
-                Background Agents
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Code Generation
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Auto PR Creation
-              </Badge>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Show configured Figma user info */}
-      {'metadata' in integrationData && integrationData.metadata && integration.id === 'figma' && integrationData.isConfigured && (
-        <div className="border-t bg-muted/20 p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">F</span>
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">{integrationData.metadata.handle || 'Figma User'}</div>
-              {integrationData.metadata.email && (
-                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
-              )}
-            </div>
-            <div className="text-sm text-green-600 font-medium">
-              Token configured ✓
-            </div>
-          </div>
-          <div className="pt-3 border-t">
-            <div className="text-sm font-medium mb-2">Available resources:</div>
-            <div className="flex flex-wrap gap-2 mb-3">
-              <Badge variant="secondary" className="text-xs">
-                Design Import
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Component Specs
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Knowledge Base
-              </Badge>
-            </div>
-            {integrationData.metadata.teams && integrationData.metadata.teams.length > 0 && (
-              <div>
-                <div className="text-sm font-medium mb-2">Teams ({integrationData.metadata.teams.length}):</div>
-                <div className="flex flex-wrap gap-2">
-                  {integrationData.metadata.teams.slice(0, 3).map((team: any) => (
-                    <Badge key={team.id} variant="outline" className="text-xs">
-                      {team.name}
-                    </Badge>
-                  ))}
-                  {integrationData.metadata.teams.length > 3 && (
-                    <span className="text-xs text-muted-foreground px-2 py-1">
-                      +{integrationData.metadata.teams.length - 3} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Show configured Claude user info */}
-      {'metadata' in integrationData && integrationData.metadata && integration.id === 'claude' && integrationData.isConfigured && (
-        <div className="border-t bg-muted/20 p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">C</span>
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">{integrationData.metadata.username || 'Claude User'}</div>
-              {integrationData.metadata.email && (
-                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
-              )}
-            </div>
-            <div className="text-sm text-green-600 font-medium">
-              API Key configured ✓
-            </div>
-          </div>
-          <div className="pt-3 border-t">
-            <div className="text-sm font-medium mb-2">Available models:</div>
-            <div className="flex flex-wrap gap-2 mb-3">
-              <Badge variant="secondary" className="text-xs">
-                Claude Sonnet 4
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                Claude Opus 4.1
-              </Badge>
-            </div>
-            <div className="text-sm font-medium mb-2">Capabilities:</div>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="text-xs">
-                Code Generation
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                File Processing
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                PR Creation
-              </Badge>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
 export default function Integrations() {
   const navigate = useNavigate();
+  const { integrations, isLoading, configureIntegration, testIntegration } = useIntegrations();
   
-  return (
-    <ErrorBoundary>
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-          {/* Header with breadcrumb */}
-          <div className="mb-8">
-            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/')}
-                className="p-0 h-auto hover:bg-transparent"
-              >
-                Home
-              </Button>
-              <ChevronRight className="h-4 w-4" />
-              <span className="text-foreground">Integrations</span>
-            </nav>
-            
-            <div className="flex items-center gap-3 mb-2">
-              <Settings className="h-6 w-6 text-primary" />
-              <h1 className="text-3xl font-bold">Integrations</h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              Connect your favorite tools to automate your development workflow.
-            </p>
-          </div>
+  const [tokens, setTokens] = useState({
+    github: '',
+    cursor: '',
+    claude: ''
+  });
 
-          {/* Integrations List */}
-          <div className="space-y-3">
-            {INTEGRATIONS_CONFIG.map((integration) => (
-              <ErrorBoundary key={integration.id}>
-                <IntegrationRow integration={integration} />
-              </ErrorBoundary>
-            ))}
-          </div>
+  const getIntegrationData = (id: string) => {
+    return integrations.find(i => i.id === id) || {
+      isConfigured: false,
+      isEnabled: false,
+      lastTestResult: null
+    };
+  };
+
+  const handleSave = async (type: 'github' | 'cursor' | 'claude') => {
+    const token = tokens[type];
+    if (!token.trim()) {
+      toast.error('Veuillez entrer un token valide');
+      return;
+    }
+
+    const success = await configureIntegration(type, token);
+    if (success) {
+      setTokens(prev => ({ ...prev, [type]: '' }));
+    }
+  };
+
+  const handleTest = async (type: string) => {
+    await testIntegration(type);
+  };
+
+  const githubData = getIntegrationData('github');
+  const cursorData = getIntegrationData('cursor');
+  const claudeData = getIntegrationData('claude');
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-3xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="mb-6 -ml-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au tableau de bord
+          </Button>
           
-          {/* Helpful Information */}
-          <div className="mt-8 p-4 bg-muted/30 rounded-lg">
-            <h3 className="font-semibold mb-2">💡 Tip</h3>
-            <p className="text-sm text-muted-foreground">
-              Enable Cursor to automatically send your prompts to your GitHub repositories. 
-              Once configured, you'll see a "Send to Cursor" button on your prompts.
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold mb-2">Intégrations</h1>
+            <p className="text-muted-foreground">
+              Configurez vos tokens d'API pour connecter vos outils de développement.
             </p>
           </div>
         </div>
+
+        {/* Integration Cards */}
+        <div className="space-y-6">
+          
+          {/* GitHub */}
+          <TokenInput
+            label="GitHub"
+            description="Connectez votre compte GitHub pour la synchronisation des dépôts"
+            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            value={tokens.github}
+            onChange={(value) => setTokens(prev => ({ ...prev, github: value }))}
+            onSave={() => handleSave('github')}
+            onTest={() => handleTest('github')}
+            isLoading={isLoading}
+            isConfigured={githubData.isConfigured}
+            isValid={githubData.lastTestResult === 'success' ? true : githubData.lastTestResult === 'error' ? false : null}
+            icon={<Github className="h-6 w-6" />}
+          />
+
+          {/* Cursor */}
+          <TokenInput
+            label="Cursor"
+            description="Activez les agents autonomes Cursor pour la génération de code"
+            placeholder="Votre clé API Cursor..."
+            value={tokens.cursor}
+            onChange={(value) => setTokens(prev => ({ ...prev, cursor: value }))}
+            onSave={() => handleSave('cursor')}
+            onTest={() => handleTest('cursor')}
+            isLoading={isLoading}
+            isConfigured={cursorData.isConfigured}
+            isValid={cursorData.lastTestResult === 'success' ? true : cursorData.lastTestResult === 'error' ? false : null}
+            icon={<Code className="h-6 w-6" />}
+          />
+
+          {/* Claude */}
+          <TokenInput
+            label="Claude"
+            description="Intégrez Claude pour l'exécution de code et l'IA avancée"
+            placeholder="sk-ant-api03-xxxxxxxxxxxxxxxxxxxx"
+            value={tokens.claude}
+            onChange={(value) => setTokens(prev => ({ ...prev, claude: value }))}
+            onSave={() => handleSave('claude')}
+            onTest={() => handleTest('claude')}
+            isLoading={isLoading}
+            isConfigured={claudeData.isConfigured}
+            isValid={claudeData.lastTestResult === 'success' ? true : claudeData.lastTestResult === 'error' ? false : null}
+            icon={<Code className="h-6 w-6 text-orange-500" />}
+          />
+        </div>
+
+        {/* Help Section */}
+        <Card className="mt-8 bg-muted/30">
+          <CardContent className="pt-6">
+            <h3 className="font-semibold mb-3">🔑 Comment obtenir vos tokens ?</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div>
+                <strong>GitHub :</strong> Allez dans Settings → Developer settings → Personal access tokens → Générer un nouveau token
+              </div>
+              <div>
+                <strong>Cursor :</strong> Ouvrez Cursor → Settings → API Keys → Générer une clé pour Background Agents
+              </div>
+              <div>
+                <strong>Claude :</strong> Visitez console.anthropic.com → Créer une clé API dans votre compte Anthropic
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </ErrorBoundary>
+    </div>
   );
 }
