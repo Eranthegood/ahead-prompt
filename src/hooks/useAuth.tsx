@@ -60,6 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 });
               }
             }, 100);
+          } else {
+            // No payment flow - redirect to /build for regular sign-ins
+            setTimeout(() => {
+              window.location.assign('/build');
+            }, 100);
           }
         }
         
