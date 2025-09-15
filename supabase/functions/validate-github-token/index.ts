@@ -142,32 +142,7 @@ serve(async (req) => {
       throw new Error('Failed to save integration');
     }
 
-    // Store token securely using store-integration-secret function
-    const secretKey = `GITHUB_TOKEN_${user.id}`;
-    
-    try {
-      const { error: secretError } = await supabase.functions.invoke('store-integration-secret', {
-        body: {
-          integrationType: 'github',
-          token: token
-        },
-        headers: {
-          Authorization: authHeader
-        }
-      });
-
-      if (secretError) {
-        console.error('Failed to store GitHub token:', secretError);
-        throw new Error('Failed to store GitHub token securely');
-      }
-      
-      console.log('GitHub token stored securely');
-    } catch (e) {
-      console.error('Error storing GitHub token:', e);
-      throw new Error('Failed to store GitHub token securely');
-    }
-
-    console.log('GitHub token validated and stored successfully');
+    console.log('GitHub token validated and integration stored successfully');
     
     return new Response(JSON.stringify({
       success: true,

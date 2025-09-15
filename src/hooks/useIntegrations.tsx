@@ -136,13 +136,14 @@ export function useIntegrations() {
         // Store token securely first
         await storeIntegrationSecret('github', secretValue);
         
-        // GitHub validation using the edge function
+        // GitHub validation using the edge function (token already stored)
         const { data, error } = await supabase.functions.invoke('validate-github-token', {
           body: { token: secretValue }
         });
 
         if (error || !data?.success) {
-          throw new Error(data?.error || 'Invalid GitHub token');
+          console.error('GitHub validation error:', error, data?.error);
+          throw new Error(data?.error || error?.message || 'Invalid GitHub token');
         }
 
         updateIntegration(id, {
