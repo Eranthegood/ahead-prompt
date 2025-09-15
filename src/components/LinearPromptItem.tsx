@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon, Settings } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon, Code, Settings } from 'lucide-react';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
@@ -21,6 +21,7 @@ interface LinearPromptItemProps {
   onPromptClick: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
   onShowCursorDialog: () => void;
+  onShowClaudeDialog?: () => void;
   onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
   onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
   onDuplicate?: (prompt: Prompt) => void;
@@ -46,6 +47,7 @@ export function LinearPromptItem({
   onPromptClick,
   onCopyGenerated,
   onShowCursorDialog,
+  onShowClaudeDialog,
   onPriorityChange,
   onStatusChange,
   onDuplicate,
@@ -58,10 +60,12 @@ export function LinearPromptItem({
   const [isSliding, setIsSliding] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   
-  // Check Cursor integration status
+  // Check integration status
   const { integrations } = useIntegrations();
   const cursorIntegration = integrations.find(int => int.id === 'cursor');
+  const claudeIntegration = integrations.find(int => int.id === 'claude');
   const isCursorConfigured = cursorIntegration?.isConfigured && cursorIntegration?.isEnabled;
+  const isClaudeConfigured = claudeIntegration?.isConfigured && claudeIntegration?.isEnabled;
   
   // Live status stream from Agent Status Service keyed by Cursor agent id
   const { latest: liveStatus } = useAgentStatusStream(prompt.cursor_agent_id || undefined);
@@ -211,7 +215,7 @@ export function LinearPromptItem({
       </div>
 
       {/* Actions - Fixed width, show on hover */}
-      <div className="flex items-center gap-1 w-16 transition-opacity duration-150 mr-3">
+      <div className="flex items-center gap-1 w-20 transition-opacity duration-150 mr-3">
         {/* Copy Button */}
         <Button
           variant="ghost"
@@ -231,8 +235,8 @@ export function LinearPromptItem({
           )}
         </Button>
         
-        {/* Cursor Button */}
-        {prompt.product?.github_repo_url && (
+        {/* Send to Cursor Button - Only show if repository is mapped and Cursor is configured */}
+        {prompt.product?.github_repo_url && isCursorConfigured && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -242,30 +246,44 @@ export function LinearPromptItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    if (isCursorConfigured) {
-                      onShowCursorDialog();
-                    } else {
-                      // Navigate to integrations settings
-                      window.location.href = '/settings/integrations';
-                    }
+                    onShowCursorDialog();
                   }}
                   disabled={!isUsable}
-                  className={`h-7 w-7 p-0 flex-shrink-0 ${
-                    isCursorConfigured 
-                      ? 'text-purple-500 hover:text-purple-600 hover:bg-muted' 
-                      : 'text-orange-500 hover:text-orange-600 hover:bg-muted'
-                  }`}
-                  aria-label={isCursorConfigured ? "Send to Cursor" : "Configure Cursor"}
+                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-muted flex-shrink-0"
+                  aria-label="Send to Cursor"
                 >
-                  {isCursorConfigured ? (
-                    <Merge className="h-3.5 w-3.5" />
-                  ) : (
-                    <Settings className="h-3.5 w-3.5" />
-                  )}
+                  <Merge className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{isCursorConfigured ? 'Send to Cursor' : 'Configure Cursor Integration'}</p>
+                <p>Send to Cursor</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
+        {/* Send to Claude Button - Only show if repository is mapped and Claude is configured */}
+        {prompt.product?.github_repo_url && isClaudeConfigured && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isUsable) return;
+                    onShowClaudeDialog?.();
+                  }}
+                  disabled={!isUsable}
+                  className="h-7 w-7 p-0 text-orange-500 hover:text-orange-600 hover:bg-muted flex-shrink-0"
+                  aria-label="Send to Claude"
+                >
+                  <Code className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Send to Claude</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

@@ -14,6 +14,7 @@ import { PromptCard } from '@/components/PromptCard';
 import { MinimalistPromptCard } from '@/components/MinimalistPromptCard';
 import { LinearPromptItem } from '@/components/LinearPromptItem';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
+import { ClaudeConfigDialog } from '@/components/ClaudeConfigDialog';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
@@ -68,6 +69,8 @@ export function MinimalPromptList({
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [showCursorDialog, setShowCursorDialog] = useState(false);
   const [cursorPrompt, setCursorPrompt] = useState<Prompt | null>(null);
+  const [showClaudeDialog, setShowClaudeDialog] = useState(false);
+  const [claudePrompt, setClaudePrompt] = useState<Prompt | null>(null);
 
   // Derive effective product when only epic is selected
   const effectiveProductId = useMemo(() => {
@@ -477,6 +480,10 @@ export function MinimalPromptList({
                       setCursorPrompt(prompt);
                       setShowCursorDialog(true);
                     }}
+                    onShowClaudeDialog={() => {
+                      setClaudePrompt(prompt);
+                      setShowClaudeDialog(true);
+                    }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
                     onEdit={handleEdit}
@@ -555,6 +562,10 @@ export function MinimalPromptList({
                       setCursorPrompt(item);
                       setShowCursorDialog(true);
                     }}
+                    onShowClaudeDialog={() => {
+                      setClaudePrompt(item);
+                      setShowClaudeDialog(true);
+                    }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
                     onEdit={handleEdit}
@@ -583,8 +594,35 @@ export function MinimalPromptList({
       {cursorPrompt && (
         <CursorConfigDialog
           isOpen={showCursorDialog}
-          onClose={() => setShowCursorDialog(false)}
+          onClose={() => {
+            setShowCursorDialog(false);
+            setCursorPrompt(null);
+          }}
           prompt={cursorPrompt}
+          onPromptUpdate={(promptId, updates) => {
+            // Update the prompt with the new status and Cursor workflow data
+            if (promptsContext?.updatePrompt) {
+              promptsContext.updatePrompt(promptId, updates);
+            }
+          }}
+        />
+      )}
+
+      {/* Claude Config Dialog */}
+      {claudePrompt && (
+        <ClaudeConfigDialog
+          isOpen={showClaudeDialog}
+          onClose={() => {
+            setShowClaudeDialog(false);
+            setClaudePrompt(null);
+          }}
+          prompt={claudePrompt}
+          onPromptUpdate={(promptId, updates) => {
+            // Update the prompt with the new status and Claude workflow data
+            if (promptsContext?.updatePrompt) {
+              promptsContext.updatePrompt(promptId, updates);
+            }
+          }}
         />
       )}
     </div>
