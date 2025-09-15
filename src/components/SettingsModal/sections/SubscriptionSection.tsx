@@ -343,6 +343,17 @@ export function SubscriptionSection() {
             );
           })}
         </div>
+
+        {/* Refund Policy Link */}
+        <div className="text-center mt-6">
+          <Button 
+            variant="link" 
+            onClick={() => window.location.href = '/refund-policy'}
+            className="text-muted-foreground hover:text-foreground text-sm"
+          >
+            Cancellation and Refund Policy
+          </Button>
+        </div>
       </div>
     </div>
   );

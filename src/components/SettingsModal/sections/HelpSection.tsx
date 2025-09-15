@@ -12,6 +12,13 @@ const helpResources = [
     badge: 'Documentation',
   },
   {
+    title: 'Annulation et remboursements',
+    description: 'Politiques d\'annulation et de remboursement',
+    icon: ExternalLink,
+    link: '/refund-policy',
+    badge: 'Politiques',
+  },
+  {
     title: 'Support par email',
     description: 'Contactez notre équipe support',
     icon: Mail,
@@ -88,13 +95,18 @@ export function HelpSection() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      if (resource.link.startsWith('/')) {
-                        window.open(resource.link, '_blank');
+                  onClick={() => {
+                    if (resource.link.startsWith('/')) {
+                      // For internal routes, use window.location or navigate
+                      if (resource.link === '/refund-policy') {
+                        window.location.href = resource.link;
                       } else {
                         window.open(resource.link, '_blank');
                       }
-                    }}
+                    } else {
+                      window.open(resource.link, '_blank');
+                    }
+                  }}
                   >
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Accéder

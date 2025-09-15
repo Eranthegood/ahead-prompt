@@ -225,6 +225,19 @@ export default function Pricing() {
               ))}
             </div>
           </BlurFade>
+
+          {/* Refund Policy Link */}
+          <BlurFade delay={1.0} inView>
+            <div className="text-center mt-8">
+              <Button 
+                variant="link" 
+                onClick={() => navigate('/refund-policy')}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Cancellation and Refund Policy
+              </Button>
+            </div>
+          </BlurFade>
         </div>
       </main>
     </div>;
