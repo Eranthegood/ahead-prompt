@@ -361,24 +361,50 @@ export function useIntegrations() {
 
         return testResult === 'success';
       } else if (id === 'claude') {
-        const integration = integrations.find(i => i.id === 'claude');
-        
-        if (!integration?.isConfigured) {
-          testResult = 'error';
-          toast.error('Aucune clé API Claude configurée');
-        } else {
-          // For testing, call the Edge Function which will retrieve the stored API key
-          const { data, error } = await supabase.functions.invoke('validate-claude-token', {
-            body: { test: true }
-          });
+        // Always test using the stored secret via Edge Function
+        const { data, error } = await supabase.functions.invoke('validate-claude-token', {
+          body: { test: true }
+        });
 
-          testResult = (!error && data?.isValid) ? 'success' : 'error';
-          
-          if (testResult === 'success') {
-            toast.success('Connexion Claude réussie');
-          } else {
-            toast.error('Clé API Claude invalide ou expirée');
+        if (error) {
+          testResult = 'error';
+          const message = (error as any)?.message || 'Erreur lors du test de Claude';
+          toast.error(message);
+        } else if (data?.isValid) {
+          testResult = 'success';
+          toast.success('Connexion Claude réussie');
+
+          // Best-effort: persist integration status for the user
+          const { data: authData } = await supabase.auth.getUser();
+          const userId = authData?.user?.id;
+          if (userId) {
+            try {
+              await supabase
+                .from('integrations')
+                .upsert({
+                  user_id: userId,
+                  integration_type: 'claude',
+                  is_configured: true,
+                  is_enabled: true,
+                  metadata: { models: data.models || [] },
+                  updated_at: new Date().toISOString()
+                });
+            } catch (e) {
+              console.warn('Unable to persist Claude integration row:', e);
+            }
           }
+
+          updateIntegration(id, {
+            isConfigured: true,
+            isEnabled: true,
+            metadata: { ...(data.user || {}), models: data.models || [] }
+          });
+        } else {
+          testResult = 'error';
+          const msg = data?.error === 'No stored API key found'
+            ? 'Aucune clé API Claude stockée. Ajoutez ANTHROPIC_API_KEY dans Supabase.'
+            : (data?.error || 'Clé API Claude invalide ou expirée');
+          toast.error(msg);
         }
 
         updateIntegration(id, {
