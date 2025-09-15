@@ -202,13 +202,13 @@ export type EpicColor = 'purple' | 'blue' | 'green' | 'orange' | 'pink';
 export type PromptPriority = 1 | 2 | 3;
 
 export const PRIORITY_LABELS = {
-  1: 'High',
-  2: 'Medium', 
-  3: 'Low'
+  1: "High",
+  2: "Normal", 
+  3: "Low"
 } as const;
 
 export const PRIORITY_OPTIONS = [
-  { value: 1, label: 'High', variant: 'destructive' as const },
-  { value: 2, label: 'Medium', variant: 'secondary' as const },
-  { value: 3, label: 'Low', variant: 'outline' as const }
-] as const;
+  { value: 1, label: "High", variant: "destructive" as const },
+  { value: 2, label: "Normal", variant: "default" as const },
+  { value: 3, label: "Low", variant: "secondary" as const }
+];

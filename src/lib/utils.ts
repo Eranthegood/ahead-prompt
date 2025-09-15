@@ -1,9 +1,43 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Prompt } from "@/types"
+import { Flame, Minus, Clock } from "lucide-react"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/**
+ * Unified priority display function - single source of truth for all priority UI
+ */
+export function getPriorityDisplay(priority: number) {
+  switch (priority) {
+    case 1:
+      return { 
+        icon: Flame, 
+        color: 'text-destructive', 
+        label: 'High',
+        bgColor: 'bg-destructive/10',
+        borderColor: 'border-destructive/20'
+      };
+    case 2:
+      return { 
+        icon: Minus, 
+        color: 'text-orange-500', 
+        label: 'Normal',
+        bgColor: 'bg-orange-500/10',
+        borderColor: 'border-orange-500/20'
+      };
+    case 3:
+    default:
+      return { 
+        icon: Clock, 
+        color: 'text-muted-foreground', 
+        label: 'Low',
+        bgColor: 'bg-muted/50',
+        borderColor: 'border-muted'
+      };
+  }
 }
 
 /**

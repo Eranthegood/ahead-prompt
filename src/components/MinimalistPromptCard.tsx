@@ -7,7 +7,7 @@ import { StatusIcon } from '@/components/ui/status-icon';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
-import { isPromptUsable } from '@/lib/utils';
+import { cn, isPromptUsable, getPriorityDisplay } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
 import { useAgentStatusStream } from '@/hooks/useAgentStatusStream';
 
@@ -61,18 +61,8 @@ export function MinimalistPromptCard({
     onCopyGenerated(prompt);
   };
 
-  // Get priority display
-  const getPriorityDisplay = () => {
-    if (priority === 1) {
-      return { icon: Flame, color: 'text-destructive' };
-    }
-    if (priority === 2) {
-      return { icon: Minus, color: 'text-orange-500' };
-    }
-    return { icon: Clock, color: 'text-muted-foreground' };
-  };
-
-  const priorityDisplay = getPriorityDisplay();
+  // Get priority display (remove local duplicate)
+  const priorityDisplay = getPriorityDisplay(prompt.priority || 3);
   const PriorityIcon = priorityDisplay.icon;
 
   // Get status variant

@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { Prompt, PromptStatus, Product, Epic } from '@/types';
-import { isPromptUsable } from '@/lib/utils';
+import { cn, isPromptUsable, getPriorityDisplay } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
 import { useAgentStatusStream } from '@/hooks/useAgentStatusStream';
 import { useIntegrations } from '@/hooks/useIntegrations';
@@ -105,18 +105,8 @@ export function LinearPromptItem({
     }
   };
 
-  // Get priority display
-  const getPriorityDisplay = () => {
-    if (priority === 1) {
-      return { icon: Flame, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950' };
-    }
-    if (priority === 2) {
-      return { icon: Minus, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950' };
-    }
-    return { icon: Clock, color: 'text-gray-400', bg: 'bg-gray-50 dark:bg-gray-900' };
-  };
 
-  const priorityDisplay = getPriorityDisplay();
+  const priorityDisplay = getPriorityDisplay(prompt.priority || 3);
   const PriorityIcon = priorityDisplay.icon;
 
   // Get status color

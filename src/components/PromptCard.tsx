@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LinearDropdown } from '@/components/ui/linear-dropdown';
 import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
@@ -23,7 +22,7 @@ import { CursorAgentModal } from '@/components/CursorAgentModal';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS, Product, Epic } from '@/types';
-import { isPromptUsable } from '@/lib/utils';
+import { cn, isPromptUsable, getPriorityDisplay } from '@/lib/utils';
 import { getStatusDisplayInfo } from '@/types/cursor';
 
 interface PromptCardProps {
@@ -184,18 +183,8 @@ export function PromptCard({
     }
   };
 
-  // Get priority display
-  const getPriorityDisplay = () => {
-    if (priority === 1) {
-      return { icon: Flame, color: 'text-destructive', bgColor: 'bg-destructive/10' };
-    }
-    if (priority === 2) {
-      return { icon: Minus, color: 'text-orange-500', bgColor: 'bg-orange-500/10' };
-    }
-    return { icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted/50' };
-  };
 
-  const priorityDisplay = getPriorityDisplay();
+  const priorityDisplay = getPriorityDisplay(prompt.priority || 3);
   const PriorityIcon = priorityDisplay.icon;
 
   // Prevent bubbling from controls inside the card (keeps card onClick from firing)
@@ -223,26 +212,37 @@ export function PromptCard({
               {/* Single Row Layout */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {/* Priority Indicator */}
-                  <LinearDropdown
-                    trigger={
-                      <div 
-                        className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} hover:bg-accent/30 transition-colors cursor-pointer`}
-                        onClick={stopEventPropagation}
-                      >
-                        <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
-                      </div>
-                    }
-                    options={PRIORITY_OPTIONS.map(option => ({
-                      id: option.value.toString(),
-                      label: option.label,
-                      icon: option.value === 1 ? Flame : option.value === 2 ? Minus : Clock,
-                      color: option.value === 1 ? 'destructive' : option.value === 2 ? 'orange-500' : 'muted-foreground',
-                      onClick: () => onPriorityChange(prompt, option.value),
-                      isSelected: prompt.priority === option.value,
-                    }))}
-                    placeholder="Select priority"
-                  />
+                  {/* Priority selector */}
+                  <Select 
+                    value={prompt.priority?.toString() || "3"} 
+                    onValueChange={(value) => onPriorityChange(prompt, parseInt(value))}
+                  >
+                    <SelectTrigger 
+                      className={cn(
+                        "h-7 gap-1.5 px-2 flex-shrink-0 w-auto border-0 bg-transparent hover:bg-muted/50",
+                        priorityDisplay.color
+                      )}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <PriorityIcon className="h-3.5 w-3.5" />
+                      <span className="text-xs">{PRIORITY_LABELS[prompt.priority as keyof typeof PRIORITY_LABELS] || 'Low'}</span>
+                    </SelectTrigger>
+                    <SelectContent className="z-[100]">
+                      {PRIORITY_OPTIONS.map(option => {
+                        const optionDisplay = getPriorityDisplay(option.value);
+                        const OptionIcon = optionDisplay.icon;
+                        return (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            <div className="flex items-center gap-2">
+                              <OptionIcon className={cn("h-4 w-4", optionDisplay.color)} />
+                              <span>{option.label}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
 
                   {/* Compact Title */}
                   <TruncatedTitle 

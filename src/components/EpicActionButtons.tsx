@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Calendar, Tag, Star } from 'lucide-react';
+import { Palette, Calendar, Tag, Star, Flame, Minus, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LinearDropdown } from '@/components/ui/linear-dropdown';
@@ -32,10 +32,9 @@ const colorOptions = [
 ];
 
 const priorityOptions = [
-  { id: 1, label: 'High', icon: Star, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(1) },
-  { id: 2, label: 'Medium', icon: Star, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(2) },
-  { id: 3, label: 'Normal', icon: Star, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(3) },
-  { id: 4, label: 'Low', icon: Star, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(4) },
+  { id: 1, label: 'High', icon: Flame, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(1) },
+  { id: 2, label: 'Normal', icon: Minus, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(2) },
+  { id: 3, label: 'Low', icon: Clock, onClick: (onPriorityChange: (p: number) => void) => onPriorityChange(3) },
 ];
 
 export function EpicActionButtons({
@@ -62,23 +61,12 @@ export function EpicActionButtons({
     onTagsChange(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const getPriorityLabel = (p: number) => {
+  const getPriorityDisplay = (p: number) => {
     switch (p) {
-      case 1: return 'High';
-      case 2: return 'Medium';
-      case 3: return 'Normal';
-      case 4: return 'Low';
-      default: return 'Normal';
-    }
-  };
-
-  const getPriorityColor = (p: number) => {
-    switch (p) {
-      case 1: return 'text-red-500';
-      case 2: return 'text-orange-500';
-      case 3: return 'text-blue-500';
-      case 4: return 'text-gray-500';
-      default: return 'text-blue-500';
+      case 1: return { icon: Flame, color: 'text-destructive', label: 'High' };
+      case 2: return { icon: Minus, color: 'text-orange-500', label: 'Normal' };
+      case 3: return { icon: Clock, color: 'text-muted-foreground', label: 'Low' };
+      default: return { icon: Clock, color: 'text-muted-foreground', label: 'Low' };
     }
   };
 
@@ -114,8 +102,8 @@ export function EpicActionButtons({
       <LinearDropdown
         trigger={
           <Button variant="outline" size="sm" className="gap-2">
-            <Star className={cn("h-4 w-4", getPriorityColor(priority))} />
-            {getPriorityLabel(priority)}
+            {React.createElement(getPriorityDisplay(priority).icon, { className: cn("h-4 w-4", getPriorityDisplay(priority).color) })}
+            {getPriorityDisplay(priority).label}
           </Button>
         }
         options={priorityOptions.map(option => ({

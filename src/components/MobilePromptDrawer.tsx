@@ -320,7 +320,7 @@ export function MobilePromptDrawer({
                     key={priority.value}
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setSelectedPriority(priority.value)}
+                    onClick={() => setSelectedPriority(priority.value as PromptPriority)}
                     className={`justify-start gap-2 transition-colors ${
                       isSelected 
                         ? 'bg-primary text-primary-foreground' 

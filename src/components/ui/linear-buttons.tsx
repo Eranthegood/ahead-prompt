@@ -97,7 +97,7 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
     icon: option.value === 1 ? Flame : 
           option.value === 2 ? Minus : 
           option.value === 3 ? Clock : Clock,
-    onClick: () => onPriorityChange(option.value),
+    onClick: () => onPriorityChange(option.value as PromptPriority),
   }));
 
   const productOptions = [
