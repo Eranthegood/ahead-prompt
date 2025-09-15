@@ -147,9 +147,9 @@ export default function Pricing() {
         <div className="text-center space-y-8">
           <BlurFade delay={0.25} inView>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Enjoy this tool for{" "}
+              Pricing{" "}
               <span className="text-primary relative">
-                free
+                for everyone
                 <Heart className="w-6 h-6 md:w-8 md:h-8 absolute -top-2 -right-8 text-red-500 fill-red-500" />
               </span>
             </h1>

@@ -164,7 +164,7 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       // Use the secure RPC function instead of direct table access
       const { data, error } = await supabase
         .rpc('get_invitation_by_token', { 
-          token_param: token 
+          token: token 
         });
 
       if (error) throw error;
@@ -172,6 +172,20 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       // The RPC returns an array, get first result
       const invitation = data?.[0];
       if (!invitation) return null;
+
+      // Get additional workspace and profile data
+      const [workspaceData, profileData] = await Promise.all([
+        supabase
+          .from('workspaces')
+          .select('name')
+          .eq('id', invitation.workspace_id)
+          .maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', invitation.invited_by)
+          .maybeSingle()
+      ]);
 
       // Transform the RPC result to match the expected interface
       return {
@@ -181,19 +195,14 @@ export function useWorkspaceInvitations(workspaceId?: string) {
         role: invitation.role as 'admin' | 'user',
         invited_by: invitation.invited_by,
         expires_at: invitation.expires_at,
-        accepted_at: invitation.accepted_at,
+        accepted_at: null, // Always null for active invitations
         // Security: Don't expose the actual token after validation
         invitation_token: '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        created_at: invitation.created_at,
+        updated_at: invitation.created_at,
         // Add nested objects for UI compatibility
-        workspaces: {
-          name: invitation.workspace_name
-        },
-        invited_by_profile: {
-          full_name: invitation.invited_by_name,
-          email: invitation.invited_by_email
-        }
+        workspaces: workspaceData.data,
+        invited_by_profile: profileData.data
       };
     } catch (error: any) {
       console.error('Error fetching invitation:', error);
