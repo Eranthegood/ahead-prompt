@@ -27,9 +27,18 @@ export function PromoBanner() {
     if (canShowSidebar) {
       sidebarState = useSidebar();
     }
-  } catch {
-    // useSidebar not available, fallback to default
+  } catch (error) {
+    console.log('Sidebar not available on this route');
   }
+
+  // Debug logging
+  console.log('PromoBanner Debug:', {
+    location: location.pathname,
+    canShowSidebar,
+    sidebarState: sidebarState?.state,
+    isDismissed,
+    isExpired
+  });
 
   useEffect(() => {
     // Check if banner was dismissed
@@ -38,6 +47,13 @@ export function PromoBanner() {
       setIsDismissed(true);
       return;
     }
+
+    // Add global reset function for debugging
+    (window as any).resetPromoBanner = () => {
+      localStorage.removeItem(DISMISSED_KEY);
+      setIsDismissed(false);
+      console.log('Promo banner reset - should be visible now');
+    };
 
     // Update countdown every second
     const updateCountdown = () => {
@@ -93,13 +109,13 @@ export function PromoBanner() {
   // Calculate sidebar-aware styles
   const getSidebarAwareStyles = () => {
     if (!canShowSidebar || !sidebarState) {
-      return "fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
+      return "fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
     }
     
     const { state } = sidebarState;
     const isCollapsed = state === 'collapsed';
     
-    return `fixed top-0 right-0 z-40 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
+    return `fixed top-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
       isCollapsed ? 'left-14' : 'left-64'
     }`;
   };
