@@ -56,26 +56,22 @@ serve(async (req) => {
       )
     }
 
-    // Store token in Supabase Secrets
+    // Store token in Supabase secrets table
     const secretKey = `${integrationType.toUpperCase()}_TOKEN_${user.id}`
     
     try {
-      const secretsResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/secrets`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          'Content-Type': 'application/json',
-          'apikey': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-        },
-        body: JSON.stringify({
-          name: secretKey,
-          value: token
+      const { error: secretError } = await supabase
+        .from('secrets')
+        .upsert({
+          user_id: user.id,
+          secret_name: secretKey,
+          secret_value: token
+        }, {
+          onConflict: 'user_id,secret_name'
         })
-      })
 
-      if (!secretsResponse.ok) {
-        const errorText = await secretsResponse.text()
-        console.error('Failed to store secret:', errorText)
+      if (secretError) {
+        console.error('Failed to store secret:', secretError)
         throw new Error('Failed to store token securely')
       }
       
