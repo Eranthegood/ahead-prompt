@@ -158,64 +158,6 @@ export default function Pricing() {
           </BlurFade>
 
 
-          {/* Feedback Section */}
-          <div className="mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 mb-12">
-            <div className="text-center space-y-6">
-              <h2 className="text-3xl font-bold text-foreground">
-                Would you pay for this?
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Help us shape the perfect pricing by choosing the plan you'd actually use. 
-                Once ready, we'll send you a special offer to thank you for your feedback!
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button 
-                  className="bg-primary hover:bg-primary/90"
-                  onClick={() => {
-                    if (user) {
-                      handleUpgrade('pro');
-                    } else {
-                      trackPricingInteraction('pro');
-                    }
-                  }}
-                  disabled={isTracking || isLoading}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {user ? "Upgrade to Pro" : "I'd pay for Pro"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="bg-background/50 hover:bg-background/80"
-                  onClick={() => {
-                    if (user) {
-                      handleGetStarted();
-                    } else {
-                      trackPricingInteraction('free');
-                    }
-                  }}
-                  disabled={isTracking}
-                >
-                  <Gift className="w-4 h-4 mr-2" />
-                  {user ? "Start Free" : "I'd use Free"}
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="bg-background/50 hover:bg-background/80"
-                  onClick={() => {
-                    if (user) {
-                      handleUpgrade('basic');
-                    } else {
-                      trackPricingInteraction('basic');
-                    }
-                  }}
-                  disabled={isTracking || isLoading}
-                >
-                  <Zap className="w-4 h-4 mr-2" />
-                  {user ? "Upgrade to Basic" : "I'd pay for Basic"}
-                </Button>
-              </div>
-            </div>
-          </div>
 
           {/* Pricing Toggle */}
           <BlurFade delay={0.6} inView>
