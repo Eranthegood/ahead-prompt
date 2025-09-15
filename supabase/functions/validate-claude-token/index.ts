@@ -28,22 +28,9 @@ serve(async (req) => {
 
     let actualApiKey = apiKey;
     
-    // For testing mode, retrieve the API key from Supabase secrets
+    // In testing mode, use the stored secret instead of a provided key
     if (test && !apiKey) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        return new Response(JSON.stringify({ 
-          isValid: false, 
-          error: 'User not authenticated' 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401,
-        });
-      }
-
-      // Get the stored API key from integrations table or secrets
-      actualApiKey = Deno.env.get('ANTHROPIC_API_KEY');
-      
+      actualApiKey = Deno.env.get('ANTHROPIC_API_KEY') || '';
       if (!actualApiKey) {
         return new Response(JSON.stringify({ 
           isValid: false, 
