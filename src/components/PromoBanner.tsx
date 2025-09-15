@@ -114,19 +114,19 @@ export function PromoBanner() {
     return null;
   }
 
-  // Calculate sidebar-aware styles with higher z-index and better positioning
+  // Calculate sidebar-aware styles without overlapping content
   const getSidebarAwareStyles = () => {
-    const baseClasses = "fixed top-0 z-[100] bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-lg";
+    const baseClasses = "sticky top-0 z-[100] bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-lg";
     
     if (!canShowSidebar || !sidebarState) {
-      return `${baseClasses} left-0 right-0`;
+      return `${baseClasses} w-full`;
     }
     
     const { state } = sidebarState;
     const isCollapsed = state === 'collapsed';
     
-    return `${baseClasses} right-0 transition-all duration-300 ${
-      isCollapsed ? 'left-14' : 'left-64'
+    return `${baseClasses} transition-all duration-300 ${
+      isCollapsed ? 'ml-14' : 'ml-64'
     }`;
   };
 
