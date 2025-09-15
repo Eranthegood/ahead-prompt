@@ -24,18 +24,21 @@ export const PLAN_LIMITS = {
     products: 1,
     epicsPerProduct: 3,
     promptLibraryItems: 10,
+    knowledgeAccess: false,
     features: ['Basic AI generation', 'Community support']
   },
   basic: {
     products: 3,
     epicsPerProduct: 10,
     promptLibraryItems: 50,
+    knowledgeAccess: true,
     features: ['Advanced AI models', 'Knowledge base access', 'Cursor integration', 'Priority support']
   },
   pro: {
     products: -1, // unlimited
     epicsPerProduct: -1, // unlimited  
     promptLibraryItems: -1, // unlimited
+    knowledgeAccess: true,
     features: ['All Basic features', 'Prompt enhancer', '2 collaboration seats', 'Premium support']
   }
 } as const;
@@ -212,6 +215,10 @@ export const canCreateEpic = (tier: SubscriptionTier, currentCount: number): boo
 export const canCreatePromptLibraryItem = (tier: SubscriptionTier, currentCount: number): boolean => {
   const limits = PLAN_LIMITS[tier];
   return limits.promptLibraryItems === -1 || currentCount < limits.promptLibraryItems;
+};
+
+export const canAccessKnowledge = (tier: SubscriptionTier): boolean => {
+  return PLAN_LIMITS[tier].knowledgeAccess;
 };
 
 export const getPlanDisplayName = (tier: SubscriptionTier): string => {

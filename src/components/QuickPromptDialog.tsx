@@ -18,6 +18,7 @@ import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector'
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
+import { useSubscription, canAccessKnowledge } from '@/hooks/useSubscription';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -130,6 +131,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Performance tracking
   const [startTime] = useState(Date.now());
   const { trackPromptCreation, trackError } = usePromptMetrics();
+  const { tier } = useSubscription();
   
   // Dark mode contrast monitoring (development only)
   useDevContrastMonitor();
@@ -556,71 +558,73 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               </div>
 
               {/* Knowledge Integration Section */}
-              <div className="space-y-3 p-4 border rounded-md bg-card/50 border-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-foreground" />
-                    <label className="text-sm font-medium text-foreground">
-                      Use knowledge
-                    </label>
+              {canAccessKnowledge(tier) && (
+                <div className="space-y-3 p-4 border rounded-md bg-card/50 border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-foreground" />
+                      <label className="text-sm font-medium text-foreground">
+                        Use knowledge
+                      </label>
+                    </div>
+                    <Switch 
+                      checked={enableKnowledge} 
+                      onCheckedChange={setEnableKnowledge}
+                      aria-label="Toggle knowledge usage"
+                    />
                   </div>
-                  <Switch 
-                    checked={enableKnowledge} 
-                    onCheckedChange={setEnableKnowledge}
-                    aria-label="Toggle knowledge usage"
-                  />
-                </div>
 
-                {enableKnowledge && knowledgeItems.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-xs text-muted-foreground">
-                      Select knowledge to include ({knowledgeItems.length} available)
-                    </div>
-                    <div className="max-h-32 overflow-y-auto space-y-1 scrollbar-thin">
-                      {knowledgeItems.map(item => (
-                        <div 
-                          key={item.id}
-                          className={`text-xs p-2 rounded cursor-pointer transition-all duration-200 ${
-                            selectedKnowledgeIds.includes(item.id) 
-                              ? 'bg-primary/15 text-primary border border-primary/30 shadow-sm' 
-                              : 'bg-card hover:bg-muted/80 border border-border text-card-foreground'
-                          }`}
-                          onClick={() => handleKnowledgeToggle(item.id)}
-                        >
-                          <div className="font-medium truncate">{item.title}</div>
-                          <div className="text-muted-foreground truncate mt-1">{item.category}</div>
-                        </div>
-                      ))}
-                    </div>
-                    {selectedKnowledgeIds.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
-                        {selectedKnowledgeItems.map(item => (
-                          <Badge 
-                            key={item.id} 
-                            variant="secondary" 
-                            className="text-xs flex items-center gap-1 bg-primary/10 text-primary border border-primary/20"
+                  {enableKnowledge && knowledgeItems.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-xs text-muted-foreground">
+                        Select knowledge to include ({knowledgeItems.length} available)
+                      </div>
+                      <div className="max-h-32 overflow-y-auto space-y-1 scrollbar-thin">
+                        {knowledgeItems.map(item => (
+                          <div 
+                            key={item.id}
+                            className={`text-xs p-2 rounded cursor-pointer transition-all duration-200 ${
+                              selectedKnowledgeIds.includes(item.id) 
+                                ? 'bg-primary/15 text-primary border border-primary/30 shadow-sm' 
+                                : 'bg-card hover:bg-muted/80 border border-border text-card-foreground'
+                            }`}
+                            onClick={() => handleKnowledgeToggle(item.id)}
                           >
-                            {item.title}
-                            <X 
-                              className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
-                              onClick={() => handleKnowledgeToggle(item.id)}
-                            />
-                          </Badge>
+                            <div className="font-medium truncate">{item.title}</div>
+                            <div className="text-muted-foreground truncate mt-1">{item.category}</div>
+                          </div>
                         ))}
                       </div>
-                    )}
-                  </div>
-                )}
+                      {selectedKnowledgeIds.length > 0 && (
+                        <div className="flex flex-wrap gap-1 pt-2 border-t border-border">
+                          {selectedKnowledgeItems.map(item => (
+                            <Badge 
+                              key={item.id} 
+                              variant="secondary" 
+                              className="text-xs flex items-center gap-1 bg-primary/10 text-primary border border-primary/20"
+                            >
+                              {item.title}
+                              <X 
+                                className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
+                                onClick={() => handleKnowledgeToggle(item.id)}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                {enableKnowledge && knowledgeItems.length === 0 && (
-                  <button 
-                    onClick={handleOpenKnowledge}
-                    className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer transition-colors p-2 rounded bg-muted/30 hover:bg-muted/50 w-full text-left"
-                  >
-                    No knowledge available for this product. Click to add some →
-                  </button>
-                )}
-              </div>
+                  {enableKnowledge && knowledgeItems.length === 0 && (
+                    <button 
+                      onClick={handleOpenKnowledge}
+                      className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline cursor-pointer transition-colors p-2 rounded bg-muted/30 hover:bg-muted/50 w-full text-left"
+                    >
+                      No knowledge available for this product. Click to add some →
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

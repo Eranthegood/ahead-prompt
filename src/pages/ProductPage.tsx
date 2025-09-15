@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
+import { KnowledgeAccessGuard } from '@/components/KnowledgeAccessGuard';
+import { useSubscription, canAccessKnowledge } from '@/hooks/useSubscription';
 import { PromptCard } from '@/components/PromptCard';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
@@ -35,6 +37,7 @@ const ProductPage = () => {
   } = usePrompts(workspace?.id, productId);
   const { sendToCursor, isLoading: cursorLoading } = useCursorIntegration();
   const { toast } = useToast();
+  const { tier } = useSubscription();
   
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
@@ -247,7 +250,13 @@ const ProductPage = () => {
             <TabsList className="grid w-full max-w-md grid-cols-3 h-9 sm:h-10 text-xs sm:text-sm">
               <TabsTrigger value="overview" className="px-2 sm:px-3">Overview</TabsTrigger>
               <TabsTrigger value="epics" className="px-2 sm:px-3">Epics</TabsTrigger>
-              <TabsTrigger value="knowledge" className="px-2 sm:px-3">Knowledge</TabsTrigger>
+              <TabsTrigger 
+                value="knowledge" 
+                className="px-2 sm:px-3"
+                disabled={!canAccessKnowledge(tier)}
+              >
+                Knowledge {!canAccessKnowledge(tier) && <span className="ml-1 text-xs">🔒</span>}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4 sm:space-y-6">
@@ -411,7 +420,9 @@ const ProductPage = () => {
             </TabsContent>
 
             <TabsContent value="knowledge">
-              <KnowledgeBase workspace={workspace} product={product} />
+              <KnowledgeAccessGuard>
+                <KnowledgeBase workspace={workspace} product={product} />
+              </KnowledgeAccessGuard>
             </TabsContent>
           </Tabs>
         </div>

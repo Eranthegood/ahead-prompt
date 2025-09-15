@@ -51,6 +51,8 @@ import { UserAccountSection } from './UserAccountSection';
 import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 import { PromptLibrary } from './PromptLibrary';
+import { KnowledgeAccessGuard } from './KnowledgeAccessGuard';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -82,6 +84,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats, isGamificationEnabled } = useGamification();
+  const { tier } = useSubscription();
   const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === 'collapsed';
   
@@ -1369,7 +1372,9 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               {selectedKnowledgeProduct?.name ?? 'Knowledge'}
             </DialogTitle>
           </DialogHeader>
-          <MinimalKnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
+          <KnowledgeAccessGuard>
+            <MinimalKnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
+          </KnowledgeAccessGuard>
         </DialogContent>
       </Dialog>
 
