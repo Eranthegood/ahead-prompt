@@ -143,7 +143,16 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
       }
 
       const data = await response.json();
-      transformedPrompt = data.choices[0].message.content;
+      console.log('OpenAI API response:', JSON.stringify(data, null, 2));
+      
+      // Validate response content
+      const content = data.choices?.[0]?.message?.content;
+      if (!content || content.trim().length === 0) {
+        console.error('Empty response from OpenAI:', data);
+        throw new Error('OpenAI returned an empty response. This might indicate an issue with the model or request.');
+      }
+      
+      transformedPrompt = content;
     }
 
     console.log('Successfully transformed prompt using provider:', provider);
