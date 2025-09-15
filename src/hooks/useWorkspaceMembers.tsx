@@ -18,7 +18,9 @@ export function useWorkspaceMembers(workspaceId?: string) {
     }
 
     fetchMembers();
-    setupRealtimeSubscription();
+    const cleanup = setupRealtimeSubscription();
+    
+    return cleanup;
   }, [user, workspaceId]);
 
   const fetchMembers = async () => {
@@ -67,7 +69,7 @@ export function useWorkspaceMembers(workspaceId?: string) {
   };
 
   const setupRealtimeSubscription = () => {
-    if (!workspaceId) return;
+    if (!workspaceId) return () => {};
 
     const channel = supabase
       .channel(`workspace-members-${workspaceId}`)
@@ -79,13 +81,15 @@ export function useWorkspaceMembers(workspaceId?: string) {
           table: 'workspace_members',
           filter: `workspace_id=eq.${workspaceId}`
         },
-        () => {
+        (payload) => {
+          console.log('Workspace member change detected:', payload);
           fetchMembers();
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Cleaning up workspace members subscription');
       supabase.removeChannel(channel);
     };
   };
