@@ -18,7 +18,7 @@ import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector'
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
-import { useSubscription, canAccessKnowledge } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -131,7 +131,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
   // Performance tracking
   const [startTime] = useState(Date.now());
   const { trackPromptCreation, trackError } = usePromptMetrics();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   
   // Dark mode contrast monitoring (development only)
   useDevContrastMonitor();
@@ -558,7 +558,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
               </div>
 
               {/* Knowledge Integration Section */}
-              {canAccessKnowledge(tier) && (
+              {hasPremiumAccess && (
                 <div className="space-y-3 p-4 border rounded-md bg-card/50 border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

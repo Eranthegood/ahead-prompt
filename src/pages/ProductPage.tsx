@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { KnowledgeAccessGuard } from '@/components/KnowledgeAccessGuard';
-import { useSubscription, canAccessKnowledge } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
 import { PromptCard } from '@/components/PromptCard';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { CursorConfigDialog } from '@/components/CursorConfigDialog';
@@ -37,7 +37,7 @@ const ProductPage = () => {
   } = usePrompts(workspace?.id, productId);
   const { sendToCursor, isLoading: cursorLoading } = useCursorIntegration();
   const { toast } = useToast();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
@@ -253,9 +253,9 @@ const ProductPage = () => {
               <TabsTrigger 
                 value="knowledge" 
                 className="px-2 sm:px-3"
-                disabled={!canAccessKnowledge(tier)}
+                disabled={!hasPremiumAccess}
               >
-                Knowledge {!canAccessKnowledge(tier) && <span className="ml-1 text-xs">🔒</span>}
+                Knowledge {!hasPremiumAccess && <span className="ml-1 text-xs">🔒</span>}
               </TabsTrigger>
             </TabsList>
 

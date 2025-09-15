@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
 import type { Product } from '@/types';
@@ -21,7 +22,7 @@ export const useProducts = (workspaceId?: string) => {
   const { toast } = useToast();
   const { trackProductCreated } = useMixpanelContext();
   const { session } = useAuth();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   const navigate = useNavigate();
 
   // Fetch products
@@ -66,23 +67,24 @@ export const useProducts = (workspaceId?: string) => {
     }
 
     // ⚠️ Check subscription limits before creating
-    const canCreate = canCreateProduct(tier, products.length);
+    const canCreate = hasPremiumAccess || products.length < PLAN_LIMITS.free.products;
     if (!canCreate) {
-      console.error('[useProducts] Product creation blocked: limit reached for plan', tier);
+      const planType = hasPremiumAccess ? 'premium' : 'free';
+      console.error('[useProducts] Product creation blocked: limit reached for plan', planType);
       toast({
         title: "Product limit reached",
-        description: `You've reached the maximum number of products for the ${tier} plan.`,
+        description: `You've reached the maximum number of products for the ${planType} plan.`,
         variant: "destructive",
-        action: (
+        action: !hasPremiumAccess ? (
           <ToastAction 
             altText="Upgrade plan"
             onClick={() => navigate('/pricing')}
           >
             Upgrade
           </ToastAction>
-        )
+        ) : undefined
       });
-      throw new Error(`You've reached the maximum number of products for the ${tier} plan. Upgrade to create more products.`);
+      throw new Error(`You've reached the maximum number of products for the ${planType} plan. ${!hasPremiumAccess ? 'Upgrade to create more products.' : ''}`);
     }
 
     // 🚀 1. Optimistic update

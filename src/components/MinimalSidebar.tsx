@@ -52,7 +52,7 @@ import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 import { PromptLibrary } from './PromptLibrary';
 import { KnowledgeAccessGuard } from './KnowledgeAccessGuard';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -84,7 +84,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
   const { achievements, stats, isGamificationEnabled } = useGamification();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === 'collapsed';
   

@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { usePromptLibrary } from '@/hooks/usePromptLibrary';
-import { useSubscription, canCreatePromptLibraryItem } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { UsageLimitIndicator } from '@/components/UsageLimitIndicator';
 import { AI_MODELS, PROMPT_CATEGORIES, type PromptLibraryItem } from '@/types/prompt-library';
 import { X, Plus, Lock } from 'lucide-react';
@@ -27,7 +28,7 @@ export function PromptLibraryCreateDialog({
   onEditComplete 
 }: PromptLibraryCreateDialogProps) {
   const { createItem, updateItem, items, userItems } = usePromptLibrary();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [aiModel, setAiModel] = useState<string>(AI_MODELS[0].value);
@@ -37,7 +38,7 @@ export function PromptLibraryCreateDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const canCreate = canCreatePromptLibraryItem(tier, userItems?.length || 0);
+  const canCreate = hasPremiumAccess || (userItems?.length || 0) < PLAN_LIMITS.free.promptLibraryItems;
 
   const isEditing = !!editItem;
 
@@ -87,9 +88,10 @@ export function PromptLibraryCreateDialog({
 
     // Check limits before creating (not editing)
     if (!isEditing && !canCreate) {
+      const planType = hasPremiumAccess ? 'premium' : 'free';
       toast({
         title: "Prompt library limit reached",
-        description: `You've reached the maximum number of prompt library items for the ${tier} plan. Upgrade to create more items.`,
+        description: `You've reached the maximum number of prompt library items for the ${planType} plan. ${!hasPremiumAccess ? 'Upgrade to create more items.' : ''}`,
         variant: "destructive"
       });
       return;

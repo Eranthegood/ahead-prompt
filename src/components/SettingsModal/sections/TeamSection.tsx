@@ -10,8 +10,10 @@ import { Separator } from '@/components/ui/separator';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import { useWorkspaceInvitations } from '@/hooks/useWorkspaceInvitations';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Copy, Trash2, MoreHorizontal } from 'lucide-react';
+import { UserPlus, Copy, Trash2, MoreHorizontal, Crown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +25,7 @@ export function TeamSection() {
   const { workspace } = useWorkspace();
   const { members, loading: membersLoading, updateMemberRole, removeMember } = useWorkspaceMembers(workspace?.id);
   const { invitations, createInvitation, cancelInvitation } = useWorkspaceInvitations(workspace?.id);
+  const { hasPremiumAccess, accessSource, loading: premiumLoading } = useWorkspacePremiumAccess();
   const { toast } = useToast();
   
   const [inviteEmail, setInviteEmail] = useState('');
@@ -31,6 +34,19 @@ export function TeamSection() {
 
   const handleInvite = async () => {
     if (!inviteEmail.trim() || !workspace) return;
+
+    // Check member limits based on workspace plan
+    const maxMembers = hasPremiumAccess && accessSource === 'workspace' ? PLAN_LIMITS.pro.maxWorkspaceMembers : PLAN_LIMITS.free.maxWorkspaceMembers;
+    const currentMemberCount = members.length + invitations.length;
+    
+    if (currentMemberCount >= maxMembers) {
+      toast({
+        title: "Member limit reached",
+        description: `You've reached the maximum of ${maxMembers} members for your current plan.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setInviting(true);
@@ -104,15 +120,32 @@ export function TeamSection() {
 
   return (
     <div className="space-y-6">
-      {/* Invite Member */}
+      {/* Plan Info and Invite Member */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             Inviter un membre
+            {hasPremiumAccess && accessSource === 'workspace' && (
+              <Badge variant="default" className="ml-auto">
+                <Crown className="w-3 h-3 mr-1" />
+                Pro Plan
+              </Badge>
+            )}
           </CardTitle>
-          <CardDescription>
-            Ajoutez de nouveaux membres à votre équipe.
+          <CardDescription className="space-y-2">
+            <div>Ajoutez de nouveaux membres à votre équipe.</div>
+            {!premiumLoading && (
+              <div className="flex items-center gap-2 text-sm">
+                <span>
+                  Membres: {members.length + invitations.length}/
+                  {hasPremiumAccess && accessSource === 'workspace' ? PLAN_LIMITS.pro.maxWorkspaceMembers : PLAN_LIMITS.free.maxWorkspaceMembers}
+                </span>
+                {hasPremiumAccess && accessSource === 'workspace' && (
+                  <span className="text-muted-foreground">• Accès premium partagé</span>
+                )}
+              </div>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -142,11 +175,24 @@ export function TeamSection() {
           </div>
           <Button 
             onClick={handleInvite} 
-            disabled={!inviteEmail.trim() || inviting}
+            disabled={!inviteEmail.trim() || inviting || (members.length + invitations.length >= (hasPremiumAccess && accessSource === 'workspace' ? PLAN_LIMITS.pro.maxWorkspaceMembers : PLAN_LIMITS.free.maxWorkspaceMembers))}
             className="w-full md:w-auto"
           >
-            {inviting ? 'Creating...' : 'Create Link'}
+            {inviting ? 'Creating...' : 
+             (members.length + invitations.length >= (hasPremiumAccess && accessSource === 'workspace' ? PLAN_LIMITS.pro.maxWorkspaceMembers : PLAN_LIMITS.free.maxWorkspaceMembers)) ? 'Limit Reached' : 'Create Link'}
           </Button>
+          
+          {hasPremiumAccess && accessSource === 'workspace' && (
+            <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-md">
+              <div className="flex items-center gap-2 text-sm text-primary">
+                <Crown className="w-4 h-4" />
+                <span className="font-medium">Pro Workspace Benefits</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tous les membres ont accès aux fonctionnalités premium grâce au plan Pro de ce workspace.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

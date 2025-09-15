@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useGamification } from '@/hooks/useGamification';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
-import { useSubscription, canCreateEpic } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
 import type { Epic } from '@/types';
@@ -21,7 +22,7 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
   const { toast } = useToast();
   const { awardXP } = useGamification();
   const { trackEpicCreated } = useMixpanelContext();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   const navigate = useNavigate();
 
   // Fetch epics
@@ -64,23 +65,25 @@ export const useEpics = (workspaceId?: string, selectedProductId?: string) => {
       ? epics.filter(epic => epic.product_id === epicData.product_id).length
       : 0;
     
-    const canCreate = canCreateEpic(tier, productEpicCount);
+    const maxEpics = hasPremiumAccess ? PLAN_LIMITS.pro.epicsPerProduct : PLAN_LIMITS.free.epicsPerProduct;
+    const canCreate = maxEpics === -1 || productEpicCount < maxEpics;
     if (!canCreate) {
-      console.error('[useEpics] Epic creation blocked: limit reached for plan', tier);
+      const planType = hasPremiumAccess ? 'premium' : 'free';
+      console.error('[useEpics] Epic creation blocked: limit reached for plan', planType);
       toast({
         title: "Epic limit reached",
-        description: `You've reached the maximum number of epics per product for the ${tier} plan.`,
+        description: `You've reached the maximum number of epics per product for the ${planType} plan.`,
         variant: "destructive",
-        action: (
+        action: !hasPremiumAccess ? (
           <ToastAction 
             altText="Upgrade plan"
             onClick={() => navigate('/pricing')}
           >
             Upgrade
           </ToastAction>
-        )
+        ) : undefined
       });
-      throw new Error(`You've reached the maximum number of epics per product for the ${tier} plan. Upgrade to create more epics.`);
+      throw new Error(`You've reached the maximum number of epics per product for the ${planType} plan. ${!hasPremiumAccess ? 'Upgrade to create more epics.' : ''}`);
     }
 
     // 🚀 1. Optimistic update - immediate UI response

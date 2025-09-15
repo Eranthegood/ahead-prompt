@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useToast } from '@/hooks/use-toast';
-import { useSubscription, canCreatePromptLibraryItem } from '@/hooks/useSubscription';
+import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
 import type { PromptLibraryItem, CreatePromptLibraryItemData } from '@/types/prompt-library';
@@ -15,7 +16,7 @@ export function usePromptLibrary() {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
-  const { tier } = useSubscription();
+  const { hasPremiumAccess } = useWorkspacePremiumAccess();
   const navigate = useNavigate();
 
   // Combine user items with system prompts
@@ -65,23 +66,25 @@ export function usePromptLibrary() {
     if (!user || !workspace) return null;
 
     // ⚠️ Check subscription limits before creating
-    const canCreate = canCreatePromptLibraryItem(tier, userItems.length);
+    const maxItems = hasPremiumAccess ? PLAN_LIMITS.pro.promptLibraryItems : PLAN_LIMITS.free.promptLibraryItems;
+    const canCreate = maxItems === -1 || userItems.length < maxItems;
     if (!canCreate) {
-      console.error('[usePromptLibrary] Prompt library item creation blocked: limit reached for plan', tier);
+      const planType = hasPremiumAccess ? 'premium' : 'free';
+      console.error('[usePromptLibrary] Prompt library item creation blocked: limit reached for plan', planType);
       toast({
         title: "Prompt library limit reached",
-        description: `You've reached the maximum number of prompt library items for the ${tier} plan.`,
+        description: `You've reached the maximum number of prompt library items for the ${planType} plan.`,
         variant: "destructive",
-        action: (
+        action: !hasPremiumAccess ? (
           <ToastAction 
             altText="Upgrade plan"
             onClick={() => navigate('/pricing')}
           >
             Upgrade
           </ToastAction>
-        )
+        ) : undefined
       });
-      throw new Error(`You've reached the maximum number of prompt library items for the ${tier} plan. Upgrade to create more items.`);
+      throw new Error(`You've reached the maximum number of prompt library items for the ${planType} plan. ${!hasPremiumAccess ? 'Upgrade to create more items.' : ''}`);
     }
 
     try {
