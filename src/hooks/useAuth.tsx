@@ -26,14 +26,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.info('[AuthProvider] Setting up auth listener');
+    let hasInitialSession = false;
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log(`[AuthProvider] Auth state change: ${event}`, session?.user?.id || 'no user');
+      async (event, session) => {
+        const userId = session?.user?.id;
+        console.info(`[AuthProvider] Auth event: ${event}`, { userId, hasInitialSession });
         
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        
+        // Only set loading to false after we get the initial session or a definitive event
+        if (event === 'INITIAL_SESSION') {
+          hasInitialSession = true;
+          setLoading(false);
+          console.info('[AuthProvider] Initial session processed, loading complete');
+        } else if (hasInitialSession && ['SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED'].includes(event)) {
+          console.info(`[AuthProvider] Auth event ${event} processed`);
+        }
         
         // Handle post-authentication plan selection
         if (event === 'SIGNED_IN' && session?.user) {
@@ -62,10 +74,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }, 100);
           }
         }
-        
-        // Handle session events (avoid forced sign-outs on refresh glitches)
-        // Note: Supabase emits SIGNED_OUT on real failures; TOKEN_REFRESHED means success.
-        // We no longer sign out when session is null during TOKEN_REFRESHED to prevent accidental logouts in restricted storage contexts.
         
         // Track login events (with error isolation)
         if (event === 'SIGNED_IN' && session?.user) {
@@ -106,21 +114,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // Check for existing session after setting up listener
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error('[AuthProvider] Error getting initial session:', error);
-        setLoading(false);
-      } else if (session) {
-        setSession(session);
-        setUser(session.user);
-        setLoading(false);
-      } else {
-        setLoading(false);
+    // Check for existing session after setting up listener (fallback safety net)
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('[AuthProvider] Error getting initial session:', error);
+        } else {
+          console.info('[AuthProvider] Fallback session check:', { userId: session?.user?.id });
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+      } catch (error) {
+        console.error('[AuthProvider] Failed to get initial session:', error);
+      } finally {
+        // Safety net: ensure loading is false after 3 seconds max
+        setTimeout(() => {
+          if (!hasInitialSession) {
+            console.warn('[AuthProvider] Forcing loading complete after timeout');
+            setLoading(false);
+          }
+        }, 3000);
       }
-    });
+    };
+
+    getInitialSession();
 
     return () => {
+      console.info('[AuthProvider] Cleaning up auth listener');
       subscription.unsubscribe();
     };
   }, []);
