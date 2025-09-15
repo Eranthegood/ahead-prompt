@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlanBadge } from "@/components/ui/plan-badge";
 import { BookOpen, Crown, Zap } from "lucide-react";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useWorkspacePremiumAccess } from "@/hooks/useWorkspacePremiumAccess";
 import { useNavigate } from "react-router-dom";
 
 interface KnowledgeAccessGuardProps {
@@ -12,11 +12,15 @@ interface KnowledgeAccessGuardProps {
 }
 
 export function KnowledgeAccessGuard({ children, showUpgradeCard = true }: KnowledgeAccessGuardProps) {
-  const { tier } = useSubscription();
+  const { hasPremiumAccess, loading } = useWorkspacePremiumAccess();
   const navigate = useNavigate();
 
-  // Allow access for basic and pro users
-  if (tier === 'basic' || tier === 'pro') {
+  if (loading) {
+    return <div className="animate-pulse bg-muted h-32 rounded-lg" />;
+  }
+
+  // Allow access for users with premium access (personal subscription or Pro workspace)
+  if (hasPremiumAccess) {
     return <>{children}</>;
   }
 

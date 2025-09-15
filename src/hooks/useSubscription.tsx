@@ -25,6 +25,7 @@ export const PLAN_LIMITS = {
     epicsPerProduct: 3,
     promptLibraryItems: 10,
     knowledgeAccess: false,
+    maxWorkspaceMembers: 1,
     features: ['Basic AI generation', 'Community support']
   },
   basic: {
@@ -32,6 +33,7 @@ export const PLAN_LIMITS = {
     epicsPerProduct: 10,
     promptLibraryItems: 50,
     knowledgeAccess: true,
+    maxWorkspaceMembers: 1,
     features: ['Advanced AI models', 'Knowledge base access', 'Cursor integration', 'Priority support']
   },
   pro: {
@@ -39,6 +41,7 @@ export const PLAN_LIMITS = {
     epicsPerProduct: -1, // unlimited  
     promptLibraryItems: -1, // unlimited
     knowledgeAccess: true,
+    maxWorkspaceMembers: 3, // owner + 2 additional members
     features: ['All Basic features', 'Prompt enhancer', '2 collaboration seats', 'Premium support']
   }
 } as const;
