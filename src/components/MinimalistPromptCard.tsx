@@ -18,7 +18,7 @@ interface MinimalistPromptCardProps {
   };
   onPromptClick: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
-  onShowCursorDialog: () => void;
+  onShowCursorDrawer: () => void;
   isHovered?: boolean;
   onHover?: (promptId: string | null) => void;
 }
@@ -38,7 +38,7 @@ export function MinimalistPromptCard({
   prompt,
   onPromptClick,
   onCopyGenerated,
-  onShowCursorDialog,
+  onShowCursorDrawer,
   isHovered,
   onHover
 }: MinimalistPromptCardProps) {
@@ -166,7 +166,7 @@ export function MinimalistPromptCard({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    onShowCursorDialog();
+                    onShowCursorDrawer();
                   }}
                   disabled={!isUsable}
                   className="h-7 w-7 p-0 text-purple-600 hover:text-purple-700"

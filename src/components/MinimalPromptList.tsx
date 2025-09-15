@@ -13,8 +13,7 @@ import { PromptTransformService } from '@/services/promptTransformService';
 import { PromptCard } from '@/components/PromptCard';
 import { MinimalistPromptCard } from '@/components/MinimalistPromptCard';
 import { LinearPromptItem } from '@/components/LinearPromptItem';
-import { CursorConfigDialog } from '@/components/CursorConfigDialog';
-import { ClaudeConfigDialog } from '@/components/ClaudeConfigDialog';
+import { PromptActionDrawer } from '@/components/PromptActionDrawer';
 import { Workspace, Prompt, PromptStatus, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/types';
 import { isPromptUsable } from '@/lib/utils';
 import { searchPrompts, SearchablePrompt } from '@/lib/searchUtils';
@@ -67,10 +66,9 @@ export function MinimalPromptList({
   
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [showCursorDialog, setShowCursorDialog] = useState(false);
-  const [cursorPrompt, setCursorPrompt] = useState<Prompt | null>(null);
-  const [showClaudeDialog, setShowClaudeDialog] = useState(false);
-  const [claudePrompt, setClaudePrompt] = useState<Prompt | null>(null);
+  // Drawer states  
+  const [drawerPrompt, setDrawerPrompt] = useState<(Prompt & { product?: any; epic?: any }) | null>(null);
+  const [drawerType, setDrawerType] = useState<'cursor' | 'claude' | null>(null);
 
   // Derive effective product when only epic is selected
   const effectiveProductId = useMemo(() => {
@@ -476,13 +474,13 @@ export function MinimalPromptList({
                     prompt={prompt}
                     onPromptClick={handlePromptClick}
                     onCopyGenerated={handleCopyGenerated}
-                    onShowCursorDialog={() => {
-                      setCursorPrompt(prompt);
-                      setShowCursorDialog(true);
+                    onShowCursorDrawer={() => {
+                      setDrawerPrompt(prompt);
+                      setDrawerType('cursor');
                     }}
-                    onShowClaudeDialog={() => {
-                      setClaudePrompt(prompt);
-                      setShowClaudeDialog(true);
+                    onShowClaudeDrawer={() => {
+                      setDrawerPrompt(prompt);
+                      setDrawerType('claude');
                     }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
@@ -558,13 +556,13 @@ export function MinimalPromptList({
                     prompt={item}
                     onPromptClick={handlePromptClick}
                     onCopyGenerated={handleCopyGenerated}
-                    onShowCursorDialog={() => {
-                      setCursorPrompt(item);
-                      setShowCursorDialog(true);
+                    onShowCursorDrawer={() => {
+                      setDrawerPrompt(item);
+                      setDrawerType('cursor');
                     }}
-                    onShowClaudeDialog={() => {
-                      setClaudePrompt(item);
-                      setShowClaudeDialog(true);
+                    onShowClaudeDrawer={() => {
+                      setDrawerPrompt(item);
+                      setDrawerType('claude');
                     }}
                     onPriorityChange={handlePriorityChangeWrapper}
                     onStatusChange={handleStatusChangeWrapper}
@@ -590,35 +588,18 @@ export function MinimalPromptList({
         epics={epics}
       />
 
-      {/* Cursor Config Dialog */}
-      {cursorPrompt && (
-        <CursorConfigDialog
-          isOpen={showCursorDialog}
+      {/* Action Drawer */}
+      {drawerPrompt && drawerType && (
+        <PromptActionDrawer
+          isOpen={true}
           onClose={() => {
-            setShowCursorDialog(false);
-            setCursorPrompt(null);
+            setDrawerPrompt(null);
+            setDrawerType(null);
           }}
-          prompt={cursorPrompt}
+          prompt={drawerPrompt}
+          actionType={drawerType}
           onPromptUpdate={(promptId, updates) => {
-            // Update the prompt with the new status and Cursor workflow data
-            if (promptsContext?.updatePrompt) {
-              promptsContext.updatePrompt(promptId, updates);
-            }
-          }}
-        />
-      )}
-
-      {/* Claude Config Dialog */}
-      {claudePrompt && (
-        <ClaudeConfigDialog
-          isOpen={showClaudeDialog}
-          onClose={() => {
-            setShowClaudeDialog(false);
-            setClaudePrompt(null);
-          }}
-          prompt={claudePrompt}
-          onPromptUpdate={(promptId, updates) => {
-            // Update the prompt with the new status and Claude workflow data
+            // Update the prompt with the new status and workflow data
             if (promptsContext?.updatePrompt) {
               promptsContext.updatePrompt(promptId, updates);
             }

@@ -20,8 +20,8 @@ interface LinearPromptItemProps {
   };
   onPromptClick: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
-  onShowCursorDialog: () => void;
-  onShowClaudeDialog?: () => void;
+  onShowCursorDrawer: () => void;
+  onShowClaudeDrawer?: () => void;
   onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
   onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
   onDuplicate?: (prompt: Prompt) => void;
@@ -46,8 +46,8 @@ export function LinearPromptItem({
   prompt,
   onPromptClick,
   onCopyGenerated,
-  onShowCursorDialog,
-  onShowClaudeDialog,
+  onShowCursorDrawer,
+  onShowClaudeDrawer,
   onPriorityChange,
   onStatusChange,
   onDuplicate,
@@ -236,7 +236,7 @@ export function LinearPromptItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    onShowCursorDialog();
+                    onShowCursorDrawer();
                   }}
                   disabled={!isUsable}
                   className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-muted flex-shrink-0"
@@ -263,7 +263,7 @@ export function LinearPromptItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    onShowClaudeDialog?.();
+                    onShowClaudeDrawer?.();
                   }}
                   disabled={!isUsable}
                   className="h-7 w-7 p-0 text-orange-500 hover:text-orange-600 hover:bg-muted flex-shrink-0"
