@@ -30,9 +30,37 @@ serve(async (req) => {
   }
 
   try {
-    const { token } = await req.json() as ValidateCursorRequest
+    const { token, test } = await req.json() as ValidateCursorRequest & { test?: boolean }
     
-    if (!token) {
+    let testToken = token;
+    
+    // If this is a test call, try to get stored token
+    if (test && !token) {
+      const authHeader = req.headers.get('authorization')
+      if (authHeader) {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
+        
+        const jwt = authHeader.replace('Bearer ', '')
+        const { data: { user }, error: userError } = await supabase.auth.getUser(jwt)
+        
+        if (!userError && user) {
+          const secretKey = `CURSOR_TOKEN_${user.id}`
+          testToken = Deno.env.get(secretKey)
+          
+          if (!testToken) {
+            return Response.json(
+              { isValid: false, error: 'No stored Cursor token found' },
+              { headers: corsHeaders }
+            )
+          }
+        }
+      }
+    }
+    
+    if (!testToken) {
       return Response.json(
         { isValid: false, error: 'Token is required' },
         { status: 400, headers: corsHeaders }
@@ -43,16 +71,13 @@ serve(async (req) => {
     const testResponse = await fetch('https://api.cursor.com/v0/agents', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${testToken}`,
         'Content-Type': 'application/json',
       },
     })
 
     if (testResponse.ok) {
       // Token is valid - try to get user info if available
-      let userData = undefined
-      
-      // Cursor API might not have a user endpoint, so we'll just validate the token works
       const response: CursorValidationResponse = {
         isValid: true,
         user: {

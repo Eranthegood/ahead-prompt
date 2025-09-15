@@ -112,6 +112,17 @@ export function useIntegrations() {
     );
   }, []);
 
+  // Unified function to store integration secrets
+  const storeIntegrationSecret = useCallback(async (integrationType: string, token: string) => {
+    const { data, error } = await supabase.functions.invoke('store-integration-secret', {
+      body: { integrationType, token }
+    });
+
+    if (error || !data?.success) {
+      throw new Error(data?.error || 'Failed to store token securely');
+    }
+  }, []);
+
   const configureIntegration = useCallback(async (id: string, secretValue: string) => {
     if (!secretValue.trim()) {
       toast.error('Clé API requise');
@@ -121,36 +132,16 @@ export function useIntegrations() {
     setIsLoading(true);
     try {
       if (id === 'github') {
+        // Store token securely first
+        await storeIntegrationSecret('github', secretValue);
+        
         // GitHub validation using the edge function
         const { data, error } = await supabase.functions.invoke('validate-github-token', {
           body: { token: secretValue }
         });
 
-        if (error || !data?.isValid) {
+        if (error || !data?.success) {
           throw new Error(data?.error || 'Invalid GitHub token');
-        }
-
-        // Store the integration configuration
-        const { error: insertError } = await supabase
-          .from('integrations')
-          .upsert({
-            user_id: (await supabase.auth.getUser()).data.user?.id,
-            integration_type: id,
-            is_configured: true,
-            is_enabled: true,
-            metadata: data.user ? {
-              username: data.user.login,
-              name: data.user.name,
-              email: data.user.email,
-              avatarUrl: data.user.avatar_url,
-              repositories: data.repositories || []
-            } : null,
-            updated_at: new Date().toISOString()
-          });
-
-        if (insertError) {
-          console.error('Error storing integration:', insertError);
-          throw new Error('Failed to store integration configuration');
         }
 
         updateIntegration(id, {
@@ -167,10 +158,13 @@ export function useIntegrations() {
         });
 
         toast.success('GitHub intégré avec succès!');
-        await loadIntegrations(); // Reload from database
+        await loadIntegrations();
         return true;
         
       } else if (id === 'cursor') {
+        // Store token securely first
+        await storeIntegrationSecret('cursor', secretValue);
+        
         // Cursor validation using the edge function
         const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
           body: { token: secretValue }
@@ -211,7 +205,7 @@ export function useIntegrations() {
         });
 
         toast.success('Cursor intégré avec succès!');
-        await loadIntegrations(); // Reload from database
+        await loadIntegrations();
         return true;
         
       } else if (id === 'figma') {
@@ -238,7 +232,7 @@ export function useIntegrations() {
         });
 
         toast.success('Figma intégré avec succès!');
-        await loadIntegrations(); // Reload from database
+        await loadIntegrations();
         return true;
         
       } else if (id === 'claude') {
@@ -284,7 +278,7 @@ export function useIntegrations() {
         });
 
         toast.success('Claude intégré avec succès!');
-        await loadIntegrations(); // Reload from database
+        await loadIntegrations();
         return true;
       }
 
@@ -297,7 +291,7 @@ export function useIntegrations() {
     } finally {
       setIsLoading(false);
     }
-  }, [integrations, loadIntegrations]);
+  }, [storeIntegrationSecret, loadIntegrations]);
 
   const testIntegration = useCallback(async (id: string) => {
     setIsLoading(true);
@@ -305,24 +299,37 @@ export function useIntegrations() {
       let testResult: 'success' | 'error' = 'success';
       
       if (id === 'github') {
-        const integration = integrations.find(i => i.id === 'github');
-        const token = integration?.configuration?.token;
-        
-        if (!token) {
-          testResult = 'error';
-          toast.error('Aucun token GitHub configuré');
-        } else {
-          const { data, error } = await supabase.functions.invoke('validate-github-token', {
-            body: { token }
-          });
+        // Test using stored secret via Edge Function
+        const { data, error } = await supabase.functions.invoke('validate-github-token', {
+          body: { test: true }
+        });
 
-          testResult = (!error && data?.isValid) ? 'success' : 'error';
-          
-          if (testResult === 'success') {
-            toast.success('Connexion GitHub réussie');
-          } else {
-            toast.error('Token GitHub invalide ou expiré');
-          }
+        if (error) {
+          testResult = 'error';
+          const message = (error as any)?.message || 'Erreur lors du test de GitHub';
+          toast.error(message);
+        } else if (data?.success) {
+          testResult = 'success';
+          toast.success('Connexion GitHub réussie');
+
+          // Update integration metadata with latest data
+          updateIntegration(id, {
+            isConfigured: true,
+            isEnabled: true,
+            metadata: data.user ? {
+              username: data.user.login,
+              name: data.user.name,
+              email: data.user.email,
+              avatarUrl: data.user.avatar_url,
+              repositories: data.repositories || []
+            } : null
+          });
+        } else {
+          testResult = 'error';
+          const msg = data?.error === 'No stored GitHub token found'
+            ? 'Aucun token GitHub stocké. Configurez GitHub d\'abord.'
+            : (data?.error || 'Token GitHub invalide ou expiré');
+          toast.error(msg);
         }
 
         updateIntegration(id, {
@@ -334,24 +341,34 @@ export function useIntegrations() {
       }
       
       if (id === 'cursor') {
-        const integration = integrations.find(i => i.id === 'cursor');
-        const token = integration?.configuration?.token;
-        
-        if (!token) {
-          testResult = 'error';
-          toast.error('Aucun token Cursor configuré');
-        } else {
-          const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
-            body: { token }
-          });
+        // Test using stored secret via Edge Function
+        const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
+          body: { test: true }
+        });
 
-          testResult = (!error && data?.isValid) ? 'success' : 'error';
-          
-          if (testResult === 'success') {
-            toast.success('Connexion Cursor réussie');
-          } else {
-            toast.error('Token Cursor invalide ou expiré');
-          }
+        if (error) {
+          testResult = 'error';
+          const message = (error as any)?.message || 'Erreur lors du test de Cursor';
+          toast.error(message);
+        } else if (data?.isValid) {
+          testResult = 'success';
+          toast.success('Connexion Cursor réussie');
+
+          // Update integration metadata
+          updateIntegration(id, {
+            isConfigured: true,
+            isEnabled: true,
+            metadata: data.user ? {
+              username: data.user.username,
+              email: data.user.email
+            } : null
+          });
+        } else {
+          testResult = 'error';
+          const msg = data?.error === 'No stored Cursor token found'
+            ? 'Aucun token Cursor stocké. Configurez Cursor d\'abord.'
+            : (data?.error || 'Token Cursor invalide ou expiré');
+          toast.error(msg);
         }
 
         updateIntegration(id, {
