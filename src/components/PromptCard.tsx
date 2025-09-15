@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LinearDropdown } from '@/components/ui/linear-dropdown';
 import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
@@ -223,34 +224,24 @@ export function PromptCard({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Priority Indicator */}
-                  <Select
-                    value={priority.toString()}
-                    onValueChange={(value: string) => onPriorityChange(prompt, parseInt(value))}
-                  >
-                    <SelectTrigger 
-                      className="w-auto h-4 border-none bg-transparent p-0 hover:bg-accent/30 transition-colors [&>svg]:hidden"
-                      onPointerDown={stopEventPropagation}
-                      onClick={stopEventPropagation}
-                    >
-                      <SelectValue asChild>
-                        <div className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor}`}>
-                          <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
-                        </div>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRIORITY_OPTIONS.map(option => (
-                        <SelectItem key={option.value} value={option.value.toString()}>
-                          <div className="flex items-center gap-2">
-                            {option.value === 1 && <Flame className="h-3 w-3 text-destructive" />}
-                            {option.value === 2 && <Minus className="h-3 w-3 text-orange-500" />}
-                            {option.value === 3 && <Clock className="h-3 w-3 text-muted-foreground" />}
-                            {option.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <LinearDropdown
+                    trigger={
+                      <div 
+                        className={`flex items-center justify-center h-6 w-6 rounded-full ${priorityDisplay.bgColor} hover:bg-accent/30 transition-colors cursor-pointer`}
+                        onClick={stopEventPropagation}
+                      >
+                        <PriorityIcon className={`h-3 w-3 ${priorityDisplay.color}`} />
+                      </div>
+                    }
+                    options={PRIORITY_OPTIONS.map(option => ({
+                      id: option.value.toString(),
+                      label: option.label,
+                      icon: option.value === 1 ? Flame : option.value === 2 ? Minus : Clock,
+                      color: option.value === 1 ? 'text-destructive' : option.value === 2 ? 'text-orange-500' : 'text-muted-foreground',
+                      onClick: () => onPriorityChange(prompt, option.value),
+                    }))}
+                    placeholder="Select priority"
+                  />
 
                   {/* Compact Title */}
                   <TruncatedTitle 
