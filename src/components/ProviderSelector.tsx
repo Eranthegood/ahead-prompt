@@ -11,7 +11,7 @@ interface ProviderSelectorProps {
   onChange: (config: ProviderConfig) => void;
 }
 
-const PROVIDER_MODELS = {
+export const PROVIDER_MODELS = {
   openai: [
     { id: 'gpt-5-2025-08-07', name: 'GPT-5 (Flagship)' },
     { id: 'gpt-5-mini-2025-08-07', name: 'GPT-5 Mini (Fast)' },

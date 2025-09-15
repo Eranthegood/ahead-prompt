@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import type { Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
+import { PROVIDER_MODELS } from '@/components/ProviderSelector';
 
 interface ProviderConfig {
   provider: 'openai' | 'claude';
@@ -136,15 +137,22 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
       id: 'openai',
       label: 'OpenAI',
       icon: Bot,
-      onClick: () => onProviderChange({ provider: 'openai', model: 'gpt-4' }),
+      onClick: () => onProviderChange({ provider: 'openai', model: PROVIDER_MODELS.openai[0].id }),
     },
     {
       id: 'claude',
       label: 'Claude',
       icon: Bot,
-      onClick: () => onProviderChange({ provider: 'claude', model: 'claude-3-sonnet' }),
+      onClick: () => onProviderChange({ provider: 'claude', model: PROVIDER_MODELS.claude[0].id }),
     },
   ];
+
+  const modelOptions = PROVIDER_MODELS[providerConfig.provider]?.map(model => ({
+    id: model.id,
+    label: model.name,
+    icon: Bot,
+    onClick: () => onProviderChange({ ...providerConfig, model: model.id }),
+  })) || [];
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -188,6 +196,24 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
         }
         options={providerOptions}
         placeholder="Select AI provider"
+      />
+
+      {/* AI Model Button */}
+      <LinearDropdown
+        trigger={
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-3 text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60"
+          >
+            <Bot className="w-4 h-4" />
+            <span className="ml-2 text-sm">
+              {PROVIDER_MODELS[providerConfig.provider]?.find(m => m.id === providerConfig.model)?.name || 'Model'}
+            </span>
+          </Button>
+        }
+        options={modelOptions}
+        placeholder="Select model"
       />
 
       {/* Product Button */}

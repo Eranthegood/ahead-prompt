@@ -21,7 +21,7 @@ export const useLinearPromptCreator = ({
   const [selectedEpic, setSelectedEpic] = useState<string | undefined>(selectedEpicId);
   const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
     provider: 'openai',
-    model: 'gpt-4',
+    model: 'gpt-5-2025-08-07',
   });
   const [selectedKnowledge, setSelectedKnowledge] = useState<KnowledgeItem[]>([]);
   const [createMore, setCreateMore] = useState(false);
@@ -34,7 +34,7 @@ export const useLinearPromptCreator = ({
     setSelectedEpic(selectedEpicId);
     setProviderConfig({
       provider: 'openai',
-      model: 'gpt-4',
+      model: 'gpt-5-2025-08-07',
     });
     setSelectedKnowledge([]);
     setIsExpanded(false);
