@@ -106,9 +106,9 @@ export function TeamSection() {
     }
   };
 
-  const handleRemoveMember = async (userId: string) => {
+  const handleRemoveMember = async (memberRecordId: string) => {
     try {
-      await removeMember(userId);
+      await removeMember(memberRecordId);
     } catch (error) {
       console.error('Error removing member:', error);
     }
@@ -242,16 +242,16 @@ export function TeamSection() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
+                           <DropdownMenuItem
                             onClick={() => handleRoleChange(
-                              member.user_id, 
+                              member.id, 
                               member.role === 'admin' ? 'user' : 'admin'
                             )}
                           >
                             {member.role === 'admin' ? 'Rétrograder' : 'Promouvoir admin'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleRemoveMember(member.user_id)}
+                            onClick={() => handleRemoveMember(member.id)}
                             className="text-destructive"
                           >
                             Supprimer
