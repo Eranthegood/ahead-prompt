@@ -16,6 +16,7 @@ import { PromptsProvider, usePromptsContext } from '@/context/PromptsContext';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
+import { PromoBanner } from './PromoBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -82,6 +83,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Always use the same layout structure but conditionally render content
   return (
     <div className="min-h-screen bg-background">
+      <PromoBanner />
       {canShowSidebar ? (
         // Render sidebar layout structure always for sidebar pages
         <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
