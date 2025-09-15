@@ -7,10 +7,10 @@ import { useSubscription, canCreatePromptLibraryItem } from '@/hooks/useSubscrip
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
 import type { PromptLibraryItem, CreatePromptLibraryItemData } from '@/types/prompt-library';
-import { SYSTEM_PROMPTS } from '@/constants/systemPrompts';
 
 export function usePromptLibrary() {
   const [userItems, setUserItems] = useState<PromptLibraryItem[]>([]);
+  const [systemItems, setSystemItems] = useState<PromptLibraryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { workspace } = useWorkspace();
@@ -20,33 +20,35 @@ export function usePromptLibrary() {
 
   // Combine user items with system prompts
   const items = useMemo(() => {
-    const systemPromptItems: PromptLibraryItem[] = SYSTEM_PROMPTS.map(systemPrompt => ({
-      ...systemPrompt,
-      workspace_id: workspace?.id || '',
-      user_id: user?.id || '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      usage_count: 0,
-      is_favorite: false,
-    }));
-
-    return [...systemPromptItems, ...userItems];
-  }, [userItems, workspace?.id, user?.id]);
+    return [...systemItems, ...userItems];
+  }, [systemItems, userItems]);
 
   const fetchItems = async () => {
     if (!user || !workspace) return;
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch user-specific prompts
+      const { data: userData, error: userError } = await supabase
         .from('prompt_library' as any)
         .select('*')
         .eq('workspace_id', workspace.id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUserItems((data || []) as unknown as PromptLibraryItem[]);
+      if (userError) throw userError;
+
+      // Fetch system prompts
+      const { data: systemData, error: systemError } = await supabase
+        .from('prompt_library' as any)
+        .select('*')
+        .eq('is_system_prompt', true)
+        .order('created_at', { ascending: false });
+
+      if (systemError) throw systemError;
+
+      setUserItems((userData || []) as unknown as PromptLibraryItem[]);
+      setSystemItems((systemData || []) as unknown as PromptLibraryItem[]);
     } catch (error: any) {
       console.error('Error fetching prompt library:', error);
       toast({
@@ -120,8 +122,10 @@ export function usePromptLibrary() {
   };
 
   const updateItem = async (id: string, updates: Partial<PromptLibraryItem>): Promise<void> => {
-    // Don't allow updating system prompts
-    if (id.startsWith('system-')) {
+    // Check if this is a system prompt
+    const isSystemPrompt = systemItems.some(item => item.id === id);
+    
+    if (isSystemPrompt) {
       toast({
         variant: 'destructive',
         title: 'Cannot edit system prompts',
@@ -157,8 +161,10 @@ export function usePromptLibrary() {
   };
 
   const deleteItem = async (id: string): Promise<void> => {
-    // Don't allow deleting system prompts
-    if (id.startsWith('system-')) {
+    // Check if this is a system prompt
+    const isSystemPrompt = systemItems.some(item => item.id === id);
+    
+    if (isSystemPrompt) {
       toast({
         variant: 'destructive',
         title: 'Cannot delete system prompts',
@@ -192,7 +198,9 @@ export function usePromptLibrary() {
 
   const incrementUsage = async (id: string): Promise<void> => {
     // Don't track usage for system prompts in database
-    if (id.startsWith('system-')) {
+    const isSystemPrompt = systemItems.some(item => item.id === id);
+    
+    if (isSystemPrompt) {
       return;
     }
 
@@ -217,7 +225,9 @@ export function usePromptLibrary() {
 
   const toggleFavorite = async (id: string): Promise<void> => {
     // Don't allow favoriting system prompts
-    if (id.startsWith('system-')) {
+    const isSystemPrompt = systemItems.some(item => item.id === id);
+    
+    if (isSystemPrompt) {
       toast({
         variant: 'destructive',
         title: 'Cannot favorite system prompts',

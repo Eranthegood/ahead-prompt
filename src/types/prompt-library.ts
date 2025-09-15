@@ -1,13 +1,14 @@
 export interface PromptLibraryItem {
   id: string;
-  workspace_id: string;
-  user_id: string;
+  workspace_id?: string;
+  user_id?: string;
   title: string;
   body: string;
   ai_model: string;
   tags: string[];
   category?: string;
   is_favorite: boolean;
+  is_system_prompt?: boolean;
   usage_count: number;
   created_at: string;
   updated_at: string;
