@@ -83,10 +83,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Always use the same layout structure but conditionally render content
   return (
     <div className="min-h-screen bg-background">
-      <PromoBanner />
       {canShowSidebar ? (
         // Render sidebar layout structure always for sidebar pages
         <SidebarProvider defaultOpen={!shouldBeCollapsedByDefault}>
+          <PromoBanner />
           {/* 
             ⚠️ CRITICAL ARCHITECTURE - DO NOT MODIFY ⚠️
             
@@ -161,6 +161,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       ) : (
         // Non-sidebar pages
         <>
+          <PromoBanner />
           {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={false} />}
           <main className={shouldShowHeader ? '' : 'min-h-screen'}>
             {children}

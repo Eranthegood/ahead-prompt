@@ -3,6 +3,8 @@ import { X, Copy } from 'lucide-react';
 import { copyText } from '@/lib/clipboard';
 import { useToast } from '@/hooks/use-toast';
 import { format, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import { useSidebar } from '@/components/ui/sidebar';
+import { useLocation } from 'react-router-dom';
 
 const PROMO_CODE = 'Early';
 const END_DATE = new Date('2025-09-21T23:59:59');
@@ -13,6 +15,21 @@ export function PromoBanner() {
   const [isExpired, setIsExpired] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
+  
+  // Only access sidebar state if we're on a sidebar page
+  const allowedSidebarPages = ['/build', '/integrations'];
+  const canShowSidebar = allowedSidebarPages.some(path => location.pathname.startsWith(path));
+  
+  // Safely get sidebar state
+  let sidebarState = null;
+  try {
+    if (canShowSidebar) {
+      sidebarState = useSidebar();
+    }
+  } catch {
+    // useSidebar not available, fallback to default
+  }
 
   useEffect(() => {
     // Check if banner was dismissed
@@ -73,8 +90,22 @@ export function PromoBanner() {
     return null;
   }
 
+  // Calculate sidebar-aware styles
+  const getSidebarAwareStyles = () => {
+    if (!canShowSidebar || !sidebarState) {
+      return "relative bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
+    }
+    
+    const { state } = sidebarState;
+    const isCollapsed = state === 'collapsed';
+    
+    return `relative bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
+      isCollapsed ? 'ml-14' : 'ml-64'
+    }`;
+  };
+
   return (
-    <div className="relative bg-gradient-to-r from-primary to-primary-glow text-primary-foreground">
+    <div className={getSidebarAwareStyles()}>
       <div className="px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-sm sm:text-base">
