@@ -62,14 +62,42 @@ export class PromptTransformService {
           }))
         : undefined;
 
-      const { data, error } = await supabase.functions.invoke('transform-prompt', {
-        body: { 
-          rawIdea: cleanIdea,
-          knowledgeContext,
+      // Helper to invoke edge function with optional model override
+      const invokeTransform = async (modelOverride?: string) => {
+        return await supabase.functions.invoke('transform-prompt', {
+          body: {
+            rawIdea: cleanIdea,
+            knowledgeContext,
+            provider,
+            model: modelOverride ?? model,
+          },
+        });
+      };
+
+      // First attempt with provided model (if any)
+      let { data, error } = await invokeTransform(model);
+
+      // If it failed or returned empty, try a safe fallback for OpenAI
+      if (
+        error ||
+        data?.error ||
+        !data?.transformedPrompt ||
+        (typeof data?.transformedPrompt === 'string' && data.transformedPrompt.trim().length === 0)
+      ) {
+        console.warn('Primary transform failed, attempting fallback model...', {
           provider,
-          model
+          model,
+          error,
+          dataError: data?.error,
+        });
+
+        if (provider === 'openai') {
+          const fallbackModel = undefined; // Let the edge function default to gpt-4o
+          const fallback = await invokeTransform(fallbackModel);
+          data = fallback.data;
+          error = fallback.error;
         }
-      });
+      }
 
       if (error) {
         console.error('Supabase function error:', error);
@@ -80,7 +108,7 @@ export class PromptTransformService {
         throw new Error(data.error);
       }
 
-      if (!data?.transformedPrompt) {
+      if (!data?.transformedPrompt || data.transformedPrompt.trim().length === 0) {
         throw new Error('No transformed prompt received');
       }
 
