@@ -36,7 +36,7 @@ export function PromptDetailDialog({
   const [hasUnsavedGeneratedChanges, setHasUnsavedGeneratedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
-  const [providerConfig, setProviderConfig] = useState({ provider: 'openai' as 'openai' | 'claude', model: 'gpt-5-2025-08-07' });
+  const [providerConfig, setProviderConfig] = useState({ provider: 'openai' as 'openai' | 'claude', model: 'gpt-4o' });
 
   const { toast } = useToast();
   const { updatePrompt } = usePrompts();
