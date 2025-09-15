@@ -68,7 +68,7 @@ export function MinimalPromptList({
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   // Drawer states  
   const [drawerPrompt, setDrawerPrompt] = useState<(Prompt & { product?: any; epic?: any }) | null>(null);
-  const [drawerType, setDrawerType] = useState<'cursor' | 'claude' | null>(null);
+  const [drawerType, setDrawerType] = useState<'send' | null>(null);
 
   // Derive effective product when only epic is selected
   const effectiveProductId = useMemo(() => {
@@ -477,12 +477,12 @@ export function MinimalPromptList({
                       onShowCursorDrawer={() => {
                         console.log('[MinimalPromptList] Opening Cursor drawer for prompt:', prompt.id);
                         setDrawerPrompt(prompt);
-                        setDrawerType('cursor');
+                        setDrawerType('send');
                       }}
                       onShowClaudeDrawer={() => {
                         console.log('[MinimalPromptList] Opening Claude drawer for prompt:', prompt.id);
                         setDrawerPrompt(prompt);
-                        setDrawerType('claude');
+                        setDrawerType('send');
                       }}
                       onPriorityChange={handlePriorityChangeWrapper}
                       onStatusChange={handleStatusChangeWrapper}
@@ -579,11 +579,11 @@ export function MinimalPromptList({
                       onCopyGenerated={handleCopyGenerated}
                       onShowCursorDrawer={() => {
                         setDrawerPrompt(item);
-                        setDrawerType('cursor');
+                        setDrawerType('send');
                       }}
                       onShowClaudeDrawer={() => {
                         setDrawerPrompt(item);
-                        setDrawerType('claude');
+                        setDrawerType('send');
                       }}
                       onPriorityChange={handlePriorityChangeWrapper}
                       onStatusChange={handleStatusChangeWrapper}

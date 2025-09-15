@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Github, GitBranch, Loader2, ExternalLink, Code, X, ChevronDown } from 'lucide-react';
+import { Github, GitBranch, Loader2, ExternalLink, Code, X, ChevronDown, Send, Cpu } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClaudeCodeIntegration } from '@/integrations/claude-code/hooks/useClaudeCodeIntegration';
@@ -15,7 +15,7 @@ interface PromptActionDrawerProps {
     product?: Product;
     epic?: Epic;
   };
-  actionType: 'cursor' | 'claude';
+  actionType: 'send';
   onPromptUpdate?: (promptId: string, updates: Partial<Prompt>) => void;
 }
 
@@ -56,7 +56,8 @@ export function PromptActionDrawer({
   
   const [repository, setRepository] = useState(defaultRepository || SAMPLE_REPOSITORIES[0]);
   const [branch, setBranch] = useState(defaultBranch || 'main');
-  const [model, setModel] = useState(actionType === 'cursor' ? 'claude-4-sonnet' : 'claude-sonnet-4-20250514');
+  const [provider, setProvider] = useState<'cursor' | 'claude'>('cursor');
+  const [model, setModel] = useState('claude-4-sonnet');
   const [isLoading, setIsLoading] = useState(false);
   
   const { toast } = useToast();
@@ -68,6 +69,11 @@ export function PromptActionDrawer({
       setBranch(defaultBranch || 'main');
     }
   }, [isOpen, defaultRepository, defaultBranch]);
+
+  useEffect(() => {
+    const defaultModel = provider === 'cursor' ? 'claude-4-sonnet' : 'claude-sonnet-4-20250514';
+    setModel(defaultModel);
+  }, [provider]);
 
   const handleSendToCursor = async () => {
     setIsLoading(true);
@@ -185,17 +191,17 @@ export function PromptActionDrawer({
     return null;
   }
 
-  const models = actionType === 'cursor' ? CURSOR_MODELS : CLAUDE_MODELS;
-  const IconComponent = actionType === 'cursor' ? ExternalLink : Code;
-  const actionLabel = actionType === 'cursor' ? 'Send to Cursor' : 'Send to Claude';
-  const handleAction = actionType === 'cursor' ? handleSendToCursor : handleSendToClaude;
+  const models = provider === 'cursor' ? CURSOR_MODELS : CLAUDE_MODELS;
+  const IconComponent = provider === 'cursor' ? ExternalLink : Code;
+  const actionLabel = provider === 'cursor' ? 'Send to Cursor' : 'Send to Claude';
+  const handleAction = provider === 'cursor' ? handleSendToCursor : handleSendToClaude;
 
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg p-4 mx-3 mt-2 mb-2 animate-in slide-in-from-top-2 duration-200 relative z-10">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <IconComponent className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">{actionLabel}</span>
+          <Send className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Send Prompt</span>
           {prompt.product?.github_repo_url && (
             <Badge variant="outline" className="text-xs">Auto-configured</Badge>
           )}
@@ -208,6 +214,34 @@ export function PromptActionDrawer({
         >
           <X className="h-4 w-4" />
         </Button>
+      </div>
+
+      {/* Provider Selection */}
+      <div className="mb-4">
+        <label className="text-xs font-medium text-muted-foreground mb-2 block flex items-center gap-1">
+          <Cpu className="h-3 w-3" />
+          Provider
+        </label>
+        <Select value={provider} onValueChange={(value: 'cursor' | 'claude') => setProvider(value)}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue />
+            <ChevronDown className="h-3 w-3 opacity-50" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="cursor" className="text-xs">
+              <div className="flex items-center gap-2">
+                <ExternalLink className="h-3 w-3" />
+                Cursor
+              </div>
+            </SelectItem>
+            <SelectItem value="claude" className="text-xs">
+              <div className="flex items-center gap-2">
+                <Code className="h-3 w-3" />
+                Claude
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-4">

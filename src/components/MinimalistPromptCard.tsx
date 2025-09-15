@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock } from 'lucide-react';
+import { Copy, Check, Send, Flame, Minus, Clock } from 'lucide-react';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
@@ -169,10 +169,10 @@ export function MinimalistPromptCard({
                     onShowCursorDrawer();
                   }}
                   disabled={!isUsable}
-                  className="h-7 w-7 p-0 text-purple-600 hover:text-purple-700"
-                  aria-label="Send to Cursor"
+                  className="h-7 w-7 p-0"
+                  aria-label="Send prompt"
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
+                  <Send className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>
