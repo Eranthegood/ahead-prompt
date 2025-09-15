@@ -1,11 +1,20 @@
-import type { PromptLibraryItem, SystemPromptTemplate } from '@/types/prompt-library';
-
-// System-wide prompts available to all users
-export const SYSTEM_PROMPTS: SystemPromptTemplate[] = [
-  {
-    id: 'system-stripe-integration',
-    title: 'Stripe Payment Integration - Scoped & Responsive',
-    body: `Integrate Stripe payments with these constraints:
+-- Insert system prompts into the prompt_library table
+INSERT INTO public.prompt_library (
+  title,
+  body,
+  ai_model,
+  tags,
+  category,
+  is_system_prompt,
+  is_favorite,
+  usage_count,
+  workspace_id,
+  user_id
+) VALUES 
+-- Stripe Payment Integration prompt
+(
+  'Stripe Payment Integration - Scoped & Responsive',
+  'Integrate Stripe payments with these constraints:
 
 **SCOPE LIMITATIONS:**
 - Only modify UI components and forms
@@ -44,16 +53,20 @@ export const SYSTEM_PROMPTS: SystemPromptTemplate[] = [
 2. Checkout flow with proper validation
 3. Success/error state handling
 4. Loading indicators during processing
-5. Mobile-first responsive design`,
-    ai_model: 'claude-3.5-sonnet',
-    tags: ['stripe', 'payments', 'ui', 'responsive', 'new-project', 'scoped'],
-    category: 'Integration',
-    is_system: true,
-  },
-  {
-    id: 'system-responsive-ui-only',
-    title: 'UI-Only Changes - Responsive & Scoped',
-    body: `Make UI-only changes with strict scope limitations:
+5. Mobile-first responsive design',
+  'claude-3.5-sonnet',
+  ARRAY['stripe', 'payments', 'ui', 'responsive', 'new-project', 'scoped'],
+  'Integration',
+  true,
+  false,
+  0,
+  NULL,
+  NULL
+),
+-- UI-Only Changes prompt
+(
+  'UI-Only Changes - Responsive & Scoped',
+  'Make UI-only changes with strict scope limitations:
 
 **SCOPE LIMITATIONS:**
 - Only modify visual components and styling
@@ -87,16 +100,20 @@ export const SYSTEM_PROMPTS: SystemPromptTemplate[] = [
 - Follow WCAG accessibility guidelines
 - Optimize for performance
 - Maintain existing functionality
-- Test in multiple browsers`,
-    ai_model: 'claude-3.5-sonnet',
-    tags: ['ui', 'responsive', 'design', 'mobile', 'scoped'],
-    category: 'Design',
-    is_system: true,
-  },
-  {
-    id: 'system-workspace-invitations',
-    title: 'Multi-User Workspace System - Complete Implementation',
-    body: `Build a complete multi-user workspace system with secure invitation flow:
+- Test in multiple browsers',
+  'claude-3.5-sonnet',
+  ARRAY['ui', 'responsive', 'design', 'mobile', 'scoped'],
+  'Design',
+  true,
+  false,
+  0,
+  NULL,
+  NULL
+),
+-- Multi-User Workspace System prompt
+(
+  'Multi-User Workspace System - Complete Implementation',
+  'Build a complete multi-user workspace system with secure invitation flow:
 
 **DATABASE STRUCTURE:**
 Create these tables with proper relationships:
@@ -164,10 +181,13 @@ Create RPC functions for:
 - Real-time workspace activity
 - Collaborative workspace management
 
-This system ensures secure, scalable multi-user collaboration with proper access control and user experience.`,
-    ai_model: 'claude-3.5-sonnet',
-    tags: ['workspace', 'invitations', 'authentication', 'supabase', 'rls', 'collaboration', 'multi-user'],
-    category: 'Integration',
-    is_system: true,
-  },
-];
+This system ensures secure, scalable multi-user collaboration with proper access control and user experience.',
+  'claude-3.5-sonnet',
+  ARRAY['workspace', 'invitations', 'authentication', 'supabase', 'rls', 'collaboration', 'multi-user'],
+  'Integration',
+  true,
+  false,
+  0,
+  NULL,
+  NULL
+);
