@@ -161,7 +161,7 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
   // Auto-save functionality
   const { clearDraft } = useAutoSave({
-    key: 'quick_prompt',
+    key: `quick_prompt_${workspace.id}_${workspace.owner_id}`,
     editor,
     isOpen,
     onRestore: (content) => {

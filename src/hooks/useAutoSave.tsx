@@ -23,7 +23,7 @@ export const useAutoSave = ({ key, editor, isOpen, onRestore, onBlurSave }: Auto
   const lastSavedContent = useRef<string>('');
   const hasRestoredRef = useRef(false);
 
-  // Clean up old drafts
+  // Clean up old drafts and clear problematic drafts
   const cleanupOldDrafts = useCallback(() => {
     const now = Date.now();
     const keysToRemove: string[] = [];
@@ -33,7 +33,19 @@ export const useAutoSave = ({ key, editor, isOpen, onRestore, onBlurSave }: Auto
       if (storageKey?.startsWith('draft_')) {
         try {
           const draftData: DraftData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+          
+          // Remove expired drafts
           if (now - draftData.timestamp > DRAFT_EXPIRY_MS) {
+            keysToRemove.push(storageKey);
+          }
+          
+          // Remove drafts with PromoteKit content contamination
+          if (draftData.content && draftData.content.includes('promotekit.com')) {
+            keysToRemove.push(storageKey);
+          }
+          
+          // Remove old generic 'quick_prompt' drafts that lack user specificity
+          if (storageKey === 'draft_quick_prompt') {
             keysToRemove.push(storageKey);
           }
         } catch {

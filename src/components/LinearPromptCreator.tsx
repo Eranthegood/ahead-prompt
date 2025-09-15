@@ -93,7 +93,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
 
   // Auto-save functionality  
   const { clearDraft } = useAutoSave({
-    key: `linear-prompt-draft-${workspace.id}`,
+    key: `linear-prompt-draft-${workspace.id}-${workspace.owner_id}`,
     editor,
     isOpen,
   });
