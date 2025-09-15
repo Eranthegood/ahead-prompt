@@ -18,7 +18,7 @@ export function PromoBanner() {
   const location = useLocation();
   
   // Define routes where the banner should be visible
-  const visibleRoutes = ['/', '/auth', '/pricing', '/build', '/blog', '/faq', '/contact', '/refund-policy'];
+  const visibleRoutes = ['/', '/auth', '/pricing', '/blog', '/faq', '/contact', '/refund-policy'];
   const shouldShowOnRoute = visibleRoutes.some(route => 
     location.pathname === route || location.pathname.startsWith(route + '/') || location.pathname === route
   );
