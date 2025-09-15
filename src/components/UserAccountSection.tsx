@@ -69,7 +69,7 @@ export function UserAccountSection() {
               setShowSettings(true);
             }}>
               <User className="mr-2 h-4 w-4" />
-              <span>Compte</span>
+              <span>Account</span>
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => navigate('/shortcuts')}>
@@ -212,7 +212,7 @@ export function UserAccountSection() {
             setShowSettings(true);
           }}>
             <User className="mr-2 h-4 w-4" />
-            <span>Compte</span>
+            <span>Account</span>
             {stats && (
               <Badge variant="secondary" className="ml-auto text-xs">
                 Lvl {stats.current_level}

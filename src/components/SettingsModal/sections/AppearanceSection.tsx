@@ -10,14 +10,14 @@ export function AppearanceSection() {
   const themeOptions = [
     {
       id: 'dark' as const,
-      label: 'Sombre',
-      description: 'Interface sombre pour moins de fatigue oculaire',
+      label: 'Dark',
+      description: 'Dark interface for reduced eye strain',
       icon: Moon,
     },
     {
       id: 'system' as const,
-      label: 'Système',
-      description: 'Suit les préférences de votre système',
+      label: 'System',
+      description: 'Follow your system preferences',
       icon: Monitor,
     },
   ];
@@ -26,9 +26,9 @@ export function AppearanceSection() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Thème</CardTitle>
+          <CardTitle>Theme</CardTitle>
           <CardDescription>
-            Choisissez l'apparence de l'interface qui vous convient le mieux.
+            Choose the interface appearance that suits you best.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -63,34 +63,34 @@ export function AppearanceSection() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Personnalisation</CardTitle>
+          <CardTitle>Customization</CardTitle>
           <CardDescription>
-            Autres options d'apparence (bientôt disponibles).
+            Other appearance options (coming soon).
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4 opacity-50">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Mode compact</div>
+                <div className="font-medium">Compact mode</div>
                 <div className="text-sm text-muted-foreground">
-                  Interface plus dense avec moins d'espacement
+                  Denser interface with less spacing
                 </div>
               </div>
               <Button variant="outline" disabled>
-                Bientôt
+                Soon
               </Button>
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">Couleur d'accent</div>
+                <div className="font-medium">Accent color</div>
                 <div className="text-sm text-muted-foreground">
-                  Personnalisez la couleur principale de l'interface
+                  Customize the main interface color
                 </div>
               </div>
               <Button variant="outline" disabled>
-                Bientôt
+                Soon
               </Button>
             </div>
           </div>

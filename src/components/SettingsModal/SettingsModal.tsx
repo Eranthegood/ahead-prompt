@@ -18,14 +18,14 @@ export interface SettingsModalProps {
 }
 
 const sections = {
-  account: { title: 'Compte', description: 'Gérez vos informations personnelles et votre sécurité' },
-  subscription: { title: 'Abonnement', description: 'Gérez votre plan et facturation' },
-  general: { title: 'Général', description: 'Préférences générales de l\'application' },
-  appearance: { title: 'Apparence', description: 'Personnalisez l\'apparence de l\'interface' },
-  shortcuts: { title: 'Raccourcis clavier', description: 'Consultez et personnalisez les raccourcis' },
+  account: { title: 'Account', description: 'Manage your personal information and security' },
+  subscription: { title: 'Subscription', description: 'Manage your plan and billing' },
+  general: { title: 'General', description: 'General application preferences' },
+  appearance: { title: 'Appearance', description: 'Customize the interface appearance' },
+  shortcuts: { title: 'Keyboard Shortcuts', description: 'View and customize shortcuts' },
   team: { title: 'Team', description: 'Manage your team members and invitations' },
-  integrations: { title: 'Intégrations', description: 'Connectez vos outils et services préférés' },
-  help: { title: 'Aide', description: 'Documentation et support' },
+  integrations: { title: 'Integrations', description: 'Connect your favorite tools and services' },
+  help: { title: 'Help', description: 'Documentation and support' },
 };
 
 export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }: SettingsModalProps) {

@@ -24,26 +24,26 @@ interface SettingsSidebarProps {
 
 const menuSections = [
   {
-    title: 'Paramètres',
+    title: 'Settings',
     items: [
-      { id: 'account', label: 'Compte', icon: User },
-      { id: 'subscription', label: 'Abonnement', icon: CreditCard },
-      { id: 'general', label: 'Général', icon: Settings },
-      { id: 'appearance', label: 'Apparence', icon: Palette },
-      { id: 'shortcuts', label: 'Raccourcis clavier', icon: Keyboard },
+      { id: 'account', label: 'Account', icon: User },
+      { id: 'subscription', label: 'Subscription', icon: CreditCard },
+      { id: 'general', label: 'General', icon: Settings },
+      { id: 'appearance', label: 'Appearance', icon: Palette },
+      { id: 'shortcuts', label: 'Keyboard Shortcuts', icon: Keyboard },
     ],
   },
   {
     title: 'Collaboration',
     items: [
       { id: 'team', label: 'Team', icon: Users },
-      { id: 'integrations', label: 'Intégrations', icon: Plug },
+      { id: 'integrations', label: 'Integrations', icon: Plug },
     ],
   },
   {
     title: 'Support',
     items: [
-      { id: 'help', label: 'Aide', icon: HelpCircle },
+      { id: 'help', label: 'Help', icon: HelpCircle },
     ],
   },
 ];
@@ -69,7 +69,7 @@ export function SettingsSidebar({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"

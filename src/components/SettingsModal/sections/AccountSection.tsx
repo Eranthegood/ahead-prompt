@@ -125,14 +125,14 @@ export function AccountSection() {
       }));
 
       toast({
-        title: "Succès",
-        description: "Mot de passe mis à jour",
+        title: "Success",
+        description: "Password updated",
       });
     } catch (error) {
       console.error('Error updating password:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le mot de passe",
+        title: "Error",
+        description: "Failed to update password",
         variant: "destructive",
       });
     } finally {
@@ -226,14 +226,14 @@ export function AccountSection() {
       {/* Password */}
       <Card>
         <CardHeader>
-          <CardTitle>Mot de passe</CardTitle>
+          <CardTitle>Password</CardTitle>
           <CardDescription>
-            Changez votre mot de passe pour sécuriser votre compte.
+            Change your password to secure your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
-            <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+            <Label htmlFor="currentPassword">Current Password</Label>
             <Input
               id="currentPassword"
               type="password"
@@ -243,7 +243,7 @@ export function AccountSection() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+            <Label htmlFor="newPassword">New password</Label>
             <Input
               id="newPassword"
               type="password"
@@ -252,12 +252,12 @@ export function AccountSection() {
               minLength={6}
             />
             <p className="text-xs text-muted-foreground">
-              Au moins 6 caractères
+              At least 6 characters
             </p>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+            <Label htmlFor="confirmPassword">Confirm password</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -270,7 +270,7 @@ export function AccountSection() {
             onClick={handlePasswordUpdate} 
             disabled={loading || !formData.newPassword || formData.newPassword !== formData.confirmPassword}
           >
-            Changer le mot de passe
+            Change password
           </Button>
         </CardContent>
       </Card>
@@ -278,9 +278,9 @@ export function AccountSection() {
       {/* Security */}
       <Card>
         <CardHeader>
-          <CardTitle>Sécurité</CardTitle>
+          <CardTitle>Security</CardTitle>
           <CardDescription>
-            Renforcez la sécurité de votre compte.
+            Strengthen your account security.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

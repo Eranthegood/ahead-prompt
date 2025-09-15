@@ -77,13 +77,13 @@ export default function GitHubIntegration() {
       const success = await testIntegration('github');
       if (success) {
         toast({
-          title: "Connexion réussie",
-          description: "Votre intégration GitHub fonctionne correctement.",
+          title: "Connection successful",
+          description: "Your GitHub integration is working correctly.",
         });
       } else {
         toast({
-          title: "Test de connexion échoué",
-          description: "Vérifiez que votre token est valide et dispose des bonnes permissions.",
+          title: "Connection test failed",
+          description: "Check that your token is valid and has the proper permissions.",
           variant: "destructive",
         });
       }
@@ -138,7 +138,7 @@ export default function GitHubIntegration() {
           className="flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          Retour aux intégrations
+          Back to integrations
         </Button>
       </div>
 
@@ -147,15 +147,15 @@ export default function GitHubIntegration() {
           <Github className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Intégration GitHub</h1>
+          <h1 className="text-3xl font-bold">GitHub Integration</h1>
           <p className="text-muted-foreground">
-            Connectez votre compte GitHub pour enrichir le contexte de vos prompts
+            Connect your GitHub account to enrich your prompts context
           </p>
         </div>
         {isConnected && (
           <Badge variant="secondary" className="ml-auto">
             <Check className="w-4 h-4 mr-1" />
-            Connecté
+            Connected
           </Badge>
         )}
       </div>
@@ -164,7 +164,7 @@ export default function GitHubIntegration() {
         <Alert className="mb-6">
           <AlertCircle className="w-4 h-4" />
           <AlertDescription>
-            <strong>Prérequis :</strong> L'intégration GitHub est nécessaire pour utiliser Cursor Background Agents avec le contexte de votre code.
+            <strong>Prerequisites:</strong> GitHub integration is required to use Cursor Background Agents with your code context.
           </AlertDescription>
         </Alert>
       )}
