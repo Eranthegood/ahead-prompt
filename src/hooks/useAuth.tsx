@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import mixpanelService from '@/services/mixpanelService';
 import { RedditPixelService } from '@/services/redditPixelService';
+import { getPriceId } from '@/constants/subscriptionPlans';
+import { toast as sonnerToast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -32,6 +34,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Handle post-authentication plan selection
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Check for plan parameters in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const selectedPlan = urlParams.get('plan');
+          const selectedBilling = urlParams.get('billing');
+          
+          if (selectedPlan) {
+            // Defer checkout initiation to prevent blocking auth flow
+            setTimeout(async () => {
+              try {
+                await initiateCheckout(selectedPlan, selectedBilling === 'annual');
+                
+                // Clear URL parameters after successful checkout initiation
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+              } catch (error) {
+                console.error('[AuthProvider] Checkout initiation error:', error);
+                toast({
+                  variant: "destructive",
+                  title: "Checkout failed",
+                  description: "There was an error starting the checkout process. Please try again."
+                });
+              }
+            }, 100);
+          }
+        }
         
         // Handle session events (avoid forced sign-outs on refresh glitches)
         // Note: Supabase emits SIGNED_OUT on real failures; TOKEN_REFRESHED means success.
@@ -94,6 +124,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  const initiateCheckout = async (planId: string, isAnnual: boolean) => {
+    try {
+      const priceId = getPriceId(planId, isAnnual);
+      if (!priceId) {
+        throw new Error("Price not found for this plan");
+      }
+
+      const { data: authData } = await supabase.auth.getSession();
+      
+      if (!authData.session) {
+        throw new Error('No active session');
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId },
+        headers: {
+          Authorization: `Bearer ${authData.session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.open(data.url, '_blank');
+        sonnerToast.success("Redirecting to checkout...");
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      throw error; // Re-throw so caller can handle
+    }
+  };
 
   const signUp = async (email: string, password: string) => {
     try {

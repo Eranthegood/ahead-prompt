@@ -25,8 +25,12 @@ export default function Pricing() {
 
   const handleUpgrade = async (planId: string) => {
     if (!user) {
-      toast.error("Please sign in to upgrade");
-      navigate('/auth');
+      // Pass plan information via URL parameters for unauthenticated users
+      const params = new URLSearchParams({
+        plan: planId,
+        billing: isAnnual ? 'annual' : 'monthly'
+      });
+      navigate(`/auth?${params.toString()}`);
       return;
     }
 

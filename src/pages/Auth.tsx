@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const {
     signUp,
     signIn,
@@ -21,6 +22,18 @@ const Auth = () => {
     user
   } = useAuth();
   const navigate = useNavigate();
+
+  // Get plan details from URL parameters
+  const selectedPlan = searchParams.get('plan');
+  const selectedBilling = searchParams.get('billing');
+  
+  const getPlanDisplayName = (plan: string) => {
+    switch (plan) {
+      case 'pro': return 'Pro';
+      case 'basic': return 'Basic';
+      default: return plan;
+    }
+  };
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -79,13 +92,29 @@ const Auth = () => {
                 Welcome to Ahead
               </h2>
               <p className="text-lg text-primary font-medium">
-                Sign up to start building 4x faster
+                {selectedPlan 
+                  ? `Sign up to activate ${getPlanDisplayName(selectedPlan)} plan`
+                  : "Sign up to start building 4x faster"
+                }
               </p>
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
+          {/* Plan Selection Info */}
+          {selectedPlan && (
+            <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="h-4 w-4 text-primary" />
+                <span className="font-medium text-sm">Selected Plan</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {getPlanDisplayName(selectedPlan)} - {selectedBilling === 'annual' ? 'Annual' : 'Monthly'} billing
+              </p>
+            </div>
+          )}
+
           {/* Google Sign In Button - shown on both tabs */}
           <div className="mb-6">
             <Button variant="outline" className="w-full mb-4" onClick={handleGoogleSignIn} disabled={googleLoading}>
