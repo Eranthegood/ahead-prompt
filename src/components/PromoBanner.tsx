@@ -93,14 +93,14 @@ export function PromoBanner() {
   // Calculate sidebar-aware styles
   const getSidebarAwareStyles = () => {
     if (!canShowSidebar || !sidebarState) {
-      return "relative bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
+      return "fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
     }
     
     const { state } = sidebarState;
     const isCollapsed = state === 'collapsed';
     
-    return `relative bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
-      isCollapsed ? 'ml-14' : 'ml-64'
+    return `fixed top-0 right-0 z-40 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
+      isCollapsed ? 'left-14' : 'left-64'
     }`;
   };
 

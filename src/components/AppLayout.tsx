@@ -128,7 +128,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <div className="flex-1 flex flex-col min-w-0">
                 {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={shouldShowSidebar} />}
                 <main 
-                  className="flex-1" 
+                  className="flex-1 pt-16" 
                   style={{ backgroundColor: '#191a23' }}
                 >
                   {isLoading ? (
@@ -163,7 +163,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <>
           <PromoBanner />
           {shouldShowHeader && <GlobalHeader showSearch={shouldShowSearch} showSidebarTrigger={false} />}
-          <main className={shouldShowHeader ? '' : 'min-h-screen'}>
+          <main className={shouldShowHeader ? 'pt-16' : 'min-h-screen pt-16'}>
             {children}
           </main>
         </>
