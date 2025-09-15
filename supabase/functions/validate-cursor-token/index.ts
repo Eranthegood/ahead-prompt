@@ -34,29 +34,40 @@ serve(async (req) => {
     
     let testToken = token;
     
+    // Always get user authentication for security
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return Response.json(
+        { isValid: false, error: 'Authentication required' },
+        { status: 401, headers: corsHeaders }
+      )
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+    
+    const jwt = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt)
+    
+    if (userError || !user) {
+      return Response.json(
+        { isValid: false, error: 'Invalid authentication' },
+        { status: 401, headers: corsHeaders }
+      )
+    }
+
     // If this is a test call, try to get stored token
     if (test && !token) {
-      const authHeader = req.headers.get('authorization')
-      if (authHeader) {
-        const supabase = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      const secretKey = `CURSOR_TOKEN_${user.id}`
+      testToken = Deno.env.get(secretKey)
+      
+      if (!testToken) {
+        return Response.json(
+          { isValid: false, error: 'No Cursor token configured for this user' },
+          { headers: corsHeaders }
         )
-        
-        const jwt = authHeader.replace('Bearer ', '')
-        const { data: { user }, error: userError } = await supabase.auth.getUser(jwt)
-        
-        if (!userError && user) {
-          const secretKey = `CURSOR_TOKEN_${user.id}`
-          testToken = Deno.env.get(secretKey)
-          
-          if (!testToken) {
-            return Response.json(
-              { isValid: false, error: 'No stored Cursor token found' },
-              { headers: corsHeaders }
-            )
-          }
-        }
       }
     }
     

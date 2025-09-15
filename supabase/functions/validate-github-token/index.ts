@@ -142,32 +142,28 @@ serve(async (req) => {
       throw new Error('Failed to save integration');
     }
 
-    // Store token in Supabase Secrets for secure access
+    // Store token securely using store-integration-secret function
     const secretKey = `GITHUB_TOKEN_${user.id}`;
     
     try {
-      // Use Supabase's secure secrets storage
-      const secretsResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/secrets`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          'Content-Type': 'application/json',
-          'apikey': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+      const { error: secretError } = await supabase.functions.invoke('store-integration-secret', {
+        body: {
+          integrationType: 'github',
+          token: token
         },
-        body: JSON.stringify({
-          name: secretKey,
-          value: token
-        })
+        headers: {
+          Authorization: authHeader
+        }
       });
 
-      if (!secretsResponse.ok) {
-        console.error('Failed to store GitHub token in secrets');
+      if (secretError) {
+        console.error('Failed to store GitHub token:', secretError);
         throw new Error('Failed to store GitHub token securely');
       }
       
-      console.log('GitHub token stored securely in Supabase Secrets');
+      console.log('GitHub token stored securely');
     } catch (e) {
-      console.error('Error storing GitHub token in secrets:', e);
+      console.error('Error storing GitHub token:', e);
       throw new Error('Failed to store GitHub token securely');
     }
 

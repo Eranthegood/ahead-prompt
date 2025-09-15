@@ -23,6 +23,15 @@ export function useCursorIntegration(): CursorIntegrationHook {
     setIsLoading(true);
     
     try {
+      // Check if Cursor is configured before attempting to send
+      const { data: integrationCheck, error: checkError } = await supabase.functions.invoke('validate-cursor-token', {
+        body: { test: true }
+      });
+
+      if (checkError || !integrationCheck?.isValid) {
+        throw new Error('Cursor integration not configured. Please configure Cursor first in Settings.');
+      }
+
       // First update the prompt status to "sending" for immediate UI feedback
       await supabase
         .from('prompts')
@@ -139,6 +148,16 @@ export function useCursorIntegration(): CursorIntegrationHook {
 
   const updateAgentStatus = useCallback(async (agentId: string) => {
     try {
+      // Check if Cursor is configured
+      const { data: integrationCheck, error: checkError } = await supabase.functions.invoke('validate-cursor-token', {
+        body: { test: true }
+      });
+
+      if (checkError || !integrationCheck?.isValid) {
+        console.error('Cursor not configured for agent status check');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('get-cursor-agent-status', {
         body: { agentId }
       });
@@ -180,6 +199,15 @@ export function useCursorIntegration(): CursorIntegrationHook {
 
   const cancelAgent = useCallback(async (agentId: string) => {
     try {
+      // Check if Cursor is configured
+      const { data: integrationCheck, error: checkError } = await supabase.functions.invoke('validate-cursor-token', {
+        body: { test: true }
+      });
+
+      if (checkError || !integrationCheck?.isValid) {
+        throw new Error('Cursor integration not configured');
+      }
+
       const { data, error } = await supabase.functions.invoke('cancel-cursor-agent', {
         body: { agentId }
       });

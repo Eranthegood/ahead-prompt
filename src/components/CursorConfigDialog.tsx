@@ -90,6 +90,15 @@ export function CursorConfigDialog({ isOpen, onClose, prompt, onPromptUpdate }: 
     setResult(null);
 
     try {
+      // Check if Cursor is configured first
+      const { data: integrationCheck, error: checkError } = await supabase.functions.invoke('validate-cursor-token', {
+        body: { test: true }
+      });
+
+      if (checkError || !integrationCheck?.isValid) {
+        throw new Error('Cursor integration not configured. Please configure Cursor first in Settings > Integrations.');
+      }
+
       // Get the generated prompt or use the description
       const promptText = prompt.generated_prompt || prompt.description;
       

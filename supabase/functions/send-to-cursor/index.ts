@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,16 +42,54 @@ serve(async (req) => {
   try {
     console.log('Send to Cursor request received');
     
-    const cursorApiKey = Deno.env.get('CURSOR_API_KEY');
-    if (!cursorApiKey) {
-      console.error('CURSOR_API_KEY not found in environment variables');
+    // Initialize Supabase client and get user
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
       return new Response(
         JSON.stringify({ 
-          error: 'Cursor API key not configured',
-          details: 'Please add your Cursor API key in the dashboard'
+          error: 'Authentication required',
+          details: 'Please log in to use Cursor integration'
         }),
         {
-          status: 500,
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid authentication',
+          details: 'Please log in again'
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Get user-specific Cursor API key
+    const userCursorTokenKey = `CURSOR_TOKEN_${user.id}`;
+    const cursorApiKey = Deno.env.get(userCursorTokenKey);
+    if (!cursorApiKey) {
+      console.error(`User-specific CURSOR_TOKEN not found: ${userCursorTokenKey}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Cursor not configured',
+          details: 'Please configure your Cursor integration first'
+        }),
+        {
+          status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );

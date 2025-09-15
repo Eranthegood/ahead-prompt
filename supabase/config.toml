@@ -4,7 +4,7 @@ project_id = "fkpbdzluddeqsfvacozw"
 verify_jwt = true
 
 [functions.validate-claude-token]
-verify_jwt = false
+verify_jwt = true
 
 [functions.transform-prompt]
 verify_jwt = false
@@ -21,11 +21,17 @@ verify_jwt = false
 [functions.send-to-cursor]
 verify_jwt = true
 
+[functions.get-cursor-agent-status]
+verify_jwt = true
+
+[functions.cancel-cursor-agent]
+verify_jwt = true
+
 [functions.validate-github-token]
 verify_jwt = true
 
 [functions.validate-cursor-token]
-verify_jwt = false
+verify_jwt = true
 
 [functions.store-integration-secret]
 verify_jwt = true

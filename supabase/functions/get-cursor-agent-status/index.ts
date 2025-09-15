@@ -35,11 +35,37 @@ serve(async (req) => {
   }
 
   try {
-    const CURSOR_API_KEY = Deno.env.get('CURSOR_API_KEY');
+    // Initialize Supabase client and get user
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Invalid authentication' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Get user-specific Cursor API key
+    const userCursorTokenKey = `CURSOR_TOKEN_${user.id}`;
+    const CURSOR_API_KEY = Deno.env.get(userCursorTokenKey);
     if (!CURSOR_API_KEY) {
-      console.error('CURSOR_API_KEY not configured');
-      return new Response(JSON.stringify({ error: 'CURSOR_API_KEY not configured' }), {
-        status: 500,
+      console.error(`User-specific CURSOR_TOKEN not found: ${userCursorTokenKey}`);
+      return new Response(JSON.stringify({ error: 'Cursor not configured for this user' }), {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
