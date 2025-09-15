@@ -52,7 +52,7 @@ export function WorkspaceMembersModal({ open, onOpenChange }: WorkspaceMembersMo
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { members, loading: membersLoading, updateMemberRole, removeMember } = useWorkspaceMembers(workspace?.id);
-  const { invitations, createInvitation, cancelInvitation } = useWorkspaceInvitations(workspace?.id);
+  const { invitations, createInvitation, cancelInvitation } = useWorkspaceInvitations(open ? workspace?.id : undefined);
   const { toast } = useToast();
 
   const isOwner = workspace?.owner_id === user?.id;
