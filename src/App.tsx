@@ -34,7 +34,7 @@ import AdminBlog from "./pages/AdminBlog";
 import AIAgents from "./pages/AIAgents";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
-import RefundPolicy from "./pages/RefundPolicy";
+import RefundPolicy from "@/pages/RefundPolicy";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
 const queryClient = new QueryClient();
