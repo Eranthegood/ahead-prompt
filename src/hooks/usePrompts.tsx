@@ -70,26 +70,36 @@ export const usePrompts = (
     return updatePrompt(promptId, { priority });
   };
 
-  // Enhanced createPrompt that auto-generates
+  // Enhanced createPrompt that handles background generation
   const createPromptAndGenerate = async (promptData: CreatePromptData): Promise<any> => {
+    // Force status to generating if content is substantial for background generation
+    const shouldGenerate = (promptData.description?.trim().length || 0) > 15 || 
+                           (promptData.original_description?.trim().length || 0) > 15;
+    
+    if (shouldGenerate) {
+      promptData.status = 'generating';
+    }
+    
     const result = await createPromptOriginal(promptData);
     
-    if (result) {
-      // Build content for generation
+    if (result && shouldGenerate) {
+      // Launch background generation without awaiting
       const content = promptData.original_description || 
                      promptData.description || 
                      `${promptData.title}\n\n${promptData.description || ''}`;
       
-      // Only auto-generate if content is substantial (>15 chars)
-      if (content.trim().length > 15) {
-        await autoGeneratePrompt(
-          result.id,
-          content,
-          promptData.knowledge_context,
-          promptData.ai_provider || 'openai',
-          promptData.ai_model || 'gpt-4o'
-        );
-      }
+      // Background generation call - don't await
+      autoGeneratePrompt(
+        result.id,
+        content,
+        promptData.knowledge_context,
+        promptData.ai_provider || 'openai',
+        promptData.ai_model || 'gpt-4o'
+      ).catch(error => {
+        console.error('Background generation failed:', error);
+        // Revert to todo if generation fails
+        updatePromptStatus(result.id, 'todo');
+      });
     }
     
     return result;
