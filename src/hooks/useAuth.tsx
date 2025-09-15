@@ -33,15 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Handle session errors
-        if (!session && event === 'TOKEN_REFRESHED') {
-          console.log('[AuthProvider] Token refresh failed, signing out');
-          try {
-            supabase.auth.signOut();
-          } catch (error) {
-            console.error('[AuthProvider] Error during forced signout:', error);
-          }
-        }
+        // Handle session events (avoid forced sign-outs on refresh glitches)
+        // Note: Supabase emits SIGNED_OUT on real failures; TOKEN_REFRESHED means success.
+        // We no longer sign out when session is null during TOKEN_REFRESHED to prevent accidental logouts in restricted storage contexts.
         
         // Track login events (with error isolation)
         if (event === 'SIGNED_IN' && session?.user) {
