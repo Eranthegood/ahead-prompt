@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
         
         // Handle post-authentication plan selection
         if (event === 'SIGNED_IN' && session?.user) {
@@ -58,11 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   description: "There was an error starting the checkout process. Please try again."
                 });
               }
-            }, 100);
-          } else {
-            // No payment flow - redirect to /build for regular sign-ins
-            setTimeout(() => {
-              window.location.assign('/build');
             }, 100);
           }
         }
@@ -287,9 +283,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast({
         title: "Signed out successfully"
       });
-      
-      // Redirect to homepage
-      window.location.assign('/');
       
       console.log('[AuthProvider] Logout completed');
     } catch (error: any) {

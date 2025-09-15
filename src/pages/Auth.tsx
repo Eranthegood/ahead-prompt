@@ -58,7 +58,14 @@ const Auth = () => {
     if (!email || !password) return;
     setLoading(true);
     try {
-      await signIn(email, password);
+      const {
+        error
+      } = await signIn(email, password);
+      if (!error) {
+        navigate('/build', {
+          replace: true
+        });
+      }
     } finally {
       setLoading(false);
     }
