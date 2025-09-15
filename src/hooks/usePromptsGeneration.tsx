@@ -41,7 +41,9 @@ export const usePromptsGeneration = (
     }
   }, [setPrompts]);
 
-  // Auto-generate prompt using AI service
+  // 🚨 CRITICAL FUNCTION - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
+  // This function handles local AI generation after dialog close
+  // Must complete generating → todo transition in < 5 seconds
   const autoGeneratePrompt = useCallback(async (
     promptId: string, 
     content: string, 

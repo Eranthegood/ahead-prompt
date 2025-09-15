@@ -70,7 +70,9 @@ export const usePrompts = (
     return updatePrompt(promptId, { priority });
   };
 
-  // Enhanced createPrompt that handles background generation
+  // 🚨 CRITICAL FUNCTION - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
+  // This function MUST close dialog immediately and generate in background
+  // Any change here can break the core UX flow of Ahead.love
   const createPromptAndGenerate = async (promptData: CreatePromptData): Promise<any> => {
     // Force status to generating if content is substantial for background generation
     const shouldGenerate = (promptData.description?.trim().length || 0) > 15 || 

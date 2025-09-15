@@ -163,7 +163,8 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
       const promptData = createPromptData(content);
       await onSave(promptData);
 
-      // Close immediately for fluid UX
+      // 🚨 CRITICAL UX FLOW - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
+      // Dialog MUST close immediately (< 100ms) - this is the core UX of Ahead.love
       onClose();
 
       // Track metrics
