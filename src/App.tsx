@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ThemeInitializer } from "@/components/ThemeInitializer";
-import { AppLayout } from "@/components/AppLayout";
+import { SimpleAppLayout } from "@/components/SimpleAppLayout";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -52,7 +52,7 @@ function App() {
             <BrowserRouter>
               <MixpanelProvider>
                 <DebugPromptStatusUpdater />
-                <AppLayout>
+                <SimpleAppLayout>
                   <Routes>
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/" element={<Home />} />
@@ -145,7 +145,7 @@ function App() {
                       
                       <Route path="*" element={<NotFound />} />
                   </Routes>
-                </AppLayout>
+                </SimpleAppLayout>
               </MixpanelProvider>
             </BrowserRouter>
           </TooltipProvider>

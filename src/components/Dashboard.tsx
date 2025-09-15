@@ -15,6 +15,7 @@ import { useEpics } from '@/hooks/useEpics';
 import { useProducts } from '@/hooks/useProducts';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
+import { useAppStore } from '@/store/AppStore';
 import { Loader2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { copyText } from '@/lib/clipboard';
@@ -37,8 +38,6 @@ void QPD_Keep;
 const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [debugConsoleOpen, setDebugConsoleOpen] = useState(false);
-  const [promptLibraryOpen, setPromptLibraryOpen] = useState(false);
-  const [promptLibraryCreateOpen, setPromptLibraryCreateOpen] = useState(false);
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [creatingNote, setCreatingNote] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,6 +45,7 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const [showMetrics, setShowMetrics] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { openDialog, state } = useAppStore();
   const {
     workspace,
     loading
@@ -109,12 +109,12 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-    'cmd+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-    'ctrl+n': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
-    'q': () => window.dispatchEvent(new CustomEvent('open-quick-prompt')),
+    'cmd+n': () => openDialog('quickPrompt'),
+    'ctrl+n': () => openDialog('quickPrompt'),
+    'q': () => openDialog('quickPrompt'),
     't': () => setDebugConsoleOpen(true),
-    'l': () => window.dispatchEvent(new CustomEvent('open-prompt-library')),
-    'll': () => window.dispatchEvent(new CustomEvent('open-prompt-library-create')),
+    'l': () => openDialog('promptLibrary'),
+    'll': () => openDialog('promptLibraryCreate'),
     'n': () => setNotesDialogOpen(true),
     'j': () => {
       setCreatingNote(true);
@@ -141,19 +141,9 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     }
   });
   
-  // Add event listeners for prompt library commands
-  useEffect(() => {
-    const handlePromptLibrary = () => setPromptLibraryOpen(true);
-    const handlePromptLibraryCreate = () => setPromptLibraryCreateOpen(true);
-    
-    window.addEventListener('open-prompt-library', handlePromptLibrary);
-    window.addEventListener('open-prompt-library-create', handlePromptLibraryCreate);
-    
-    return () => {
-      window.removeEventListener('open-prompt-library', handlePromptLibrary);
-      window.removeEventListener('open-prompt-library-create', handlePromptLibraryCreate);
-    };
-  }, []);
+  // Sync with app store state for library dialogs
+  const promptLibraryOpen = state.dialogs.promptLibrary;
+  const promptLibraryCreateOpen = state.dialogs.promptLibraryCreate;
   
   const handleToggleCompletedItems = (show: boolean) => {
     saveCompletedItemsPreference(show);
@@ -215,12 +205,12 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
       
       <PromptLibrary
         open={promptLibraryOpen}
-        onOpenChange={setPromptLibraryOpen}
+        onOpenChange={(open) => open ? openDialog('promptLibrary') : openDialog('promptLibrary')}
       />
       
       <PromptLibraryCreateDialog
         open={promptLibraryCreateOpen}
-        onOpenChange={setPromptLibraryCreateOpen}
+        onOpenChange={(open) => open ? openDialog('promptLibraryCreate') : openDialog('promptLibraryCreate')}
       />
       
       <NotesDialog

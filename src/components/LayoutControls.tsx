@@ -1,0 +1,85 @@
+// Separated layout controls from AppLayout
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LinearPromptCreator } from './LinearPromptCreator';
+import { MobilePromptDrawer } from './MobilePromptDrawer';
+import { MobilePromptFAB } from './MobilePromptFAB';
+import { PromptLibrary } from './PromptLibrary';
+import { useAppStore } from '@/store/AppStore';
+import { usePromptsContext } from '@/context/PromptsContext';
+import { useProducts } from '@/hooks/useProducts';
+import { useEpics } from '@/hooks/useEpics';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
+
+interface LayoutControlsProps {
+  workspace: any;
+}
+
+export function LayoutControls({ workspace }: LayoutControlsProps) {
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { state, openDialog, closeDialog } = useAppStore();
+  const { preferences } = useUserPreferences();
+  const { products } = useProducts(workspace.id);
+  const { epics } = useEpics(workspace.id);
+  const promptsContext = usePromptsContext();
+
+  // Global shortcuts
+  useGlobalShortcuts({
+    'cmd+n': () => openDialog('quickPrompt'),
+    'ctrl+n': () => openDialog('quickPrompt'),
+    'q': () => openDialog('quickPrompt'),
+    '/l': () => openDialog('promptLibrary'),
+    'll': () => openDialog('promptLibraryCreate'),
+  });
+
+  const handleSavePrompt = async (promptData: any) => {
+    if (promptsContext?.createPrompt) {
+      const result = await promptsContext.createPrompt(promptData);
+      closeDialog('quickPrompt');
+      return result;
+    }
+    return null;
+  };
+
+  return (
+    <>
+      <LinearPromptCreator
+        isOpen={state.dialogs.quickPrompt && !isMobile}
+        onClose={() => closeDialog('quickPrompt')}
+        onSave={handleSavePrompt}
+        workspace={workspace}
+        products={products}
+        epics={epics}
+        selectedProductId={undefined}
+        selectedEpicId={undefined}
+        onCreateProduct={() => navigate('/build?create=product')}
+        onCreateEpic={() => navigate('/build?create=epic')}
+      />
+
+      <MobilePromptDrawer
+        isOpen={state.dialogs.quickPrompt && isMobile}
+        onClose={() => closeDialog('quickPrompt')}
+        onSave={handleSavePrompt}
+        workspace={workspace}
+        products={products}
+        epics={epics}
+        selectedProductId={undefined}
+        selectedEpicId={undefined}
+      />
+
+      <MobilePromptFAB 
+        onOpenPrompt={() => openDialog('quickPrompt')}
+        isQuickPromptOpen={state.dialogs.quickPrompt}
+      />
+
+      <PromptLibrary 
+        open={state.dialogs.promptLibrary}
+        onOpenChange={(open) => open ? openDialog('promptLibrary') : closeDialog('promptLibrary')}
+        autoFocus={true}
+      />
+    </>
+  );
+}

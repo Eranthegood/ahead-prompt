@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useAppStore } from '@/store/AppStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Workspace, Prompt, Epic, KnowledgeItem, Product } from '@/types';
@@ -64,7 +65,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { openDialog } = useAppStore();
 
   // Local, fuzzy prompt search aligned with list view
   const promptsContext = usePromptsContext();
@@ -293,9 +294,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               Create new prompt
             </CommandItem>
             <CommandItem onSelect={() => {
-              // Dispatch event to open quick prompt dialog
-              const event = new CustomEvent('open-quick-prompt');
-              window.dispatchEvent(event);
+              openDialog('quickPrompt');
               onOpenChange(false);
             }}>
               <Plus className="mr-2 h-4 w-4" />
@@ -311,7 +310,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             </CommandItem>
             <CommandItem onSelect={() => {
               console.log('CommandPalette: Navigating to profile');
-              navigate('/profile');
+              onNavigate('/profile');
               onOpenChange(false);
             }}>
               <User className="mr-2 h-4 w-4" />
