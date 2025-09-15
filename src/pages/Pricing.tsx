@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { usePricingTracking } from "@/hooks/usePricingTracking";
 import { getPriceId, getAnnualPrice } from "@/constants/subscriptionPlans";
 import { supabase } from "@/integrations/supabase/client";
@@ -236,6 +237,73 @@ export default function Pricing() {
               >
                 Cancellation and Refund Policy
               </Button>
+            </div>
+          </BlurFade>
+
+          {/* FAQ Section */}
+          <BlurFade delay={1.2} inView>
+            <div className="mt-16">
+              <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+              <Card className="max-w-3xl mx-auto">
+                <CardContent className="p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="free">
+                      <AccordionTrigger>Why Ahead is not completely free?</AccordionTrigger>
+                      <AccordionContent>
+                        As we support API costs for prompt generation, we try to cover our costs.
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="limits">
+                      <AccordionTrigger>How do the plan limits work?</AccordionTrigger>
+                      <AccordionContent>
+                        <p>Basic and Pro plans will have access to more features such as:</p>
+                        <ul className="list-disc list-inside mt-2 space-y-1">
+                          <li>Knowledge Box</li>
+                          <li>Prompt enhancer</li>
+                          <li>Biggest library</li>
+                          <li>Team collaboration</li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="cancel">
+                      <AccordionTrigger>Can I cancel my subscription?</AccordionTrigger>
+                      <AccordionContent>
+                        Anytime! No questions asked.
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="refund">
+                      <AccordionTrigger>Can I have a refund for my annual subscription?</AccordionTrigger>
+                      <AccordionContent>
+                        Yes, within 30 days after your payment.
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="users">
+                      <AccordionTrigger>How many users can I onboard on my Pro subscription?</AccordionTrigger>
+                      <AccordionContent>
+                        You can add 2 teammates. If you need more, send us a message to setup a proper company workspace.
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="integrations">
+                      <AccordionTrigger>Does Ahead support integrations?</AccordionTrigger>
+                      <AccordionContent>
+                        Yes, Cursor, Claude, Figma and GitHub.
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem value="team">
+                      <AccordionTrigger>Who is the team behind Ahead?</AccordionTrigger>
+                      <AccordionContent>
+                        Jérémy. I'm alone working on this project.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
             </div>
           </BlurFade>
         </div>
