@@ -13,7 +13,8 @@ import { useWorkspaceInvitations } from '@/hooks/useWorkspaceInvitations';
 import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
 import { PLAN_LIMITS } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Copy, Trash2, MoreHorizontal, Crown } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { UserPlus, Copy, Trash2, MoreHorizontal, Crown, AlertTriangle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,8 +23,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function TeamSection() {
+  const { user } = useAuth();
   const { workspace } = useWorkspace();
-  const { members, loading: membersLoading, updateMemberRole, removeMember } = useWorkspaceMembers(workspace?.id);
+  const { members, loading: membersLoading, updateMemberRole, removeMember, transferOwnership, claimOwnership } = useWorkspaceMembers(workspace?.id);
   const { invitations, createInvitation, cancelInvitation } = useWorkspaceInvitations(workspace?.id);
   const { hasPremiumAccess, accessSource, loading: premiumLoading } = useWorkspacePremiumAccess();
   const { toast } = useToast();
@@ -114,6 +116,33 @@ export function TeamSection() {
     }
   };
 
+  const handleTransferOwnership = async (newOwnerId: string) => {
+    if (!workspace) return;
+    
+    try {
+      await transferOwnership(workspace.id, newOwnerId);
+    } catch (error) {
+      console.error('Error transferring ownership:', error);
+    }
+  };
+
+  const handleClaimOwnership = async () => {
+    if (!workspace) return;
+    
+    try {
+      await claimOwnership(workspace.id);
+    } catch (error) {
+      console.error('Error claiming ownership:', error);
+    }
+  };
+
+  // Check if current user is the owner
+  const isCurrentUserOwner = user?.id === workspace?.owner_id;
+  
+  // Check if current owner is not a member (meaning they're "stuck")
+  const ownerIsMember = members.some(member => member.user_id === workspace?.owner_id);
+  const canClaimOwnership = !isCurrentUserOwner && !ownerIsMember && members.some(member => member.user_id === user?.id && member.role === 'admin');
+
   if (!workspace) {
     return <div>Aucun workspace sélectionné</div>;
   }
@@ -196,6 +225,27 @@ export function TeamSection() {
         </CardContent>
       </Card>
 
+      {/* Ownership Issues Alert */}
+      {canClaimOwnership && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-orange-800">
+              <AlertTriangle className="h-5 w-5" />
+              Workspace Ownership Issue
+            </CardTitle>
+            <CardDescription className="text-orange-700">
+              The current workspace owner is no longer a member. As an admin, you can claim ownership.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={handleClaimOwnership} variant="outline" className="border-orange-300 text-orange-800 hover:bg-orange-100">
+              <Crown className="mr-2 h-4 w-4" />
+              Claim Ownership
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Current Members */}
       <Card>
         <CardHeader>
@@ -230,6 +280,12 @@ export function TeamSection() {
                   </div>
                   
                   <div className="flex items-center gap-2">
+                    {workspace.owner_id === member.user_id && (
+                      <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Owner
+                      </Badge>
+                    )}
                     <Badge variant={member.role === 'admin' ? 'default' : 'secondary'}>
                       {member.role === 'admin' ? 'Admin' : 'Utilisateur'}
                     </Badge>
@@ -250,6 +306,15 @@ export function TeamSection() {
                           >
                             {member.role === 'admin' ? 'Rétrograder' : 'Promouvoir admin'}
                           </DropdownMenuItem>
+                          {isCurrentUserOwner && member.role === 'admin' && (
+                            <DropdownMenuItem
+                              onClick={() => handleTransferOwnership(member.user_id)}
+                              className="text-primary"
+                            >
+                              <Crown className="mr-2 h-4 w-4" />
+                              Transfer Ownership
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onClick={() => handleRemoveMember(member.id)}
                             className="text-destructive"

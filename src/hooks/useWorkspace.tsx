@@ -119,7 +119,9 @@ export function useWorkspace() {
       const fetchWorkspace = async (): Promise<Workspace> => {
         try {
           const { data: workspaceData, error: functionError } = await supabase
-            .rpc('get_user_workspaces')
+            .rpc('get_user_workspaces', {
+              user_uuid: user.id
+            })
             .limit(1)
             .single();
 

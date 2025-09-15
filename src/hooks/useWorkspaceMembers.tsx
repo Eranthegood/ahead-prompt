@@ -144,11 +144,66 @@ export function useWorkspaceMembers(workspaceId?: string) {
     }
   };
 
+  const transferOwnership = async (workspaceId: string, newOwnerId: string) => {
+    try {
+      const { error } = await supabase.rpc('transfer_workspace_ownership', {
+        workspace_uuid: workspaceId,
+        new_owner_uuid: newOwnerId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Ownership transferred',
+        description: 'Workspace ownership has been successfully transferred'
+      });
+      
+      // Refetch members to reflect the changes
+      fetchMembers();
+    } catch (error: any) {
+      console.error('Error transferring ownership:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error transferring ownership',
+        description: error?.message || 'Failed to transfer workspace ownership'
+      });
+      throw error;
+    }
+  };
+
+  const claimOwnership = async (workspaceId: string) => {
+    try {
+      const { error } = await supabase.rpc('claim_workspace_ownership', {
+        workspace_uuid: workspaceId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Ownership claimed',
+        description: 'You are now the owner of this workspace'
+      });
+      
+      // Refetch members to reflect the changes
+      fetchMembers();
+    } catch (error: any) {
+      console.error('Error claiming ownership:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error claiming ownership',
+        description: error?.message || 'Failed to claim workspace ownership'
+      });
+      throw error;
+    }
+  };
+
   return {
     members,
     loading,
     updateMemberRole,
     removeMember,
+    transferOwnership,
+    claimOwnership,
     refetch: fetchMembers
   };
 }
