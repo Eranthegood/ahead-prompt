@@ -17,6 +17,12 @@ export function PromoBanner() {
   const { toast } = useToast();
   const location = useLocation();
   
+  // Define routes where the banner should be visible
+  const visibleRoutes = ['/', '/auth', '/pricing', '/build', '/blog', '/faq', '/contact', '/refund-policy'];
+  const shouldShowOnRoute = visibleRoutes.some(route => 
+    location.pathname === route || location.pathname.startsWith(route + '/') || location.pathname === route
+  );
+
   // Only access sidebar state if we're on a sidebar page
   const allowedSidebarPages = ['/build', '/integrations'];
   const canShowSidebar = allowedSidebarPages.some(path => location.pathname.startsWith(path));
@@ -34,10 +40,12 @@ export function PromoBanner() {
   // Debug logging
   console.log('PromoBanner Debug:', {
     location: location.pathname,
+    shouldShowOnRoute,
     canShowSidebar,
     sidebarState: sidebarState?.state,
     isDismissed,
-    isExpired
+    isExpired,
+    visibleRoutes
   });
 
   useEffect(() => {
@@ -101,21 +109,23 @@ export function PromoBanner() {
     setIsDismissed(true);
   };
 
-  // Don't show if expired or dismissed
-  if (isExpired || isDismissed) {
+  // Don't show if expired, dismissed, or not on allowed route
+  if (isExpired || isDismissed || !shouldShowOnRoute) {
     return null;
   }
 
-  // Calculate sidebar-aware styles
+  // Calculate sidebar-aware styles with higher z-index and better positioning
   const getSidebarAwareStyles = () => {
+    const baseClasses = "fixed top-0 z-[100] bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-lg";
+    
     if (!canShowSidebar || !sidebarState) {
-      return "fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground";
+      return `${baseClasses} left-0 right-0`;
     }
     
     const { state } = sidebarState;
     const isCollapsed = state === 'collapsed';
     
-    return `fixed top-0 right-0 z-50 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground transition-all duration-300 ${
+    return `${baseClasses} right-0 transition-all duration-300 ${
       isCollapsed ? 'left-14' : 'left-64'
     }`;
   };
