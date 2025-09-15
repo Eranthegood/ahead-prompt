@@ -41,7 +41,7 @@ export const usePromptsGeneration = (
     }
   }, [setPrompts]);
 
-  // Auto-generate prompt using background service
+  // Auto-generate prompt using AI service
   const autoGeneratePrompt = useCallback(async (
     promptId: string, 
     content: string, 
@@ -56,45 +56,101 @@ export const usePromptsGeneration = (
       return;
     }
 
-    console.log(`Starting background generation for prompt: ${promptId}`);
+    console.log(`Auto-generating prompt for: ${promptId}`);
     
     try {
-      // Get knowledge items for context
+      // Step 1: Set generating status
+      setPrompts(prev => prev.map(p => 
+        p.id === promptId 
+          ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
+          : p
+      ));
+
+      const { error: statusError } = await supabase
+        .from('prompts')
+        .update({
+          status: 'generating',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', promptId);
+
+      if (statusError) {
+        console.error(`Failed to set generating status for prompt ${promptId}:`, statusError);
+        throw statusError;
+      }
+
+      // Step 2: Transform content
       const selectedKnowledgeItems = knowledgeContext 
         ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
         : [];
+        
+      const response = await Promise.race([
+        PromptTransformService.transformPrompt(content, selectedKnowledgeItems, provider, model),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Transform timeout')), 30000)
+        )
+      ]) as any;
+      
+      if (response.success && response.transformedPrompt) {
+        // Step 3: Update with generated content
+        setPrompts(prev => prev.map(p => 
+          p.id === promptId 
+            ? { 
+                ...p, 
+                generated_prompt: response.transformedPrompt,
+                generated_at: new Date().toISOString(),
+                status: 'todo' as PromptStatus,
+                updated_at: new Date().toISOString()
+              }
+            : p
+        ));
 
-      // Call background generation function - don't await, return immediately
-      const { error } = await supabase.functions.invoke('generate-prompt-background', {
-        body: { 
-          promptId, 
-          content: cleanContent, 
-          knowledgeContext: selectedKnowledgeItems, 
-          provider, 
-          model 
+        // Update database in two calls for robustness
+        const { error: contentError } = await supabase
+          .from('prompts')
+          .update({
+            generated_prompt: response.transformedPrompt,
+            generated_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', promptId);
+
+        if (contentError) {
+          throw contentError;
         }
-      });
 
-      if (error) {
-        console.error('Background generation invoke error:', error);
-        throw error;
+        const { error: statusUpdateError } = await supabase
+          .from('prompts')
+          .update({
+            status: 'todo',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', promptId);
+
+        if (statusUpdateError) {
+          throw statusUpdateError;
+        }
+        
+        toast({
+          title: "Prompt généré !",
+          description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
+        });
+
+      } else {
+        await revertStatusToTodo(promptId, "Transform service failed");
       }
 
-      console.log('Background generation started successfully for prompt:', promptId);
-
     } catch (error: any) {
-      console.error('Error starting background prompt generation:', error);
-      
-      // Revert status on immediate error
-      await revertStatusToTodo(promptId, `Background generation start failed: ${error.message}`);
+      console.error(`Auto-generation failed for prompt ${promptId}:`, error);
+      await revertStatusToTodo(promptId, `Auto-generation error: ${error.message}`);
       
       toast({
         variant: "destructive",
         title: "Erreur de génération",
-        description: "Impossible de démarrer la génération. Le prompt reste disponible.",
+        description: "Impossible de générer le prompt. Veuillez réessayer.",
       });
     }
-  }, [knowledgeItems, toast, revertStatusToTodo]);
+  }, [setPrompts, knowledgeItems, toast, revertStatusToTodo]);
 
   return {
     autoGeneratePrompt,
