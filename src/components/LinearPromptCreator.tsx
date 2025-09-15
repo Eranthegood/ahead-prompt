@@ -163,6 +163,9 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
       const promptData = createPromptData(content);
       await onSave(promptData);
 
+      // Close immediately for fluid UX
+      onClose();
+
       // Track metrics
       trackPromptCreation(200, {
         hasKnowledgeContext: selectedKnowledge.length > 0,
@@ -188,10 +191,9 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         description: "Your prompt has been saved successfully.",
       });
 
-      // Reset form and close
+      // Reset form
       resetForm();
       editor?.commands.clearContent();
-      onClose();
     } catch (error) {
       console.error('Error creating prompt:', error);
       toast({

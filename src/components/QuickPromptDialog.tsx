@@ -351,6 +351,9 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
       const promptData = createPromptData(content);
       await onSave(promptData);
       
+      // Close immediately for fluid UX
+      onClose();
+      
       // Track performance metrics
       const responseTime = Date.now() - startTime;
       trackPromptCreation(responseTime, {
@@ -375,8 +378,6 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
           workspace.owner_id
         );
       }
-      
-      onClose();
       
     } catch (error) {
       console.error('Error saving prompt:', error);
