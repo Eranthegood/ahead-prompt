@@ -90,9 +90,31 @@ serve(async (req) => {
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       subscriptionId = subscription.id;
       productId = subscription.items.data[0].price.product;
+      
+      // Safe date conversion with validation
+      if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
+        try {
+          subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+          logStep("Date conversion successful", { 
+            rawTimestamp: subscription.current_period_end,
+            convertedDate: subscriptionEnd 
+          });
+        } catch (dateError) {
+          logStep("Date conversion failed", { 
+            rawTimestamp: subscription.current_period_end,
+            error: dateError.message 
+          });
+          subscriptionEnd = null;
+        }
+      } else {
+        logStep("Invalid timestamp received", { 
+          currentPeriodEnd: subscription.current_period_end,
+          type: typeof subscription.current_period_end
+        });
+        subscriptionEnd = null;
+      }
       
       // Map Stripe product ID to subscription tier
       if (productId === 'prod_T3HCJpUD2Br7Ea') {
