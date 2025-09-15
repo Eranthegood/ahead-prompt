@@ -143,7 +143,7 @@ export function PromptLibraryCreateDialog({
         {!isEditing && (
           <UsageLimitIndicator 
             type="promptLibrary" 
-            currentCount={items?.length || 0}
+            currentCount={userItems?.length || 0}
             className="mb-4"
           />
         )}

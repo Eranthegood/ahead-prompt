@@ -112,11 +112,29 @@ export function usePromptLibrary() {
       return newItem as unknown as PromptLibraryItem;
     } catch (error: any) {
       console.error('Error creating prompt library item:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error saving prompt',
-        description: error.message,
-      });
+      
+      // Handle database-level limit enforcement
+      if (error.message?.includes('Prompt library limit reached')) {
+        toast({
+          title: "Prompt library limit reached",
+          description: error.message,
+          variant: "destructive",
+          action: (
+            <ToastAction 
+              altText="Upgrade plan"
+              onClick={() => navigate('/pricing')}
+            >
+              Upgrade
+            </ToastAction>
+          )
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error saving prompt',
+          description: error.message,
+        });
+      }
       return null;
     }
   };
