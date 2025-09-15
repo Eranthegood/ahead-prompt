@@ -29,6 +29,7 @@ export function useIntegrations() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        console.log('No authenticated user found');
         setIsLoading(false);
         return;
       }

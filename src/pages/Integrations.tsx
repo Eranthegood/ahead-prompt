@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIntegrations } from '@/hooks/useIntegrations';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const INTEGRATIONS_CONFIG = [
   {
@@ -99,7 +100,9 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
   const { integrations, isLoading, toggleIntegration, testIntegration, configureIntegration } = useIntegrations();
   const [showTokenField, setShowTokenField] = useState(false);
   const [token, setToken] = useState('');
-  const Icon = integration.icon;
+  
+  // Safe icon rendering with fallback
+  const Icon = integration.icon || Code;
   
   const integrationData = integrations.find(i => i.id === integration.id) || {
     isConfigured: false,
@@ -471,48 +474,52 @@ export default function Integrations() {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header with breadcrumb */}
-        <div className="mb-8">
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/')}
-              className="p-0 h-auto hover:bg-transparent"
-            >
-              Home
-            </Button>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground">Integrations</span>
-          </nav>
-          
-          <div className="flex items-center gap-3 mb-2">
-            <Settings className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-bold">Integrations</h1>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+          {/* Header with breadcrumb */}
+          <div className="mb-8">
+            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="p-0 h-auto hover:bg-transparent"
+              >
+                Home
+              </Button>
+              <ChevronRight className="h-4 w-4" />
+              <span className="text-foreground">Integrations</span>
+            </nav>
+            
+            <div className="flex items-center gap-3 mb-2">
+              <Settings className="h-6 w-6 text-primary" />
+              <h1 className="text-3xl font-bold">Integrations</h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Connect your favorite tools to automate your development workflow.
+            </p>
           </div>
-          <p className="text-muted-foreground text-lg">
-            Connect your favorite tools to automate your development workflow.
-          </p>
-        </div>
 
-        {/* Integrations List */}
-        <div className="space-y-3">
-          {INTEGRATIONS_CONFIG.map((integration) => (
-            <IntegrationRow key={integration.id} integration={integration} />
-          ))}
-        </div>
-        
-        {/* Helpful Information */}
-        <div className="mt-8 p-4 bg-muted/30 rounded-lg">
-          <h3 className="font-semibold mb-2">💡 Tip</h3>
-          <p className="text-sm text-muted-foreground">
-            Enable Cursor to automatically send your prompts to your GitHub repositories. 
-            Once configured, you'll see a "Send to Cursor" button on your prompts.
-          </p>
+          {/* Integrations List */}
+          <div className="space-y-3">
+            {INTEGRATIONS_CONFIG.map((integration) => (
+              <ErrorBoundary key={integration.id}>
+                <IntegrationRow integration={integration} />
+              </ErrorBoundary>
+            ))}
+          </div>
+          
+          {/* Helpful Information */}
+          <div className="mt-8 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-semibold mb-2">💡 Tip</h3>
+            <p className="text-sm text-muted-foreground">
+              Enable Cursor to automatically send your prompts to your GitHub repositories. 
+              Once configured, you'll see a "Send to Cursor" button on your prompts.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
