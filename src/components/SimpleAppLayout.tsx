@@ -1,5 +1,5 @@
 // Simplified AppLayout with separated concerns
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
@@ -10,6 +10,10 @@ import { PromoBanner } from './PromoBanner';
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
+import { useAppStore } from '@/store/AppStore';
+import Dashboard from './Dashboard';
 
 interface SimpleAppLayoutProps {
   children: React.ReactNode;
@@ -19,6 +23,12 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const location = useLocation();
   const { user } = useAuth();
   const { workspace } = useWorkspace();
+  const { preferences, updatePreferences } = useUserPreferences();
+  const { openDialog } = useAppStore();
+  
+  // Product/Epic assignment state - core functionality for prompt association
+  const [selectedProductId, setSelectedProductId] = useState<string>('all');
+  const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
 
   // Simple page configuration
   const config = {
@@ -27,6 +37,32 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     showSearch: !['/profile', '/shortcuts', '/achievements'].some(path => location.pathname.startsWith(path)),
     sidebarDefaultOpen: location.pathname === '/build'
   };
+
+  const handleToggleCompletedItems = (show: boolean) => {
+    updatePreferences({ showCompletedItems: show });
+  };
+
+  const handleQuickAdd = () => {
+    openDialog('quickPrompt');
+  };
+
+  // Global keyboard shortcuts
+  useGlobalShortcuts({
+    '/l': () => openDialog('promptLibrary'),
+  });
+
+  // Global keyboard shortcut handler for quick prompt creation
+  useEffect(() => {
+    const handler = () => {
+      openDialog('quickPrompt');
+    };
+    // @ts-ignore - custom event name
+    window.addEventListener('open-quick-prompt', handler as EventListener);
+    return () => {
+      // @ts-ignore - custom event name  
+      window.removeEventListener('open-quick-prompt', handler as EventListener);
+    };
+  }, [openDialog]);
 
   // Loading states
   if (config.showSidebar && (!user || !workspace)) {
@@ -44,17 +80,21 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
         
         {config.showSidebar ? (
           <SidebarProvider defaultOpen={config.sidebarDefaultOpen}>
-            <PromptsProvider workspaceId={workspace?.id}>
+            <PromptsProvider 
+              workspaceId={workspace?.id}
+              selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+              selectedEpicId={selectedEpicId}
+            >
               <div className="min-h-screen w-full bg-background flex">
                 <MinimalSidebar 
                   workspace={workspace}
-                  selectedProductId={undefined}
-                  selectedEpicId={undefined}
-                  onProductSelect={() => {}}
-                  onEpicSelect={() => {}}
-                  showCompletedItems={true}
-                  onToggleCompletedItems={() => {}}
-                  onQuickAdd={() => {}}
+                  selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+                  selectedEpicId={selectedEpicId}
+                  onProductSelect={setSelectedProductId}
+                  onEpicSelect={setSelectedEpicId}
+                  showCompletedItems={preferences.showCompletedItems}
+                  onToggleCompletedItems={handleToggleCompletedItems}
+                  onQuickAdd={handleQuickAdd}
                   searchQuery=""
                 />
                 
@@ -70,11 +110,20 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
                     className="flex-1 pt-16"
                     style={{ backgroundColor: '#191a23' }}
                   >
-                    {children}
+                    {React.isValidElement(children) && children.type === Dashboard 
+                      ? React.cloneElement(children as React.ReactElement<any>, {
+                          selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
+                          selectedEpicId: selectedEpicId
+                        })
+                      : children}
                   </main>
                 </div>
 
-                <LayoutControls workspace={workspace} />
+                <LayoutControls 
+                  workspace={workspace}
+                  selectedProductId={selectedProductId}
+                  selectedEpicId={selectedEpicId}
+                />
               </div>
             </PromptsProvider>
           </SidebarProvider>

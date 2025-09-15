@@ -15,9 +15,11 @@ import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 
 interface LayoutControlsProps {
   workspace: any;
+  selectedProductId: string;
+  selectedEpicId: string | undefined;
 }
 
-export function LayoutControls({ workspace }: LayoutControlsProps) {
+export function LayoutControls({ workspace, selectedProductId, selectedEpicId }: LayoutControlsProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { state, openDialog, closeDialog } = useAppStore();
@@ -26,12 +28,11 @@ export function LayoutControls({ workspace }: LayoutControlsProps) {
   const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
 
-  // Global shortcuts
+  // Global shortcuts for prompt creation only
   useGlobalShortcuts({
     'cmd+n': () => openDialog('quickPrompt'),
     'ctrl+n': () => openDialog('quickPrompt'),
     'q': () => openDialog('quickPrompt'),
-    '/l': () => openDialog('promptLibrary'),
     'll': () => openDialog('promptLibraryCreate'),
   });
 
@@ -53,8 +54,8 @@ export function LayoutControls({ workspace }: LayoutControlsProps) {
         workspace={workspace}
         products={products}
         epics={epics}
-        selectedProductId={undefined}
-        selectedEpicId={undefined}
+        selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        selectedEpicId={selectedEpicId}
         onCreateProduct={() => navigate('/build?create=product')}
         onCreateEpic={() => navigate('/build?create=epic')}
       />
@@ -66,8 +67,8 @@ export function LayoutControls({ workspace }: LayoutControlsProps) {
         workspace={workspace}
         products={products}
         epics={epics}
-        selectedProductId={undefined}
-        selectedEpicId={undefined}
+        selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        selectedEpicId={selectedEpicId}
       />
 
       <MobilePromptFAB 

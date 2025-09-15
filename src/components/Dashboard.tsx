@@ -45,7 +45,8 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
   const [showMetrics, setShowMetrics] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { openDialog, state } = useAppStore();
+  // Dialog state management - use AppStore for consistency
+  const { openDialog, closeDialog, state } = useAppStore();
   const {
     workspace,
     loading
@@ -105,16 +106,11 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     }
   };
 
-  // Set up global shortcuts
+  // Set up global shortcuts - removed duplicates that are in LayoutControls
   useGlobalShortcuts({
     'cmd+k': () => setCommandPaletteOpen(true),
     'ctrl+k': () => setCommandPaletteOpen(true),
-    'cmd+n': () => openDialog('quickPrompt'),
-    'ctrl+n': () => openDialog('quickPrompt'),
-    'q': () => openDialog('quickPrompt'),
     't': () => setDebugConsoleOpen(true),
-    'l': () => openDialog('promptLibrary'),
-    'll': () => openDialog('promptLibraryCreate'),
     'n': () => setNotesDialogOpen(true),
     'j': () => {
       setCreatingNote(true);
@@ -205,12 +201,12 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
       
       <PromptLibrary
         open={promptLibraryOpen}
-        onOpenChange={(open) => open ? openDialog('promptLibrary') : openDialog('promptLibrary')}
+        onOpenChange={(open) => open ? openDialog('promptLibrary') : closeDialog('promptLibrary')}
       />
       
       <PromptLibraryCreateDialog
         open={promptLibraryCreateOpen}
-        onOpenChange={(open) => open ? openDialog('promptLibraryCreate') : openDialog('promptLibraryCreate')}
+        onOpenChange={(open) => open ? openDialog('promptLibraryCreate') : closeDialog('promptLibraryCreate')}
       />
       
       <NotesDialog
