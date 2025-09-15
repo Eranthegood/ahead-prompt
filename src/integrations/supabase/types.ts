@@ -1727,18 +1727,15 @@ export type Database = {
         Returns: string
       }
       get_invitation_by_token: {
-        Args: { token_param: string }
+        Args: { token: string }
         Returns: {
-          accepted_at: string
+          created_at: string
           email: string
           expires_at: string
           id: string
           invited_by: string
-          invited_by_email: string
-          invited_by_name: string
           role: string
           workspace_id: string
-          workspace_name: string
         }[]
       }
       get_user_workspaces: {
@@ -1759,6 +1756,10 @@ export type Database = {
       }
       is_workspace_admin: {
         Args: { user_uuid?: string; workspace_uuid: string }
+        Returns: boolean
+      }
+      validate_invitation_token: {
+        Args: { token: string }
         Returns: boolean
       }
     }
