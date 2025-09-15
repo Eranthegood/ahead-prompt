@@ -362,14 +362,14 @@ export function useIntegrations() {
         return testResult === 'success';
       } else if (id === 'claude') {
         const integration = integrations.find(i => i.id === 'claude');
-        const token = integration?.configuration?.token;
         
-        if (!token) {
+        if (!integration?.isConfigured) {
           testResult = 'error';
           toast.error('Aucune clé API Claude configurée');
         } else {
+          // For testing, call the Edge Function which will retrieve the stored API key
           const { data, error } = await supabase.functions.invoke('validate-claude-token', {
-            body: { apiKey: token }
+            body: { test: true }
           });
 
           testResult = (!error && data?.isValid) ? 'success' : 'error';

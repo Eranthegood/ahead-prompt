@@ -37,5 +37,10 @@ export function PlanBadge({
     md: 'text-sm px-2.5 py-0.5',
     lg: 'text-base px-3 py-1'
   };
-  return;
+  return (
+    <Badge variant={config.variant} className={`${config.className} ${sizeClasses[size]}`}>
+      {showIcon && <Icon className="w-3 h-3 mr-1" />}
+      {config.label}
+    </Badge>
+  );
 }
