@@ -237,8 +237,9 @@ export function PromptCard({
                       id: option.value.toString(),
                       label: option.label,
                       icon: option.value === 1 ? Flame : option.value === 2 ? Minus : Clock,
-                      color: option.value === 1 ? 'text-destructive' : option.value === 2 ? 'text-orange-500' : 'text-muted-foreground',
+                      color: option.value === 1 ? 'destructive' : option.value === 2 ? 'orange-500' : 'muted-foreground',
                       onClick: () => onPriorityChange(prompt, option.value),
+                      isSelected: prompt.priority === option.value,
                     }))}
                     placeholder="Select priority"
                   />

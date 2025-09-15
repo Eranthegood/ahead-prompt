@@ -19,6 +19,25 @@ export const getPriorityDisplay = (priority: number) => {
   return { icon: Clock, color: 'text-muted-foreground' };
 };
 
+// Color mapping function to handle different color formats
+const getColorClass = (color?: string) => {
+  if (!color) return '';
+  
+  // If color already has text- prefix, return as is
+  if (color.startsWith('text-')) return color;
+  
+  // Map clean color identifiers to proper Tailwind classes
+  const colorMap: Record<string, string> = {
+    'destructive': 'text-destructive',
+    'orange-500': 'text-orange-500',
+    'muted-foreground': 'text-muted-foreground',
+    'primary': 'text-primary',
+    'secondary': 'text-secondary',
+  };
+  
+  return colorMap[color] || `text-${color}`;
+};
+
 interface DropdownOption {
   id: string;
   label: string;
@@ -47,17 +66,22 @@ export const LinearDropdown: React.FC<LinearDropdownProps> = ({
         {trigger}
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="w-56 bg-popover border border-border shadow-lg z-50"
+        className="w-56 bg-popover/95 backdrop-blur-sm border border-border shadow-lg z-[100]"
         align="start"
         sideOffset={4}
       >
         {options.map((option) => {
           const IconComponent = option.icon;
+          const colorClass = getColorClass(option.color);
           
           return (
             <DropdownMenuItem
               key={option.id}
-              onClick={option.onClick}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                option.onClick();
+              }}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 text-sm cursor-pointer",
                 "hover:bg-accent hover:text-accent-foreground",
@@ -67,10 +91,7 @@ export const LinearDropdown: React.FC<LinearDropdownProps> = ({
             >
               {IconComponent && (
                 <IconComponent 
-                  className={cn(
-                    "w-4 h-4",
-                    option.color && `text-[${option.color}]`
-                  )} 
+                  className={cn("w-4 h-4", colorClass)} 
                 />
               )}
               <span className="flex-1">{option.label}</span>
