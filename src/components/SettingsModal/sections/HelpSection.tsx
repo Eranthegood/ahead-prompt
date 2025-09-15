@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, BookOpen, MessageCircle, Bug, Lightbulb, Mail } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 const helpResources = [
   {
     title: 'Documentation',
@@ -61,6 +61,7 @@ const quickLinks = [
 ];
 
 export function HelpSection() {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <Card>
@@ -95,14 +96,9 @@ export function HelpSection() {
                   <Button
                     variant="outline"
                     size="sm"
-                  onClick={() => {
+onClick={() => {
                     if (resource.link.startsWith('/')) {
-                      // For internal routes, use window.location or navigate
-                      if (resource.link === '/refund-policy') {
-                        window.location.href = resource.link;
-                      } else {
-                        window.open(resource.link, '_blank');
-                      }
+                      navigate(resource.link);
                     } else {
                       window.open(resource.link, '_blank');
                     }
@@ -139,9 +135,11 @@ export function HelpSection() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
+onClick={() => {
                     if (link.action) {
                       link.action();
+                    } else if (link.link.startsWith('/')) {
+                      navigate(link.link);
                     } else {
                       window.open(link.link, '_blank');
                     }

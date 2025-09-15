@@ -19,6 +19,7 @@ import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/u
 import { useIntegrations } from "@/hooks/useIntegrations";
 import { FigmaProjectSelector } from "./FigmaProjectSelector";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
+import { useNavigate } from 'react-router-dom';
 
 interface KnowledgeModalProps {
   open: boolean;
@@ -147,6 +148,7 @@ export function KnowledgeModal({
 }: KnowledgeModalProps) {
   const { createKnowledgeItem, updateKnowledgeItem } = useKnowledge(workspace.id, product?.id);
   const { integrations } = useIntegrations();
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -326,7 +328,7 @@ export function KnowledgeModal({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => window.open('/integrations', '_blank')}
+                    onClick={() => navigate('/integrations')}
                   >
                     <ExternalLink className="h-3 w-3 mr-1" />
                     Connect Figma
