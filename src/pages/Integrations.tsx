@@ -31,7 +31,8 @@ const INTEGRATIONS_CONFIG = [
     name: 'Claude Code Integration',
     description: 'Execute your prompts directly with Claude Code for autonomous development on your repositories.',
     icon: Code,
-    logo: '/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png'
+    logo: '/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png',
+    repositoryConfigPath: '/settings/repository-mapping'
   },
   {
     id: 'github',
@@ -145,7 +146,13 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
     if (integration.isComingSoon) return null;
     
     if (!integrationData.isConfigured) return 'Configure';
-    if (integrationData.isEnabled && integration.repositoryConfigPath) return 'Configure Repository';
+    if (integrationData.isEnabled && integration.repositoryConfigPath) {
+      // For Claude and Cursor, show "Configure" instead of "Configure Repository" when repos aren't mapped
+      if (integration.id === 'claude' || integration.id === 'cursor') {
+        return 'Configure';
+      }
+      return 'Configure Repository';
+    }
     return 'Test';
   };
   
