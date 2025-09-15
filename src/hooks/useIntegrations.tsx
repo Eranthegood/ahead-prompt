@@ -59,6 +59,14 @@ export function useIntegrations() {
           lastTestResult: null,
         },
         {
+          id: 'claude',
+          name: 'Claude Code Integration',
+          description: 'Execute your prompts with Claude Code for autonomous development',
+          isConfigured: false,
+          isEnabled: false,
+          lastTestResult: null,
+        },
+        {
           id: 'figma',
           name: 'Figma Integration',
           description: 'Connect your Figma projects to enrich your Knowledge Base',
@@ -232,6 +240,52 @@ export function useIntegrations() {
         toast.success('Figma intégré avec succès!');
         await loadIntegrations(); // Reload from database
         return true;
+        
+      } else if (id === 'claude') {
+        // Claude validation using the edge function
+        const { data, error } = await supabase.functions.invoke('validate-claude-token', {
+          body: { apiKey: secretValue }
+        });
+
+        if (error || !data?.isValid) {
+          throw new Error(data?.error || 'Invalid Anthropic API key');
+        }
+
+        // Store the integration configuration
+        const { error: insertError } = await supabase
+          .from('integrations')
+          .upsert({
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            integration_type: id,
+            is_configured: true,
+            is_enabled: true,
+            metadata: data.user ? {
+              username: data.user.username,
+              email: data.user.email,
+              models: data.models || []
+            } : null,
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error('Error storing integration:', insertError);
+          throw new Error('Failed to store integration configuration');
+        }
+
+        updateIntegration(id, {
+          isConfigured: true,
+          isEnabled: true,
+          configuration: { token: 'configured' },
+          metadata: data.user ? {
+            username: data.user.username,
+            email: data.user.email,
+            models: data.models || []
+          } : null
+        });
+
+        toast.success('Claude intégré avec succès!');
+        await loadIntegrations(); // Reload from database
+        return true;
       }
 
       toast.error('Type d\'intégration non supporté');
@@ -297,6 +351,33 @@ export function useIntegrations() {
             toast.success('Connexion Cursor réussie');
           } else {
             toast.error('Token Cursor invalide ou expiré');
+          }
+        }
+
+        updateIntegration(id, {
+          lastTestResult: testResult,
+          lastTestTime: new Date()
+        });
+
+        return testResult === 'success';
+      } else if (id === 'claude') {
+        const integration = integrations.find(i => i.id === 'claude');
+        const token = integration?.configuration?.token;
+        
+        if (!token) {
+          testResult = 'error';
+          toast.error('Aucune clé API Claude configurée');
+        } else {
+          const { data, error } = await supabase.functions.invoke('validate-claude-token', {
+            body: { apiKey: token }
+          });
+
+          testResult = (!error && data?.isValid) ? 'success' : 'error';
+          
+          if (testResult === 'success') {
+            toast.success('Connexion Claude réussie');
+          } else {
+            toast.error('Clé API Claude invalide ou expirée');
           }
         }
 

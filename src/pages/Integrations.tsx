@@ -27,6 +27,13 @@ const INTEGRATIONS_CONFIG = [
     repositoryConfigPath: '/settings/repository-mapping'
   },
   {
+    id: 'claude',
+    name: 'Claude Code Integration',
+    description: 'Execute your prompts directly with Claude Code for autonomous development on your repositories.',
+    icon: Code,
+    logo: '/lovable-uploads/a8aec4c7-12f7-4831-9e35-c7dafdc9f43d.png'
+  },
+  {
     id: 'github',
     name: 'GitHub Integration',
     description: 'Automatically sync your prompts with your GitHub repositories and create issues.',
@@ -212,6 +219,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
               <label className="text-sm font-medium">
                 {integration.id === 'github' ? 'Personal Access Token' : 
                  integration.id === 'figma' ? 'Personal Access Token' :
+                 integration.id === 'claude' ? 'Anthropic API Key' :
                  'API Token'}
               </label>
               <p className="text-xs text-muted-foreground">
@@ -219,6 +227,8 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                   ? 'Enter your GitHub Personal Access Token'
                   : integration.id === 'figma'
                   ? 'Enter your Figma Personal Access Token from Account Settings > Personal Access Tokens'
+                  : integration.id === 'claude'
+                  ? 'Enter your Anthropic API Key from console.anthropic.com'
                   : 'Enter your API token'
                 }
               </p>
@@ -229,6 +239,7 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                 placeholder={
                   integration.id === 'github' ? 'ghp_xxxxxxxxxxxx' : 
                   integration.id === 'figma' ? 'figd_xxxxxxxxxxxx' :
+                  integration.id === 'claude' ? 'sk-ant-api03-xxxxxxxxxxxx' :
                   'Token...'
                 }
                 value={token}
@@ -381,6 +392,49 @@ function IntegrationRow({ integration }: { integration: typeof INTEGRATIONS_CONF
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Show configured Claude user info */}
+      {'metadata' in integrationData && integrationData.metadata && integration.id === 'claude' && integrationData.isConfigured && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold">C</span>
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">{integrationData.metadata.username || 'Claude User'}</div>
+              {integrationData.metadata.email && (
+                <div className="text-sm text-muted-foreground">{integrationData.metadata.email}</div>
+              )}
+            </div>
+            <div className="text-sm text-green-600 font-medium">
+              API Key configured ✓
+            </div>
+          </div>
+          <div className="pt-3 border-t">
+            <div className="text-sm font-medium mb-2">Available models:</div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Badge variant="secondary" className="text-xs">
+                Claude Sonnet 4
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                Claude Opus 4.1
+              </Badge>
+            </div>
+            <div className="text-sm font-medium mb-2">Capabilities:</div>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs">
+                Code Generation
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                File Processing
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                PR Creation
+              </Badge>
+            </div>
           </div>
         </div>
       )}
