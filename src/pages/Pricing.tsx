@@ -158,7 +158,7 @@ export default function Pricing() {
           <BlurFade delay={0.4} inView>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               We're building this for developers who want to stay ahead. 
-              No paywalls, no limits, just pure productivity.
+              Just pure productivity.
             </p>
           </BlurFade>
 
