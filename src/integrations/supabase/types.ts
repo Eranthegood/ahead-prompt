@@ -1726,6 +1726,21 @@ export type Database = {
         Args: { title: string }
         Returns: string
       }
+      get_invitation_by_token: {
+        Args: { token_param: string }
+        Returns: {
+          accepted_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          invited_by_email: string
+          invited_by_name: string
+          role: string
+          workspace_id: string
+          workspace_name: string
+        }[]
+      }
       get_user_workspaces: {
         Args: { user_uuid?: string }
         Returns: {

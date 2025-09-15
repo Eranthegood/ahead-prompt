@@ -161,35 +161,39 @@ export function useWorkspaceInvitations(workspaceId?: string) {
 
   const getInvitationByToken = async (token: string) => {
     try {
+      // Use the secure RPC function instead of direct table access
       const { data, error } = await supabase
-        .from('workspace_invitations')
-        .select('*')
-        .eq('invitation_token', token)
-        .is('accepted_at', null)
-        .gt('expires_at', new Date().toISOString())
-        .single();
+        .rpc('get_invitation_by_token', { 
+          token_param: token 
+        });
 
       if (error) throw error;
 
-      // Get workspace and profile data
-      const [workspaceData, profileData] = await Promise.all([
-        supabase
-          .from('workspaces')
-          .select('name')
-          .eq('id', data.workspace_id)
-          .maybeSingle(),
-        supabase
-          .from('profiles')
-          .select('email, full_name')
-          .eq('id', data.invited_by)
-          .maybeSingle()
-      ]);
+      // The RPC returns an array, get first result
+      const invitation = data?.[0];
+      if (!invitation) return null;
 
+      // Transform the RPC result to match the expected interface
       return {
-        ...data,
-        role: data.role as 'admin' | 'user',
-        workspaces: workspaceData.data,
-        invited_by_profile: profileData.data
+        id: invitation.id,
+        workspace_id: invitation.workspace_id,
+        email: invitation.email,
+        role: invitation.role as 'admin' | 'user',
+        invited_by: invitation.invited_by,
+        expires_at: invitation.expires_at,
+        accepted_at: invitation.accepted_at,
+        // Security: Don't expose the actual token after validation
+        invitation_token: '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        // Add nested objects for UI compatibility
+        workspaces: {
+          name: invitation.workspace_name
+        },
+        invited_by_profile: {
+          full_name: invitation.invited_by_name,
+          email: invitation.invited_by_email
+        }
       };
     } catch (error: any) {
       console.error('Error fetching invitation:', error);
