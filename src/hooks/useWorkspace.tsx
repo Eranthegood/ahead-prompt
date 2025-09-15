@@ -46,7 +46,7 @@ const workspaceCache = WorkspaceCache.getInstance();
 export function useWorkspace() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
-  const [retryCount, setRetryCount] = useState(0);
+  const retryCount = useRef(0);
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -91,7 +91,7 @@ export function useWorkspace() {
         if (!memberError && memberWorkspace?.workspaces) {
           console.log('[useWorkspace] Successfully loaded requested workspace via membership');
           setWorkspace(memberWorkspace.workspaces as Workspace);
-          setRetryCount(0);
+          retryCount.current = 0;
           isRequestInProgress.current = false;
           return;
         }
@@ -106,7 +106,7 @@ export function useWorkspace() {
         if (!ownedError && ownedWorkspace) {
           console.log('[useWorkspace] Successfully loaded requested workspace via ownership');
           setWorkspace(ownedWorkspace);
-          setRetryCount(0);
+          retryCount.current = 0;
           isRequestInProgress.current = false;
           return;
         }
@@ -114,7 +114,7 @@ export function useWorkspace() {
         console.log('[useWorkspace] User does not have access to requested workspace, loading default');
       }
       
-      console.log(`[useWorkspace] Fetching default workspace for user: ${user.id}, attempt: ${retryCount + 1}`);
+      console.log(`[useWorkspace] Fetching default workspace for user: ${user.id}, attempt: ${retryCount.current + 1}`);
       
       const fetchWorkspace = async (): Promise<Workspace> => {
         try {
@@ -181,21 +181,21 @@ export function useWorkspace() {
 
       const workspaceResult = await workspaceCache.get(cacheKey, fetchWorkspace);
       setWorkspace(workspaceResult);
-      setRetryCount(0);
+      retryCount.current = 0;
       
     } catch (error: any) {
       console.error('[useWorkspace] Error:', error);
       
-      if (retryCount < MAX_RETRIES && (
+      if (retryCount.current < MAX_RETRIES && (
         error.code === '42P17' || 
         error.message?.includes('infinite recursion') ||
         error.message?.includes('network') ||
         error.message?.includes('timeout')
       )) {
-        console.log(`[useWorkspace] Retrying in ${RETRY_DELAY}ms... (${retryCount + 1}/${MAX_RETRIES})`);
-        setRetryCount(prev => prev + 1);
+        console.log(`[useWorkspace] Retrying in ${RETRY_DELAY}ms... (${retryCount.current + 1}/${MAX_RETRIES})`);
+        retryCount.current = retryCount.current + 1;
         
-        await sleep(RETRY_DELAY * (retryCount + 1));
+        await sleep(RETRY_DELAY * retryCount.current);
         
         setTimeout(() => {
           fetchOrCreateWorkspace();
@@ -214,17 +214,17 @@ export function useWorkspace() {
         description: userMessage
       });
       
-      setRetryCount(0);
+      retryCount.current = 0;
     } finally {
       setLoading(false);
       isRequestInProgress.current = false;
     }
-  }, [user, retryCount, toast, searchParams]);
+  }, [user, toast, searchParams]);
 
   return { 
     workspace, 
     loading, 
     refetch: fetchOrCreateWorkspace,
-    retryCount 
+    retryCount: retryCount.current 
   };
 }
