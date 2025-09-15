@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMixpanelContext } from '@/components/MixpanelProvider';
-import { useSessionManager } from '@/hooks/useSessionManager';
+import { useAuth } from '@/hooks/useAuth';
 import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
@@ -20,7 +20,7 @@ export const useProducts = (workspaceId?: string) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { trackProductCreated } = useMixpanelContext();
-  const { ensureValidSession, isValid: sessionIsValid } = useSessionManager();
+  const { session } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
 
@@ -55,9 +55,8 @@ export const useProducts = (workspaceId?: string) => {
 
     console.log('[useProducts] Creating product:', productData.name);
 
-    // Ensure valid session before operation
-    const sessionValid = await ensureValidSession();
-    if (!sessionValid) {
+    // Check if user is authenticated
+    if (!session) {
       toast({
         title: 'Authentication Error',
         description: 'Please sign in again to create products.',
@@ -123,38 +122,17 @@ export const useProducts = (workspaceId?: string) => {
             error.code === 'PGRST301' || 
             error.details?.includes('policy')) {
           
-          console.log('[useProducts] RLS/Auth error detected, attempting session refresh...');
+          console.log('[useProducts] RLS/Auth error detected, user needs to re-authenticate');
           
-          // Try to refresh session and retry once
-          const refreshed = await ensureValidSession();
-          if (refreshed) {
-            console.log('[useProducts] Session refreshed, retrying...');
-            
-            const { data: retryData, error: retryError } = await supabase
-              .from('products')
-              .insert(payload)
-              .select()
-              .single();
-            
-            if (retryError) {
-              throw retryError;
-            }
-            
-            // Success after retry
-            setProducts(prev => prev.map(p => p.id === optimisticProduct.id ? retryData : p));
-            
-            trackProductCreated({
-              productId: retryData.id,
-              color: retryData.color || undefined
-            });
-
-            toast({
-              title: 'Product created',
-              description: `"${productData.name}" has been created successfully`,
-            });
-
-            return retryData;
-          }
+          // Rollback on auth error
+          setProducts(prev => prev.filter(p => p.id !== optimisticProduct.id));
+          
+          toast({
+            title: 'Authentication Error',
+            description: 'Please sign in again to continue.',
+            variant: 'destructive',
+          });
+          return null;
         }
         
         // Rollback on error

@@ -21,12 +21,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authStateStable, setAuthStateStable] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    let stableTimer: number;
-    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -36,12 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Stabilize auth state to prevent rapid changes
-        setAuthStateStable(false);
-        clearTimeout(stableTimer);
-        stableTimer = window.setTimeout(() => {
-          setAuthStateStable(true);
-        }, 100);
+        // Handle session errors
+        if (!session && event === 'TOKEN_REFRESHED') {
+          console.log('[AuthProvider] Token refresh failed, signing out');
+          try {
+            supabase.auth.signOut();
+          } catch (error) {
+            console.error('[AuthProvider] Error during forced signout:', error);
+          }
+        }
         
         // Track login events (with error isolation)
         if (event === 'SIGNED_IN' && session?.user) {
@@ -82,18 +82,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // Initial session is handled by onAuthStateChange
-    // Remove redundant getSession call to prevent double initialization
+    // Check for existing session after setting up listener
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('[AuthProvider] Error getting initial session:', error);
+        setLoading(false);
+      } else if (session) {
+        setSession(session);
+        setUser(session.user);
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    });
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(stableTimer);
     };
   }, []);
 
   const signUp = async (email: string, password: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/build`;
+      const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -169,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/build`
+          redirectTo: `${window.location.origin}/`
         }
       });
 
@@ -210,7 +220,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Force clear auth state
       setSession(null);
       setUser(null);
-      setAuthStateStable(true);
       
       toast({
         title: "Signed out successfully"
@@ -232,7 +241,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     session,
-    loading: loading || !authStateStable,
+    loading,
     signUp,
     signIn,
     signInWithGoogle,
