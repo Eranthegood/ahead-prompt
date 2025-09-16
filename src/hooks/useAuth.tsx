@@ -275,10 +275,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      // In preview/iframe environments, redirecting the current window can cause a blank page.
+      // We request the OAuth URL and open it in a new tab so the flow happens in a top-level context.
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/auth`,
+          skipBrowserRedirect: true,
         }
       });
 
@@ -288,6 +291,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Google sign in failed",
           description: error.message
         });
+      } else if (data?.url) {
+        // Open OAuth in a new tab to avoid iframe issues and third-party cookie restrictions
+        window.open(data.url, '_blank', 'noopener,noreferrer');
       }
 
       return { error };
