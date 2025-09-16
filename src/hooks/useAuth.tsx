@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const initiateCheckout = async (planId: string, isAnnual: boolean) => {
+  const initiateCheckout = async (planId: string, isAnnual: boolean, couponCode?: string) => {
     try {
       const priceId = getPriceId(planId, isAnnual);
       if (!priceId) {
@@ -159,8 +159,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('No active session');
       }
 
+      const requestBody: { priceId: string; couponId?: string } = { priceId };
+      if (couponCode?.trim()) {
+        requestBody.couponId = couponCode.trim();
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
+        body: requestBody,
         headers: {
           Authorization: `Bearer ${authData.session.access_token}`,
         },

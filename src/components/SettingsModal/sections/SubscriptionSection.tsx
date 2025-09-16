@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { SUBSCRIPTION_PLANS, getPlanByProductId, getPriceId, getAnnualPrice } from "@/constants/subscriptionPlans";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export function SubscriptionSection() {
@@ -21,6 +23,9 @@ export function SubscriptionSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState("");
+  const [couponSuccess, setCouponSuccess] = useState("");
 
   // Handle success/cancel messages from Stripe
   useEffect(() => {
@@ -75,6 +80,9 @@ export function SubscriptionSection() {
     }
 
     setIsLoading(true);
+    setCouponError("");
+    setCouponSuccess("");
+    
     try {
       const { data: authData } = await supabase.auth.getSession();
       
@@ -82,8 +90,13 @@ export function SubscriptionSection() {
         throw new Error('No active session');
       }
 
+      const requestBody: { priceId: string; couponId?: string } = { priceId };
+      if (couponCode.trim()) {
+        requestBody.couponId = couponCode.trim();
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
+        body: requestBody,
         headers: {
           Authorization: `Bearer ${authData.session.access_token}`,
         },
@@ -92,17 +105,26 @@ export function SubscriptionSection() {
       if (error) throw error;
       
       if (data?.url) {
+        if (couponCode.trim()) {
+          setCouponSuccess(`Coupon "${couponCode}" applied successfully!`);
+        }
         window.open(data.url, '_blank');
       } else {
         throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
+      const errorMessage = error.message || "Failed to start checkout process. Please try again.";
+      
+      if (errorMessage.includes("Invalid coupon") || errorMessage.includes("coupon")) {
+        setCouponError(errorMessage);
+      } else {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -280,6 +302,44 @@ export function SubscriptionSection() {
           <span className={isAnnual ? "text-foreground font-medium" : "text-muted-foreground"}>
             Annual {isAnnual && <span className="text-xs text-muted-foreground">(billed annually)</span>} <Badge variant="secondary" className="ml-2">-20%</Badge>
           </span>
+        </div>
+
+        {/* Coupon Code Input */}
+        <div className="space-y-3">
+          <div className="flex flex-col space-y-2">
+            <Label htmlFor="coupon-code" className="text-sm font-medium">
+              Coupon Code (Optional)
+            </Label>
+            <Input
+              id="coupon-code"
+              placeholder="Enter coupon code (e.g., Early)"
+              value={couponCode}
+              onChange={(e) => {
+                setCouponCode(e.target.value);
+                setCouponError("");
+                setCouponSuccess("");
+              }}
+              className="max-w-xs"
+            />
+          </div>
+          
+          {couponError && (
+            <Alert className="max-w-xs">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-red-600 dark:text-red-400">
+                {couponError}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {couponSuccess && (
+            <Alert className="max-w-xs border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
+              <Check className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-700 dark:text-green-300">
+                {couponSuccess}
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

@@ -21,11 +21,11 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { priceId } = await req.json();
+    const { priceId, couponId } = await req.json();
     if (!priceId) {
       throw new Error("priceId is required");
     }
-    logStep("Price ID received", { priceId });
+    logStep("Price ID received", { priceId, couponId });
 
     // Create a Supabase client using the anon key
     const supabaseClient = createClient(
@@ -44,6 +44,22 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil" 
     });
 
+    // Validate coupon if provided
+    let validatedCoupon = null;
+    if (couponId) {
+      try {
+        validatedCoupon = await stripe.coupons.retrieve(couponId);
+        logStep("Coupon validated", { couponId, valid: validatedCoupon.valid });
+        
+        if (!validatedCoupon.valid) {
+          throw new Error("Coupon is not valid");
+        }
+      } catch (couponError) {
+        logStep("Coupon validation failed", { couponId, error: couponError.message });
+        throw new Error(`Invalid coupon: ${couponError.message}`);
+      }
+    }
+
     // Check for existing customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
@@ -55,7 +71,7 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
@@ -67,7 +83,15 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/settings?tab=subscription&success=true`,
       cancel_url: `${req.headers.get("origin")}/settings?tab=subscription&canceled=true`,
-    });
+    };
+
+    // Add discount if coupon is validated
+    if (validatedCoupon) {
+      sessionConfig.discounts = [{ coupon: couponId }];
+      logStep("Discount applied to session", { couponId });
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
 

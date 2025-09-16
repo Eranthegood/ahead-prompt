@@ -17,6 +17,8 @@ export default function Pricing() {
   const { user } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // Auto-apply the "Early" coupon that's promoted in the banner
+  const [autoCoupon] = useState("Early");
   const { trackPricingInteraction, isTracking } = usePricingTracking();
   
   const handleGetStarted = () => {
@@ -48,8 +50,13 @@ export default function Pricing() {
         throw new Error('No active session');
       }
 
+      const requestBody: { priceId: string; couponId?: string } = { priceId };
+      if (autoCoupon) {
+        requestBody.couponId = autoCoupon;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
+        body: requestBody,
         headers: {
           Authorization: `Bearer ${authData.session.access_token}`,
         },
@@ -188,17 +195,25 @@ export default function Pricing() {
                   <CardHeader className="text-center pb-2">
                     <CardTitle className="text-xl">{tier.name}</CardTitle>
                     <CardDescription>{tier.description}</CardDescription>
-                    <div className="py-4">
-                      <div className="text-3xl font-bold">
-                        ${isAnnual ? Math.floor(tier.yearlyPrice / 12) : tier.monthlyPrice}
-                        <span className="text-base font-normal text-muted-foreground">/mo</span>
-                      </div>
-                      {isAnnual && tier.yearlyPrice > 0 && (
-                        <div className="text-sm text-muted-foreground">
-                          ${tier.yearlyPrice}/year (save 20%)
+                      <div className="py-4">
+                        <div className="text-3xl font-bold">
+                          ${isAnnual ? Math.floor(tier.yearlyPrice / 12) : tier.monthlyPrice}
+                          <span className="text-base font-normal text-muted-foreground">/mo</span>
                         </div>
-                      )}
-                    </div>
+                        {isAnnual && tier.yearlyPrice > 0 && (
+                          <div className="text-sm text-muted-foreground">
+                            ${tier.yearlyPrice}/year (save 20%)
+                          </div>
+                        )}
+                        {tier.planId !== "free" && autoCoupon && (
+                          <div className="mt-2">
+                            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              <Gift className="w-3 h-3 mr-1" />
+                              Extra 30% off with "{autoCoupon}"
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
