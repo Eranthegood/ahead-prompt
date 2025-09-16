@@ -5,7 +5,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { PromptsProvider } from '@/context/PromptsContext';
-import { AppStoreProvider } from '@/store/AppStore';
+
 import { PromoBanner } from './PromoBanner';
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
@@ -74,7 +74,6 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   }
 
   return (
-    <AppStoreProvider>
       <div className="min-h-screen bg-background">
         <PromoBanner />
         
@@ -141,6 +140,5 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
           </>
         )}
       </div>
-    </AppStoreProvider>
-  );
-}
+    );
+  }

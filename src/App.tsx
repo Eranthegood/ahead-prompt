@@ -37,13 +37,15 @@ import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
 import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
+import { AppStoreProvider } from '@/store/AppStore';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+    <AppStoreProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeInitializer>
           <TooltipProvider>
@@ -153,6 +155,7 @@ function App() {
       </AuthProvider>
     </QueryClientProvider>
     </ErrorBoundary>
+    </AppStoreProvider>
   );
 }
 
