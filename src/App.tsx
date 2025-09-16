@@ -36,7 +36,6 @@ import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
-import { DebugPromptStatusUpdater } from '@/components/DebugPromptStatusUpdater';
 
 const queryClient = new QueryClient();
 
@@ -51,7 +50,6 @@ function App() {
             <Sonner />
             <BrowserRouter>
               <MixpanelProvider>
-                <DebugPromptStatusUpdater />
                 <SimpleAppLayout>
                   <Routes>
                       <Route path="/auth" element={<Auth />} />

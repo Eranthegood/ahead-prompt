@@ -33,7 +33,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         const userId = session?.user?.id;
-        console.info(`[AuthProvider] Auth event: ${event}`, { userId, hasInitialSession });
+        console.info(`[AuthProvider] Auth event: ${event}`, { 
+          userId, 
+          hasInitialSession, 
+          sessionExists: !!session,
+          userExists: !!session?.user,
+          currentLocation: window.location.pathname
+        });
         
         setSession(session);
         setUser(session?.user ?? null);
@@ -45,6 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.info('[AuthProvider] Initial session processed, loading complete');
         } else if (hasInitialSession && ['SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED'].includes(event)) {
           console.info(`[AuthProvider] Auth event ${event} processed`);
+          
+          // Force navigation to /build after successful sign in
+          if (event === 'SIGNED_IN' && session?.user && window.location.pathname === '/auth') {
+            console.info('[AuthProvider] Redirecting to /build after successful sign in');
+            setTimeout(() => {
+              window.location.href = '/build';
+            }, 100);
+          }
         }
         
         // Handle post-authentication plan selection
