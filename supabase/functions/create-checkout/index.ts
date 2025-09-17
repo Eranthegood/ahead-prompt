@@ -83,6 +83,7 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/settings?tab=subscription&success=true`,
       cancel_url: `${req.headers.get("origin")}/settings?tab=subscription&canceled=true`,
+      allow_promotion_codes: true,
     };
 
     // Add discount if coupon is validated
