@@ -8,23 +8,27 @@ import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamification } from '@/hooks/useGamification';
 import { useTheme } from '@/hooks/useTheme';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { PromptLibrary } from './PromptLibrary';
 import { WorkspaceMembersModal } from './WorkspaceMembersModal';
+import { ProSubscriptionModal } from './ProSubscriptionModal';
 import { ThemeToggle } from './ui/theme-toggle';
 
 export function UserAccountSection() {
   const { user, signOut } = useAuth();
   const { stats } = useGamification();
   const { theme, setTheme, resolvedTheme, isDarkModeUnlocked, xpNeededForDarkMode, currentLevel, requiredLevel } = useTheme();
+  const { tier } = useSubscription();
   const navigate = useNavigate();
   const { state } = useSidebar();
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   const [showWorkspaceMembers, setShowWorkspaceMembers] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showProModal, setShowProModal] = useState(false);
   const [settingsSection, setSettingsSection] = useState('account');
   
   const isCollapsed = state === 'collapsed';
@@ -64,6 +68,20 @@ export function UserAccountSection() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             
+            {/* Pro CTA for Free users */}
+            {tier === 'free' && (
+              <>
+                <DropdownMenuItem 
+                  onClick={() => setShowProModal(true)}
+                  className="bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20"
+                >
+                  <Crown className="mr-2 h-4 w-4 text-primary" />
+                  <span className="font-medium text-primary">S'abonner à Pro</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+
             <DropdownMenuItem onClick={() => {
               setSettingsSection('account');
               setShowSettings(true);
@@ -129,6 +147,11 @@ export function UserAccountSection() {
           open={showSettings}
           onOpenChange={setShowSettings}
           defaultSection={settingsSection}
+        />
+        
+        <ProSubscriptionModal 
+          open={showProModal}
+          onOpenChange={setShowProModal}
         />
       </div>
     );
@@ -206,6 +229,20 @@ export function UserAccountSection() {
           </div>
 
           <DropdownMenuSeparator />
+
+          {/* Pro CTA for Free users */}
+          {tier === 'free' && (
+            <>
+              <DropdownMenuItem 
+                onClick={() => setShowProModal(true)}
+                className="bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20 mb-2"
+              >
+                <Crown className="mr-2 h-4 w-4 text-primary" />
+                <span className="font-medium text-primary">S'abonner à Pro</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
 
           <DropdownMenuItem onClick={() => {
             setSettingsSection('account');
@@ -303,6 +340,12 @@ export function UserAccountSection() {
         open={showSettings}
         onOpenChange={setShowSettings}
         defaultSection={settingsSection}
+      />
+      
+      {/* Pro Subscription Modal */}
+      <ProSubscriptionModal 
+        open={showProModal}
+        onOpenChange={setShowProModal}
       />
     </div>
   );
