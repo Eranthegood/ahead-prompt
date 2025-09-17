@@ -82,10 +82,7 @@ export function UserAccountSection() {
               <span>Prompt Library</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => {
-              setSettingsSection('team');
-              setShowSettings(true);
-            }}>
+            <DropdownMenuItem onClick={() => navigate('/collaboration/team')}>
               <Users className="mr-2 h-4 w-4" />
               <span>Team</span>
             </DropdownMenuItem>
@@ -247,10 +244,7 @@ export function UserAccountSection() {
             <span>Prompt Library</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => {
-            setSettingsSection('team');
-            setShowSettings(true);
-          }}>
+          <DropdownMenuItem onClick={() => navigate('/collaboration/team')}>
             <Users className="mr-2 h-4 w-4" />
             <span>Team</span>
           </DropdownMenuItem>
