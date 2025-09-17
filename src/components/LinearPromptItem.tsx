@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Merge, Edit, Trash2, Copy as CopyIcon, Code, Settings } from 'lucide-react';
+import { Copy, Check, ExternalLink, Flame, Minus, Clock, ChevronDown, Send, Edit, Trash2, Copy as CopyIcon } from 'lucide-react';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
@@ -20,8 +20,7 @@ interface LinearPromptItemProps {
   };
   onPromptClick: (prompt: Prompt) => void;
   onCopyGenerated: (prompt: Prompt) => void;
-  onShowCursorDrawer: () => void;
-  onShowClaudeDrawer?: () => void;
+  onShowActionDrawer: () => void;
   onPriorityChange?: (prompt: Prompt, newPriority: number) => void;
   onStatusChange?: (prompt: Prompt, newStatus: PromptStatus) => void;
   onDuplicate?: (prompt: Prompt) => void;
@@ -46,8 +45,7 @@ export function LinearPromptItem({
   prompt,
   onPromptClick,
   onCopyGenerated,
-  onShowCursorDrawer,
-  onShowClaudeDrawer,
+  onShowActionDrawer,
   onPriorityChange,
   onStatusChange,
   onDuplicate,
@@ -225,8 +223,8 @@ export function LinearPromptItem({
           )}
         </Button>
         
-        {/* Send to Cursor Button - Only show if repository is mapped and Cursor is configured */}
-        {prompt.product?.github_repo_url && isCursorConfigured && (
+        {/* Send Button - Only show if repository is mapped and either integration is configured */}
+        {prompt.product?.github_repo_url && (isCursorConfigured || isClaudeConfigured) && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -236,44 +234,17 @@ export function LinearPromptItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isUsable) return;
-                    onShowCursorDrawer();
+                    onShowActionDrawer();
                   }}
                   disabled={!isUsable}
-                  className="h-7 w-7 p-0 text-purple-500 hover:text-purple-600 hover:bg-muted flex-shrink-0"
-                  aria-label="Send to Cursor"
+                  className="h-7 w-7 p-0 text-primary hover:text-primary/80 hover:bg-muted flex-shrink-0"
+                  aria-label="Send to AI provider"
                 >
-                  <Merge className="h-3.5 w-3.5" />
+                  <Send className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Send to Cursor</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-
-        {/* Send to Claude Button - Only show if repository is mapped and Claude is configured */}
-        {prompt.product?.github_repo_url && isClaudeConfigured && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isUsable) return;
-                    onShowClaudeDrawer?.();
-                  }}
-                  disabled={!isUsable}
-                  className="h-7 w-7 p-0 text-orange-500 hover:text-orange-600 hover:bg-muted flex-shrink-0"
-                  aria-label="Send to Claude"
-                >
-                  <Code className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Send to Claude</p>
+                <p>Send to AI provider</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

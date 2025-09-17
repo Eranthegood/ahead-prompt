@@ -474,13 +474,8 @@ export function MinimalPromptList({
                       prompt={prompt}
                       onPromptClick={handlePromptClick}
                       onCopyGenerated={handleCopyGenerated}
-                      onShowCursorDrawer={() => {
-                        console.log('[MinimalPromptList] Opening Cursor drawer for prompt:', prompt.id);
-                        setDrawerPrompt(prompt);
-                        setDrawerType('send');
-                      }}
-                      onShowClaudeDrawer={() => {
-                        console.log('[MinimalPromptList] Opening Claude drawer for prompt:', prompt.id);
+                      onShowActionDrawer={() => {
+                        console.log('[MinimalPromptList] Opening action drawer for prompt:', prompt.id);
                         setDrawerPrompt(prompt);
                         setDrawerType('send');
                       }}
@@ -577,11 +572,7 @@ export function MinimalPromptList({
                       prompt={item}
                       onPromptClick={handlePromptClick}
                       onCopyGenerated={handleCopyGenerated}
-                      onShowCursorDrawer={() => {
-                        setDrawerPrompt(item);
-                        setDrawerType('send');
-                      }}
-                      onShowClaudeDrawer={() => {
+                      onShowActionDrawer={() => {
                         setDrawerPrompt(item);
                         setDrawerType('send');
                       }}
