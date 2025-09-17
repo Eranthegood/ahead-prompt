@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { Github, Figma, Zap, ExternalLink, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const availableIntegrations = [
   {
@@ -30,6 +31,7 @@ const availableIntegrations = [
 ];
 
 export function IntegrationsSection() {
+  const navigate = useNavigate();
   const { integrations, isLoading } = useIntegrations();
 
   const getIntegrationStatus = (integrationId: string) => {
@@ -45,44 +47,57 @@ export function IntegrationsSection() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Intégrations disponibles</CardTitle>
+          <CardTitle>Intégrations</CardTitle>
           <CardDescription>
-            Connectez vos outils favoris pour améliorer votre workflow.
+            Configurez vos tokens d'API pour connecter vos outils de développement.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 opacity-50">
-            <p className="text-muted-foreground mb-4">
-              Les intégrations sont en cours de développement et seront bientôt disponibles.
-            </p>
-            <div className="space-y-4">
-              {availableIntegrations.map((integration) => {
-                const Icon = integration.icon;
-                
-                return (
-                  <div key={integration.id} className="flex items-center justify-between p-4 border rounded-lg opacity-50">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-lg ${integration.color}`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium">{integration.name}</h3>
-                          <Badge variant="secondary">Bientôt</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {integration.description}
-                        </p>
-                      </div>
+          <div className="space-y-4">
+            {availableIntegrations.map((integration) => {
+              const Icon = integration.icon;
+              const status = getIntegrationStatus(integration.id);
+              
+              return (
+                <div key={integration.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-lg ${integration.color}`}>
+                      <Icon className="h-5 w-5" />
                     </div>
-                    
-                    <Button disabled variant="outline" size="sm">
-                      Bientôt disponible
-                    </Button>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium">{integration.name}</h3>
+                        {status.isConfigured ? (
+                          <Badge variant={status.lastTest === 'success' ? 'default' : 'secondary'}>
+                            {status.lastTest === 'success' ? 'Configuré' : 'Configuré'}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">Non configuré</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {integration.description}
+                      </p>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate('/integrations')}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configurer
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+          
+          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              💡 Cliquez sur "Configurer" pour accéder à la page complète des intégrations où vous pouvez saisir vos tokens d'API.
+            </p>
           </div>
         </CardContent>
       </Card>
