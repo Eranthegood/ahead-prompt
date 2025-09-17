@@ -13,8 +13,8 @@ const LovableLogo = ({ className }: { className?: string }) => (
 
 const CursorLogo = ({ className }: { className?: string }) => (
   <img 
-    src="/lovable-uploads/456cca9d-618c-4e30-9fd7-efc5fe32ad5d.png" 
-    alt="3D Cube Logo" 
+    src="/src/assets/cursor-logo.png" 
+    alt="Cursor Logo" 
     className={className}
   />
 );
