@@ -46,6 +46,7 @@ function TokenInput({
   description 
 }: TokenInputProps) {
   const [showToken, setShowToken] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const getStatusBadge = () => {
     if (!isConfigured) {
@@ -79,39 +80,63 @@ function TokenInput({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label>Token / Clé API</Label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                type={showToken ? "text" : "password"}
-                placeholder={placeholder}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-3"
-                onClick={() => setShowToken(!showToken)}
-              >
-                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
+        {/* Token Input - Show only if not configured or editing */}
+        {(!isConfigured || isEditing) && (
+          <div className="space-y-2">
+            <Label>Token / Clé API</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showToken ? "text" : "password"}
+                  placeholder={placeholder}
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3"
+                  onClick={() => setShowToken(!showToken)}
+                >
+                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         
         <div className="flex gap-2">
-          <Button 
-            onClick={onSave}
-            disabled={!value.trim() || isLoading}
-            className="flex-1"
-          >
-            <Key className="w-4 h-4 mr-2" />
-            {isConfigured ? 'Remplacer' : 'Configurer'}
-          </Button>
+          {/* Show Configure/Replace button when editing or not configured */}
+          {(!isConfigured || isEditing) && (
+            <Button 
+              onClick={() => {
+                onSave();
+                setIsEditing(false);
+              }}
+              disabled={!value.trim() || isLoading}
+              className="flex-1"
+            >
+              <Key className="w-4 h-4 mr-2" />
+              {isConfigured ? 'Remplacer' : 'Configurer'}
+            </Button>
+          )}
+          
+          {/* Show Update Token button when configured and not editing */}
+          {isConfigured && !isEditing && (
+            <Button 
+              variant="outline"
+              onClick={() => setIsEditing(true)}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              <Key className="w-4 h-4 mr-2" />
+              Update Token
+            </Button>
+          )}
+          
+          {/* Show Test button when configured */}
           {onTest && isConfigured && (
             <Button 
               variant="outline"
@@ -119,6 +144,20 @@ function TokenInput({
               disabled={isLoading}
             >
               Tester
+            </Button>
+          )}
+          
+          {/* Show Cancel button when editing */}
+          {isEditing && (
+            <Button 
+              variant="ghost"
+              onClick={() => {
+                setIsEditing(false);
+                onChange(''); // Clear the input
+              }}
+              disabled={isLoading}
+            >
+              Annuler
             </Button>
           )}
         </div>
