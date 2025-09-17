@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { Github, Figma, Zap, ExternalLink, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ClaudeSection } from './ClaudeSection';
 
 const availableIntegrations = [
   {
@@ -45,6 +46,7 @@ export function IntegrationsSection() {
 
   return (
     <div className="space-y-6">
+      <ClaudeSection />
       <Card>
         <CardHeader>
           <CardTitle>Integrations</CardTitle>

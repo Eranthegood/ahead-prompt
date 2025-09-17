@@ -9,6 +9,8 @@ interface UserPreferences {
   promptCardMode: 'default' | 'minimalist';
   gamificationEnabled: boolean;
   autoSaveEnabled: boolean;
+  claudeCliMode: boolean;
+  claudeCliEndpoint: string;
 }
 
 const PREFERENCES_KEY = 'user_prompt_preferences';
@@ -22,6 +24,8 @@ const defaultPreferences: UserPreferences = {
   promptCardMode: 'default',
   gamificationEnabled: false, // Disabled by default
   autoSaveEnabled: false, // Disabled by default for better UX
+  claudeCliMode: false,
+  claudeCliEndpoint: 'http://localhost:3001',
 };
 
 export const useUserPreferences = () => {
@@ -105,6 +109,20 @@ export const useUserPreferences = () => {
     });
   };
 
+  // Save Claude CLI mode preference
+  const saveClaudeCliModePreference = (enabled: boolean) => {
+    updatePreferences({
+      claudeCliMode: enabled,
+    });
+  };
+
+  // Save Claude CLI endpoint preference
+  const saveClaudeCliEndpointPreference = (endpoint: string) => {
+    updatePreferences({
+      claudeCliEndpoint: endpoint,
+    });
+  };
+
   return {
     preferences,
     loading,
@@ -116,5 +134,7 @@ export const useUserPreferences = () => {
     saveGamificationPreference,
     saveAutoSavePreference,
     savePromptCardModePreference,
+    saveClaudeCliModePreference,
+    saveClaudeCliEndpointPreference,
   };
 };

@@ -2,16 +2,56 @@ import { useState, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { ClaudeConfig, ClaudeSession, ClaudeOutputEvent } from '../types/claude-types'
 import { toast } from 'sonner'
+import { useUserPreferences } from '@/hooks/useUserPreferences'
 
 export const useClaudeCodeIntegration = () => {
+  const { preferences } = useUserPreferences()
   const [sessions, setSessions] = useState<Map<string, ClaudeSession>>(new Map())
   const [isExecuting, setIsExecuting] = useState(false)
+
+  // CLI mode functions
+  const sendToClaudeCLI = useCallback(async (prompt: string): Promise<void> => {
+    try {
+      setIsExecuting(true)
+      
+      const response = await fetch(`${preferences.claudeCliEndpoint}/send-prompt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: prompt
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        toast.success('✅ Prompt envoyé vers Claude Code !')
+        console.log('Réponse:', result)
+      } else {
+        toast.error('❌ Erreur: ' + result.error)
+      }
+    } catch (error) {
+      toast.error('❌ Connexion au serveur échouée. Vérifiez que le serveur tourne.')
+      console.error('Error:', error)
+      throw error
+    } finally {
+      setIsExecuting(false)
+    }
+  }, [preferences.claudeCliEndpoint])
 
   const sendToClaudeCode = useCallback(async (
     promptId: string,
     prompt: string,
     config: ClaudeConfig
   ): Promise<string | null> => {
+    // Si mode CLI activé, utiliser la fonction CLI
+    if (preferences.claudeCliMode) {
+      await sendToClaudeCLI(prompt)
+      return null // Pas de session ID en mode CLI
+    }
+
     try {
       setIsExecuting(true)
       
@@ -72,7 +112,7 @@ export const useClaudeCodeIntegration = () => {
     } finally {
       setIsExecuting(false)
     }
-  }, [])
+  }, [preferences.claudeCliMode, preferences.claudeCliEndpoint, sendToClaudeCLI])
 
   const startOutputStreaming = useCallback((sessionId: string) => {
     // Subscribe to real-time changes on claude_sessions table
@@ -199,6 +239,7 @@ export const useClaudeCodeIntegration = () => {
     cancelSession,
     getSession,
     getSessionsForPrompt,
-    loadSessionsForPrompt
+    loadSessionsForPrompt,
+    isCliMode: preferences.claudeCliMode
   }
 }
