@@ -5,7 +5,7 @@ import { Zap } from 'lucide-react';
 // Logo components as SVGs for scalability
 const LovableLogo = ({ className }: { className?: string }) => (
   <img 
-    src="/lovable-uploads/162687fb-f31e-4075-8e48-bbe053181925.png" 
+    src="/src/assets/lovable-logo.png" 
     alt="Lovable Logo" 
     className={className}
   />
