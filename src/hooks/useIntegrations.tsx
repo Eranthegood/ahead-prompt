@@ -189,7 +189,7 @@ export function useIntegrations() {
               email: data.user.email
             } : null,
             updated_at: new Date().toISOString()
-          });
+          }, { onConflict: 'user_id,integration_type' });
 
         if (insertError) {
           console.error('Error storing integration:', insertError);
@@ -264,7 +264,7 @@ export function useIntegrations() {
               models: data.models || []
             } : null,
             updated_at: new Date().toISOString()
-          });
+          }, { onConflict: 'user_id,integration_type' });
 
         if (insertError) {
           console.error('Error storing integration:', insertError);
@@ -410,7 +410,7 @@ export function useIntegrations() {
                   is_enabled: true,
                   metadata: { models: data.models || [] },
                   updated_at: new Date().toISOString()
-                });
+                }, { onConflict: 'user_id,integration_type' });
             } catch (e) {
               console.warn('Unable to persist Claude integration row:', e);
             }
