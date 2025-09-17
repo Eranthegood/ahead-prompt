@@ -6,7 +6,6 @@ import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { PromptsProvider } from '@/context/PromptsContext';
 
-import { PromoBanner } from './PromoBanner';
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -76,7 +75,6 @@ const appStore = useAppStoreOptional();
 
   return (
       <div className="min-h-screen bg-background">
-        <PromoBanner />
         
         {config.showSidebar ? (
           <SidebarProvider defaultOpen={config.sidebarDefaultOpen}>
