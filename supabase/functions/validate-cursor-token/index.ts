@@ -8,7 +8,7 @@ const corsHeaders = {
 }
 
 interface ValidateCursorRequest {
-  token: string;
+  token?: string;
 }
 
 interface CursorValidationResponse {
@@ -58,10 +58,21 @@ serve(async (req) => {
       )
     }
 
-    // If this is a test call, try to get stored token
-    if (test && !token) {
+    // If no token provided or this is a test call, try to get stored token from Supabase
+    if ((test && !token) || !token) {
       const secretKey = `CURSOR_TOKEN_${user.id}`
-      testToken = Deno.env.get(secretKey)
+      const { data: secretRow, error: secretError } = await supabase
+        .from('secrets')
+        .select('secret_value')
+        .eq('user_id', user.id)
+        .eq('secret_name', secretKey)
+        .maybeSingle()
+
+      if (secretError) {
+        console.error('Error fetching stored Cursor token:', secretError)
+      }
+
+      testToken = secretRow?.secret_value as string | undefined
       
       if (!testToken) {
         return Response.json(

@@ -30,10 +30,49 @@ serve(async (req) => {
   }
 
   try {
-    const { token } = await req.json();
+    const { token, test } = await req.json() as { token?: string; test?: boolean };
 
-    if (!token) {
-      throw new Error('GitHub token is required');
+    // Initialize Supabase client early to authenticate and optionally fetch stored token
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Get user from request for security and per-user secret lookup
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      throw new Error('Authorization header required');
+    }
+
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      throw new Error('Invalid user token');
+    }
+
+    // Determine which token to use: prefer provided token, otherwise load from secrets table
+    let effectiveToken = token;
+    if (!effectiveToken || test) {
+      const secretKey = `GITHUB_TOKEN_${user.id}`;
+      const { data: secretRow, error: secretError } = await supabase
+        .from('secrets')
+        .select('secret_value')
+        .eq('user_id', user.id)
+        .eq('secret_name', secretKey)
+        .maybeSingle();
+
+      if (secretError) {
+        console.error('Error fetching stored GitHub token:', secretError);
+      }
+
+      if (!effectiveToken && secretRow?.secret_value) {
+        effectiveToken = secretRow.secret_value as string;
+      }
+    }
+
+    if (!effectiveToken) {
+      throw new Error('GitHub token is required or not configured for this user');
     }
 
     console.log('Validating GitHub token...');
@@ -41,7 +80,7 @@ serve(async (req) => {
     // Validate token with GitHub API
     const userResponse = await fetch('https://api.github.com/user', {
       headers: {
-        'Authorization': `token ${token}`,
+        'Authorization': `token ${effectiveToken}`,
         'Accept': 'application/vnd.github.v3+json',
       },
     });
@@ -62,7 +101,7 @@ serve(async (req) => {
     for (const sort of sortOptions) {
       const reposResponse = await fetch(`https://api.github.com/user/repos?sort=${sort}&per_page=100&type=all&visibility=all`, {
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `token ${effectiveToken}`,
           'Accept': 'application/vnd.github.v3+json',
         },
       });
@@ -87,25 +126,6 @@ serve(async (req) => {
     });
     
     console.log(`Fetched ${allRepos.length} repositories for user ${userData.login}`);
-
-    // Initialize Supabase client
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Get user from request
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      throw new Error('Authorization header required');
-    }
-
-    const jwt = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
-    
-    if (userError || !user) {
-      throw new Error('Invalid user token');
-    }
 
     console.log('Updating integration for user:', user.id);
 
