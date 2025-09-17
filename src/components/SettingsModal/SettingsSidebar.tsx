@@ -10,6 +10,7 @@ import {
   Users, 
   Mail, 
   Plug, 
+  GitBranch,
   HelpCircle,
   CreditCard
 } from 'lucide-react';
@@ -38,6 +39,7 @@ const menuSections = [
     items: [
       { id: 'team', label: 'Team', icon: Users },
       { id: 'integrations', label: 'Integrations', icon: Plug },
+      { id: 'repository', label: 'Repository Mapping', icon: GitBranch },
     ],
   },
   {

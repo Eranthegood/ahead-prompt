@@ -10,21 +10,21 @@ const availableIntegrations = [
   {
     id: 'github',
     name: 'GitHub',
-    description: 'Synchronisez vos projets et gérez vos pull requests',
+    description: 'Sync your projects and manage pull requests',
     icon: Github,
     color: 'bg-slate-900 text-white',
   },
   {
     id: 'figma',
     name: 'Figma',
-    description: 'Importez vos designs et composants Figma',
+    description: 'Import your Figma designs and components',
     icon: Figma,
     color: 'bg-purple-600 text-white',
   },
   {
     id: 'cursor',
     name: 'Cursor',
-    description: 'Intégration avec l\'éditeur Cursor pour l\'IA',
+    description: 'Integration with Cursor AI editor',
     icon: Zap,
     color: 'bg-blue-600 text-white',
   },
@@ -32,7 +32,7 @@ const availableIntegrations = [
 
 export function IntegrationsSection() {
   const navigate = useNavigate();
-  const { integrations, isLoading } = useIntegrations();
+  const { integrations, isLoading, configureIntegration, testIntegration } = useIntegrations();
 
   const getIntegrationStatus = (integrationId: string) => {
     const integration = integrations.find(i => i.id === integrationId);
@@ -47,9 +47,9 @@ export function IntegrationsSection() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Intégrations</CardTitle>
+          <CardTitle>Integrations</CardTitle>
           <CardDescription>
-            Configurez vos tokens d'API pour connecter vos outils de développement.
+            Configure your API tokens to connect your development tools.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -69,10 +69,10 @@ export function IntegrationsSection() {
                         <h3 className="font-medium">{integration.name}</h3>
                         {status.isConfigured ? (
                           <Badge variant={status.lastTest === 'success' ? 'default' : 'secondary'}>
-                            {status.lastTest === 'success' ? 'Configuré' : 'Configuré'}
+                            {status.lastTest === 'success' ? 'Validated' : 'Configured'}
                           </Badge>
                         ) : (
-                          <Badge variant="outline">Non configuré</Badge>
+                          <Badge variant="outline">Not configured</Badge>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
@@ -87,7 +87,7 @@ export function IntegrationsSection() {
                     onClick={() => navigate('/integrations')}
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Configurer
+                    Configure
                   </Button>
                 </div>
               );
@@ -96,7 +96,7 @@ export function IntegrationsSection() {
           
           <div className="mt-6 p-4 bg-muted/30 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              💡 Cliquez sur "Configurer" pour accéder à la page complète des intégrations où vous pouvez saisir vos tokens d'API.
+              💡 Click "Configure" to access the full integrations page where you can enter your API tokens.
             </p>
           </div>
         </CardContent>

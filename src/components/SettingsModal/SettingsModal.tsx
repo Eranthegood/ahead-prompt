@@ -7,6 +7,7 @@ import { TeamSection } from './sections/TeamSection';
 import { GeneralSection } from './sections/GeneralSection';
 import { ShortcutsSection } from './sections/ShortcutsSection';
 import { IntegrationsSection } from './sections/IntegrationsSection';
+import { RepositorySection } from './sections/RepositorySection';
 import { HelpSection } from './sections/HelpSection';
 import { SubscriptionSection } from './sections/SubscriptionSection';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ const sections = {
   shortcuts: { title: 'Keyboard Shortcuts', description: 'View and customize shortcuts' },
   team: { title: 'Team', description: 'Manage your team members and invitations' },
   integrations: { title: 'Integrations', description: 'Connect your favorite tools and services' },
+  repository: { title: 'Repository Mapping', description: 'Map your products to Git repositories and branches' },
   help: { title: 'Help', description: 'Documentation and support' },
 };
 
@@ -34,13 +36,7 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
   const navigate = useNavigate();
 
   const handleSectionChange = (section: string) => {
-    if (section === 'integrations') {
-      // Close modal and navigate to integrations page
-      onOpenChange(false);
-      navigate('/integrations');
-    } else {
-      setActiveSection(section);
-    }
+    setActiveSection(section);
   };
 
   const renderSectionContent = () => {
@@ -59,6 +55,8 @@ export function SettingsModal({ open, onOpenChange, defaultSection = 'account' }
         return <TeamSection />;
       case 'integrations':
         return <IntegrationsSection />;
+      case 'repository':
+        return <RepositorySection />;
       case 'help':
         return <HelpSection />;
       default:
