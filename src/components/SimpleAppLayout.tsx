@@ -34,7 +34,7 @@ const appStore = useAppStoreOptional();
   // Simple page configuration
   const config = {
     showHeader: !location.pathname.startsWith('/join-workspace'),
-    showSidebar: ['/build', '/integrations'].some(path => location.pathname.startsWith(path)),
+    showSidebar: ['/build', '/integrations', '/chat'].some(path => location.pathname.startsWith(path)),
     showSearch: !['/profile', '/shortcuts', '/achievements'].some(path => location.pathname.startsWith(path)),
     sidebarDefaultOpen: location.pathname === '/build'
   };

@@ -38,7 +38,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library, X } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library, X, MessageCircle } from 'lucide-react';
 import { ProductIcon } from '@/components/ui/product-icon';
 import { Workspace, Product } from '@/types';
 
@@ -770,6 +770,27 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               </SidebarGroupContent>
             </SidebarGroup>
           )}
+
+          {/* Navigation Section */}
+          <SidebarGroup className="mt-6">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => navigate('/chat')}
+                    className={`w-full justify-start ${
+                      location.pathname.startsWith('/chat') 
+                        ? 'bg-primary/10 text-primary hover:bg-primary/15' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    {!isCollapsed && <span>AI Chat</span>}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
           {/* User Account Section */}
           <SidebarGroup className="mt-auto">

@@ -36,6 +36,7 @@ import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
+import ChatbotPage from "./pages/ChatbotPage";
 
 const queryClient = new QueryClient();
 
@@ -135,13 +136,23 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
-                      <Route path="/ai-agents" element={
-                        <ProtectedRoute>
-                          <AIAgents />
-                        </ProtectedRoute>
-                      } />
-                      
-                      <Route path="*" element={<NotFound />} />
+                     <Route path="/ai-agents" element={
+                       <ProtectedRoute>
+                         <AIAgents />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/chat" element={
+                       <ProtectedRoute>
+                         <ChatbotPage />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/chat/:sessionId" element={
+                       <ProtectedRoute>
+                         <ChatbotPage />
+                       </ProtectedRoute>
+                     } />
+                     
+                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </SimpleAppLayout>
               </MixpanelProvider>
