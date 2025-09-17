@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIntegrations } from '@/hooks/useIntegrations';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 interface TokenInputProps {
@@ -183,6 +185,7 @@ function TokenInput({
 export default function Integrations() {
   const navigate = useNavigate();
   const { integrations, isLoading, configureIntegration, testIntegration } = useIntegrations();
+  const { preferences, updatePreferences } = useUserPreferences();
   
   const [tokens, setTokens] = useState({
     github: '',
@@ -288,6 +291,63 @@ export default function Integrations() {
             isValid={claudeData.lastTestResult === 'success' ? true : claudeData.lastTestResult === 'error' ? false : null}
             icon={<Code className="h-6 w-6 text-orange-500" />}
           />
+
+          {/* Claude CLI Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code className="h-5 w-5 text-orange-500" />
+                Claude Code - Configuration CLI
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Configurez le mode CLI local pour envoyer les prompts directement vers votre serveur Claude CLI
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Mode CLI Local</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Utilise votre serveur local Claude CLI au lieu de Supabase
+                  </p>
+                </div>
+                <Switch
+                  checked={preferences.claudeCliMode}
+                  onCheckedChange={(checked) => updatePreferences({ claudeCliMode: checked })}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Badge variant={preferences.claudeCliMode ? "default" : "secondary"}>
+                  {preferences.claudeCliMode ? "CLI Local" : "Supabase"}
+                </Badge>
+              </div>
+              
+              {preferences.claudeCliMode && (
+                <div className="space-y-2">
+                  <Label>Endpoint du serveur CLI</Label>
+                  <Input
+                    type="text"
+                    placeholder="http://localhost:3001"
+                    value={preferences.claudeCliEndpoint}
+                    onChange={(e) => updatePreferences({ claudeCliEndpoint: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    L'URL de votre serveur Claude CLI local
+                  </p>
+                </div>
+              )}
+              
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  {preferences.claudeCliMode 
+                    ? "🔧 Mode CLI : Les prompts seront envoyés vers votre serveur local"
+                    : "☁️ Mode Supabase : Les prompts utilisent l'intégration cloud standard"
+                  }
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Help Section */}
