@@ -238,9 +238,12 @@ export function useIntegrations() {
         return true;
         
       } else if (id === 'claude') {
-        // Claude validation using the edge function
+        // Store the secret first
+        await storeIntegrationSecret('claude', secretValue);
+        
+        // Claude validation using the edge function with stored secret
         const { data, error } = await supabase.functions.invoke('validate-claude-token', {
-          body: { apiKey: secretValue }
+          body: { test: true }
         });
 
         if (error || !data?.isValid) {
@@ -420,8 +423,8 @@ export function useIntegrations() {
           });
         } else {
           testResult = 'error';
-          const msg = data?.error === 'No stored API key found'
-            ? 'Aucune clé API Claude stockée. Ajoutez ANTHROPIC_API_KEY dans Supabase.'
+          const msg = data?.error === 'API key is required or not configured for this user'
+            ? 'Aucune clé API Claude stockée. Configurez Claude d\'abord.'
             : (data?.error || 'Clé API Claude invalide ou expirée');
           toast.error(msg);
         }

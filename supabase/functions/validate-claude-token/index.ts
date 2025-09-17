@@ -26,24 +26,56 @@ serve(async (req) => {
   try {
     const { apiKey, test } = await req.json();
 
-    let actualApiKey = apiKey;
-    
-    // In testing mode, use the stored secret instead of a provided key
-    if (test && !apiKey) {
-      actualApiKey = Deno.env.get('ANTHROPIC_API_KEY') || '';
-      if (!actualApiKey) {
-        return new Response(JSON.stringify({ 
-          isValid: false, 
-          error: 'No stored API key found' 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        });
-      }
-    } else if (!apiKey) {
+    // Get user from request for security and per-user secret lookup
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
       return new Response(JSON.stringify({ 
         isValid: false, 
-        error: 'API key is required' 
+        error: 'Authorization header required' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      });
+    }
+
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      return new Response(JSON.stringify({ 
+        isValid: false, 
+        error: 'Invalid user token' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      });
+    }
+
+    let actualApiKey = apiKey;
+    
+    // If no API key provided or this is a test call, try to get stored token from Supabase
+    if ((test && !apiKey) || !apiKey) {
+      const secretKey = `CLAUDE_TOKEN_${user.id}`;
+      const { data: secretRow, error: secretError } = await supabase
+        .from('secrets')
+        .select('secret_value')
+        .eq('user_id', user.id)
+        .eq('secret_name', secretKey)
+        .maybeSingle();
+
+      if (secretError) {
+        console.error('Error fetching stored Claude token:', secretError);
+      }
+
+      if (!actualApiKey && secretRow?.secret_value) {
+        actualApiKey = secretRow.secret_value as string;
+      }
+    }
+
+    if (!actualApiKey) {
+      return new Response(JSON.stringify({ 
+        isValid: false, 
+        error: 'API key is required or not configured for this user' 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
