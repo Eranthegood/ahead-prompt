@@ -32,9 +32,63 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')
+    // Get user from request for security and per-user secret lookup
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Authentication required',
+          details: 'Please log in to use Claude Code integration'
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid authentication',
+          details: 'Please log in again'
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    // Get user-specific Claude API key from secrets table
+    const userClaudeTokenKey = `CLAUDE_TOKEN_${user.id}`;
+    const { data: secretRow, error: secretError } = await supabase
+      .from('secrets')
+      .select('secret_value')
+      .eq('user_id', user.id)
+      .eq('secret_name', userClaudeTokenKey)
+      .maybeSingle();
+
+    if (secretError) {
+      console.error('Error fetching stored Claude token:', secretError);
+    }
+
+    const anthropicApiKey = secretRow?.secret_value as string | undefined;
     if (!anthropicApiKey) {
-      throw new Error('ANTHROPIC_API_KEY non configuré')
+      console.error(`User-specific CLAUDE_TOKEN not found: ${userClaudeTokenKey}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Claude not configured',
+          details: 'Please configure your Claude integration first'
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const { sessionId, prompt, config, promptId }: ExecuteRequest = await req.json()
