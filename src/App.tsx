@@ -36,7 +36,6 @@ import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
-import TeamManagement from "./pages/TeamManagement";
 
 const queryClient = new QueryClient();
 
@@ -136,18 +135,13 @@ function App() {
                          <MixpanelAdmin />
                        </ProtectedRoute>
                      } />
-                       <Route path="/ai-agents" element={
-                         <ProtectedRoute>
-                           <AIAgents />
-                         </ProtectedRoute>
-                       } />
-                       <Route path="/collaboration/team" element={
-                         <ProtectedRoute>
-                           <TeamManagement />
-                         </ProtectedRoute>
-                       } />
-                       
-                       <Route path="*" element={<NotFound />} />
+                      <Route path="/ai-agents" element={
+                        <ProtectedRoute>
+                          <AIAgents />
+                        </ProtectedRoute>
+                      } />
+                      
+                      <Route path="*" element={<NotFound />} />
                   </Routes>
                 </SimpleAppLayout>
               </MixpanelProvider>
