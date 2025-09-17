@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail } from "lucide-react";
+import { ArrowRight, Zap, Code, Layers, ToggleLeft, Clipboard, Circle, Github, Twitter, Mail, BookOpen, Search, Heart, Copy, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { TestimonialSlider } from "@/components/ui/testimonial-slider";
 import { Footer } from "@/components/ui/footer";
 import { IntegrationBanner } from "@/components/IntegrationBanner";
@@ -282,6 +283,102 @@ export default function LandingPage() {
                     <span className="text-sm">Professional-quality outputs</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Prompt Library Section */}
+      <section className="py-16 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Your Personal AI Toolkit
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Never lose a brilliant prompt again. Build your personal library of AI prompts with professional templates, smart organization, and universal compatibility across all AI platforms.
+              </p>
+              
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Professional Templates</h3>
+                    <p className="text-muted-foreground">Pre-built system prompts for common development tasks - bug fixes, features, refactoring, documentation, and more.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Search className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Smart Organization</h3>
+                    <p className="text-muted-foreground">Tag, categorize, and favorite your prompts. Lightning-fast search finds exactly what you need instantly.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Universal Compatibility</h3>
+                    <p className="text-muted-foreground">Works seamlessly with Cursor, Claude, ChatGPT, GitHub Copilot - copy and paste into any AI platform.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Button size="lg" onClick={handleSignIn} className="px-8 py-6 text-lg font-medium group">
+                {user ? "Access Library" : "Start Building Library"}
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <div className="bg-background border rounded-2xl p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Prompt Library</h3>
+                  <Badge variant="secondary">24 Templates</Badge>
+                </div>
+                
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm font-medium">React Component Refactor</span>
+                    <Badge variant="outline" className="ml-auto">Bug Fix</Badge>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium">API Integration Guide</span>
+                    <Badge variant="outline" className="ml-auto">Feature</Badge>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm font-medium">Database Schema Review</span>
+                    <Badge variant="outline" className="ml-auto">Review</Badge>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Quick access via Cmd+L</span>
+                  <div className="flex items-center space-x-2">
+                    <Heart className="w-4 h-4" />
+                    <span>12 favorites</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating elements */}
+              <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground rounded-full p-3 shadow-lg">
+                <Copy className="w-5 h-5" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 bg-secondary text-secondary-foreground rounded-full p-3 shadow-lg">
+                <Star className="w-5 h-5" />
               </div>
             </div>
           </div>
