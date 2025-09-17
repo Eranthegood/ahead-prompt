@@ -12,7 +12,8 @@ import {
   CheckCircle,
   AlertCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  GitBranch
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIntegrations } from '@/hooks/useIntegrations';
@@ -45,6 +46,7 @@ function TokenInput({
   icon,
   description 
 }: TokenInputProps) {
+  const navigate = useNavigate();
   const [showToken, setShowToken] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -53,7 +55,7 @@ function TokenInput({
       return <Badge variant="outline" className="text-orange-600"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
     }
     if (isValid === true) {
-      return <Badge variant="default" className="bg-green-600"><CheckCircle className="w-3 h-3 mr-1" />Valide</Badge>;
+      return <Badge variant="default" className="bg-green-600"><CheckCircle className="w-3 h-3 mr-1" />Validé</Badge>;
     }
     if (isValid === false) {
       return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Invalide</Badge>;
@@ -144,6 +146,18 @@ function TokenInput({
               disabled={isLoading}
             >
               Tester
+            </Button>
+          )}
+          
+          {/* Show Map Repo button for GitHub when validated */}
+          {label === 'GitHub' && isValid === true && (
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/repository-mapping')}
+              disabled={isLoading}
+            >
+              <GitBranch className="w-4 h-4 mr-2" />
+              Map Repo
             </Button>
           )}
           
