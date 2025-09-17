@@ -153,7 +153,7 @@ function TokenInput({
           {label === 'GitHub' && isValid === true && (
             <Button 
               variant="outline"
-              onClick={() => navigate('/repository-mapping')}
+              onClick={() => navigate('/settings/repository-mapping')}
               disabled={isLoading}
             >
               <GitBranch className="w-4 h-4 mr-2" />
