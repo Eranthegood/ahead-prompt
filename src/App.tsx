@@ -36,6 +36,7 @@ import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
+import { InvitationErrorDemo } from "./components/InvitationErrorDemo";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ function App() {
                       <Route path="/refund-policy" element={<RefundPolicy />} />
                       <Route path="/faq" element={<FAQ />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/invitation-error-demo" element={<InvitationErrorDemo />} />
                       <Route path="/join-workspace/:invitationToken" element={<JoinWorkspace />} />
                     <Route path="/prompt-management" element={<PromptManagement />} />
                     <Route path="/cursor-multi-agent" element={<CursorMultiAgentLanding />} />

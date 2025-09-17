@@ -3,12 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { WorkspaceInvitation } from '@/types/workspace';
+import { invitationErrorService } from '@/services/invitationErrorService';
+import { toast } from 'sonner';
 
 export function useWorkspaceInvitations(workspaceId?: string) {
   const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { toast: legacyToast } = useToast();
 
   useEffect(() => {
     if (!user || !workspaceId) {
@@ -63,12 +66,27 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       );
 
       setInvitations(invitationsWithData);
+      setError(null); // Clear any previous errors
     } catch (error: any) {
       console.error('Error fetching workspace invitations:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error loading invitations',
-        description: error?.message || 'Failed to load workspace invitations'
+      setError(error);
+      
+      // Use the enhanced error service
+      const userFriendlyError = await invitationErrorService.handleError(
+        error,
+        'FETCH_INVITATIONS',
+        { workspaceId },
+        () => fetchInvitations() // Retry callback
+      );
+
+      // Show enhanced toast notification
+      toast.error(userFriendlyError.title, {
+        description: userFriendlyError.message,
+        duration: 6000,
+        action: userFriendlyError.actionCallback ? {
+          label: userFriendlyError.actionText || 'Retry',
+          onClick: userFriendlyError.actionCallback
+        } : undefined
       });
     } finally {
       setLoading(false);
@@ -116,7 +134,7 @@ export function useWorkspaceInvitations(workspaceId?: string) {
 
       if (error) throw error;
 
-      toast({
+      legacyToast({
         title: 'Invitation created',
         description: `Invitation sent to ${email}`
       });
@@ -125,10 +143,17 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       return data;
     } catch (error: any) {
       console.error('Error creating invitation:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error creating invitation',
-        description: error?.message || 'Failed to create invitation'
+      setError(error);
+      
+      const userFriendlyError = await invitationErrorService.handleError(
+        error,
+        'CREATE_INVITATION',
+        { workspaceId }
+      );
+
+      toast.error(userFriendlyError.title, {
+        description: userFriendlyError.message,
+        duration: 5000
       });
       return null;
     }
@@ -143,7 +168,7 @@ export function useWorkspaceInvitations(workspaceId?: string) {
 
       if (error) throw error;
 
-      toast({
+      legacyToast({
         title: 'Invitation cancelled',
         description: 'Invitation has been cancelled'
       });
@@ -151,10 +176,17 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       fetchInvitations();
     } catch (error: any) {
       console.error('Error cancelling invitation:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error cancelling invitation',
-        description: error?.message || 'Failed to cancel invitation'
+      setError(error);
+      
+      const userFriendlyError = await invitationErrorService.handleError(
+        error,
+        'CANCEL_INVITATION',
+        { workspaceId, invitationId }
+      );
+
+      toast.error(userFriendlyError.title, {
+        description: userFriendlyError.message,
+        duration: 5000
       });
     }
   };
@@ -206,6 +238,13 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       };
     } catch (error: any) {
       console.error('Error fetching invitation:', error);
+      setError(error);
+      
+      await invitationErrorService.handleError(
+        error,
+        'GET_BY_TOKEN',
+        { invitationToken: token }
+      );
       return null;
     }
   };
@@ -224,6 +263,13 @@ export function useWorkspaceInvitations(workspaceId?: string) {
       return workspaceId;
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
+      setError(error);
+      
+      await invitationErrorService.handleError(
+        error,
+        'ACCEPT_INVITATION',
+        { invitationToken: token, userId }
+      );
       throw error;
     }
   };
@@ -231,10 +277,12 @@ export function useWorkspaceInvitations(workspaceId?: string) {
   return {
     invitations,
     loading,
+    error,
     createInvitation,
     cancelInvitation,
     getInvitationByToken,
     acceptInvitation,
-    refetch: fetchInvitations
+    refetch: fetchInvitations,
+    clearError: () => setError(null)
   };
 }
