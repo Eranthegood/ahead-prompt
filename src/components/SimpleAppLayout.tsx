@@ -13,6 +13,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
+import { FeedbackButton } from './FeedbackButton';
 
 interface SimpleAppLayoutProps {
   children: React.ReactNode;
@@ -138,6 +139,7 @@ const appStore = useAppStoreOptional();
             </main>
           </>
         )}
+        <FeedbackButton />
       </div>
     );
   }

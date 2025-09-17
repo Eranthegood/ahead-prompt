@@ -36,6 +36,7 @@ import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQ from "@/pages/FAQ";
+import FeedbackManagement from "./pages/FeedbackManagement";
 
 const queryClient = new QueryClient();
 
@@ -133,6 +134,11 @@ function App() {
                      <Route path="/admin/mixpanel" element={
                        <ProtectedRoute>
                          <MixpanelAdmin />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/admin/feedback" element={
+                       <ProtectedRoute>
+                         <FeedbackManagement />
                        </ProtectedRoute>
                      } />
                       <Route path="/ai-agents" element={
