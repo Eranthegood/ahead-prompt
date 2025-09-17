@@ -78,9 +78,20 @@ serve(async (req) => {
       );
     }
 
-    // Get user-specific Cursor API key
+    // Get user-specific Cursor API key from secrets table
     const userCursorTokenKey = `CURSOR_TOKEN_${user.id}`;
-    const cursorApiKey = Deno.env.get(userCursorTokenKey);
+    const { data: secretRow, error: secretError } = await supabase
+      .from('secrets')
+      .select('secret_value')
+      .eq('user_id', user.id)
+      .eq('secret_name', userCursorTokenKey)
+      .maybeSingle();
+
+    if (secretError) {
+      console.error('Error fetching stored Cursor token:', secretError);
+    }
+
+    const cursorApiKey = secretRow?.secret_value as string | undefined;
     if (!cursorApiKey) {
       console.error(`User-specific CURSOR_TOKEN not found: ${userCursorTokenKey}`);
       return new Response(
