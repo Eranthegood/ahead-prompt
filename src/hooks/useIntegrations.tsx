@@ -167,9 +167,9 @@ export function useIntegrations() {
         // Store token securely first
         await storeIntegrationSecret('cursor', secretValue);
         
-        // Cursor validation using the edge function
+        // Cursor validation using stored secret via edge function  
         const { data, error } = await supabase.functions.invoke('validate-cursor-token', {
-          body: { token: secretValue }
+          body: { test: true }
         });
 
         if (error || !data?.isValid) {
