@@ -115,7 +115,13 @@ export const IntegrationBanner: React.FC = () => {
                 title={integration.description}
               >
                 <div className="relative">
-                  <LogoComponent className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-muted-foreground group-hover:text-foreground transition-all duration-300 group-hover:scale-110" />
+                  {integration.name === 'Lovable' ? (
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-1 border border-border/20">
+                      <LogoComponent className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 transition-all duration-300 group-hover:scale-110" />
+                    </div>
+                  ) : (
+                    <LogoComponent className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-muted-foreground group-hover:text-foreground transition-all duration-300 group-hover:scale-110" />
+                  )}
                   <div className="absolute inset-0 bg-primary/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm -z-10" />
                 </div>
                 <span className="text-xs sm:text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300 text-center">
