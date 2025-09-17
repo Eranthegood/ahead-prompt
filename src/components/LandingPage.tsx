@@ -104,11 +104,21 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                   <span>Integration with</span>
                 </div>
-                <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 group cursor-pointer">
                     <CursorLogo className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" />
                     <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
                       Cursor
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 group cursor-pointer">
+                    <img 
+                      src="/src/assets/claude-logo.png" 
+                      alt="Claude" 
+                      className="h-5 w-5 sm:h-6 sm:w-6 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110" 
+                    />
+                    <span className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
+                      Claude
                     </span>
                   </div>
                   <div className="flex items-center gap-2 group cursor-pointer">
