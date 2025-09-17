@@ -99,3 +99,8 @@ export function useAppStore() {
   }
   return context;
 }
+
+// Optional hook variant that returns undefined instead of throwing
+export function useAppStoreOptional() {
+  return useContext(AppStoreContext);
+}

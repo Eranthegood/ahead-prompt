@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
-import { useAppStore } from '@/store/AppStore';
+import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
 
 interface SimpleAppLayoutProps {
@@ -24,7 +24,8 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
-  const { openDialog } = useAppStore();
+const appStore = useAppStoreOptional();
+  const openDialog = appStore?.openDialog ?? (() => {});
   
   // Product/Epic assignment state - core functionality for prompt association
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
