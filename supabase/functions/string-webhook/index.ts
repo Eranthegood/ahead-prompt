@@ -103,39 +103,64 @@ serve(async (req) => {
 
         console.log('SEO article stored successfully:', seoArticle?.id)
 
-        // Auto-create blog post from SEO article (always create, not just for published)
+        // Auto-create blog post from SEO article with enhanced error handling
         if (seoArticle) {
-          // Get the first available workspace
-          const { data: workspaces, error: workspaceError } = await supabase
-            .from('workspaces')
-            .select('*')
-            .limit(1)
-
-          let workspace = workspaces?.[0]
-
-          // If no workspace exists, create a default one (this should rarely happen)
-          if (!workspace) {
-            console.log('No workspace found, creating default workspace')
-            const { data: profiles } = await supabase
-              .from('profiles')
-              .select('id')
+          try {
+            console.log('Starting blog post creation process...')
+            
+            // Get the first available workspace
+            const { data: workspaces, error: workspaceError } = await supabase
+              .from('workspaces')
+              .select('id, name, owner_id')
               .limit(1)
 
-            if (profiles?.[0]) {
-              const { data: newWorkspace } = await supabase
-                .from('workspaces')
-                .insert({
-                  name: 'Default Workspace',
-                  owner_id: profiles[0].id
-                })
-                .select()
-                .single()
-              
-              workspace = newWorkspace
+            if (workspaceError) {
+              console.error('Error fetching workspaces:', workspaceError)
+              throw new Error(`Failed to fetch workspace: ${workspaceError.message}`)
             }
-          }
 
-          if (workspace) {
+            let workspace = workspaces?.[0]
+
+            // If no workspace exists, create a default one (this should rarely happen)
+            if (!workspace) {
+              console.log('No workspace found, creating default workspace')
+              const { data: profiles, error: profileError } = await supabase
+                .from('profiles')
+                .select('id')
+                .limit(1)
+
+              if (profileError) {
+                console.error('Error fetching profiles:', profileError)
+                throw new Error(`Failed to fetch profiles: ${profileError.message}`)
+              }
+
+              if (profiles?.[0]) {
+                const { data: newWorkspace, error: createWorkspaceError } = await supabase
+                  .from('workspaces')
+                  .insert({
+                    name: 'Default Workspace',
+                    owner_id: profiles[0].id
+                  })
+                  .select()
+                  .single()
+                
+                if (createWorkspaceError) {
+                  console.error('Error creating workspace:', createWorkspaceError)
+                  throw new Error(`Failed to create workspace: ${createWorkspaceError.message}`)
+                }
+                
+                workspace = newWorkspace
+                console.log('Default workspace created:', workspace.id)
+              } else {
+                throw new Error('No profiles available to create workspace')
+              }
+            }
+
+            if (!workspace) {
+              throw new Error('No workspace available for blog post creation')
+            }
+
+            console.log(`Using workspace: ${workspace.name} (${workspace.id}) with owner ${workspace.owner_id}`)
             
             // Create blog post
             const blogPostData = {
@@ -170,7 +195,26 @@ serve(async (req) => {
 
             if (blogError) {
               console.error('Error creating blog post:', blogError)
-              // Don't throw here, SEO article creation was successful
+              console.error('Blog post data that failed:', JSON.stringify(blogPostData, null, 2))
+              
+              // Log detailed error to webhook logs
+              await supabase
+                .from('webhook_logs')
+                .insert({
+                  source: 'string.com',
+                  event_type: 'blog_post_creation_failed',
+                  payload: { 
+                    article_id: article.id, 
+                    seo_article_id: seoArticle.id,
+                    blog_post_data: blogPostData,
+                    error: blogError.message 
+                  },
+                  status: 'error',
+                  error_message: `Blog post creation failed: ${blogError.message}`,
+                  created_at: new Date().toISOString()
+                })
+              
+              // Still continue processing since SEO article was saved
             } else if (blogPost) {
               console.log(`Blog post created successfully: ${blogPost.title} (ID: ${blogPost.id})`)
               
@@ -216,8 +260,29 @@ serve(async (req) => {
             } else {
               console.log('Blog post upsert returned no data (possibly already exists)')
             }
-          } else {
-            console.error('No workspace available for blog post creation')
+            
+          } catch (blogPostError) {
+            console.error('Blog post creation process failed:', blogPostError)
+            
+            // Log blog post creation failure
+            await supabase
+              .from('webhook_logs')
+              .insert({
+                source: 'string.com',
+                event_type: 'blog_post_creation_error',
+                payload: { 
+                  article_id: article.id,
+                  seo_article_id: seoArticle?.id,
+                  error_details: blogPostError.message,
+                  stack_trace: blogPostError.stack
+                },
+                status: 'error',
+                error_message: `Blog post creation failed: ${blogPostError.message}`,
+                created_at: new Date().toISOString()
+              })
+            
+            // Don't fail the entire webhook since SEO article was stored successfully
+            console.log('Continuing despite blog post creation failure...')
           }
         }
 
