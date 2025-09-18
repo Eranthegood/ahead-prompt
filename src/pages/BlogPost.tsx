@@ -176,7 +176,7 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4 text-white">Article not found</h1>
+          <h1 className="text-2xl font-bold mb-4 text-foreground">Article not found</h1>
           <Button onClick={() => navigate('/blog')}>Back to Blog</Button>
         </div>
       </div>
@@ -213,19 +213,19 @@ export default function BlogPostPage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-foreground">
             {post.title}
           </h1>
 
           {/* Excerpt */}
           {post.excerpt && (
-            <p className="text-xl text-white mb-8 leading-relaxed">
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
               {post.excerpt}
             </p>
           )}
 
           {/* Meta Information */}
-          <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-white">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
@@ -291,7 +291,7 @@ export default function BlogPostPage() {
         )}
 
         {/* Content */}
-        <div className="prose prose-lg max-w-none mb-16 text-white">
+        <div className="prose prose-lg max-w-none mb-16 prose-content">
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
 
@@ -307,10 +307,10 @@ export default function BlogPostPage() {
                 />
               )}
                <div>
-                <h4 className="font-semibold text-lg text-white">
+                <h4 className="font-semibold text-lg text-foreground">
                   {post.author.full_name || 'Author'}
                 </h4>
-                <p className="text-white">
+                <p className="text-muted-foreground">
                   Blog contributor
                 </p>
               </div>
@@ -323,7 +323,7 @@ export default function BlogPostPage() {
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <section>
-            <h3 className="text-2xl font-bold mb-8 text-white">Related Articles</h3>
+            <h3 className="text-2xl font-bold mb-8 text-foreground">Related Articles</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {relatedPosts.map((relatedPost) => (
                 <BlogPostCard

@@ -315,7 +315,11 @@
     border-color: hsl(var(--dialog-border, var(--border)));
   }
   
-  /* Generated content display styles */
+  /* Generated content display styles with enhanced contrast */
+  .prose-content {
+    color: hsl(var(--foreground));
+  }
+  
   .prose-content h1 {
     @apply text-2xl font-bold mb-4 text-foreground;
     line-height: 1.2;
@@ -328,6 +332,21 @@
   
   .prose-content h3 {
     @apply text-lg font-medium mb-2 text-foreground;
+    line-height: 1.4;
+  }
+  
+  .prose-content h4 {
+    @apply text-base font-medium mb-2 text-foreground;
+    line-height: 1.4;
+  }
+  
+  .prose-content h5 {
+    @apply text-sm font-medium mb-2 text-foreground;
+    line-height: 1.4;
+  }
+  
+  .prose-content h6 {
+    @apply text-sm font-medium mb-2 text-foreground;
     line-height: 1.4;
   }
   
@@ -354,6 +373,35 @@
   
   .prose-content em {
     @apply italic text-foreground;
+  }
+  
+  .prose-content a {
+    @apply text-primary underline hover:text-primary/80;
+  }
+  
+  .prose-content blockquote {
+    @apply border-l-4 border-border pl-4 italic text-muted-foreground;
+  }
+  
+  .prose-content code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm text-foreground;
+  }
+  
+  .prose-content pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto text-foreground;
+  }
+  
+  .prose-content table {
+    @apply w-full border-collapse border border-border;
+  }
+  
+  .prose-content th,
+  .prose-content td {
+    @apply border border-border px-4 py-2 text-foreground;
+  }
+  
+  .prose-content th {
+    @apply bg-muted font-semibold;
   }
 
   /* Gradients */
