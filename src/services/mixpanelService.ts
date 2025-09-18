@@ -1,44 +1,32 @@
 import { supabase } from '@/integrations/supabase/client';
 import { isSafeMode } from '@/lib/safeMode';
 
-// Configuration Mixpanel
-const MIXPANEL_TOKEN = '403921a14a2085274aca10bf5a616324';
-
 class MixpanelService {
   private initialized = false;
   private excludedUsers = new Set<string>();
-  private mixpanel: any | null = null;
   private excludeRefreshTimer: number | null = null;
 
-  // Do NOT auto-init at module load to avoid crashes under SES
   async init() {
     if (this.initialized || isSafeMode()) return;
+    
     try {
-      const mod = await import('mixpanel-browser');
-      this.mixpanel = mod.default;
-      
-      const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
-      
-      this.mixpanel.init(MIXPANEL_TOKEN, {
-        debug: isDev,
-        track_pageview: false, // Handle manually to prevent conflicts
-        persistence: 'localStorage',
-        api_host: 'https://api.mixpanel.com',
-        loaded: () => {
-          console.log('Mixpanel loaded successfully');
-          this.initialized = true;
-        },
-        error: (error: any) => {
-          console.error('Mixpanel initialization error:', error);
-          this.initialized = false;
-        }
-      });
+      // Check if Mixpanel is available globally and not disabled
+      if (typeof window !== 'undefined' && 
+          window.mixpanel && 
+          !window.__DISABLE_MIXPANEL__) {
+        
+        console.log('Mixpanel SDK detected and ready');
+        this.initialized = true;
 
-      // Load exclusions after init and refresh periodically
-      await this.loadExcludedUsers();
-      this.excludeRefreshTimer = window.setInterval(() => this.loadExcludedUsers(), 5 * 60 * 1000);
+        // Load exclusions after init and refresh periodically
+        await this.loadExcludedUsers();
+        this.excludeRefreshTimer = window.setInterval(() => this.loadExcludedUsers(), 5 * 60 * 1000);
+      } else {
+        console.debug('Mixpanel SDK not available or disabled');
+        this.initialized = false;
+      }
     } catch (error) {
-      console.debug('Mixpanel dynamic import/init blocked:', error);
+      console.debug('Mixpanel initialization blocked:', error);
       this.initialized = false;
     }
   }
@@ -70,42 +58,42 @@ class MixpanelService {
   }
 
   identify(userId: string) {
-    if (!this.initialized || !this.mixpanel) return;
+    if (!this.initialized || typeof window === 'undefined' || !window.mixpanel) return;
     if (this.isUserExcluded(userId)) {
       console.log('User excluded from Mixpanel tracking:', userId);
       return;
     }
     try {
-      this.mixpanel.identify(userId);
+      window.mixpanel.identify(userId);
     } catch (error) {
       console.error('Error identifying user in Mixpanel:', error);
     }
   }
 
   setUserProperties(properties: Record<string, any>) {
-    if (!this.initialized || !this.mixpanel) return;
+    if (!this.initialized || typeof window === 'undefined' || !window.mixpanel) return;
     try {
-      this.mixpanel.people.set(properties);
+      window.mixpanel.people.set(properties);
     } catch (error) {
       console.error('Error setting user properties in Mixpanel:', error);
     }
   }
 
   track(eventName: string, properties?: Record<string, any>) {
-    if (!this.initialized || !this.mixpanel) {
+    if (!this.initialized || typeof window === 'undefined' || !window.mixpanel) {
       console.debug(`[MixpanelService] Tracking skipped - not initialized: ${eventName}`);
       return;
     }
     
     try {
-      const currentUserId = this.mixpanel.get_distinct_id?.();
+      const currentUserId = window.mixpanel.get_distinct_id?.();
       if (currentUserId && this.isUserExcluded(currentUserId)) {
         console.log('Event tracking skipped for excluded user:', currentUserId);
         return;
       }
       
       console.log(`[MixpanelService] Tracking event: ${eventName}`);
-      this.mixpanel.track(eventName, {
+      window.mixpanel.track(eventName, {
         timestamp: new Date().toISOString(),
         ...properties
       });
@@ -208,10 +196,10 @@ class MixpanelService {
   }
 
   reset() {
-    if (!this.initialized || !this.mixpanel) return;
+    if (!this.initialized || typeof window === 'undefined' || !window.mixpanel) return;
     try {
       console.log('[MixpanelService] Resetting Mixpanel session');
-      this.mixpanel.reset();
+      window.mixpanel.reset();
       
       // Clear exclusions timer if exists
       if (this.excludeRefreshTimer) {
