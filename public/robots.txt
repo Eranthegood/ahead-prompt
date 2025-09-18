@@ -14,3 +14,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://ahead.love/sitemap.xml
+Sitemap: https://fkpbdzluddeqsfvacozw.supabase.co/functions/v1/sitemap
