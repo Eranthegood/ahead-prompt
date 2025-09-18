@@ -1,5 +1,8 @@
 project_id = "fkpbdzluddeqsfvacozw"
 
+[functions.sitemap]
+verify_jwt = false
+
 [functions.execute-claude-code]
 verify_jwt = true
 
