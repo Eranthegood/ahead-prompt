@@ -52,13 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else if (hasInitialSession && ['SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED'].includes(event)) {
           console.info(`[AuthProvider] Auth event ${event} processed`);
           
-          // Force navigation to /build after successful sign in
-          if (event === 'SIGNED_IN' && session?.user && window.location.pathname === '/auth') {
-            console.info('[AuthProvider] Redirecting to /build after successful sign in');
-            setTimeout(() => {
-              window.location.href = '/build';
-            }, 100);
-          }
+          // Force navigation to /build after successful sign in (removed - handled in post-auth plan processing)
         }
         
         // Handle post-authentication plan selection
@@ -69,14 +63,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const selectedBilling = urlParams.get('billing');
           
           if (selectedPlan) {
+            console.info('[AuthProvider] Found plan parameters after sign in:', { selectedPlan, selectedBilling });
             // Defer checkout initiation to prevent blocking auth flow
             setTimeout(async () => {
               try {
+                console.info('[AuthProvider] Starting checkout process for:', selectedPlan);
                 await initiateCheckout(selectedPlan, selectedBilling === 'annual');
                 
                 // Clear URL parameters after successful checkout initiation
                 const newUrl = window.location.pathname;
                 window.history.replaceState({}, '', newUrl);
+                
+                // Redirect to build page after successful checkout initiation
+                setTimeout(() => {
+                  console.info('[AuthProvider] Redirecting to /build after checkout');
+                  window.location.href = '/build';
+                }, 500);
               } catch (error) {
                 console.error('[AuthProvider] Checkout initiation error:', error);
                 toast({
@@ -84,8 +86,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   title: "Checkout failed",
                   description: "There was an error starting the checkout process. Please try again."
                 });
+                
+                // Still redirect to build even if checkout fails
+                setTimeout(() => {
+                  window.location.href = '/build';
+                }, 1000);
               }
             }, 100);
+          } else {
+            // No plan parameters, normal redirect
+            if (window.location.pathname === '/auth') {
+              console.info('[AuthProvider] Normal redirect to /build after sign in');
+              setTimeout(() => {
+                window.location.href = '/build';
+              }, 100);
+            }
           }
         }
         

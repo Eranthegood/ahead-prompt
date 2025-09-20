@@ -35,14 +35,21 @@ const Auth = () => {
     }
   };
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (but not if there are plan parameters to process)
   useEffect(() => {
     if (user) {
-      navigate('/build', {
-        replace: true
-      });
+      // Check if there are plan parameters that need to be processed
+      const hasPlanParams = selectedPlan && selectedBilling;
+      
+      if (!hasPlanParams) {
+        // No plan parameters, safe to redirect immediately
+        navigate('/build', {
+          replace: true
+        });
+      }
+      // If there are plan parameters, let useAuth handle the redirect after processing checkout
     }
-  }, [user, navigate]);
+  }, [user, navigate, selectedPlan, selectedBilling]);
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
