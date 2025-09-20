@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock, Library } from 'lucide-react';
 import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
 
@@ -150,8 +150,8 @@ const onboardingSteps = [
     )
   },
   {
-    title: 'Knowledge Box & Global Search',
-    description: 'Store your references and find everything instantly.',
+    title: 'Knowledge Box & Prompt Library',
+    description: 'Store your references and organize reusable prompts.',
     icon: <BookOpen className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
@@ -165,24 +165,23 @@ const onboardingSteps = [
               <li>• Links & docs</li>
               <li>• Design systems</li>
               <li>• Code snippets</li>
-              <li>• Important PDFs</li>
             </ul>
           </div>
           <div className="space-y-2">
             <div className="font-medium flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Global Search
+              <Library className="h-4 w-4" />
+              Prompt Library
             </div>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• All your prompts</li>
-              <li>• KB content</li>
-              <li>• Advanced filters</li>
-              <li>• Auto-archiving</li>
+              <li>• Templates</li>
+              <li>• Reusable prompts</li>
+              <li>• Categories</li>
+              <li>• Quick access</li>
             </ul>
           </div>
         </div>
         <div className="bg-muted p-3 rounded-lg">
-          <p className="text-sm">Like Claude Projects or Notebook LLM, but optimized for developers!</p>
+          <p className="text-sm">Save time with organized templates and context-rich knowledge!</p>
         </div>
       </div>
     )
