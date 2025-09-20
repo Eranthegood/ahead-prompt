@@ -129,7 +129,7 @@ serve(async (req) => {
           .upsert({
             external_id: article.id,
             title: article.title,
-            content_markdown: article.content_markdown,
+            content: article.content_markdown, // Map content_markdown to content column
             content_html: article.content_html,
             meta_description: article.meta_description,
             image_url: article.image_url,
