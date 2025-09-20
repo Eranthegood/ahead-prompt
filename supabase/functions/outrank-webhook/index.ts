@@ -98,12 +98,32 @@ serve(async (req) => {
     const processedArticles = [];
     const errors = [];
 
+    // Get the first workspace and its owner for blog posts
+    const { data: workspace } = await supabase
+      .from('workspaces')
+      .select('id, owner_id')
+      .limit(1)
+      .single();
+
+    if (!workspace) {
+      console.error('No workspace found - cannot create blog posts');
+      return new Response(
+        JSON.stringify({ error: 'No workspace available for blog posts' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log(`Using workspace: ${workspace.id} with owner: ${workspace.owner_id}`);
+
     // Process each article
     for (const article of payload.data.articles) {
       try {
         console.log(`Processing article: ${article.title} (ID: ${article.id})`);
 
-        // Store article in seo_articles table
+        // Store article in seo_articles table with all fields
         const { data: seoArticle, error: seoError } = await supabase
           .from('seo_articles')
           .upsert({
@@ -114,7 +134,7 @@ serve(async (req) => {
             meta_description: article.meta_description,
             image_url: article.image_url,
             slug: article.slug,
-            tags: article.tags,
+            tags: article.tags || [],
             source: 'outrank',
             created_at: article.created_at,
             updated_at: new Date().toISOString()
@@ -129,65 +149,64 @@ serve(async (req) => {
           console.error('Error storing SEO article:', seoError);
           errors.push({
             article_id: article.id,
-            error: seoError.message
+            error: `SEO article error: ${seoError.message}`
           });
           continue;
         }
 
-        // Try to create a blog post
-        try {
-          // Get or create default workspace (assuming first workspace for now)
-          const { data: workspaces } = await supabase
-            .from('workspaces')
-            .select('id')
-            .limit(1);
+        console.log(`SEO article stored successfully: ${seoArticle.id}`);
 
-          let workspaceId = workspaces?.[0]?.id;
+        // Generate unique slug for blog post
+        const { data: uniqueSlug, error: slugError } = await supabase
+          .rpc('generate_unique_blog_slug', {
+            base_title: article.title,
+            workspace_uuid: workspace.id
+          });
 
-          if (!workspaceId) {
-            // Create a default workspace if none exists
-            const { data: newWorkspace } = await supabase
-              .from('workspaces')
-              .insert({
-                name: 'Default Workspace',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              })
-              .select()
-              .single();
-            
-            workspaceId = newWorkspace?.id;
-          }
+        if (slugError || !uniqueSlug) {
+          console.error('Error generating unique slug:', slugError);
+          errors.push({
+            article_id: article.id,
+            error: `Slug generation error: ${slugError?.message || 'Unknown error'}`
+          });
+          continue;
+        }
 
-          // Create blog post
-          const { data: blogPost, error: blogError } = await supabase
-            .from('blog_posts')
-            .upsert({
-              title: article.title,
-              slug: article.slug,
-              content: article.content_html,
-              excerpt: article.meta_description,
-              featured_image_url: article.image_url,
-              published_at: new Date().toISOString(),
-              workspace_id: workspaceId,
-              seo_article_id: seoArticle.id,
-              created_at: article.created_at,
-              updated_at: new Date().toISOString()
-            }, {
-              onConflict: 'slug',
-              ignoreDuplicates: false
-            })
-            .select()
-            .single();
+        console.log(`Generated unique slug: ${uniqueSlug}`);
 
-          if (blogError) {
-            console.error('Error creating blog post:', blogError);
-          } else {
-            console.log(`Blog post created successfully: ${blogPost.title}`);
-          }
+        // Create blog post and auto-publish it
+        const { data: blogPost, error: blogError } = await supabase
+          .from('blog_posts')
+          .upsert({
+            title: article.title,
+            slug: uniqueSlug,
+            content: article.content_html,
+            excerpt: article.meta_description || article.content_markdown?.substring(0, 160) || '',
+            featured_image_url: article.image_url,
+            status: 'published', // Auto-publish Outrank articles
+            published_at: new Date().toISOString(),
+            author_id: workspace.owner_id,
+            workspace_id: workspace.id,
+            seo_article_id: seoArticle.id,
+            meta_description: article.meta_description,
+            keywords: article.tags || [],
+            created_at: article.created_at,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'slug,workspace_id',
+            ignoreDuplicates: false
+          })
+          .select()
+          .single();
 
-        } catch (blogCreationError) {
-          console.error('Error in blog post creation:', blogCreationError);
+        if (blogError) {
+          console.error('Error creating blog post:', blogError);
+          errors.push({
+            article_id: article.id,
+            error: `Blog post error: ${blogError.message}`
+          });
+        } else {
+          console.log(`Blog post published successfully: ${blogPost.title} (${blogPost.slug})`);
         }
 
         processedArticles.push({

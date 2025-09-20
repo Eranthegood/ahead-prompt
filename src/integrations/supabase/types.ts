@@ -1387,16 +1387,20 @@ export type Database = {
       seo_articles: {
         Row: {
           content: string | null
+          content_html: string | null
           created_at: string
           external_id: string
           id: string
+          image_url: string | null
           keywords: string[] | null
           meta_description: string | null
           metadata: Json | null
           published_at: string | null
           seo_score: number | null
+          slug: string | null
           source: string
           status: string
+          tags: string[] | null
           title: string
           updated_at: string
           url: string | null
@@ -1404,16 +1408,20 @@ export type Database = {
         }
         Insert: {
           content?: string | null
+          content_html?: string | null
           created_at?: string
           external_id: string
           id?: string
+          image_url?: string | null
           keywords?: string[] | null
           meta_description?: string | null
           metadata?: Json | null
           published_at?: string | null
           seo_score?: number | null
+          slug?: string | null
           source?: string
           status?: string
+          tags?: string[] | null
           title: string
           updated_at?: string
           url?: string | null
@@ -1421,16 +1429,20 @@ export type Database = {
         }
         Update: {
           content?: string | null
+          content_html?: string | null
           created_at?: string
           external_id?: string
           id?: string
+          image_url?: string | null
           keywords?: string[] | null
           meta_description?: string | null
           metadata?: Json | null
           published_at?: string | null
           seo_score?: number | null
+          slug?: string | null
           source?: string
           status?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
           url?: string | null
@@ -1755,6 +1767,10 @@ export type Database = {
       }
       generate_slug: {
         Args: { title: string }
+        Returns: string
+      }
+      generate_unique_blog_slug: {
+        Args: { base_title: string; workspace_uuid: string }
         Returns: string
       }
       get_invitation_by_token: {
