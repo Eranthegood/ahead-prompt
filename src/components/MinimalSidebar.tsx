@@ -38,7 +38,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useGamification } from '@/hooks/useGamification';
-import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library, X } from 'lucide-react';
+import { Hash, Package, Plus, FileText, CheckCircle, Eye, EyeOff, ChevronDown, ChevronRight, Palette, Edit, Edit3, Trash2, Trophy, BookOpen, User, Settings, Keyboard, LogOut, Home, GitBranch, Github, TrendingUp, BarChart3, Sparkles, Zap, Library, X, StickyNote } from 'lucide-react';
 import { ProductIcon } from '@/components/ui/product-icon';
 import { Workspace, Product } from '@/types';
 
@@ -52,6 +52,7 @@ import { OnboardingChecklist } from './OnboardingChecklist';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
 import { PromptLibrary } from './PromptLibrary';
 import { KnowledgeAccessGuard } from './KnowledgeAccessGuard';
+import { NotesDialog } from './NotesDialog';
 import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
 
 interface MinimalSidebarProps {
@@ -153,6 +154,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   });
 
   const [isPromptLibraryOpen, setIsPromptLibraryOpen] = useState(false);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
 
   // Filter function to get prompts that match current view filters (only active prompts)
   const getVisiblePrompts = (productFilter?: string, epicFilter?: string) => {
@@ -612,6 +614,38 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                   <span className="text-foreground">Knowledge Box</span>
                 </div>
                 <kbd className="px-2 py-1 text-xs bg-muted/70 text-muted-foreground rounded border border-border/40">K</kbd>
+              </Button>
+            )}
+
+            {/* Notes */}
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full aspect-square p-0 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                    onClick={() => setIsNotesOpen(true)}
+                    aria-label="Notes"
+                  >
+                    <StickyNote className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Notes</p>
+                  <p className="text-xs text-muted-foreground">Press N to open</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 rounded-md"
+                onClick={() => setIsNotesOpen(true)}
+              >
+                <div className="flex items-center">
+                  <StickyNote className="mr-3 h-4 w-4 text-foreground/70" />
+                  <span className="text-foreground">Notes</span>
+                </div>
+                <kbd className="px-2 py-1 text-xs bg-muted/70 text-muted-foreground rounded border border-border/40">N</kbd>
               </Button>
             )}
 
@@ -1398,6 +1432,14 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       <PromptLibrary
         open={isPromptLibraryOpen}
         onOpenChange={setIsPromptLibraryOpen}
+      />
+
+      {/* Notes Dialog */}
+      <NotesDialog
+        open={isNotesOpen}
+        onOpenChange={setIsNotesOpen}
+        selectedProductId={selectedProductId}
+        selectedEpicId={selectedEpicId}
       />
     </TooltipProvider>
   );
