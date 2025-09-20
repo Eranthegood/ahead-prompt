@@ -469,6 +469,9 @@ export default function LandingPage() {
       href: "/build",
       label: "Dashboard"
     }, {
+      href: "/blog",
+      label: "Blog"
+    }, {
       href: "/pricing",
       label: "Pricing"
     }, {
