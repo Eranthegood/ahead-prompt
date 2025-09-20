@@ -124,6 +124,9 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
         if (newProduct) {
           console.log('[ProductManagement] Product created successfully:', newProduct.id);
           console.log('[ProductManagement] Products now available:', products.length + 1);
+
+          // Dispatch global event so other UIs can update instantly (local echo)
+          window.dispatchEvent(new CustomEvent('product:created', { detail: { product: newProduct } }));
           
           if (createKnowledge) {
             setCreatedProduct(newProduct);

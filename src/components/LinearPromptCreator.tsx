@@ -57,7 +57,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
 }) => {
   const { toast } = useToast();
   const { trackPromptCreation } = usePromptMetrics();
-  const { knowledgeItems } = useKnowledge(workspace.id, selectedProductId);
+  // knowledgeItems will be initialized after hook to avoid TS order issues
   
   const {
     title,
@@ -77,10 +77,29 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     resetForm,
   } = useLinearPromptCreator({ selectedProductId, selectedEpicId });
 
-  // Force re-render when products list changes
+  // Knowledge items depend on currently selected product (after hook init)
+  const { knowledgeItems } = useKnowledge(workspace.id, selectedProduct || selectedProductId);
+
+  // Local-echo product list for instant availability
+  const [modalProducts, setModalProducts] = useState<Product[]>(products);
+  // Keep in sync with upstream products but allow immediate inserts via event
   useEffect(() => {
-    console.log('[LinearPromptCreator] Products updated:', products.length);
+    setModalProducts(products);
   }, [products]);
+
+  // Listen for globally dispatched product creation events to instantly show/select
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<any>;
+      const newProduct: Product | undefined = ce.detail?.product || ce.detail;
+      if (!newProduct?.id) return;
+      setModalProducts(prev => (prev.some(p => p.id === newProduct.id) ? prev : [newProduct, ...prev]));
+      // Auto-select the newly created product
+      setSelectedProduct(newProduct.id);
+    };
+    window.addEventListener('product:created', handler as EventListener);
+    return () => window.removeEventListener('product:created', handler as EventListener);
+  }, [setSelectedProduct]);
 
   const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -311,7 +330,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
             onEpicChange={setSelectedEpic}
             providerConfig={providerConfig}
             onProviderChange={setProviderConfig}
-            products={products}
+            products={modalProducts}
             epics={filteredEpics}
             onCreateProduct={onCreateProduct}
             onCreateEpic={onCreateEpic}
