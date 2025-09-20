@@ -26,7 +26,7 @@ export default function Pricing() {
   const { trackPricingInteraction, isTracking } = usePricingTracking();
   
   const handleGetStarted = () => {
-    navigate('/dashboard');
+    navigate('/auth');
   };
 
   const handleUpgrade = async (planId: string) => {
