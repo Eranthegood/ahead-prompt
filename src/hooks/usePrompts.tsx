@@ -74,11 +74,8 @@ export const usePrompts = (
   // This function MUST close dialog immediately and generate in background
   // Any change here can break the core UX flow of Ahead.love
   const createPromptAndGenerate = async (promptData: CreatePromptData): Promise<any> => {
-    // Enhanced generation logic with knowledge context and provider checks
-    const shouldGenerate = !!(
-      (promptData.original_description?.trim().length || 0) > 15 &&
-      (promptData.knowledge_context?.length || promptData.ai_provider === 'claude')
-    );
+    // Generate for any substantial content (core feature!)
+    const shouldGenerate = (promptData.original_description?.trim().length || 0) > 15;
     
     console.log('🚀 Generation check:', {
       hasOriginalDescription: !!promptData.original_description,
