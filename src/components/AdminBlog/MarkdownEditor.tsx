@@ -120,18 +120,104 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
   };
 
   const renderMarkdownPreview = (markdown: string) => {
-    // Simple markdown preview (basic conversion)
-    return markdown
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code>$1</code>')
-      .replace(/^\> (.*$)/gm, '<blockquote>$1</blockquote>')
-      .replace(/^\* (.*$)/gm, '<li>$1</li>')
-      .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
-      .replace(/\n/g, '<br>');
+    // Enhanced markdown preview with proper styling
+    let html = markdown
+      // Headers
+      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-4 text-foreground border-b pb-2">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mb-3 text-foreground">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-medium mb-2 text-foreground">$1</h3>')
+      .replace(/^#### (.*$)/gm, '<h4 class="text-lg font-medium mb-2 text-foreground">$1</h4>')
+      .replace(/^##### (.*$)/gm, '<h5 class="text-base font-medium mb-1 text-foreground">$1</h5>')
+      .replace(/^###### (.*$)/gm, '<h6 class="text-sm font-medium mb-1 text-foreground">$1</h6>')
+      
+      // Bold and italic
+      .replace(/\*\*\*(.*?)\*\*\*/g, '<strong class="font-bold text-foreground"><em class="italic">$1</em></strong>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-foreground">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-foreground">$1</em>')
+      
+      // Code blocks and inline code
+      .replace(/```([^`]*?)```/gs, '<pre class="bg-muted p-4 rounded-md my-4 overflow-x-auto"><code class="text-foreground text-sm font-mono">$1</code></pre>')
+      .replace(/`([^`]*?)`/g, '<code class="bg-muted px-2 py-1 rounded text-foreground text-sm font-mono">$1</code>')
+      
+      // Blockquotes
+      .replace(/^\> (.*$)/gm, '<blockquote class="border-l-4 border-primary pl-4 py-2 my-4 bg-muted/50 italic text-muted-foreground">$1</blockquote>')
+      
+      // Links
+      .replace(/\[([^\]]*?)\]\(([^)]*?)\)/g, '<a href="$2" class="text-primary hover:text-primary/80 underline underline-offset-2" target="_blank" rel="noopener noreferrer">$1</a>')
+      
+      // Images
+      .replace(/!\[([^\]]*?)\]\(([^)]*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-md my-4" />')
+      
+      // Horizontal rules
+      .replace(/^---$/gm, '<hr class="border-border my-6" />');
+
+    // Handle lists
+    const lines = html.split('\n');
+    const processedLines: string[] = [];
+    let inUnorderedList = false;
+    let inOrderedList = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmedLine = line.trim();
+      
+      // Unordered list items
+      if (trimmedLine.match(/^[\*\-\+] /)) {
+        if (!inUnorderedList) {
+          processedLines.push('<ul class="list-disc pl-6 mb-4 text-foreground space-y-1">');
+          inUnorderedList = true;
+        }
+        if (inOrderedList) {
+          processedLines.push('</ol>');
+          inOrderedList = false;
+        }
+        const content = trimmedLine.replace(/^[\*\-\+] /, '');
+        processedLines.push(`<li class="text-foreground">${content}</li>`);
+      }
+      // Ordered list items
+      else if (trimmedLine.match(/^\d+\. /)) {
+        if (!inOrderedList) {
+          processedLines.push('<ol class="list-decimal pl-6 mb-4 text-foreground space-y-1">');
+          inOrderedList = true;
+        }
+        if (inUnorderedList) {
+          processedLines.push('</ul>');
+          inUnorderedList = false;
+        }
+        const content = trimmedLine.replace(/^\d+\. /, '');
+        processedLines.push(`<li class="text-foreground">${content}</li>`);
+      }
+      // Regular content
+      else {
+        if (inUnorderedList) {
+          processedLines.push('</ul>');
+          inUnorderedList = false;
+        }
+        if (inOrderedList) {
+          processedLines.push('</ol>');
+          inOrderedList = false;
+        }
+        
+        // Handle paragraphs and line breaks
+        if (trimmedLine === '') {
+          processedLines.push('<br class="my-2" />');
+        } else if (!trimmedLine.match(/^<[hH][1-6]|^<blockquote|^<pre|^<hr/)) {
+          processedLines.push(`<p class="text-foreground mb-3 leading-relaxed">${line}</p>`);
+        } else {
+          processedLines.push(line);
+        }
+      }
+    }
+    
+    // Close any remaining lists
+    if (inUnorderedList) {
+      processedLines.push('</ul>');
+    }
+    if (inOrderedList) {
+      processedLines.push('</ol>');
+    }
+    
+    return processedLines.join('\n');
   };
 
   const toolbarButtons = [
@@ -230,7 +316,7 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
 
           <TabsContent value="preview" className="space-y-4">
             <div 
-              className="min-h-[400px] p-4 border rounded-md bg-background prose prose-sm max-w-none"
+              className="min-h-[400px] p-6 border rounded-md bg-background"
               dangerouslySetInnerHTML={{ 
                 __html: value ? renderMarkdownPreview(value) : '<p class="text-muted-foreground">Aucun contenu à prévisualiser</p>' 
               }}
