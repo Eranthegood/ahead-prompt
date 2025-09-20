@@ -7,6 +7,7 @@ import { MinimalSidebar } from './MinimalSidebar';
 import { PromptsProvider } from '@/context/PromptsContext';
 import { KnowledgeBoxModal } from './KnowledgeBoxModal';
 import { NotesDialog } from './NotesDialog';
+import { OnboardingModal } from './OnboardingModal';
 
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +34,15 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('workspace');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if user has seen onboarding
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('ahead-onboarding-completed');
+    if (!hasSeenOnboarding && user) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   // Simple page configuration
   const config = {
@@ -53,9 +63,15 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   // Global keyboard shortcuts
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
+    'l': () => openDialog('promptLibrary'), // Simple 'L' shortcut
     'k': () => setIsKnowledgeModalOpen(true),
     'n': () => setIsNotesOpen(true),
   });
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('ahead-onboarding-completed', 'true');
+    setShowOnboarding(false);
+  };
 
   // Listen for knowledge dialog events
   useEffect(() => {
@@ -174,6 +190,13 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
         onOpenChange={setIsNotesOpen}
         selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
         selectedEpicId={selectedEpicId}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onComplete={handleOnboardingComplete}
       />
     </div>
   );
