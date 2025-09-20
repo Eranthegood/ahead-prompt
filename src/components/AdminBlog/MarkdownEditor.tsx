@@ -17,7 +17,8 @@ import {
   Quote, 
   Upload,
   Eye,
-  Edit3
+  Edit3,
+  Image
 } from 'lucide-react';
 
 interface MarkdownEditorProps {
@@ -121,8 +122,13 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
 
   const renderMarkdownPreview = (markdown: string) => {
     // Enhanced markdown preview with proper styling
-    let html = markdown
-      // Headers
+    let html = markdown;
+    
+    // Process images first (before line processing)
+    html = html.replace(/!\[([^\]]*?)\]\(([^)]*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-md my-4 shadow-md" style="display: block; margin: 1rem auto;" />');
+    
+    // Headers
+    html = html
       .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-4 text-foreground border-b pb-2">$1</h1>')
       .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mb-3 text-foreground">$1</h2>')
       .replace(/^### (.*$)/gm, '<h3 class="text-xl font-medium mb-2 text-foreground">$1</h3>')
@@ -145,9 +151,6 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
       // Links
       .replace(/\[([^\]]*?)\]\(([^)]*?)\)/g, '<a href="$2" class="text-primary hover:text-primary/80 underline underline-offset-2" target="_blank" rel="noopener noreferrer">$1</a>')
       
-      // Images
-      .replace(/!\[([^\]]*?)\]\(([^)]*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-md my-4" />')
-      
       // Horizontal rules
       .replace(/^---$/gm, '<hr class="border-border my-6" />');
 
@@ -160,6 +163,20 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const trimmedLine = line.trim();
+      
+      // Skip lines that are already processed images
+      if (trimmedLine.startsWith('<img ')) {
+        if (inUnorderedList) {
+          processedLines.push('</ul>');
+          inUnorderedList = false;
+        }
+        if (inOrderedList) {
+          processedLines.push('</ol>');
+          inOrderedList = false;
+        }
+        processedLines.push(line);
+        continue;
+      }
       
       // Unordered list items
       if (trimmedLine.match(/^[\*\-\+] /)) {
@@ -201,7 +218,7 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
         // Handle paragraphs and line breaks
         if (trimmedLine === '') {
           processedLines.push('<br class="my-2" />');
-        } else if (!trimmedLine.match(/^<[hH][1-6]|^<blockquote|^<pre|^<hr/)) {
+        } else if (!trimmedLine.match(/^<[hH][1-6]|^<blockquote|^<pre|^<hr|^<img/)) {
           processedLines.push(`<p class="text-foreground mb-3 leading-relaxed">${line}</p>`);
         } else {
           processedLines.push(line);
@@ -229,6 +246,7 @@ export function MarkdownEditor({ value, onChange, placeholder, className }: Mark
     { icon: List, action: () => insertText('- ', '', 'élément de liste'), tooltip: 'Liste à puces' },
     { icon: ListOrdered, action: () => insertText('1. ', '', 'élément numéroté'), tooltip: 'Liste numérotée' },
     { icon: Link, action: () => insertText('[', '](url)', 'texte du lien'), tooltip: 'Lien' },
+    { icon: Image, action: () => insertText('![', '](url)', 'description de l\'image'), tooltip: 'Image' },
     { icon: Code, action: () => insertText('`', '`', 'code'), tooltip: 'Code inline' },
     { icon: Quote, action: () => insertText('> ', '', 'citation'), tooltip: 'Citation' },
   ];
