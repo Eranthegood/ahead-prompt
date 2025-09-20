@@ -13,19 +13,22 @@ interface OnboardingModalProps {
 
 const onboardingSteps = [
   {
-    title: 'Welcome to Ahead.love!',
-    description: 'Your intelligent workspace to capture and organize AI prompts during code generation wait times.',
+    title: 'Create Prompts Lightning Fast',
+    description: 'Capture your AI prompt ideas instantly while waiting for code generation.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4 text-center">
         <p className="text-muted-foreground">
-          While Cursor, Claude, or GitHub Copilot generates your code (2-4 minutes), 
-          stay productive by preparing your next 3-4 moves.
+          Press <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Q</kbd> to instantly create a new prompt. 
+          No more losing brilliant ideas during those 2-4 minute AI wait times.
         </p>
         <div className="bg-primary/10 p-4 rounded-lg">
           <p className="text-sm font-medium">
-            💡 Transform your wait times into productive moments
+            ⚡ From idea to organized prompt in seconds
           </p>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          Perfect for Bug Fixes, Features, Refactors, and Documentation
         </div>
       </div>
     )
