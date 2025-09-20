@@ -253,6 +253,7 @@ export type Database = {
         Row: {
           author_id: string
           content: string
+          content_html: string | null
           created_at: string
           excerpt: string | null
           featured_image_url: string | null
@@ -272,6 +273,7 @@ export type Database = {
         Insert: {
           author_id: string
           content: string
+          content_html?: string | null
           created_at?: string
           excerpt?: string | null
           featured_image_url?: string | null
@@ -291,6 +293,7 @@ export type Database = {
         Update: {
           author_id?: string
           content?: string
+          content_html?: string | null
           created_at?: string
           excerpt?: string | null
           featured_image_url?: string | null

@@ -21,6 +21,7 @@ import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { copyText } from '@/lib/clipboard';
+import { markdownToHtml } from '@/utils/markdownToHtml';
 
 export default function BlogPostPage() {
   const { slug } = useParams();
@@ -292,7 +293,9 @@ export default function BlogPostPage() {
 
         {/* Content */}
         <div className="prose prose-lg max-w-none mb-16 prose-content">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div dangerouslySetInnerHTML={{ 
+            __html: post.content_html || markdownToHtml(post.content) 
+          }} />
         </div>
 
         {/* Author Info */}

@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { Loader2, Save, Eye, Trash2, Plus, X } from 'lucide-react';
 import { MarkdownEditor } from './MarkdownEditor';
+import { markdownToHtml } from '@/utils/markdownToHtml';
 
 const blogSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').max(200, 'Le titre ne peut pas dépasser 200 caractères'),
@@ -202,11 +203,15 @@ export function BlogEditForm({ blogId, onSave, onCancel }: BlogEditFormProps) {
     try {
       const keywordArray = keywords.length > 0 ? keywords : null;
       
+      // Convert Markdown to HTML for storage
+      const contentHtml = markdownToHtml(data.content);
+      
       const blogData = {
         title: data.title,
         slug: data.slug,
         excerpt: data.excerpt || null,
         content: data.content,
+        content_html: contentHtml,
         meta_description: data.meta_description || null,
         keywords: keywordArray,
         status: data.status,

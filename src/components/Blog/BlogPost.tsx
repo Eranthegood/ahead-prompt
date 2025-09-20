@@ -13,6 +13,7 @@ export interface BlogPost {
   slug: string;
   excerpt?: string;
   content: string;
+  content_html?: string;
   featured_image_url?: string;
   published_at: string;
   author_id: string;
