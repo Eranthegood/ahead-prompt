@@ -1,6 +1,5 @@
 import React from 'react';
 import { BlogList } from '@/components/Blog/BlogList';
-import { OutrankSyncButton } from '@/components/OutrankSyncButton';
 
 export default function Blog() {
   return (
@@ -13,9 +12,6 @@ export default function Blog() {
             <p className="text-muted-foreground mb-8">
               Latest articles on development, productivity, AI, and best practices.
             </p>
-            <div className="mb-8">
-              <OutrankSyncButton />
-            </div>
           </div>
         </div>
       </section>
