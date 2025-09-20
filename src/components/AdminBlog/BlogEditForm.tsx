@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { Loader2, Save, Eye, Trash2, Plus, X } from 'lucide-react';
+import { MarkdownEditor } from './MarkdownEditor';
 
 const blogSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').max(200, 'Le titre ne peut pas dépasser 200 caractères'),
@@ -351,10 +352,10 @@ export function BlogEditForm({ blogId, onSave, onCancel }: BlogEditFormProps) {
                     <FormItem>
                       <FormLabel>Contenu *</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <MarkdownEditor
+                          value={field.value}
+                          onChange={field.onChange}
                           placeholder="Contenu de l'article en Markdown..."
-                          className="min-h-[400px] font-mono text-sm"
-                          {...field} 
                         />
                       </FormControl>
                       <FormMessage />
