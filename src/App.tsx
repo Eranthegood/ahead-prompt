@@ -31,6 +31,7 @@ import PromptManagement from "./pages/PromptManagement";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
+import BlogEditor from "./pages/BlogEditor";
 import AIAgents from "./pages/AIAgents";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
@@ -112,11 +113,21 @@ function App() {
                      } />
                      <Route path="/blog" element={<Blog />} />
                      <Route path="/blog/:slug" element={<BlogPost />} />
-                     <Route path="/admin/blog" element={
-                       <ProtectedRoute>
-                         <AdminBlog />
-                       </ProtectedRoute>
-                     } />
+                      <Route path="/admin/blog" element={
+                        <ProtectedRoute>
+                          <AdminBlog />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/admin/blog/new" element={
+                        <ProtectedRoute>
+                          <BlogEditor />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/admin/blog/edit/:id" element={
+                        <ProtectedRoute>
+                          <BlogEditor />
+                        </ProtectedRoute>
+                      } />
                     <Route path="/settings/repository-mapping" element={
                        <ProtectedRoute>
                          <RepositoryMapping />
