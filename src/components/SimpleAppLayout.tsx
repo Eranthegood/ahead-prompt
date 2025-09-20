@@ -49,6 +49,7 @@ const appStore = useAppStoreOptional();
   // Global keyboard shortcuts
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
+    'k': () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')),
   });
 
   // Global keyboard shortcut handler for quick prompt creation

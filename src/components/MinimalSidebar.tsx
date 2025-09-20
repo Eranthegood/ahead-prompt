@@ -586,6 +586,38 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
               </Button>
             )}
 
+            {/* Knowledge Box */}
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full aspect-square p-0 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                    onClick={() => handleOpenKnowledge()}
+                    aria-label="Knowledge Box"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Knowledge Box</p>
+                  <p className="text-xs text-muted-foreground">Press K to open</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="w-full justify-between text-left font-medium text-sm py-2.5 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 rounded-md"
+                onClick={() => handleOpenKnowledge()}
+              >
+                <div className="flex items-center">
+                  <BookOpen className="mr-3 h-4 w-4 text-foreground/70" />
+                  <span className="text-foreground">Knowledge Box</span>
+                </div>
+                <kbd className="px-2 py-1 text-xs bg-muted/70 text-muted-foreground rounded border border-border/40">K</kbd>
+              </Button>
+            )}
+
             {/* All Prompts */}
             {isCollapsed ? (
               <Tooltip>
