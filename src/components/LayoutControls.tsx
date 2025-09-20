@@ -26,7 +26,7 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
   const isMobile = useIsMobile();
   const { state, openDialog, closeDialog } = useAppStore();
   const { preferences } = useUserPreferences();
-  const { products } = useProducts(workspace.id);
+  const { products, loading: productsLoading, createProduct, updateProduct, deleteProduct, refetch: refetchProducts } = useProducts(workspace.id);
   const { epics } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
 
@@ -94,7 +94,15 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
         onOpenChange={(open) => open ? openDialog('productDialog') : closeDialog('productDialog')}
       >
         <DialogContent className="max-w-2xl">
-          <ProductManagement workspace={workspace} />
+          <ProductManagement 
+            workspace={workspace}
+            products={products}
+            loading={productsLoading}
+            createProduct={createProduct}
+            updateProduct={updateProduct}
+            deleteProduct={deleteProduct}
+            refetch={refetchProducts}
+          />
         </DialogContent>
       </Dialog>
     </>

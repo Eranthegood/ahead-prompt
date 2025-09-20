@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useProducts } from '@/hooks/useProducts';
 import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
 import { UsageLimitIndicator } from '@/components/UsageLimitIndicator';
 import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen, Lock } from 'lucide-react';
@@ -18,6 +17,12 @@ import type { Product, Workspace } from '@/types';
 
 interface ProductManagementProps {
   workspace: Workspace;
+  products: Product[];
+  loading: boolean;
+  createProduct: (data: { name: string; description?: string; color?: string; order_index?: number }) => Promise<Product | null>;
+  updateProduct: (id: string, updates: Partial<{ name: string; description?: string; color?: string; order_index?: number }>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 const PRODUCT_COLORS = [
@@ -29,8 +34,14 @@ const PRODUCT_COLORS = [
   { value: '#6B7280', label: 'Gray' },
 ];
 
-export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace }) => {
-  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts(workspace.id);
+export const ProductManagement: React.FC<ProductManagementProps> = ({ 
+  workspace, 
+  products, 
+  loading, 
+  createProduct, 
+  updateProduct, 
+  deleteProduct 
+}) => {
   const { tier } = useSubscription();
   const { toast } = useToast();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -102,6 +113,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
         handleCloseDialog();
       } else {
         console.log('[ProductManagement] Creating product:', formData.name);
+        console.log('[ProductManagement] Current products before create:', products.length);
         
         const newProduct = await createProduct({
           name: formData.name.trim(),
@@ -111,6 +123,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
         
         if (newProduct) {
           console.log('[ProductManagement] Product created successfully:', newProduct.id);
+          console.log('[ProductManagement] Products now available:', products.length + 1);
           
           if (createKnowledge) {
             setCreatedProduct(newProduct);
