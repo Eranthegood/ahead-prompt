@@ -31,7 +31,7 @@ import PromptManagement from "./pages/PromptManagement";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
-import BlogEditor from "./pages/BlogEditor";
+import BlogEditor from "@/pages/BlogEditor";
 import AIAgents from "./pages/AIAgents";
 import JoinWorkspace from "./pages/JoinWorkspace";
 import Contact from "./pages/Contact";
@@ -106,14 +106,12 @@ function App() {
                          <LovableIntegration />
                        </ProtectedRoute>
                      } />
-                     <Route path="/integrations/figma" element={
-                       <ProtectedRoute>
-                         <FigmaIntegration />
-                       </ProtectedRoute>
-                     } />
-                     <Route path="/blog" element={<Blog />} />
-                     <Route path="/blog/:slug" element={<BlogPost />} />
-                      <Route path="/admin/blog" element={
+                      <Route path="/integrations/figma" element={
+                        <ProtectedRoute>
+                          <FigmaIntegration />
+                        </ProtectedRoute>
+                      } />
+                       <Route path="/admin/blog" element={
                         <ProtectedRoute>
                           <AdminBlog />
                         </ProtectedRoute>

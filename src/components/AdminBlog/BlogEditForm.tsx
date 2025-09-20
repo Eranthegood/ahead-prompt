@@ -146,7 +146,7 @@ export function BlogEditForm({ blogId, onSave, onCancel }: BlogEditFormProps) {
             content: data.content,
             meta_description: data.meta_description || '',
             keywords: data.keywords?.join(', ') || '',
-          status: data.status as 'draft' | 'published' | 'archived',
+            status: data.status as 'draft' | 'published' | 'archived',
             featured_image_url: data.featured_image_url || '',
           });
 
