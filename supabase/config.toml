@@ -1,5 +1,8 @@
 project_id = "fkpbdzluddeqsfvacozw"
 
+[functions.sync-outrank-articles]
+verify_jwt = true
+
 [functions.outrank-webhook]
 verify_jwt = false
 
