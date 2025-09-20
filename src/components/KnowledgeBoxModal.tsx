@@ -17,7 +17,15 @@ export function KnowledgeBoxModal({ open, onOpenChange, defaultSection = 'worksp
   const [searchTerm, setSearchTerm] = useState('');
   
   const { workspace } = useWorkspace();
-  const { products } = useProducts(workspace?.id);
+  const { products, loading: productsLoading } = useProducts(workspace?.id);
+  
+  // Debug logging to understand what's happening
+  console.log('KnowledgeBoxModal Debug:', {
+    workspace,
+    workspaceId: workspace?.id,
+    products,
+    productsLoading
+  });
   
   // Update active section when defaultSection changes
   useEffect(() => {
@@ -75,35 +83,44 @@ export function KnowledgeBoxModal({ open, onOpenChange, defaultSection = 'worksp
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] p-0">
-        <div className="flex h-full min-h-[600px] max-h-[calc(90vh-2rem)]">
-          {/* Sidebar */}
-          <KnowledgeSidebar
-            activeSection={activeSection}
-            onSectionChange={handleSectionChange}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            workspace={workspace}
-            products={products}
-          />
-          
-          {/* Main content */}
-          <div className="flex-1 flex flex-col">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-border">
-              <h1 className="text-2xl font-semibold text-foreground">
-                {currentSection.title}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {currentSection.description}
-              </p>
-            </div>
-            
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {renderSectionContent()}
+        {!workspace ? (
+          <div className="flex items-center justify-center h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Loading workspace...</p>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex h-full min-h-[600px] max-h-[calc(90vh-2rem)]">
+            {/* Sidebar */}
+            <KnowledgeSidebar
+              activeSection={activeSection}
+              onSectionChange={handleSectionChange}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              workspace={workspace}
+              products={products}
+            />
+            
+            {/* Main content */}
+            <div className="flex-1 flex flex-col">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-border">
+                <h1 className="text-2xl font-semibold text-foreground">
+                  {currentSection.title}
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {currentSection.description}
+                </p>
+              </div>
+              
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {renderSectionContent()}
+              </div>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
