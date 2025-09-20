@@ -116,6 +116,9 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
     }] : [])
   ];
 
+  // Debug log for product options
+  console.log('[LinearActionButtons] Product options:', productOptions.length, products.map(p => p.name));
+
   const epicOptions = [
     ...epics.map(epic => ({
       id: epic.id,

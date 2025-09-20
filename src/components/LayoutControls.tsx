@@ -45,6 +45,11 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
     return null;
   };
 
+  const handleCreateProduct = () => {
+    // Instead of navigating, trigger the product creation dialog
+    openDialog('productDialog');
+  };
+
   return (
     <>
       <LinearPromptCreator
@@ -56,7 +61,7 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
         epics={epics}
         selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
         selectedEpicId={selectedEpicId}
-        onCreateProduct={() => navigate('/build?create=product')}
+        onCreateProduct={handleCreateProduct}
         onCreateEpic={() => navigate('/build?create=epic')}
       />
 

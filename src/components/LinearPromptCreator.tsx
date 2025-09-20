@@ -77,6 +77,11 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     resetForm,
   } = useLinearPromptCreator({ selectedProductId, selectedEpicId });
 
+  // Force re-render when products list changes
+  useEffect(() => {
+    console.log('[LinearPromptCreator] Products updated:', products.length);
+  }, [products]);
+
   const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
