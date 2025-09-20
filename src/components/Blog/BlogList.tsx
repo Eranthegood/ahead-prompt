@@ -62,9 +62,9 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
         .from('blog_posts')
         .select(`
           *,
-          blog_post_categories!inner(
+          blog_post_categories(
             category_id,
-            blog_categories!inner(
+            blog_categories(
               id,
               name,
               slug,
