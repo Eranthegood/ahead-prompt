@@ -5,6 +5,8 @@ import { LinearPromptCreator } from './LinearPromptCreator';
 import { MobilePromptDrawer } from './MobilePromptDrawer';
 import { MobilePromptFAB } from './MobilePromptFAB';
 import { PromptLibrary } from './PromptLibrary';
+import { ProductManagement } from './ProductManagement';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAppStore } from '@/store/AppStore';
 import { usePromptsContext } from '@/context/PromptsContext';
 import { useProducts } from '@/hooks/useProducts';
@@ -86,6 +88,15 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
         onOpenChange={(open) => open ? openDialog('promptLibrary') : closeDialog('promptLibrary')}
         autoFocus={true}
       />
+
+      <Dialog 
+        open={state.dialogs.productDialog} 
+        onOpenChange={(open) => open ? openDialog('productDialog') : closeDialog('productDialog')}
+      >
+        <DialogContent className="max-w-2xl">
+          <ProductManagement workspace={workspace} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
