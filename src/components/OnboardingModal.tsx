@@ -64,7 +64,7 @@ const onboardingSteps = [
   },
   {
     title: 'Smart Kanban Workflow',
-    description: 'Your prompts automatically evolve: Todo → In Progress → Done.',
+    description: 'Your prompts automatically evolve: Todo → In Progress → Done with priority management.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
@@ -81,6 +81,24 @@ const onboardingSteps = [
             <div className="font-medium text-green-600 dark:text-green-400">Done</div>
             <div className="text-xs text-muted-foreground mt-1">Completed ✨</div>
           </div>
+        </div>
+        <div className="bg-accent/20 p-3 rounded-lg">
+          <p className="text-sm font-medium mb-2">Priority System:</p>
+          <div className="flex items-center gap-4 text-xs">
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-red-500 rounded"></div>
+              High
+            </span>
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-yellow-500 rounded"></div>
+              Normal
+            </span>
+            <span className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-gray-400 rounded"></div>
+              Low
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">High priority prompts appear at the top of each column</p>
         </div>
         <div className="bg-primary/10 p-3 rounded-lg">
           <p className="text-sm">
