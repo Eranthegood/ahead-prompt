@@ -46,6 +46,7 @@ interface LinearActionButtonsProps {
   selectedKnowledge: KnowledgeItem[];
   onKnowledgeChange: (knowledge: KnowledgeItem[]) => void;
   onExpandToggle: () => void;
+  onProductDropdownOpen?: () => void;
 }
 
 export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
@@ -65,6 +66,7 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
   selectedKnowledge,
   onKnowledgeChange,
   onExpandToggle,
+  onProductDropdownOpen,
 }) => {
   const getStatusIcon = () => <Circle className="w-4 h-4 text-muted-foreground" />;
   
@@ -235,6 +237,11 @@ export const LinearActionButtons: React.FC<LinearActionButtonsProps> = ({
         }
         options={productOptions}
         placeholder="Select product"
+        onOpenChange={(open) => {
+          if (open) {
+            try { onProductDropdownOpen?.(); } catch (e) { console.warn('onProductDropdownOpen error', e); }
+          }
+        }}
       />
 
       {/* Epic Button (conditional) */}

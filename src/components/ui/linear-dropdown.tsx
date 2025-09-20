@@ -44,6 +44,7 @@ interface LinearDropdownProps {
   options: DropdownOption[];
   placeholder?: string;
   allowMultiple?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const LinearDropdown: React.FC<LinearDropdownProps> = ({
@@ -51,9 +52,10 @@ export const LinearDropdown: React.FC<LinearDropdownProps> = ({
   options,
   placeholder = "Select option",
   allowMultiple = false,
+  onOpenChange,
 }) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         {trigger}
       </DropdownMenuTrigger>

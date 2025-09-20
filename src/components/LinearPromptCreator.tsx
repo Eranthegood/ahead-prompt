@@ -41,6 +41,7 @@ interface LinearPromptCreatorProps {
   selectedEpicId?: string;
   onCreateProduct?: () => void;
   onCreateEpic?: () => void;
+  onProductsRefetch?: () => void;
 }
 
 export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
@@ -54,6 +55,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   selectedEpicId,
   onCreateProduct,
   onCreateEpic,
+  onProductsRefetch,
 }) => {
   const { toast } = useToast();
   const { trackPromptCreation } = usePromptMetrics();
@@ -338,6 +340,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
             selectedKnowledge={selectedKnowledge}
             onKnowledgeChange={setSelectedKnowledge}
             onExpandToggle={() => setIsExpanded(!isExpanded)}
+            onProductDropdownOpen={() => onProductsRefetch?.()}
           />
         </div>
 

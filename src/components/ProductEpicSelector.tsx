@@ -12,6 +12,7 @@ interface ProductEpicSelectorProps {
   onProductChange: (productId: string | null) => void;
   onEpicChange: (epicId: string | null) => void;
   className?: string;
+  onProductDropdownOpen?: () => void;
 }
 
 export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
@@ -22,6 +23,7 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
   onProductChange,
   onEpicChange,
   className = "",
+  onProductDropdownOpen,
 }) => {
   const { trackAllocation } = usePromptMetrics();
   
@@ -56,6 +58,7 @@ export const ProductEpicSelector: React.FC<ProductEpicSelectorProps> = ({
                 trackAllocation('product', { productId, productName: products.find(p => p.id === productId)?.name });
               }
             }}
+            onOpenChange={(open) => { if (open) { try { (typeof onProductDropdownOpen === 'function') && onProductDropdownOpen(); } catch (e) { console.warn('onProductDropdownOpen error', e); } } }}
           >
             <SelectTrigger className="h-9">
               <div className="flex items-center gap-2">

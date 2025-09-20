@@ -65,6 +65,7 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
         selectedEpicId={selectedEpicId}
         onCreateProduct={handleCreateProduct}
         onCreateEpic={() => navigate('/build?create=epic')}
+        onProductsRefetch={refetchProducts}
       />
 
       <MobilePromptDrawer
