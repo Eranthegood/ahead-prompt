@@ -6,6 +6,7 @@ import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { PromptsProvider } from '@/context/PromptsContext';
 import { KnowledgeBoxModal } from './KnowledgeBoxModal';
+import { NotesDialog } from './NotesDialog';
 
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,7 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('workspace');
 
   // Simple page configuration
@@ -52,6 +54,7 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
     'k': () => setIsKnowledgeModalOpen(true),
+    'n': () => setIsNotesOpen(true),
   });
 
   // Listen for knowledge dialog events
@@ -163,6 +166,14 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
         open={isKnowledgeModalOpen}
         onOpenChange={setIsKnowledgeModalOpen}
         defaultSection={activeSection}
+      />
+
+      {/* Notes Dialog */}
+      <NotesDialog
+        open={isNotesOpen}
+        onOpenChange={setIsNotesOpen}
+        selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+        selectedEpicId={selectedEpicId}
       />
     </div>
   );
