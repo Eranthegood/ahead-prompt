@@ -78,7 +78,12 @@ export default function Pricing() {
       
       if (data?.url) {
         if (couponCode.trim()) {
-          setCouponSuccess(`Coupon "${couponCode}" applied successfully!`);
+          if (data.coupon_applied) {
+            setCouponSuccess(`Coupon "${couponCode}" applied successfully!`);
+          } else {
+            setCouponError(`Coupon "${couponCode}" is invalid or expired. Proceeding without discount.`);
+            setCouponSuccess("");
+          }
         }
         // Redirect to Stripe checkout
         window.open(data.url, '_blank');

@@ -52,11 +52,13 @@ serve(async (req) => {
         logStep("Coupon validated", { couponId, valid: validatedCoupon.valid });
         
         if (!validatedCoupon.valid) {
-          throw new Error("Coupon is not valid");
+          logStep("Coupon not valid; proceeding without discount", { couponId });
+          validatedCoupon = null;
         }
       } catch (couponError) {
-        logStep("Coupon validation failed", { couponId, error: couponError.message });
-        throw new Error(`Invalid coupon: ${couponError.message}`);
+        logStep("Coupon validation failed", { couponId, error: (couponError as any).message });
+        // Proceed without coupon if invalid/non-existent
+        validatedCoupon = null;
       }
     }
 
@@ -71,7 +73,8 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const sessionConfig = {
+    const couponApplied = !!validatedCoupon;
+    const sessionConfig: any = {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
@@ -96,7 +99,7 @@ serve(async (req) => {
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: session.url, coupon_applied: couponApplied }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
