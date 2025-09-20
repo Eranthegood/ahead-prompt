@@ -3,7 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock } from 'lucide-react';
+import { getPriorityDisplay } from '@/lib/utils';
+import { getStatusIcon } from '@/components/ui/status-icon';
 
 interface OnboardingModalProps {
   open: boolean;
@@ -70,15 +72,24 @@ const onboardingSteps = [
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-2 text-sm">
           <div className="text-center p-3 bg-yellow-500/10 rounded">
-            <div className="font-medium text-yellow-600 dark:text-yellow-400">Todo</div>
+            <div className="flex items-center justify-center gap-2 font-medium text-yellow-600 dark:text-yellow-400">
+              <Circle className="w-4 h-4" />
+              Todo
+            </div>
             <div className="text-xs text-muted-foreground mt-1">New ideas</div>
           </div>
           <div className="text-center p-3 bg-blue-500/10 rounded">
-            <div className="font-medium text-blue-600 dark:text-blue-400">In Progress</div>
+            <div className="flex items-center justify-center gap-2 font-medium text-blue-600 dark:text-blue-400">
+              <CircleDot className="w-4 h-4" />
+              In Progress
+            </div>
             <div className="text-xs text-muted-foreground mt-1">Copied (Cmd+C)</div>
           </div>
           <div className="text-center p-3 bg-green-500/10 rounded">
-            <div className="font-medium text-green-600 dark:text-green-400">Done</div>
+            <div className="flex items-center justify-center gap-2 font-medium text-green-600 dark:text-green-400">
+              <CheckCircle className="w-4 h-4 fill-current" />
+              Done
+            </div>
             <div className="text-xs text-muted-foreground mt-1">Completed ✨</div>
           </div>
         </div>
@@ -86,15 +97,15 @@ const onboardingSteps = [
           <p className="text-sm font-medium mb-2">Priority System:</p>
           <div className="flex items-center gap-4 text-xs">
             <span className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-red-500 rounded"></div>
+              <Flame className="w-3 h-3 text-destructive" />
               High
             </span>
             <span className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-yellow-500 rounded"></div>
+              <Minus className="w-3 h-3 text-orange-500" />
               Normal
             </span>
             <span className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-gray-400 rounded"></div>
+              <Clock className="w-3 h-3 text-muted-foreground" />
               Low
             </span>
           </div>
