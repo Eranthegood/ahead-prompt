@@ -203,6 +203,26 @@ serve(async (req) => {
           });
         } else {
           console.log(`Blog post published successfully: ${blogPost.title} (${blogPost.slug})`);
+          
+          // Assign SEO category to the blog post
+          const { data: seoCategory } = await supabase
+            .from('blog_categories')
+            .select('id')
+            .eq('slug', 'seo')
+            .eq('workspace_id', workspace.id)
+            .maybeSingle();
+
+          if (seoCategory) {
+            await supabase
+              .from('blog_post_categories')
+              .upsert({
+                post_id: blogPost.id,
+                category_id: seoCategory.id
+              }, {
+                onConflict: 'post_id,category_id',
+                ignoreDuplicates: true
+              });
+          }
         }
 
         processedArticles.push({
