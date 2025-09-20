@@ -32,7 +32,17 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader) {
+      logStep("No authorization header; returning default free state");
+      return new Response(JSON.stringify({
+        subscribed: false,
+        subscription_tier: 'free',
+        subscription_status: 'inactive'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
     logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
@@ -44,9 +54,14 @@ serve(async (req) => {
       ({ data: userData, error: userError } = await supabaseClient.auth.getUser(token));
     }
     if (userError || !userData?.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      logStep("Unauthenticated request; returning default free state");
+      return new Response(JSON.stringify({
+        subscribed: false,
+        subscription_tier: 'free',
+        subscription_status: 'inactive'
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
+        status: 200,
       });
     }
     const user = userData.user;

@@ -74,7 +74,14 @@ export const useSubscription = (): SubscriptionInfo => {
       const { data: authData } = await supabase.auth.getSession();
       
       if (!authData.session) {
-        throw new Error('No active session');
+        // No session yet: treat as free without throwing
+        setTier('free');
+        setSubscribed(false);
+        setSubscriptionStatus('inactive');
+        setSubscriptionEnd(null);
+        setProductId(null);
+        setLoading(false);
+        return false;
       }
 
       const { data, error } = await supabase.functions.invoke('check-subscription', {
@@ -84,24 +91,26 @@ export const useSubscription = (): SubscriptionInfo => {
       });
 
       if (error) {
-        console.error('Error checking subscription:', error);
-        setError('Failed to check subscription');
-        // Fallback to profile data
-        const { data: profileData, error: profileError } = await supabase
+        // Likely unauthorized (401) or temporary function issue – fallback silently to profile
+        console.debug('[useSubscription] check-subscription fallback to profile', error);
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('subscription_tier, subscription_status, current_period_end, stripe_product_id')
           .eq('id', user.id)
           .single();
 
-        if (!profileError && profileData) {
+        if (profileData) {
           setTier(profileData.subscription_tier || 'free');
           setSubscriptionStatus(profileData.subscription_status || 'inactive');
           setSubscriptionEnd(profileData.current_period_end);
           setProductId(profileData.stripe_product_id);
-          setSubscribed(profileData.subscription_status === 'active');
+          const isActive = profileData.subscription_status === 'active';
+          setSubscribed(isActive);
           setError(null);
-          return profileData.subscription_status === 'active';
+          return isActive;
         } else {
+          // Default to free without surfacing an error to the UI
+          setError(null);
           setTier('free');
           setSubscribed(false);
           setSubscriptionStatus('inactive');
