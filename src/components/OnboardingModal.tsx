@@ -13,93 +13,93 @@ interface OnboardingModalProps {
 
 const onboardingSteps = [
   {
-    title: 'Bienvenue sur Ahead.love !',
-    description: 'Votre workspace intelligent pour capturer et organiser vos prompts AI pendant les temps d\'attente de génération.',
+    title: 'Welcome to Ahead.love!',
+    description: 'Your intelligent workspace to capture and organize AI prompts during code generation wait times.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4 text-center">
         <p className="text-muted-foreground">
-          Pendant que Cursor, Claude ou GitHub Copilot génèrent votre code (2-4 minutes), 
-          restez productif en préparant vos 3-4 prochains moves.
+          While Cursor, Claude, or GitHub Copilot generates your code (2-4 minutes), 
+          stay productive by preparing your next 3-4 moves.
         </p>
         <div className="bg-primary/10 p-4 rounded-lg">
           <p className="text-sm font-medium">
-            💡 Transformez vos temps d'attente en moments productifs
+            💡 Transform your wait times into productive moments
           </p>
         </div>
       </div>
     )
   },
   {
-    title: 'Organisation par Produit > Epic > Prompts',
-    description: 'Structurez vos idées avec notre hiérarchie claire inspirée de Todoist et Slack.',
+    title: 'Product > Epic > Prompts Organization',
+    description: 'Structure your ideas with our clean hierarchy inspired by Todoist and Slack.',
     icon: <FolderPlus className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-primary rounded"></div>
-            <span className="font-medium">Produit</span>
-            <span className="text-muted-foreground">- Vos différents projets</span>
+            <span className="font-medium">Product</span>
+            <span className="text-muted-foreground">- Your different projects</span>
           </div>
           <div className="flex items-center gap-2 ml-6">
             <div className="w-3 h-3 bg-secondary rounded"></div>
             <span className="font-medium">Epic</span>
-            <span className="text-muted-foreground">- Fonctionnalités majeures</span>
+            <span className="text-muted-foreground">- Major features</span>
           </div>
           <div className="flex items-center gap-2 ml-12">
             <div className="w-3 h-3 bg-accent rounded"></div>
             <span className="font-medium">Prompts</span>
-            <span className="text-muted-foreground">- Vos idées et tâches</span>
+            <span className="text-muted-foreground">- Your ideas and tasks</span>
           </div>
         </div>
         <div className="bg-muted p-3 rounded-lg">
-          <p className="text-sm">Navigation intuitive dans la barre latérale, exactement comme Todoist !</p>
+          <p className="text-sm">Intuitive sidebar navigation, just like Todoist!</p>
         </div>
       </div>
     )
   },
   {
-    title: 'Workflow Kanban Intelligent',
-    description: 'Vos prompts évoluent automatiquement : Todo → En Cours → Terminé.',
+    title: 'Smart Kanban Workflow',
+    description: 'Your prompts automatically evolve: Todo → In Progress → Done.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
         <div className="grid grid-cols-3 gap-2 text-sm">
           <div className="text-center p-3 bg-yellow-500/10 rounded">
             <div className="font-medium text-yellow-600 dark:text-yellow-400">Todo</div>
-            <div className="text-xs text-muted-foreground mt-1">Nouvelles idées</div>
+            <div className="text-xs text-muted-foreground mt-1">New ideas</div>
           </div>
           <div className="text-center p-3 bg-blue-500/10 rounded">
-            <div className="font-medium text-blue-600 dark:text-blue-400">En Cours</div>
-            <div className="text-xs text-muted-foreground mt-1">Copié (Cmd+C)</div>
+            <div className="font-medium text-blue-600 dark:text-blue-400">In Progress</div>
+            <div className="text-xs text-muted-foreground mt-1">Copied (Cmd+C)</div>
           </div>
           <div className="text-center p-3 bg-green-500/10 rounded">
-            <div className="font-medium text-green-600 dark:text-green-400">Terminé</div>
-            <div className="text-xs text-muted-foreground mt-1">Accompli ✨</div>
+            <div className="font-medium text-green-600 dark:text-green-400">Done</div>
+            <div className="text-xs text-muted-foreground mt-1">Completed ✨</div>
           </div>
         </div>
         <div className="bg-primary/10 p-3 rounded-lg">
           <p className="text-sm">
-            <strong>Astuce :</strong> Copiez un prompt (Cmd+C) et il passe automatiquement en "En Cours" !
+            <strong>Tip:</strong> Copy a prompt (Cmd+C) and it automatically moves to "In Progress"!
           </p>
         </div>
       </div>
     )
   },
   {
-    title: 'Raccourcis Clavier Ultra-Rapides',
-    description: 'Travaillez à la vitesse de la pensée avec nos raccourcis optimisés.',
+    title: 'Ultra-Fast Keyboard Shortcuts',
+    description: 'Work at the speed of thought with our optimized shortcuts.',
     icon: <Keyboard className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-2">
           <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Création rapide de prompt</span>
+            <span className="text-sm">Quick prompt creation</span>
             <Badge variant="secondary">Q</Badge>
           </div>
           <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Ouvrir la bibliothèque</span>
+            <span className="text-sm">Open prompt library</span>
             <Badge variant="secondary">L</Badge>
           </div>
           <div className="flex items-center justify-between p-2 bg-muted rounded">
@@ -107,7 +107,7 @@ const onboardingSteps = [
             <Badge variant="secondary">K</Badge>
           </div>
           <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Notes rapides</span>
+            <span className="text-sm">Quick notes</span>
             <Badge variant="secondary">N</Badge>
           </div>
         </div>
@@ -118,8 +118,8 @@ const onboardingSteps = [
     )
   },
   {
-    title: 'Knowledge Box & Recherche Globale',
-    description: 'Stockez vos références et retrouvez tout instantanément.',
+    title: 'Knowledge Box & Global Search',
+    description: 'Store your references and find everything instantly.',
     icon: <BookOpen className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
@@ -130,27 +130,27 @@ const onboardingSteps = [
               Knowledge Box
             </div>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Liens & docs</li>
-              <li>• Système de design</li>
-              <li>• Snippets de code</li>
-              <li>• PDFs importants</li>
+              <li>• Links & docs</li>
+              <li>• Design systems</li>
+              <li>• Code snippets</li>
+              <li>• Important PDFs</li>
             </ul>
           </div>
           <div className="space-y-2">
             <div className="font-medium flex items-center gap-2">
               <Search className="h-4 w-4" />
-              Recherche Globale
+              Global Search
             </div>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Tous vos prompts</li>
-              <li>• Contenu KB</li>
-              <li>• Filtres avancés</li>
-              <li>• Auto-archivage</li>
+              <li>• All your prompts</li>
+              <li>• KB content</li>
+              <li>• Advanced filters</li>
+              <li>• Auto-archiving</li>
             </ul>
           </div>
         </div>
         <div className="bg-muted p-3 rounded-lg">
-          <p className="text-sm">Comme Claude Projects ou Notebook LLM, mais optimisé pour les devs !</p>
+          <p className="text-sm">Like Claude Projects or Notebook LLM, but optimized for developers!</p>
         </div>
       </div>
     )
@@ -195,7 +195,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
             <div>
               <div className="text-lg">{step.title}</div>
               <div className="text-sm text-muted-foreground font-normal">
-                Étape {currentStep + 1} sur {onboardingSteps.length}
+                Step {currentStep + 1} of {onboardingSteps.length}
               </div>
             </div>
           </DialogTitle>
@@ -226,7 +226,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
             className="flex items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Précédent
+            Previous
           </Button>
 
           <div className="flex items-center gap-2">
@@ -242,14 +242,14 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
 
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={handleSkip}>
-              Passer
+              Skip
             </Button>
             <Button onClick={nextStep} className="flex items-center gap-2">
               {currentStep === onboardingSteps.length - 1 ? (
-                'Commencer !'
+                'Get Started!'
               ) : (
                 <>
-                  Suivant
+                  Next
                   <ChevronRight className="h-4 w-4" />
                 </>
               )}
