@@ -5,6 +5,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalHeader } from './GlobalHeader';
 import { MinimalSidebar } from './MinimalSidebar';
 import { PromptsProvider } from '@/context/PromptsContext';
+import { KnowledgeBoxModal } from './KnowledgeBoxModal';
 
 import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,12 +24,13 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
-const appStore = useAppStoreOptional();
+  const appStore = useAppStoreOptional();
   const openDialog = appStore?.openDialog ?? (() => {});
   
   // Product/Epic assignment state - core functionality for prompt association
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
 
   // Simple page configuration
   const config = {
@@ -49,8 +51,15 @@ const appStore = useAppStoreOptional();
   // Global keyboard shortcuts
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
-    'k': () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')),
+    'k': () => setIsKnowledgeModalOpen(true),
   });
+
+  // Listen for knowledge dialog events
+  useEffect(() => {
+    const handleOpenKnowledge = () => setIsKnowledgeModalOpen(true);
+    window.addEventListener('open-knowledge-dialog', handleOpenKnowledge);
+    return () => window.removeEventListener('open-knowledge-dialog', handleOpenKnowledge);
+  }, []);
 
   // Global keyboard shortcut handler for quick prompt creation
   useEffect(() => {
@@ -75,70 +84,75 @@ const appStore = useAppStoreOptional();
   }
 
   return (
-      <div className="min-h-screen bg-background">
-        
-        {config.showSidebar ? (
-          <SidebarProvider defaultOpen={config.sidebarDefaultOpen}>
-            <PromptsProvider 
-              workspaceId={workspace?.id}
-              selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-              selectedEpicId={selectedEpicId}
-            >
-              <div className="min-h-screen w-full bg-background flex">
-                <MinimalSidebar 
-                  workspace={workspace}
-                  selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
-                  selectedEpicId={selectedEpicId}
-                  onProductSelect={setSelectedProductId}
-                  onEpicSelect={setSelectedEpicId}
-                  showCompletedItems={preferences.showCompletedItems}
-                  onToggleCompletedItems={handleToggleCompletedItems}
-                  onQuickAdd={handleQuickAdd}
-                  searchQuery=""
-                />
-                
-                <div className="flex-1 flex flex-col min-w-0">
-                  {config.showHeader && (
-                    <GlobalHeader 
-                      showSearch={config.showSearch} 
-                      showSidebarTrigger={true} 
-                    />
-                  )}
-                  
-                  <main 
-                    className="flex-1 pt-16"
-                    style={{ backgroundColor: '#191a23' }}
-                  >
-                    {React.isValidElement(children) && children.type === Dashboard 
-                      ? React.cloneElement(children as React.ReactElement<any>, {
-                          selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
-                          selectedEpicId: selectedEpicId
-                        })
-                      : children}
-                  </main>
-                </div>
-
-                <LayoutControls 
-                  workspace={workspace}
-                  selectedProductId={selectedProductId}
-                  selectedEpicId={selectedEpicId}
-                />
-              </div>
-            </PromptsProvider>
-          </SidebarProvider>
-        ) : (
-          <>
-            {config.showHeader && (
-              <GlobalHeader 
-                showSearch={config.showSearch} 
-                showSidebarTrigger={false} 
+    <div className="min-h-screen bg-background">
+      {config.showSidebar ? (
+        <SidebarProvider defaultOpen={config.sidebarDefaultOpen}>
+          <PromptsProvider 
+            workspaceId={workspace?.id}
+            selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+            selectedEpicId={selectedEpicId}
+          >
+            <div className="min-h-screen w-full bg-background flex">
+              <MinimalSidebar 
+                workspace={workspace}
+                selectedProductId={selectedProductId === 'all' ? undefined : selectedProductId}
+                selectedEpicId={selectedEpicId}
+                onProductSelect={setSelectedProductId}
+                onEpicSelect={setSelectedEpicId}
+                showCompletedItems={preferences.showCompletedItems}
+                onToggleCompletedItems={handleToggleCompletedItems}
+                onQuickAdd={handleQuickAdd}
+                searchQuery=""
               />
-            )}
-            <main className={config.showHeader ? 'pt-16' : 'min-h-screen pt-16'}>
-              {children}
-            </main>
-          </>
-        )}
-      </div>
-    );
-  }
+              
+              <div className="flex-1 flex flex-col min-w-0">
+                {config.showHeader && (
+                  <GlobalHeader 
+                    showSearch={config.showSearch} 
+                    showSidebarTrigger={true} 
+                  />
+                )}
+                
+                <main 
+                  className="flex-1 pt-16"
+                  style={{ backgroundColor: '#191a23' }}
+                >
+                  {React.isValidElement(children) && children.type === Dashboard 
+                    ? React.cloneElement(children as React.ReactElement<any>, {
+                        selectedProductId: selectedProductId === 'all' ? undefined : selectedProductId,
+                        selectedEpicId: selectedEpicId
+                      })
+                    : children}
+                </main>
+              </div>
+
+              <LayoutControls 
+                workspace={workspace}
+                selectedProductId={selectedProductId}
+                selectedEpicId={selectedEpicId}
+              />
+            </div>
+          </PromptsProvider>
+        </SidebarProvider>
+      ) : (
+        <>
+          {config.showHeader && (
+            <GlobalHeader 
+              showSearch={config.showSearch} 
+              showSidebarTrigger={false} 
+            />
+          )}
+          <main className={config.showHeader ? 'pt-16' : 'min-h-screen pt-16'}>
+            {children}
+          </main>
+        </>
+      )}
+
+      {/* Knowledge Box Modal */}
+      <KnowledgeBoxModal
+        open={isKnowledgeModalOpen}
+        onOpenChange={setIsKnowledgeModalOpen}
+      />
+    </div>
+  );
+}
