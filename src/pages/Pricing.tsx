@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Heart, Check, Zap, Sparkles, Gift, AlertCircle } from "lucide-react";
+import { ArrowRight, Heart, Check, Zap, Sparkles, AlertCircle } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
@@ -20,9 +20,6 @@ export default function Pricing() {
   const { user } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [couponCode, setCouponCode] = useState("Early"); // Default to "Early" coupon
-  const [couponError, setCouponError] = useState("");
-  const [couponSuccess, setCouponSuccess] = useState("");
   const { trackPricingInteraction, isTracking } = usePricingTracking();
   
   const handleGetStarted = () => {
@@ -52,8 +49,6 @@ export default function Pricing() {
     }
 
     setIsLoading(true);
-    setCouponError("");
-    setCouponSuccess("");
     
     try {
       const { data: authData } = await supabase.auth.getSession();
@@ -62,10 +57,7 @@ export default function Pricing() {
         throw new Error('No active session');
       }
 
-      const requestBody: { priceId: string; couponId?: string } = { priceId };
-      if (couponCode.trim()) {
-        requestBody.couponId = couponCode.trim();
-      }
+      const requestBody = { priceId };
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: requestBody,
@@ -77,14 +69,6 @@ export default function Pricing() {
       if (error) throw error;
       
       if (data?.url) {
-        if (couponCode.trim()) {
-          if (data.coupon_applied) {
-            setCouponSuccess(`Coupon "${couponCode}" applied successfully!`);
-          } else {
-            setCouponError(`Coupon "${couponCode}" is invalid or expired. Proceeding without discount.`);
-            setCouponSuccess("");
-          }
-        }
         // Redirect to Stripe checkout
         window.open(data.url, '_blank');
       } else {
@@ -93,12 +77,7 @@ export default function Pricing() {
     } catch (error) {
       console.error('Checkout error:', error);
       const errorMessage = error.message || "Failed to start checkout process. Please try again.";
-      
-      if (errorMessage.includes("Invalid coupon") || errorMessage.includes("coupon")) {
-        setCouponError(errorMessage);
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -208,46 +187,6 @@ export default function Pricing() {
             </div>
           </BlurFade>
 
-          {/* Coupon Code Input */}
-          <BlurFade delay={0.7} inView>
-            <div className="max-w-md mx-auto space-y-3 mb-8">
-              <div className="text-center">
-                <Label htmlFor="coupon-code" className="text-sm font-medium">
-                  Coupon Code (Optional)
-                </Label>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <Input
-                  id="coupon-code"
-                  placeholder="Enter coupon code (e.g., Early)"
-                  value={couponCode}
-                  onChange={(e) => {
-                    setCouponCode(e.target.value);
-                    setCouponError("");
-                    setCouponSuccess("");
-                  }}
-                  className="text-center"
-                />
-                {couponError && (
-                  <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                    <AlertDescription className="text-red-600 dark:text-red-400">
-                      {couponError}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {couponSuccess && (
-                  <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-700 dark:text-green-300">
-                      {couponSuccess}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-            </div>
-          </BlurFade>
-
           {/* Pricing Cards */}
           <BlurFade delay={0.8} inView>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -269,14 +208,6 @@ export default function Pricing() {
                         {isAnnual && tier.yearlyPrice > 0 && (
                           <div className="text-sm text-muted-foreground">
                             ${tier.yearlyPrice}/year (save 20%)
-                          </div>
-                        )}
-                        {tier.planId !== "free" && couponCode && (
-                          <div className="mt-2">
-                            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              <Gift className="w-3 h-3 mr-1" />
-                              Extra 30% off with "{couponCode}"
-                            </Badge>
                           </div>
                         )}
                       </div>
