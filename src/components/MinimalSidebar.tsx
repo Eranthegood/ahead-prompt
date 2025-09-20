@@ -152,9 +152,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     color: '#8B5CF6'
   });
 
-  // Knowledge Modal states
-  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
-  const [selectedKnowledgeProduct, setSelectedKnowledgeProduct] = useState<Product | undefined>();
   const [isPromptLibraryOpen, setIsPromptLibraryOpen] = useState(false);
 
   // Filter function to get prompts that match current view filters (only active prompts)
@@ -394,20 +391,20 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
 
   // Knowledge Modal handlers
   const handleOpenKnowledge = (product?: Product) => {
-    setSelectedKnowledgeProduct(product);
-    setIsKnowledgeModalOpen(true);
-  };
-
-  const handleCloseKnowledge = () => {
-    setIsKnowledgeModalOpen(false);
-    setSelectedKnowledgeProduct(undefined);
+    // Use event system to open the new Knowledge Box modal
+    const event = new CustomEvent('open-knowledge-dialog', { 
+      detail: { productId: product?.id } 
+    });
+    window.dispatchEvent(event);
   };
 
   // Add event listeners for onboarding checklist actions
   useEffect(() => {
     const handleOpenKnowledgeDialog = () => {
       console.log('Opening knowledge dialog from onboarding');
-      setIsKnowledgeModalOpen(true);
+      // Use event system to open the new Knowledge Box modal
+      const event = new CustomEvent('open-knowledge-dialog');
+      window.dispatchEvent(event);
     };
 
     const handleOpenProductDialog = () => {
@@ -1396,19 +1393,6 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
         </DialogContent>
       </Dialog>
 
-      {/* Knowledge Manager - Minimalist */}
-      <Dialog open={isKnowledgeModalOpen} onOpenChange={setIsKnowledgeModalOpen}>
-        <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg">
-              {selectedKnowledgeProduct?.name ?? 'Knowledge'}
-            </DialogTitle>
-          </DialogHeader>
-          <KnowledgeAccessGuard>
-            <MinimalKnowledgeBase workspace={workspace} product={selectedKnowledgeProduct} />
-          </KnowledgeAccessGuard>
-        </DialogContent>
-      </Dialog>
 
       {/* Prompt Library */}
       <PromptLibrary

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { KnowledgeSidebar } from './KnowledgeSidebar';
 import { MinimalKnowledgeBase } from './MinimalKnowledgeBase';
@@ -15,8 +15,16 @@ export interface KnowledgeBoxModalProps {
 export function KnowledgeBoxModal({ open, onOpenChange, defaultSection = 'workspace' }: KnowledgeBoxModalProps) {
   const [activeSection, setActiveSection] = useState(defaultSection);
   const [searchTerm, setSearchTerm] = useState('');
+  
   const { workspace } = useWorkspace();
   const { products } = useProducts(workspace?.id);
+  
+  // Update active section when defaultSection changes
+  useEffect(() => {
+    if (defaultSection) {
+      setActiveSection(defaultSection);
+    }
+  }, [defaultSection]);
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);

@@ -27,10 +27,10 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const appStore = useAppStoreOptional();
   const openDialog = appStore?.openDialog ?? (() => {});
   
-  // Product/Epic assignment state - core functionality for prompt association
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
   const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('workspace');
 
   // Simple page configuration
   const config = {
@@ -56,9 +56,19 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
 
   // Listen for knowledge dialog events
   useEffect(() => {
-    const handleOpenKnowledge = () => setIsKnowledgeModalOpen(true);
-    window.addEventListener('open-knowledge-dialog', handleOpenKnowledge);
-    return () => window.removeEventListener('open-knowledge-dialog', handleOpenKnowledge);
+    const handleOpenKnowledge = (event?: CustomEvent) => {
+      setIsKnowledgeModalOpen(true);
+      // If event has productId, set the active section to that product
+      if (event?.detail?.productId) {
+        setActiveSection(event.detail.productId);
+      } else {
+        // Default to workspace section
+        setActiveSection('workspace');
+      }
+    };
+    
+    window.addEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
+    return () => window.removeEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
   }, []);
 
   // Global keyboard shortcut handler for quick prompt creation
@@ -152,6 +162,7 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       <KnowledgeBoxModal
         open={isKnowledgeModalOpen}
         onOpenChange={setIsKnowledgeModalOpen}
+        defaultSection={activeSection}
       />
     </div>
   );
