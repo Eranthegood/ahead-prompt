@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, Eye, User, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Eye, User, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +35,45 @@ interface BlogPostCardProps {
   variant?: 'default' | 'featured' | 'compact';
 }
 
+function BlogImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  if (!src || imageError) {
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center`}>
+        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {imageLoading && (
+        <div className={`${className} bg-muted animate-pulse flex items-center justify-center absolute inset-0 z-10`}>
+          <ImageIcon className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        onError={handleImageError}
+        onLoad={handleImageLoad}
+      />
+    </div>
+  );
+}
+
 export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
   const navigate = useNavigate();
 
@@ -47,7 +86,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
       <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300" onClick={handleReadMore}>
         {post.featured_image_url && (
           <div className="aspect-[16/9] overflow-hidden">
-            <img
+            <BlogImage
               src={post.featured_image_url}
               alt={post.title}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
@@ -109,7 +148,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
           <div className="flex gap-4">
             {post.featured_image_url && (
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
-                <img
+                <BlogImage
                   src={post.featured_image_url}
                   alt={post.title}
                   className="w-full h-full object-cover"
@@ -138,7 +177,7 @@ export function BlogPostCard({ post, variant = 'default' }: BlogPostCardProps) {
     <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300" onClick={handleReadMore}>
       {post.featured_image_url && (
         <div className="aspect-[16/10] overflow-hidden">
-          <img
+          <BlogImage
             src={post.featured_image_url}
             alt={post.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
