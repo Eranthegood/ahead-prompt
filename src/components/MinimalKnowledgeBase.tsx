@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Search, Edit, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
-// Removed KnowledgeModal import - using event-based approach
 import { QuickKnowledgeForm } from "./QuickKnowledgeForm";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
@@ -20,10 +19,8 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
     workspace.id, 
     product?.id
   );
-  // States - removing modal states as we use event system
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const deleteKnowledgeItem = async (itemId: string) => {
     const success = await deleteItem(itemId);
@@ -39,13 +36,14 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
   );
 
   const handleEdit = (item: KnowledgeItem) => {
-    // Open Knowledge Box Modal through event system
-    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
+    // Dispatch event to edit knowledge item
+    window.dispatchEvent(new CustomEvent('edit-knowledge-item', { 
+      detail: { item, workspace, product } 
+    }));
   };
 
   const handleCreate = () => {
-    // Open Knowledge Box Modal through event system
-    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
+    setShowCreateForm(true);
   };
 
   if (loading) {
@@ -67,6 +65,28 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
           Add
         </Button>
       </div>
+
+      {/* Create form */}
+      {showCreateForm && (
+        <div className="border border-border rounded-lg p-4 bg-card">
+          <QuickKnowledgeForm 
+            workspace={workspace}
+            product={product}
+            onSuccess={() => {
+              setShowCreateForm(false);
+              toast.success("Knowledge item created!");
+            }}
+          />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowCreateForm(false)}
+            className="mt-3 h-8"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
 
       {/* Simple search */}
       {knowledgeItems.length > 0 && (
