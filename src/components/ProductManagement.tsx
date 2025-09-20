@@ -12,7 +12,7 @@ import { useSubscription, canCreateProduct } from '@/hooks/useSubscription';
 import { UsageLimitIndicator } from '@/components/UsageLimitIndicator';
 import { Package, Edit, Trash2, Plus, Palette, MoreVertical, BookOpen, Lock } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { KnowledgeModal } from '@/components/KnowledgeModal';
+// Removed KnowledgeModal import - using event-based approach
 import { useToast } from '@/hooks/use-toast';
 import type { Product, Workspace } from '@/types';
 
@@ -42,9 +42,9 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
     description: '',
     color: '#3B82F6',
   });
+  // Remove knowledge modal states - using event system instead
   const [createKnowledge, setCreateKnowledge] = useState(false);
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
-  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenEdit = (product: Product) => {
@@ -59,16 +59,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
   const handleCloseDialog = () => {
     setEditingProduct(null);
     setIsCreateDialogOpen(false);
-    setIsKnowledgeModalOpen(false);
     setFormData({ name: '', description: '', color: '#3B82F6' });
     setCreateKnowledge(false);
     setCreatedProduct(null);
   };
 
-  const handleKnowledgeModalClose = () => {
-    setIsKnowledgeModalOpen(false);
-    handleCloseDialog();
-  };
+  // Remove knowledge modal close handler - using event system
 
   const handleOpenCreate = () => {
     if (!canCreate) {
@@ -119,7 +115,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
           if (createKnowledge) {
             setCreatedProduct(newProduct);
             setIsCreateDialogOpen(false);
-            setIsKnowledgeModalOpen(true);
+            // Open Knowledge Box Modal through event system
+            window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
           } else {
             handleCloseDialog();
           }
@@ -379,17 +376,6 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ workspace 
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Knowledge Modal */}
-      {createdProduct && (
-        <KnowledgeModal
-          open={isKnowledgeModalOpen}
-          onOpenChange={setIsKnowledgeModalOpen}
-          onClose={handleKnowledgeModalClose}
-          workspace={workspace}
-          product={createdProduct}
-        />
-      )}
     </div>
   );
 };

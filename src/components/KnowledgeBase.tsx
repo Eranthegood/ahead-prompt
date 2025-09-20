@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Edit, Trash2, Copy, Tag, Filter, BookOpen } from "lucide-react";
 import { toast } from "sonner";
-import { KnowledgeModal } from "./KnowledgeModal";
+// Removed KnowledgeModal import - using event-based approach
 import { QuickKnowledgeForm } from "./QuickKnowledgeForm";
 import { format } from "date-fns";
 import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/useKnowledge";
@@ -24,11 +24,10 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
     workspace.id, 
     product?.id
   );
+  // States - removing modal states as we use event system
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<KnowledgeItem | null>(null);
 
   const deleteKnowledgeItem = async (itemId: string) => {
     const success = await deleteItem(itemId);
@@ -84,19 +83,16 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
   };
 
   const handleEdit = (item: KnowledgeItem) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
+    // Open Knowledge Box Modal through event system
+    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
   };
 
   const handleCreate = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
+    // Open Knowledge Box Modal through event system
+    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
+  // Remove handleModalClose function as we no longer use modal
 
   if (loading) {
     return (
@@ -305,15 +301,6 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
           </div>
         </div>
       )}
-
-      <KnowledgeModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        workspace={workspace}
-        product={product}
-        editingItem={editingItem}
-        onClose={handleModalClose}
-      />
     </div>
   );
 }

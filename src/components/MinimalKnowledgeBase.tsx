@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Search, Edit, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
-import { KnowledgeModal } from "./KnowledgeModal";
+// Removed KnowledgeModal import - using event-based approach
 import { QuickKnowledgeForm } from "./QuickKnowledgeForm";
 import { useKnowledge } from "@/hooks/useKnowledge";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
@@ -20,9 +20,10 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
     workspace.id, 
     product?.id
   );
+  // States - removing modal states as we use event system
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<KnowledgeItem | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const deleteKnowledgeItem = async (itemId: string) => {
     const success = await deleteItem(itemId);
@@ -38,13 +39,13 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
   );
 
   const handleEdit = (item: KnowledgeItem) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
+    // Open Knowledge Box Modal through event system
+    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
   };
 
   const handleCreate = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
+    // Open Knowledge Box Modal through event system
+    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
   };
 
   if (loading) {
@@ -131,18 +132,6 @@ export function MinimalKnowledgeBase({ workspace, product }: MinimalKnowledgeBas
           />
         </div>
       )}
-
-      <KnowledgeModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        workspace={workspace}
-        product={product}
-        editingItem={editingItem}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingItem(null);
-        }}
-      />
     </div>
   );
 }

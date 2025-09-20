@@ -51,10 +51,7 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   // Global keyboard shortcuts
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
-    'k': () => {
-      console.log('Knowledge Box shortcut triggered');
-      setIsKnowledgeModalOpen(true);
-    },
+    'k': () => setIsKnowledgeModalOpen(true),
   });
 
   // Listen for knowledge dialog events

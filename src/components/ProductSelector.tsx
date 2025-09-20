@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useProducts } from '@/hooks/useProducts';
 import { Package, Plus, Palette, BookOpen } from 'lucide-react';
-import { KnowledgeModal } from '@/components/KnowledgeModal';
+// Removed KnowledgeModal import - using event-based approach
 import type { Product, Workspace } from '@/types';
 
 interface ProductSelectorProps {
@@ -39,9 +39,9 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
   const [newProductName, setNewProductName] = useState('');
   const [newProductDescription, setNewProductDescription] = useState('');
   const [newProductColor, setNewProductColor] = useState('#3B82F6');
+  // Remove knowledge modal states - using event system instead
   const [createKnowledge, setCreateKnowledge] = useState(false);
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
-  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateProduct = async () => {
@@ -61,7 +61,8 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
         
         if (createKnowledge) {
           setIsCreateDialogOpen(false);
-          setIsKnowledgeModalOpen(true);
+          // Open Knowledge Box Modal through event system
+          window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
         } else {
           handleCloseDialogs();
         }
@@ -73,7 +74,6 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
 
   const handleCloseDialogs = () => {
     setIsCreateDialogOpen(false);
-    setIsKnowledgeModalOpen(false);
     setNewProductName('');
     setNewProductDescription('');
     setNewProductColor('#3B82F6');
@@ -81,10 +81,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
     setCreatedProduct(null);
   };
 
-  const handleKnowledgeModalClose = () => {
-    setIsKnowledgeModalOpen(false);
-    handleCloseDialogs();
-  };
+  // Remove knowledge modal close handler - using event system
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
 
@@ -235,17 +232,6 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Knowledge Modal */}
-      {createdProduct && (
-        <KnowledgeModal
-          open={isKnowledgeModalOpen}
-          onOpenChange={setIsKnowledgeModalOpen}
-          onClose={handleKnowledgeModalClose}
-          workspace={workspace}
-          product={createdProduct}
-        />
-      )}
     </div>
   );
 };
