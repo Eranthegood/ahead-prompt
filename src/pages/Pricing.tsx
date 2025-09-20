@@ -30,6 +30,8 @@ export default function Pricing() {
   };
 
   const handleUpgrade = async (planId: string) => {
+    console.log('[PRICING] handleUpgrade called with planId:', planId, 'isAnnual:', isAnnual);
+    
     if (!user) {
       // Pass plan information via URL parameters for unauthenticated users
       const params = new URLSearchParams({
@@ -41,7 +43,10 @@ export default function Pricing() {
     }
 
     const priceId = getPriceId(planId, isAnnual);
+    console.log('[PRICING] getPriceId result:', priceId, 'for plan:', planId);
+    
     if (!priceId) {
+      console.error('[PRICING] No price ID found for plan:', planId);
       toast.error("Price not found for this plan");
       return;
     }
