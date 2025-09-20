@@ -189,7 +189,7 @@ serve(async (req) => {
             created_at: article.created_at,
             updated_at: new Date().toISOString()
           }, {
-            onConflict: 'slug,workspace_id',
+            onConflict: 'slug',
             ignoreDuplicates: false
           })
           .select()
