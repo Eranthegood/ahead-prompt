@@ -74,9 +74,19 @@ export const usePrompts = (
   // This function MUST close dialog immediately and generate in background
   // Any change here can break the core UX flow of Ahead.love
   const createPromptAndGenerate = async (promptData: CreatePromptData): Promise<any> => {
-    // Force status to generating if content is substantial for background generation
-    const shouldGenerate = (promptData.description?.trim().length || 0) > 15 || 
-                           (promptData.original_description?.trim().length || 0) > 15;
+    // Enhanced generation logic with knowledge context and provider checks
+    const shouldGenerate = !!(
+      (promptData.original_description?.trim().length || 0) > 15 &&
+      (promptData.knowledge_context?.length || promptData.ai_provider === 'claude')
+    );
+    
+    console.log('🚀 Generation check:', {
+      hasOriginalDescription: !!promptData.original_description,
+      originalDescriptionLength: promptData.original_description?.length || 0,
+      hasKnowledgeContext: !!promptData.knowledge_context?.length,
+      aiProvider: promptData.ai_provider,
+      shouldGenerate
+    });
     
     if (shouldGenerate) {
       promptData.status = 'generating';
@@ -89,6 +99,8 @@ export const usePrompts = (
       const content = promptData.original_description || 
                      promptData.description || 
                      `${promptData.title}\n\n${promptData.description || ''}`;
+      
+      console.log('🚀 Starting background generation for prompt:', result.id);
       
       // Background generation call - don't await
       autoGeneratePrompt(

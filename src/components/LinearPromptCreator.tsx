@@ -150,11 +150,22 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
 
     // Strip HTML from content for plain text description
     const plainTextContent = extractTextFromHTML(content);
+    
+    // Keep original content (HTML or title) for AI generation
+    const originalContent = content.trim() || title.trim();
+
+    console.log('🚀 Creating prompt data:', {
+      originalContent: originalContent.substring(0, 100) + '...',
+      plainTextContent: plainTextContent.substring(0, 100) + '...',
+      hasKnowledge: selectedKnowledge.length > 0,
+      provider: providerConfig.provider,
+      model: providerConfig.model
+    });
 
     return {
       title: title.trim() || generateTitleFromContent(plainTextContent),
       description: plainTextContent,
-      original_description: plainTextContent,
+      original_description: originalContent, // 🔥 This is key for generation!
       epic_id: actualEpic,
       product_id: finalProductId,
       priority,
