@@ -73,7 +73,7 @@ export function BlogList({ featured = false, limit, category }: BlogListProps) {
           )
         `)
         .eq('status', 'published')
-        .order('published_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .range(from, to);
 
       // Filter by category if selected
