@@ -30,6 +30,7 @@ export default function Pricing() {
     console.log('[PRICING] handleUpgrade called with planId:', planId, 'isAnnual:', isAnnual);
     
     if (!user) {
+      console.log('[PRICING] User not authenticated, redirecting to auth');
       // Pass plan information via URL parameters for unauthenticated users
       const params = new URLSearchParams({
         plan: planId,
@@ -38,6 +39,8 @@ export default function Pricing() {
       navigate(`/auth?${params.toString()}`);
       return;
     }
+
+    console.log('[PRICING] User authenticated:', { userId: user.id, email: user.email });
 
     const priceId = getPriceId(planId, isAnnual);
     console.log('[PRICING] getPriceId result:', priceId, 'for plan:', planId);
@@ -51,13 +54,23 @@ export default function Pricing() {
     setIsLoading(true);
     
     try {
-      const { data: authData } = await supabase.auth.getSession();
+      const { data: authData, error: sessionError } = await supabase.auth.getSession();
+      console.log('[PRICING] Session check:', { 
+        hasSession: !!authData.session, 
+        hasToken: !!authData.session?.access_token,
+        sessionError 
+      });
       
       if (!authData.session) {
-        throw new Error('No active session');
+        throw new Error('No active session found');
+      }
+
+      if (!authData.session.access_token) {
+        throw new Error('No access token found in session');
       }
 
       const requestBody = { priceId };
+      console.log('[PRICING] Calling create-checkout with:', { priceId, hasAuth: true });
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: requestBody,
@@ -66,16 +79,19 @@ export default function Pricing() {
         },
       });
 
+      console.log('[PRICING] create-checkout response:', { data, error });
+
       if (error) throw error;
       
       if (data?.url) {
+        console.log('[PRICING] Opening checkout URL:', data.url);
         // Redirect to Stripe checkout
         window.open(data.url, '_blank');
       } else {
-        throw new Error('No checkout URL received');
+        throw new Error('No checkout URL received from Stripe');
       }
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('[PRICING] Checkout error:', error);
       const errorMessage = error.message || "Failed to start checkout process. Please try again.";
       toast.error(errorMessage);
     } finally {

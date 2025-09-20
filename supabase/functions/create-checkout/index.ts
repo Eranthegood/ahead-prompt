@@ -27,18 +27,32 @@ serve(async (req) => {
     }
     logStep("Price ID received", { priceId, couponId });
 
-    // Create a Supabase client using the anon key
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+  // Create a Supabase client using the anon key
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+  // Get the authorization header
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) throw new Error("No authorization header provided");
+  logStep("Authorization header found");
+
+  const token = authHeader.replace("Bearer ", "");
+  logStep("Attempting to authenticate user with token");
+  
+  const { data, error: authError } = await supabaseClient.auth.getUser(token);
+  if (authError) {
+    logStep("Authentication error", { error: authError.message });
+    throw new Error(`Authentication failed: ${authError.message}`);
+  }
+  
+  const user = data.user;
+  if (!user?.email) {
+    logStep("User data incomplete", { user: user });
+    throw new Error("User not authenticated or email not available");
+  }
+  logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
       apiVersion: "2025-08-27.basil" 
