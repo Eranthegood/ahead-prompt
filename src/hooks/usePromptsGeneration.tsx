@@ -53,14 +53,6 @@ export const usePromptsGeneration = (
   ) => {
     const cleanContent = stripHtmlAndNormalize(content);
     
-    console.log('🔧 Prompt generation - Content cleaning:', {
-      promptId,
-      original: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
-      cleaned: cleanContent.substring(0, 100) + (cleanContent.length > 100 ? '...' : ''),
-      originalLength: content.length,
-      cleanedLength: cleanContent.length
-    });
-    
     if (cleanContent.length <= 15) {
       console.warn('❌ Content too short after cleaning:', { 
         promptId,

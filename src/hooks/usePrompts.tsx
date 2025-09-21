@@ -77,14 +77,6 @@ export const usePrompts = (
     // Generate for any substantial content (core feature!)
     const shouldGenerate = (promptData.original_description?.trim().length || 0) > 15;
     
-    console.log('🚀 Generation check:', {
-      hasOriginalDescription: !!promptData.original_description,
-      originalDescriptionLength: promptData.original_description?.length || 0,
-      hasKnowledgeContext: !!promptData.knowledge_context?.length,
-      aiProvider: promptData.ai_provider,
-      shouldGenerate
-    });
-    
     if (shouldGenerate) {
       promptData.status = 'generating';
     }
@@ -96,8 +88,6 @@ export const usePrompts = (
       const content = promptData.original_description || 
                      promptData.description || 
                      `${promptData.title}\n\n${promptData.description || ''}`;
-      
-      console.log('🚀 Starting background generation for prompt:', result.id);
       
       // Background generation call - don't await
       autoGeneratePrompt(
