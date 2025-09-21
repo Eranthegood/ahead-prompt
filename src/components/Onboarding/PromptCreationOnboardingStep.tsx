@@ -124,83 +124,118 @@ export function PromptCreationOnboardingStep({
 
   return (
     <div className="space-y-6">
-      {/* Message principal simplifié */}
-      <div className="text-center space-y-3">
-        <div className="flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mx-auto">
-          <Sparkles className="h-8 w-8 text-primary" />
+      {/* Titre et explication */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Zap className="h-5 w-5 text-primary" />
+          <h3 className="font-medium">Découvrez la création de prompt avancée</h3>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold">Créez votre premier prompt</h3>
-          <p className="text-muted-foreground">
-            Écrivez simplement votre idée, l'IA génère le prompt parfait
-          </p>
+        <p className="text-sm text-muted-foreground">
+          Cette interface vous permettra de créer tous vos futurs prompts avec des options avancées.
+        </p>
+      </div>
+
+      {/* Explications des fonctionnalités */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Target className="h-4 w-4 text-primary" />
+          <span>Priorité pour organiser</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Palette className="h-4 w-4 text-primary" />
+          <span>Produit et Epic</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Bot className="h-4 w-4 text-primary" />
+          <span>IA personnalisée</span>
         </div>
       </div>
 
-      {/* Zone de création simplifiée */}
-      <Card className="border-2 border-primary/20">
-        <CardContent className="p-6 space-y-4">
-          {/* Input principal mis en avant */}
-          <div className="space-y-3">
-            <Label htmlFor="prompt-idea" className="text-lg font-medium">
-              Quelle est votre idée ?
-            </Label>
+      {/* Suggestions d'exemples */}
+      <div className="space-y-3">
+        <Label>Choisissez un exemple ou créez le vôtre :</Label>
+        <div className="flex flex-wrap gap-2">
+          {suggestionExamples.map((suggestion) => (
+            <Badge
+              key={suggestion}
+              variant="outline"
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              {suggestion}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* Interface de création intégrée */}
+      <Card className="border-2 border-dashed border-primary/20">
+        <CardHeader className="pb-4">
+          <Label className="text-base font-medium">Interface de création complète</Label>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Titre du prompt */}
+          <div className="space-y-2">
+            <Label htmlFor="prompt-title">Titre du prompt *</Label>
             <Input
-              id="prompt-idea"
+              id="prompt-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="ex: Ajouter une page de connexion"
-              className="text-lg h-12 text-center"
+              placeholder="ex: Ajouter authentification utilisateur"
               maxLength={100}
+              className="text-base"
             />
-            <p className="text-sm text-muted-foreground text-center">
-              C'est tout ! L'IA va transformer cette idée en prompt détaillé et prêt à utiliser.
-            </p>
           </div>
 
-          {/* Exemples rapides */}
+          {/* Boutons d'action linéaires */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-center">Ou choisissez un exemple :</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {suggestionExamples.map((suggestion) => (
-                <Badge
-                  key={suggestion}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-xs"
-                  onClick={() => handleSuggestionClick(suggestion)}
-                >
-                  {suggestion}
-                </Badge>
-              ))}
-            </div>
+            <Label>Options avancées</Label>
+            <LinearActionButtons
+              priority={priority}
+              onPriorityChange={setPriority}
+              selectedProduct={selectedProduct}
+              onProductChange={setSelectedProduct}
+              selectedEpic={selectedEpic}
+              onEpicChange={setSelectedEpic}
+              providerConfig={providerConfig}
+              onProviderChange={setProviderConfig}
+              selectedKnowledge={selectedKnowledge}
+              onKnowledgeChange={setSelectedKnowledge}
+              products={products || []}
+              epics={epics || []}
+              knowledgeItems={knowledgeItems || []}
+              onCreateProduct={() => {}}
+              onCreateEpic={() => {}}
+              onExpandToggle={() => {}}
+            />
           </div>
 
-          {/* Bouton de création principal */}
+          {/* Bouton de création */}
           <Button
             onClick={handleCreatePrompt}
             disabled={!title.trim() || isCreating}
-            className="w-full h-12"
+            className="w-full"
             size="lg"
           >
             {isCreating ? (
               <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                L'IA génère votre prompt...
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Création et génération...
               </>
             ) : (
               <>
-                <Sparkles className="h-5 w-5 mr-2" />
-                Générer le prompt parfait
+                <Zap className="h-4 w-4 mr-2" />
+                Créer le prompt
               </>
             )}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Message de motivation */}
-      <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 rounded-lg text-center">
+      {/* Conseil d'utilisation */}
+      <div className="bg-accent/20 p-3 rounded-lg">
         <p className="text-sm">
-          <strong>✨ Magie de l'IA :</strong> Vous donnez l'idée, on fait le reste !
+          💡 <strong>Raccourci :</strong> Utilisez <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Q</kbd> pour ouvrir cette interface rapidement !
         </p>
       </div>
     </div>
