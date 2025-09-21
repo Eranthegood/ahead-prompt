@@ -11,8 +11,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Temporarily disabled to resolve WebSocket connection issues
-    // mode === 'development' && componentTagger(),
+    mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {

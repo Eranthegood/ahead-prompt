@@ -14,7 +14,10 @@ if (!isSafeMode()) {
 // Log active storage backend for debugging
 console.info(`[App] Active storage: ${getActiveStorageName()}`);
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Root element not found");
+
+createRoot(rootElement).render(
   <AppStoreProvider>
     <App />
   </AppStoreProvider>
