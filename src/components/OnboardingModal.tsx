@@ -49,7 +49,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
       )
     },
     {
-      title: 'Votre premier prompt avec IA',
+      title: 'Saisissez une idée simple, l\'IA va la transformer en prompt détaillé.',
       description: '',
       icon: <MessageSquare className="h-8 w-8 text-primary" />,
       content: createdProductId ? (
