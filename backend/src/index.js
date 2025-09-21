@@ -5,6 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { ErrorPrompt } from './models/ErrorPrompt.js';
+import feedbackRoutes from './routes/feedback.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -54,6 +55,9 @@ app.post('/api/errors', async (req, res) => {
     res.status(500).json({ error: 'Failed to save error' });
   }
 });
+
+// Feedback routes
+app.use('/api', feedbackRoutes);
 
 async function start() {
   try {
