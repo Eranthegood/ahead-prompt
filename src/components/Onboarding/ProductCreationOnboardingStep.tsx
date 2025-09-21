@@ -87,11 +87,8 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <FolderPlus className="h-5 w-5 text-primary" />
-          <h3 className="font-medium">Créons votre premier produit</h3>
+          <h3 className="font-medium">Les produits vous aident à organiser vos projets. Pensez "App Mobile", "Site Web", "API Backend"...</h3>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Les produits vous aident à organiser vos projets. Pensez "App Mobile", "Site Web", "API Backend"...
-        </p>
       </div>
 
       <Card className="border-dashed">
