@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { FolderPlus, Loader2, CheckCircle } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useAuth } from '@/hooks/useAuth';
@@ -91,71 +90,67 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
         </div>
       </div>
 
-      <Card className="border-dashed">
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="product-name">Nom du produit *</Label>
-              <Input
-                id="product-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="ex: Mon App Mobile"
-                maxLength={50}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="product-name">Nom du produit *</Label>
+          <Input
+            id="product-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="ex: Mon App Mobile"
+            maxLength={50}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="product-description">Description (optionnel)</Label>
+          <Textarea
+            id="product-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Brève description de votre projet..."
+            rows={2}
+            maxLength={200}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Couleur</Label>
+          <div className="flex gap-2">
+            {productColors.map((color) => (
+              <button
+                key={color}
+                type="button"
+                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                  selectedColor === color
+                    ? 'border-primary scale-110'
+                    : 'border-muted hover:border-primary/50'
+                }`}
+                style={{ backgroundColor: color }}
+                onClick={() => setSelectedColor(color)}
               />
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="product-description">Description (optionnel)</Label>
-              <Textarea
-                id="product-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Brève description de votre projet..."
-                rows={2}
-                maxLength={200}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Couleur</Label>
-              <div className="flex gap-2">
-                {productColors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      selectedColor === color
-                        ? 'border-primary scale-110'
-                        : 'border-muted hover:border-primary/50'
-                    }`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => setSelectedColor(color)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={!name.trim() || isCreating}
-              className="w-full"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                <>
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  Créer le produit
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        <Button
+          type="submit"
+          disabled={!name.trim() || isCreating}
+          className="w-full"
+        >
+          {isCreating ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Création...
+            </>
+          ) : (
+            <>
+              <FolderPlus className="h-4 w-4 mr-2" />
+              Créer le produit
+            </>
+          )}
+        </Button>
+      </form>
 
       <div className="bg-accent/20 p-3 rounded-lg">
         <p className="text-sm">
