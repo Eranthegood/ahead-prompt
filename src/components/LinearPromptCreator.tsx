@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuickPromptDialog } from './QuickPromptDialog';
+import { LinearPromptDialogLegacy } from './LinearPromptDialogLegacy';
 import type { Workspace, Epic, Product, PromptPriority } from '@/types';
 
 interface CreatePromptData {
@@ -46,7 +46,7 @@ interface LinearPromptCreatorProps {
  * - Animation and UX enhancements
  */
 export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = (props) => {
-  return <QuickPromptDialog {...props} />;
+  return <LinearPromptDialogLegacy {...props} />;
 };
 
 // Export types for backward compatibility
