@@ -172,7 +172,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             {step.icon}
@@ -186,15 +186,15 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
         </DialogHeader>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-4">
             <CardDescription>{step.description}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {step.content}
           </CardContent>
         </Card>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-2">
           <Button
             variant="outline"
             onClick={prevStep}
