@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, RotateCcw, BookOpen, X } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Flame, RotateCcw, BookOpen, X, Keyboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateTitleFromContent, extractTextFromHTML } from '@/lib/titleUtils';
+import { generateTitleFromContent } from '@/lib/titleUtils';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
-import { ProviderSelector, ProviderConfig as SelectorProviderConfig } from '@/components/ProviderSelector';
+import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
@@ -107,53 +108,44 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   onCreateEpic,
   onProductsRefetch,
 }) => {
-  const { toast } = useToast();
-  const { trackPromptCreation } = usePromptMetrics();
+  // Form state - maintains user selections for product/epic assignment
+  const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(selectedProductId || null);
+  const [selectedPriority, setSelectedPriority] = useState<PromptPriority>(2);
   
-  const {
-    title,
-    setTitle,
-    priority,
-    setPriority,
-    selectedProduct,
-    setSelectedProduct,
-    selectedEpic,
-    setSelectedEpic,
-    providerConfig,
-    setProviderConfig,
-    selectedKnowledge,
-    setSelectedKnowledge,
-    resetForm,
-  } = useLinearPromptCreator({ selectedProductId, selectedEpicId });
-
-  // Knowledge items depend on currently selected product (after hook init)
-  const { knowledgeItems } = useKnowledge(workspace.id, selectedProduct || selectedProductId);
-
-  // Local-echo product list for instant availability
-  const [modalProducts, setModalProducts] = useState<Product[]>(products);
-  useEffect(() => {
-    setModalProducts(products);
-  }, [products]);
-
-  // Listen for product creation events using EventManager
-  useEventSubscription('product:created', (data) => {
-    const newProduct = data?.product || data;
-    if (!newProduct?.id) return;
-    setModalProducts(prev => (prev.some(p => p.id === newProduct.id) ? prev : [newProduct, ...prev]));
-    setSelectedProduct(newProduct.id);
-  }, [setSelectedProduct]);
-
+  // AI Provider state
+  const [providerConfig, setProviderConfig] = useState<ProviderConfig>({
+    provider: 'openai',
+    model: 'gpt-5-2025-08-07'
+  });
+  
+  // Knowledge state
+  const [enableKnowledge, setEnableKnowledge] = useState(true); // Default enabled
+  const [selectedKnowledgeIds, setSelectedKnowledgeIds] = useState<string[]>([]);
+  
+  // Knowledge modal state
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  
+  // Load knowledge items
+  const productIdForKnowledge = selectedProduct || selectedProductId;
+  const { knowledgeItems } = useKnowledge(workspace.id, productIdForKnowledge || undefined);
+  
+  // Performance tracking
+  const [startTime] = useState(Date.now());
+  const { trackPromptCreation, trackError } = usePromptMetrics();
+  
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [hasContent, setHasContent] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
-  const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
+  
+  // Animation state for prompt generation
+  const [showAnimation, setShowAnimation] = useState(false);
   const [generationStep, setGenerationStep] = useState<'input' | 'knowledge' | 'processing' | 'output' | 'complete'>('input');
   
-  // Knowledge modal state
-  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  const { toast } = useToast();
 
-  // Rich text editor
+  // Initialize rich text editor
   const editor = useEditor({
     extensions: [StarterKit],
     content: '',
@@ -175,35 +167,89 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     onRestore: (content) => {
       setDraftRestored(true);
       setHasContent(true);
+      // Hide draft restored indicator after 3 seconds
       setTimeout(() => setDraftRestored(false), 3000);
     },
   });
 
-  useEffect(() => {
-    if (isOpen && editor) {
-      resetForm();
-      if (editor && editor.view && editor.view.dom) {
-        editor.commands.focus();
-      }
-    }
-  }, [isOpen, resetForm, editor]);
-
   // Filter epics based on selected product
-  const filteredEpics = epics.filter(epic => 
-    !selectedProduct || epic.product_id === selectedProduct
-  );
+  const getFilteredEpics = () => {
+    const activeProductId = selectedProductId || (selectedProduct !== 'none' ? selectedProduct : undefined);
+    return activeProductId 
+      ? epics.filter(epic => epic.product_id === activeProductId)
+      : epics;
+  };
+
+  /**
+   * CRITICAL: Product/Epic assignment logic
+   * This function handles the core functionality of auto-assigning prompts to products/epics
+   * when the dialog opens. This logic is essential for the product/epic workflow.
+   */
+  const resetForm = () => {
+    if (!editor) {
+      console.error('Editor not available for resetForm');
+      return;
+    }
+    
+    // Clear previous form state
+    clearDraft();
+    editor.commands.setContent('');
+    
+    // CRITICAL LOGIC: Handle epic selection with automatic parent product selection
+    if (selectedEpicId) {
+      // Find the epic and validate it exists
+      const selectedEpicData = epics.find(epic => epic.id === selectedEpicId);
+      
+      if (selectedEpicData) {
+        // Epic found - set both epic and its parent product
+        setSelectedEpic(selectedEpicId);
+        setSelectedProduct(selectedEpicData.product_id);
+        
+        // Validate epic belongs to a valid product
+        const parentProduct = products.find(p => p.id === selectedEpicData.product_id);
+        if (!parentProduct) {
+          console.warn('Epic found but parent product missing:', {
+            epicId: selectedEpicId,
+            missingProductId: selectedEpicData.product_id
+          });
+        }
+      } else {
+        // Epic not found - fallback to product-only selection
+        console.warn('Selected epic not found in available epics:', {
+          selectedEpicId,
+          availableEpicIds: epics.map(e => e.id)
+        });
+        setSelectedEpic(null);
+        setSelectedProduct(selectedProductId || null);
+      }
+    } else {
+      // No epic selected - use only product selection
+      setSelectedEpic(null);
+      setSelectedProduct(selectedProductId || null);
+    }
+    
+    // Reset other form state
+    setSelectedPriority(2);
+    setHasContent(false);
+    setDraftRestored(false);
+    setSelectedKnowledgeIds([]);
+    
+    // Focus editor - removed timeout delay for better performance
+    if (editor && editor.view && editor.view.dom) {
+      editor.commands.focus();
+    }
+  };
 
   // Handle knowledge selection
   const handleKnowledgeToggle = (knowledgeId: string) => {
-    const currentIds = selectedKnowledge.map(k => k.id);
-    const newIds = currentIds.includes(knowledgeId) 
-      ? currentIds.filter(id => id !== knowledgeId)
-      : [...currentIds, knowledgeId];
-    
-    const newKnowledgeItems = knowledgeItems.filter(item => newIds.includes(item.id));
-    setSelectedKnowledge(newKnowledgeItems);
+    setSelectedKnowledgeIds(prev => 
+      prev.includes(knowledgeId) 
+        ? prev.filter(id => id !== knowledgeId)
+        : [...prev, knowledgeId]
+    );
   };
 
+  // Handle opening knowledge modal
   const handleOpenKnowledge = () => {
     setIsKnowledgeModalOpen(true);
   };
@@ -212,46 +258,57 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     setIsKnowledgeModalOpen(false);
   };
 
-  const createPromptData = (content: string): CreatePromptData => {
-    const actualProduct = selectedProduct || selectedProductId;
-    const actualEpic = selectedEpic || selectedEpicId;
+  // Get selected knowledge items
+  const selectedKnowledgeItems = knowledgeItems.filter(item => 
+    selectedKnowledgeIds.includes(item.id)
+  );
 
-    // Auto-assign product if epic is selected but no product
-    let finalProductId = actualProduct;
-    if (actualEpic && !actualProduct) {
-      const epic = epics.find(e => e.id === actualEpic);
-      if (epic?.product_id) {
+  /**
+   * Creates prompt data with proper product/epic assignment validation
+   * This ensures prompts are correctly associated with selected products/epics
+   */
+  const createPromptData = (content: string): CreatePromptData => {
+    // Validate epic-product relationship
+    let finalProductId = selectedProduct;
+    let finalEpicId = selectedEpic;
+    
+    if (selectedEpic) {
+      const epic = epics.find(e => e.id === selectedEpic);
+      if (epic) {
+        // Ensure epic's parent product matches selected product
         finalProductId = epic.product_id;
+        if (selectedProduct && selectedProduct !== epic.product_id) {
+          console.warn('Epic-Product mismatch corrected:', {
+            selectedProduct,
+            epicProductId: epic.product_id
+          });
+        }
+      } else {
+        // Epic not found - remove invalid selection
+        console.warn('Invalid epic selection removed:', selectedEpic);
+        finalEpicId = null;
       }
     }
-
-    // Strip HTML from content for plain text description
-    const plainTextContent = extractTextFromHTML(content);
     
-    // Keep original content (HTML or title) for AI generation
-    const originalContent = content.trim() || title.trim();
-
-    console.log('🚀 Creating prompt data:', {
-      originalContent: originalContent.substring(0, 100) + '...',
-      plainTextContent: plainTextContent.substring(0, 100) + '...',
-      hasKnowledge: selectedKnowledge.length > 0,
-      provider: providerConfig.provider,
-      model: providerConfig.model
-    });
-
+    // Include knowledge context if enabled and items selected
+    const knowledgeContext = enableKnowledge && selectedKnowledgeIds.length > 0 
+      ? selectedKnowledgeIds 
+      : undefined;
+    
     return {
-      title: title.trim() || generateTitleFromContent(plainTextContent),
-      description: plainTextContent,
-      original_description: originalContent, // 🔥 This is key for generation!
-      epic_id: actualEpic,
-      product_id: finalProductId,
-      priority,
-      knowledge_context: selectedKnowledge.length > 0 ? selectedKnowledge.map(k => k.id) : undefined,
+      title: generateTitleFromContent(content),
+      description: content,
+      original_description: content, // Set immutable original content
+      epic_id: finalEpicId || undefined,
+      product_id: finalProductId || undefined,
+      priority: selectedPriority,
+      knowledge_context: knowledgeContext,
       ai_provider: providerConfig.provider,
       ai_model: providerConfig.model,
     };
   };
 
+  // Main save handler - creates prompt with enhanced AI animation
   const handleSave = async () => {
     if (!editor) return;
     
@@ -262,12 +319,14 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     
     try {
       // Show animation if knowledge is enabled and items are selected
-      const shouldShowAnimation = selectedKnowledge.length > 0;
+      const shouldShowAnimation = enableKnowledge && selectedKnowledgeIds.length > 0;
       
       if (shouldShowAnimation) {
-        setShowGenerationAnimation(true);
+        // Start animation sequence
+        setShowAnimation(true);
         setGenerationStep('input');
         
+        // Simulate processing steps
         await new Promise(resolve => setTimeout(resolve, 1000));
         setGenerationStep('knowledge');
         
@@ -281,9 +340,10 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         setGenerationStep('complete');
         
         await new Promise(resolve => setTimeout(resolve, 500));
-        setShowGenerationAnimation(false);
+        setShowAnimation(false);
       }
 
+      // Create prompt data and save
       const promptData = createPromptData(content);
       
       // 🚨 CRITICAL UX FLOW - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
@@ -295,27 +355,16 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
       onSave(promptData).catch(error => {
         console.error('Background prompt creation failed:', error);
       });
-
-      // Track metrics
-      trackPromptCreation(200, {
-        hasKnowledgeContext: selectedKnowledge.length > 0,
-        priority,
-        hasEpic: !!selectedEpic,
+      
+      // Track performance metrics
+      const responseTime = Date.now() - startTime;
+      trackPromptCreation(responseTime, {
         hasProduct: !!selectedProduct,
+        hasEpic: !!selectedEpic,
+        priority: selectedPriority,
+        contentLength: content.length,
       });
-
-      // Track Reddit Pixel conversion
-      if (workspace.created_at) {
-        const accountAge = Date.now() - new Date(workspace.created_at).getTime();
-        const isFirstDay = accountAge < 24 * 60 * 60 * 1000;
-        
-        if (isFirstDay) {
-          RedditPixelService.trackFirstPromptCreated(workspace.id);
-        } else {
-          RedditPixelService.trackPromptCreated(Date.now().toString(), workspace.id);
-        }
-      }
-
+      
       // Clear draft and show success
       clearDraft();
       toast({
@@ -323,18 +372,28 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         description: shouldShowAnimation ? 'Your enhanced prompt has been generated!' : 'Your prompt will be generated automatically.',
         variant: 'default'
       });
-
-      // Reset form
-      resetForm();
-      editor?.commands.clearContent();
+      
+      // Track general prompt creation with Reddit Pixel
+      if (workspace.owner_id) {
+        RedditPixelService.trackPromptCreated(
+          Math.random().toString(36).substr(2, 9), // temporary ID
+          workspace.owner_id
+        );
+      }
+      
     } catch (error) {
-      console.error('Error creating prompt:', error);
-      toast({
-        title: "Error creating prompt",
-        description: "Please try again.",
-        variant: "destructive",
+      console.error('Error saving prompt:', error);
+      trackError(error as Error, {
+        hasProduct: !!selectedProduct,
+        hasEpic: !!selectedEpic,
+        contentLength: content.length,
       });
-      setShowGenerationAnimation(false);
+      toast({
+        title: 'Error',
+        description: 'Failed to create prompt. Please try again.',
+        variant: 'destructive'
+      });
+      setShowAnimation(false);
     } finally {
       setIsLoading(false);
     }
@@ -360,10 +419,14 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     }
   };
 
-  // Handle product/epic selection
+  /**
+   * Handle product selection with validation
+   * When product changes, clear epic if it doesn't belong to the new product
+   */
   const handleProductChange = (productId: string | null) => {
     setSelectedProduct(productId);
     
+    // Clear epic if it doesn't belong to the newly selected product
     if (selectedEpic && productId) {
       const epic = epics.find(e => e.id === selectedEpic);
       if (epic && epic.product_id !== productId) {
@@ -372,9 +435,14 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     }
   };
 
+  /**
+   * Handle epic selection with automatic parent product selection
+   * This ensures epic-product relationship consistency
+   */
   const handleEpicChange = (epicId: string | null) => {
     setSelectedEpic(epicId);
     
+    // Auto-select parent product when epic is selected
     if (epicId) {
       const epic = epics.find(e => e.id === epicId);
       if (epic) {
@@ -383,177 +451,211 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     }
   };
 
+  /**
+   * CRITICAL: Dialog lifecycle management
+   * This effect handles form reset when dialog opens or product/epic props change
+   * The resetForm function is the core of product/epic assignment functionality
+   */
+  useEffect(() => {
+    if (isOpen && editor) {
+      // Immediate form reset for better UX - no delay needed
+      resetForm();
+    }
+  }, [isOpen, selectedProductId, selectedEpicId]);
+
   if (!editor) return null;
+
+  const filteredEpics = getFilteredEpics();
 
   return (
     <>
-      {showGenerationAnimation && (
-        <PromptGenerationAnimation
-          isVisible={showGenerationAnimation}
-          onComplete={() => setShowGenerationAnimation(false)}
-          currentStep={generationStep}
-        />
-      )}
-      
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent 
-          className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col"
-          onKeyDown={handleKeyDown}
-          data-dialog-content
-        >
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-              Capture Your Next AI Move
-              {draftRestored && (
-                <div className="flex items-center gap-1 text-sm text-accent">
-                  <RotateCcw className="h-4 w-4" />
-                  <span>Draft restored</span>
-                </div>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="flex-1 space-y-6">
-            {/* Rich text editor with formatting toolbar */}
-            <div className="space-y-4">
-              <FormattingToolbar editor={editor} />
-              <div className="border rounded-md bg-card">
-                <EditorContent 
-                  editor={editor} 
-                  className="prose prose-sm max-w-none p-4 rounded-md min-h-[300px] focus-within:outline-none"
-                />
+    {showAnimation && (
+      <PromptGenerationAnimation
+        isVisible={showAnimation}
+        onComplete={() => setShowAnimation(false)}
+        currentStep={generationStep}
+      />
+    )}
+    
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto flex flex-col quickprompt-enhanced"
+        style={{ backgroundColor: '#16161c' }}
+        onKeyDown={handleKeyDown}
+        data-dialog-content
+      >
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+            Capture Your Next AI Move
+            {draftRestored && (
+              <div className="flex items-center gap-1 text-sm text-accent">
+                <RotateCcw className="h-4 w-4" />
+                <span>Draft restored</span>
               </div>
-            </div>
+            )}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Stay productive while AI generates code. Capture your next 3-4 moves.
+          </DialogDescription>
+        </DialogHeader>
 
-            {/* Product/Epic Selection */}
-            <ProductEpicSelector
-              products={modalProducts}
-              epics={filteredEpics}
-              selectedProductId={selectedProduct}
-              selectedEpicId={selectedEpic}
-              onProductChange={handleProductChange}
-              onEpicChange={handleEpicChange}
-            />
-
-            {/* Priority Selection */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Priority</label>
-              <Select value={priority?.toString()} onValueChange={(value) => setPriority(parseInt(value) as PromptPriority)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRIORITY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value.toString()}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${
-                          option.variant === 'destructive' ? 'bg-red-500' :
-                          option.variant === 'secondary' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`} />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* AI Provider Selection */}
-            <ProviderSelector
-              value={providerConfig as SelectorProviderConfig}
-              onChange={setProviderConfig}
-            />
-
-            {/* Knowledge Context */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Knowledge Context</label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleOpenKnowledge}
-                  className="text-xs"
-                >
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  Browse ({selectedKnowledge.length} selected)
-                </Button>
-              </div>
-              
-              {selectedKnowledge.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedKnowledge.map((item) => (
-                    <Badge
-                      key={item.id}
-                      variant="secondary"
-                      className="text-xs cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors"
-                      onClick={() => handleKnowledgeToggle(item.id)}
-                    >
-                      {item.title}
-                      <X className="h-3 w-3 ml-1" />
-                    </Badge>
-                  ))}
-                </div>
-              )}
+        <div className="flex-1 space-y-6">
+          {/* Rich text editor with formatting toolbar */}
+          <div className="space-y-4">
+            <FormattingToolbar editor={editor} />
+            <div className="border rounded-md bg-card">
+              <EditorContent 
+                editor={editor} 
+                className="prose prose-sm max-w-none p-4 rounded-md min-h-[300px] focus-within:outline-none"
+              />
             </div>
           </div>
 
-          {/* Footer with actions */}
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-xs text-muted-foreground">
-              Press Enter to save • Esc to close
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleSave}
-                disabled={isLoading || !hasContent}
-                className="min-w-[120px]"
+          {/* Product/Epic Selection */}
+          <ProductEpicSelector
+            products={products}
+            epics={filteredEpics}
+            selectedProductId={selectedProduct}
+            selectedEpicId={selectedEpic}
+            onProductChange={handleProductChange}
+            onEpicChange={handleEpicChange}
+          />
+
+          {/* Priority Selection */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Priority</label>
+            <Select value={selectedPriority?.toString()} onValueChange={(value) => setSelectedPriority(parseInt(value) as PromptPriority)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                {PRIORITY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value.toString()}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        option.variant === 'destructive' ? 'bg-red-500' :
+                        option.variant === 'secondary' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`} />
+                      {option.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* AI Provider Selection */}
+          <ProviderSelector
+            value={providerConfig}
+            onChange={setProviderConfig}
+          />
+
+          {/* Knowledge Context */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">Knowledge Context</label>
+                <Switch 
+                  checked={enableKnowledge}
+                  onCheckedChange={setEnableKnowledge}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleOpenKnowledge}
+                disabled={!enableKnowledge}
+                className="text-xs"
               >
-                {isLoading ? 'Creating...' : 'Create Prompt'}
+                <BookOpen className="h-3 w-3 mr-1" />
+                Browse ({selectedKnowledgeIds.length} selected)
               </Button>
             </div>
+            
+            {enableKnowledge && selectedKnowledgeItems.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedKnowledgeItems.map((item) => (
+                  <Badge
+                    key={item.id}
+                    variant="secondary"
+                    className="text-xs cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors"
+                    onClick={() => handleKnowledgeToggle(item.id)}
+                  >
+                    {item.title}
+                    <X className="h-3 w-3 ml-1" />
+                  </Badge>
+                ))}
+              </div>
+            )}
+            
+            {enableKnowledge && selectedKnowledgeItems.length === 0 && (
+              <div className="text-xs text-muted-foreground">
+                <Flame className="h-3 w-3 inline mr-1" />
+                Select knowledge items to enhance your prompt with AI context
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer with actions */}
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="text-xs text-muted-foreground flex items-center gap-2">
+            <Keyboard className="h-3 w-3" />
+            Press Enter to save • Esc to close
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave}
+              disabled={isLoading || !hasContent}
+              className="min-w-[120px]"
+            >
+              {isLoading ? 'Creating...' : 'Create Prompt'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Knowledge Modal */}
+    {isKnowledgeModalOpen && (
+      <Dialog open={isKnowledgeModalOpen} onOpenChange={handleCloseKnowledge}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Select Knowledge Items</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {knowledgeItems.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No knowledge items found for this product.
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                {knowledgeItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-3 rounded-md border cursor-pointer transition-colors ${
+                      selectedKnowledgeIds.includes(item.id)
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:bg-muted/50'
+                    }`}
+                    onClick={() => handleKnowledgeToggle(item.id)}
+                  >
+                    <div className="font-medium">{item.title}</div>
+                    <div className="text-sm text-muted-foreground line-clamp-2">
+                      {item.content.substring(0, 150)}...
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Knowledge Modal */}
-      {isKnowledgeModalOpen && (
-        <Dialog open={isKnowledgeModalOpen} onOpenChange={handleCloseKnowledge}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Select Knowledge Items</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {knowledgeItems.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No knowledge items found for this product.
-                </div>
-              ) : (
-                <div className="grid gap-2">
-                  {knowledgeItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`p-3 rounded-md border cursor-pointer transition-colors ${
-                        selectedKnowledge.some(k => k.id === item.id)
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:bg-muted/50'
-                      }`}
-                      onClick={() => handleKnowledgeToggle(item.id)}
-                    >
-                      <div className="font-medium">{item.title}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        {item.content.substring(0, 150)}...
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+    )}
     </>
   );
 };
