@@ -26,10 +26,8 @@
       (function(){
         try {
           var params = new URLSearchParams(window.location.search);
-          var inIframe = false;
-          try { inIframe = window.self !== window.top; } catch (_) { inIframe = true; }
           // @ts-ignore
-          window.__SAFE_MODE__ = inIframe || params.has('safe') || params.get('mode') === 'safe';
+          window.__SAFE_MODE__ = params.has('safe') || params.get('mode') === 'safe';
           // Selective script control for debugging
           // @ts-ignore
           window.__DISABLE_REDDIT__ = params.has('no-reddit');
@@ -41,7 +39,7 @@
           window.__DISABLE_MIXPANEL__ = params.has('no-mixpanel');
         } catch(e) { 
           // @ts-ignore
-          window.__SAFE_MODE__ = true; 
+          window.__SAFE_MODE__ = false; 
         }
       })();
     </script>
