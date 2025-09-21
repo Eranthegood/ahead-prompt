@@ -53,7 +53,7 @@ export const usePromptsGeneration = (
   ) => {
     const cleanContent = stripHtmlAndNormalize(content);
     
-    console.log('🔧 Prompt generation - Content cleaning:', {
+    console.info('🔧 Prompt generation - Content cleaning:', {
       promptId,
       original: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
       cleaned: cleanContent.substring(0, 100) + (cleanContent.length > 100 ? '...' : ''),
@@ -105,7 +105,7 @@ export const usePromptsGeneration = (
         ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
         : [];
 
-      console.log('🤖 Starting AI transformation:', {
+      console.info('🤖 Starting AI transformation:', {
         promptId,
         provider,
         model,
@@ -120,7 +120,7 @@ export const usePromptsGeneration = (
         )
       ]) as any;
 
-      console.log('✅ AI transformation result:', {
+      console.info('✅ AI transformation result:', {
         promptId,
         success: response.success,
         hasContent: !!response.transformedPrompt,

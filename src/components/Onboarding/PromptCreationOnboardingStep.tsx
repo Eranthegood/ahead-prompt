@@ -32,7 +32,7 @@ export function PromptCreationOnboardingStep({
   const { products } = useProducts(workspace?.id);
   const { epics } = useEpics(workspace?.id, productId);
   const { knowledgeItems } = useKnowledge(workspace?.id, productId);
-  const { createPrompt } = usePrompts(workspace?.id, productId);
+  const { createPrompt, autoGeneratePrompt } = usePrompts(workspace?.id, productId);
   const { toast } = useToast();
   
   const {
@@ -59,19 +59,53 @@ export function PromptCreationOnboardingStep({
 
     setIsCreating(true);
     try {
-      const prompt = await createPrompt({
+      const promptData = {
         title: title.trim(),
         original_description: title.trim(),
         product_id: selectedProduct || productId,
         epic_id: selectedEpic,
-        status: 'todo',
+        status: 'todo' as const,
         priority,
         ai_provider: providerConfig.provider,
         ai_model: providerConfig.model,
         knowledge_context: selectedKnowledge.map(item => item.id),
+      };
+
+      console.info('📝 Onboarding createPrompt called:', {
+        titleLength: promptData.title.length,
+        originalDescriptionLength: promptData.original_description.length,
+        provider: promptData.ai_provider,
+        model: promptData.ai_model,
+        knowledgeCount: promptData.knowledge_context.length,
+        productId: promptData.product_id,
+        epicId: promptData.epic_id
       });
 
+      const prompt = await createPrompt(promptData);
+
       if (prompt) {
+        console.info('✅ Onboarding createPrompt result:', {
+          promptId: prompt.id,
+          status: prompt.status,
+          hasGeneratedContent: !!prompt.generated_prompt
+        });
+
+        // Fallback auto-generation if status is not 'generating'
+        if (prompt.status !== 'generating') {
+          console.info('🔄 Fallback auto-generation triggered from onboarding');
+          try {
+            await autoGeneratePrompt(
+              prompt.id,
+              promptData.original_description,
+              promptData.knowledge_context,
+              promptData.ai_provider || 'openai',
+              promptData.ai_model || 'gpt-4o'
+            );
+          } catch (genError) {
+            console.error('❌ Fallback auto-generation failed:', genError);
+          }
+        }
+
         setIsCreated(true);
         setCreatedPromptTitle(title);
         toast({
@@ -83,6 +117,7 @@ export function PromptCreationOnboardingStep({
         onPromptCreated(prompt.id);
       }
     } catch (error) {
+      console.error('💥 Onboarding createPrompt error:', error);
       toast({
         title: "Erreur",
         description: "Impossible de créer le prompt",
