@@ -58,6 +58,19 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     refetch: refetchPrompts
   } = promptsContext || {};
 
+  // Listen for refetch events from onboarding completion
+  useEffect(() => {
+    const handleRefetchPrompts = () => {
+      console.log('[Dashboard] Refetching prompts after onboarding');
+      refetchPrompts?.();
+    };
+
+    window.addEventListener('refetch-prompts', handleRefetchPrompts);
+    return () => {
+      window.removeEventListener('refetch-prompts', handleRefetchPrompts);
+    };
+  }, [refetchPrompts]);
+
   // Provide safe fallback if createPrompt is not available yet
   const handleCreatePrompt = createPrompt || (async () => {
     console.warn('createPrompt not available yet');

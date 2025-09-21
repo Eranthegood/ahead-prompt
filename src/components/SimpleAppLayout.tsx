@@ -131,9 +131,16 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       } catch {}
     }
 
+    // Force refetch des prompts après l'onboarding pour assurer la synchronisation
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('refetch-prompts'));
+    }, 100);
+
     // Focaliser et surligner le prompt nouvellement créé
     if (data?.promptId) {
-      window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
+      }, 200);
     }
   };
 
