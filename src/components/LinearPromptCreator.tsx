@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -181,7 +181,8 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
    * This function handles the core functionality of auto-assigning prompts to products/epics
    * when the dialog opens. This logic is essential for the product/epic workflow.
    */
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
+    console.log('🔄 resetForm called:', { hasEditor: !!editor, selectedEpicId, selectedProductId });
     if (!editor) {
       console.error('Editor not available for resetForm');
       return;
@@ -234,7 +235,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
     if (editor && editor.view && editor.view.dom) {
       editor.commands.focus();
     }
-  };
+  }, [editor, selectedEpicId, selectedProductId, epics, products, clearDraft]);
 
   // Handle knowledge selection
   const handleKnowledgeToggle = (knowledgeId: string) => {
@@ -455,11 +456,12 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
    * The resetForm function is the core of product/epic assignment functionality
    */
   useEffect(() => {
+    console.log('🔍 LinearPromptCreator useEffect triggered:', { isOpen, selectedProductId, selectedEpicId, hasEditor: !!editor });
     if (isOpen && editor) {
       // Immediate form reset for better UX - no delay needed
       resetForm();
     }
-  }, [isOpen, selectedProductId, selectedEpicId, editor]);
+  }, [isOpen, selectedProductId, selectedEpicId, editor, resetForm]);
 
   if (!editor) return null;
 
