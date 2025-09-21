@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
+      ""build:dev": "vite build --mode development",
     "dev": "nodemon src/index.js"
   },
   "dependencies": {
