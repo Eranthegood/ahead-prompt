@@ -52,6 +52,8 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
           title: "Produit créé !",
           description: `"${product.name}" est prêt pour vos prompts`,
         });
+        // Notify the rest of the app (e.g., sidebar) to refresh and select the new product
+        window.dispatchEvent(new CustomEvent('product-created', { detail: { productId: product.id } }));
         onProductCreated(product.id, product.name);
       }
     } catch (error) {

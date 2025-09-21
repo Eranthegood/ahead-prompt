@@ -80,7 +80,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { products, createProduct, updateProduct, deleteProduct, reorderProducts } = useProducts(workspace.id);
+  const { products, createProduct, updateProduct, deleteProduct, reorderProducts, refetch } = useProducts(workspace.id);
   const { epics, createEpic, updateEpic, deleteEpic } = useEpics(workspace.id);
   const promptsContext = usePromptsContext();
   const { prompts = [] } = promptsContext || {};
@@ -442,6 +442,18 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
       window.removeEventListener('open-quick-prompt', handleOpenQuickPrompt);
     };
   }, [products, onQuickAdd]);
+
+  // Listen for product creation events (e.g., from onboarding) to refresh the list
+  useEffect(() => {
+    const handleProductCreated = (e: CustomEvent) => {
+      refetch?.();
+      if ((e as any)?.detail?.productId) {
+        onProductSelect((e as any).detail.productId);
+      }
+    };
+    window.addEventListener('product-created', handleProductCreated as EventListener);
+    return () => window.removeEventListener('product-created', handleProductCreated as EventListener);
+  }, [refetch, onProductSelect]);
 
   // Handle drag end for product reordering
   const handleDragEnd = (event: any) => {
