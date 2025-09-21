@@ -1,5 +1,5 @@
 import React from 'react';
-import { Circle, CircleDot, CheckCircle } from 'lucide-react';
+import { Circle, CircleDot, CheckCircle, Loader2 } from 'lucide-react';
 import { PromptStatus } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,8 @@ export function StatusIcon({ status, size = 'md', className }: StatusIconProps) 
   switch (status) {
     case 'todo':
       return <Circle className={cn(iconSize, 'text-muted-foreground', className)} />;
+    case 'generating':
+      return <Loader2 className={cn(iconSize, 'text-purple-500 animate-spin', className)} />;
     case 'in_progress':
       return <CircleDot className={cn(iconSize, 'text-blue-500', className)} />;
     case 'done':
@@ -34,6 +36,8 @@ export function getStatusIcon(status: PromptStatus) {
   switch (status) {
     case 'todo':
       return { icon: Circle, color: 'text-muted-foreground', label: 'To do' };
+    case 'generating':
+      return { icon: Loader2, color: 'text-purple-500 animate-spin', label: 'En génération...' };
     case 'in_progress':
       return { icon: CircleDot, color: 'text-blue-500', label: 'In progress' };
     case 'done':

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Copy, Check, Send, Flame, Minus, Clock } from 'lucide-react';
+import { Copy, Check, Send, Flame, Minus, Clock, Loader2 } from 'lucide-react';
 import { StatusIcon } from '@/components/ui/status-icon';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
 import { AgentWorkingIndicator } from '@/components/ui/loading-pulse';
@@ -91,7 +91,9 @@ export function MinimalistPromptCard({
         'border-l-muted'
       } ${
         isHovered ? 'ring-2 ring-primary/30 shadow-lg' : ''
-      } ${!isUsable ? 'opacity-60' : ''}`}
+      } ${!isUsable ? 'opacity-60' : ''} ${
+        prompt.status === 'generating' ? 'ring-2 ring-purple-500/40 shadow-purple-500/10 animate-pulse' : ''
+      }`}
       onMouseEnter={() => onHover?.(prompt.id)}
       onMouseLeave={() => onHover?.(null)}
     >
@@ -107,21 +109,31 @@ export function MinimalistPromptCard({
             </div>
           </div>
 
-          {/* Center: Title */}
+          {/* Center: Title + Generating Badge */}
           <div className="flex-1 min-w-0">
-            <TruncatedTitle 
-              title={prompt.title}
-              maxLength={40}
-              className="font-medium text-foreground text-sm leading-tight"
-              showCopyButton={false}
-              variant="inline"
-            />
+            <div className="flex items-center gap-2">
+              <TruncatedTitle 
+                title={prompt.title}
+                maxLength={40}
+                className="font-medium text-foreground text-sm leading-tight"
+                showCopyButton={false}
+                variant="inline"
+              />
+              
+              {/* Generating Status Badge */}
+              {prompt.status === 'generating' && (
+                <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 border-purple-300">
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  En génération...
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Right: Status + Actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Working Indicator */}
-            {['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) && (
+            {/* Working Indicator for generating and agent states */}
+            {(['sent_to_cursor', 'cursor_working', 'sending_to_cursor'].includes(prompt.status) || prompt.status === 'generating') && (
               <AgentWorkingIndicator size="sm" />
             )}
             

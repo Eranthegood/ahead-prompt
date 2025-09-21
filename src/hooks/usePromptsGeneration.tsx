@@ -60,6 +60,12 @@ export const usePromptsGeneration = (
 
     console.log(`Auto-generating prompt for: ${promptId}`);
     
+    // Step 0: Initial toast
+    toast({
+      title: "🤖 Génération en cours...",
+      description: "Votre prompt est en cours de transformation par l'IA.",
+    });
+    
     try {
       // Step 1: Set generating status
       setPrompts(prev => prev.map(p => 
@@ -134,7 +140,7 @@ export const usePromptsGeneration = (
         }
         
         toast({
-          title: "Prompt généré !",
+          title: "✅ Prompt généré !",
           description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
         });
 
@@ -148,7 +154,7 @@ export const usePromptsGeneration = (
       
       toast({
         variant: "destructive",
-        title: "Erreur de génération",
+        title: "❌ Erreur de génération",
         description: "Impossible de générer le prompt. Veuillez réessayer.",
       });
     }
