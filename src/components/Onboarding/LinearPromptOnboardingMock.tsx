@@ -57,26 +57,30 @@ export default function LinearPromptOnboardingMock() {
     {
       id: 'priority',
       title: '🔥 Priority Control',
-      content: 'Click to set High/Normal/Low priority. High priority prompts bubble to the top!',
-      position: 'left',
+      content: 'Click the flame/minus/clock icon to set High/Normal/Low priority. High priority prompts bubble to the top!',
+      style: { top: '15px', left: '8px' }, // Points to priority dropdown (far left)
+      arrowClass: 'right-[-4px] top-1/2 -translate-y-1/2'
     },
     {
       id: 'copy',
       title: '📋 Magic Copy',
       content: 'One click copies to clipboard AND auto-moves to "In Progress". Zero extra steps!',
-      position: 'top',
+      style: { top: '-50px', left: '85px' }, // Points to copy button
+      arrowClass: 'bottom-[-4px] left-1/2 -translate-x-1/2'
     },
     {
       id: 'status',
       title: '⚡ Status Flow',
-      content: 'Todo → In Progress → Done. Click to cycle through states instantly.',
-      position: 'right',
+      content: 'Todo → In Progress → Done. Click the status badge to cycle through states instantly.',
+      style: { top: '15px', right: '140px' }, // Points to status area
+      arrowClass: 'left-[-4px] top-1/2 -translate-y-1/2'
     },
     {
       id: 'title',
       title: '✏️ Full Edit Mode',
-      content: 'Click anywhere on the title to open detailed editing. Rich text, tags, everything!',
-      position: 'bottom',
+      content: 'Click anywhere on the title area to open detailed editing modal with rich text support!',
+      style: { bottom: '-50px', left: '200px', transform: 'translateX(-50%)' }, // Points to title area (center)
+      arrowClass: 'top-[-4px] left-1/2 -translate-x-1/2'
     }
   ];
 
@@ -93,7 +97,7 @@ export default function LinearPromptOnboardingMock() {
         <div className="text-center space-y-2">
           <h4 className="font-semibold text-sm">✨ Interactive Prompt Card Demo</h4>
           <p className="text-xs text-muted-foreground">
-            Click the buttons below to explore each feature!
+            Click the buttons below to explore each feature with precision tooltips!
           </p>
         </div>
 
@@ -113,37 +117,23 @@ export default function LinearPromptOnboardingMock() {
             />
           </div>
 
-          {/* Interactive tooltip overlays */}
+          {/* Interactive tooltip overlays with precise positioning */}
           {interactiveSteps.map((step) => (
             <div
               key={step.id}
               className={`absolute transition-all duration-300 ${
                 activeTooltip === step.id
-                  ? 'opacity-100 scale-100 z-20' 
+                  ? 'opacity-100 scale-100 z-20 animate-scale-in' 
                   : 'opacity-0 scale-95 pointer-events-none'
               }`}
-              style={{
-                top: step.position === 'top' ? '-40px' : 
-                     step.position === 'bottom' ? '60px' : '10px',
-                left: step.position === 'left' ? '-10px' : 
-                      step.position === 'right' ? '80%' : '50%',
-                transform: step.position === 'top' || step.position === 'bottom' 
-                  ? 'translateX(-50%)' : 'translateY(0)'
-              }}
+              style={step.style}
             >
-              <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-lg max-w-60 text-xs">
+              <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-xl max-w-64 text-xs border border-primary/20">
                 <div className="font-semibold mb-1">{step.title}</div>
-                <div>{step.content}</div>
+                <div className="leading-relaxed">{step.content}</div>
                 
-                {/* Arrow pointer */}
-                <div 
-                  className={`absolute w-2 h-2 bg-primary rotate-45 ${
-                    step.position === 'top' ? 'bottom-[-4px] left-1/2 -translate-x-1/2' :
-                    step.position === 'bottom' ? 'top-[-4px] left-1/2 -translate-x-1/2' :
-                    step.position === 'left' ? 'right-[-4px] top-1/2 -translate-y-1/2' :
-                    'left-[-4px] top-1/2 -translate-y-1/2'
-                  }`}
-                />
+                {/* Precise arrow pointer */}
+                <div className={`absolute w-2 h-2 bg-primary rotate-45 ${step.arrowClass}`} />
               </div>
             </div>
           ))}
@@ -155,8 +145,8 @@ export default function LinearPromptOnboardingMock() {
             variant="ghost"
             size="sm"
             onClick={() => showTooltip('priority')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
-              activeTooltip === 'priority' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'priority' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
             <Target className="h-3 w-3 text-primary" />
@@ -167,8 +157,8 @@ export default function LinearPromptOnboardingMock() {
             variant="ghost"
             size="sm"
             onClick={() => showTooltip('copy')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
-              activeTooltip === 'copy' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'copy' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
             <Zap className="h-3 w-3 text-primary" />
@@ -179,8 +169,8 @@ export default function LinearPromptOnboardingMock() {
             variant="ghost"
             size="sm"
             onClick={() => showTooltip('status')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
-              activeTooltip === 'status' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'status' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
             <Clock className="h-3 w-3 text-primary" />
@@ -191,8 +181,8 @@ export default function LinearPromptOnboardingMock() {
             variant="ghost"
             size="sm"
             onClick={() => showTooltip('title')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
-              activeTooltip === 'title' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'title' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
             <Mouse className="h-3 w-3 text-primary" />
