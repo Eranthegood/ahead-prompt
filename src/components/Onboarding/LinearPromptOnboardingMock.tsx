@@ -58,29 +58,29 @@ export default function LinearPromptOnboardingMock() {
       id: 'priority',
       title: '🔥 Priority Control',
       content: 'Click the flame/minus/clock icon to set High/Normal/Low priority. High priority prompts bubble to the top!',
-      style: { top: '15px', left: '8px' }, // Points to priority dropdown (far left)
-      arrowClass: 'right-[-4px] top-1/2 -translate-y-1/2'
+      style: { top: '-50px', left: '20px' }, // Above priority dropdown
+      arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'copy',
       title: '📋 Magic Copy',
       content: 'One click copies to clipboard AND auto-moves to "In Progress". Zero extra steps!',
-      style: { top: '-50px', left: '85px' }, // Points to copy button
-      arrowClass: 'bottom-[-4px] left-1/2 -translate-x-1/2'
+      style: { top: '-50px', left: '85px' }, // Above copy button
+      arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'status',
       title: '⚡ Status Flow',
       content: 'Todo → In Progress → Done. Click the status badge to cycle through states instantly.',
-      style: { top: '15px', right: '140px' }, // Points to status area
-      arrowClass: 'left-[-4px] top-1/2 -translate-y-1/2'
+      style: { top: '-50px', right: '120px' }, // Above status area
+      arrowClass: 'bottom-[-4px] right-6'
     },
     {
       id: 'title',
       title: '✏️ Full Edit Mode',
       content: 'Click anywhere on the title area to open detailed editing modal with rich text support!',
-      style: { bottom: '-50px', left: '200px', transform: 'translateX(-50%)' }, // Points to title area (center)
-      arrowClass: 'top-[-4px] left-1/2 -translate-x-1/2'
+      style: { top: '-50px', left: '200px' }, // Above title area (center)
+      arrowClass: 'bottom-[-4px] left-1/2 -translate-x-1/2'
     }
   ];
 
