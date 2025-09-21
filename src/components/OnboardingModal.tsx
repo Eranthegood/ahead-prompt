@@ -42,7 +42,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
     },
     {
       title: 'Comprendre l\'architecture',
-      description: 'Product → Epic → Prompt : comment tout s\'organise',
+      description: '',
       icon: <Layers className="h-8 w-8 text-primary" />,
       content: (
         <ArchitectureExplanationStep productName={createdProductName} />
