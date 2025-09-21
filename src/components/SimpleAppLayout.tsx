@@ -15,7 +15,7 @@ import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useEventSubscription, useEventEmitter } from '@/hooks/useEventManager';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
-import { useAppStoreOptional } from '@/store/AppStore';
+import { useAppStore } from '@/store/AppStore';
 import Dashboard from './Dashboard';
 import { OnboardingDebug } from './debug/OnboardingDebug';
 
@@ -28,13 +28,13 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
-  const appStore = useAppStoreOptional();
-  const openDialog = appStore?.openDialog ?? (() => {});
+  const { state: appState, openDialog, closeDialog } = useAppStore();
   const emit = useEventEmitter();
   
+  // Use AppStore for dialog state instead of local state
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
-  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
+  // Remove local dialog states - using AppStore now
   const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('workspace');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -112,9 +112,11 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
     'l': () => openDialog('promptLibrary'), // Simple 'L' shortcut
-    'k': () => setIsKnowledgeModalOpen(true),
+    'k': () => openDialog('knowledgeDialog'),
     'n': () => setIsNotesOpen(true),
   });
+
+  // Note: Command palette and other dialog shortcuts are handled by AppStore events
 
   const handleOnboardingComplete = (data?: { productId?: string; promptId?: string }) => {
     console.log('[Onboarding] Completed by user', data);
@@ -160,35 +162,10 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     }
   }, []);
 
-  // Listen for knowledge dialog events
-  useEffect(() => {
-    const handleOpenKnowledge = (event?: CustomEvent) => {
-      setIsKnowledgeModalOpen(true);
-      // If event has productId, set the active section to that product
-      if (event?.detail?.productId) {
-        setActiveSection(event.detail.productId);
-      } else {
-        // Default to workspace section
-        setActiveSection('workspace');
-      }
-    };
-    
-    window.addEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
-    return () => window.removeEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
-  }, []);
+  // Note: Knowledge dialog events now handled by AppStore automatically
 
-  // Global keyboard shortcut handler for quick prompt creation
-  useEffect(() => {
-    const handler = () => {
-      openDialog('quickPrompt');
-    };
-    // @ts-ignore - custom event name
-    window.addEventListener('open-quick-prompt', handler as EventListener);
-    return () => {
-      // @ts-ignore - custom event name  
-      window.removeEventListener('open-quick-prompt', handler as EventListener);
-    };
-  }, [openDialog]);
+  // Global keyboard shortcut handler for quick prompt creation - now handled by AppStore
+  // Note: All dialog events now handled by AppStore automatically
 
   // Loading states
   if (config.showSidebar && (!user || !workspace)) {
@@ -265,11 +242,11 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       )}
 
       {/* Knowledge Box Modal */}
-      <KnowledgeBoxModal
-        open={isKnowledgeModalOpen}
-        onOpenChange={setIsKnowledgeModalOpen}
-        defaultSection={activeSection}
-      />
+        <KnowledgeBoxModal
+          open={appState.dialogs.knowledgeDialog}
+          onOpenChange={(open) => !open && closeDialog('knowledgeDialog')}
+          defaultSection={activeSection}
+        />
 
       {/* Notes Dialog */}
       <NotesDialog
