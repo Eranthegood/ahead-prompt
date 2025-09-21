@@ -39,7 +39,9 @@ export function OnboardingPromptCreator({
   const { workspace } = useWorkspace();
   const { products } = useProducts(workspace?.id);
   const { epics } = useEpics(workspace?.id, productId);
-  const { createPrompt } = usePrompts(workspace?.id, productId);
+  // Use shared PromptsContext to avoid state desync with the main list
+  const promptsCtx = require('@/context/PromptsContext').usePromptsContext?.();
+  const { createPrompt } = (promptsCtx || usePrompts(workspace?.id, productId)) as { createPrompt: (data: CreatePromptData) => Promise<any> };
   const { toast } = useToast();
 
   const handleSave = async (promptData: CreatePromptData) => {

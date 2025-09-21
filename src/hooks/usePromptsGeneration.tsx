@@ -176,6 +176,10 @@ export const usePromptsGeneration = (
           title: "✅ Prompt généré !",
           description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
         });
+        
+        // Notify provider/UI to refresh
+        window.dispatchEvent(new CustomEvent('refetch-prompts'));
+
 
       } else {
         console.error('❌ [autoGeneratePrompt] Generation failed:', {
