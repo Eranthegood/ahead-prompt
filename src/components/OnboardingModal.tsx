@@ -28,8 +28,8 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
 
   const getOnboardingSteps = () => [
     {
-      title: 'Créez votre premier produit',
-      description: 'Organisez vos projets avec des produits. Commençons par créer le vôtre !',
+      title: 'Premier produit',
+      description: '',
       icon: <FolderPlus className="h-8 w-8 text-primary" />,
       content: (
         <ProductCreationOnboardingStep 
