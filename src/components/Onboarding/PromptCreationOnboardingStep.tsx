@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Zap, CheckCircle, Sparkles, Clock, Target, Palette, Bot, Loader2 } from 'lucide-react';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
@@ -54,16 +53,6 @@ export function PromptCreationOnboardingStep({
     selectedProductId: productId,
   });
 
-  const suggestionExamples = [
-    "Ajouter authentification utilisateur",
-    "Créer page d'accueil responsive", 
-    "Implémenter recherche avec filtres",
-    "Optimiser performance API",
-  ];
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setTitle(suggestion);
-  };
 
   const handleCreatePrompt = async () => {
     if (!title.trim() || !workspace || isCreating) return;
@@ -135,22 +124,6 @@ export function PromptCreationOnboardingStep({
         </p>
       </div>
 
-      {/* Suggestions d'exemples */}
-      <div className="space-y-3">
-        <Label>Exemples d'idées :</Label>
-        <div className="flex flex-wrap gap-2">
-          {suggestionExamples.map((suggestion) => (
-            <Badge
-              key={suggestion}
-              variant="outline"
-              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-              onClick={() => handleSuggestionClick(suggestion)}
-            >
-              {suggestion}
-            </Badge>
-          ))}
-        </div>
-      </div>
 
       {/* Interface de création intégrée */}
       <Card className="border-2 border-dashed border-primary/20">
