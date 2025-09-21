@@ -3,6 +3,9 @@
  * Replaces scattered window.addEventListener calls across the app
  */
 
+import { useEffect } from 'react';
+import type { DependencyList } from 'react';
+
 export type EventName = 
   | 'refetch-prompts'
   | 'prompt-created'
@@ -121,9 +124,6 @@ class EventManager {
 export const eventManager = new EventManager();
 
 // React hook for easy integration
-import { useEffect } from 'react';
-import type { DependencyList } from 'react';
-
 export function useEventListener<T = any>(
   eventName: EventName, 
   callback: EventCallback<T>, 
