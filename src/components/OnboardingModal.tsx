@@ -16,7 +16,7 @@ import { PromptCreationOnboardingStep } from '@/components/Onboarding/PromptCrea
 interface OnboardingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: () => void;
+  onComplete: (data?: { productId?: string; promptId?: string }) => void;
 }
 
 
@@ -159,7 +159,10 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
   };
 
   const handleComplete = () => {
-    onComplete();
+    onComplete({
+      productId: createdProductId || undefined,
+      promptId: createdPromptId || undefined
+    });
     onOpenChange(false);
   };
 

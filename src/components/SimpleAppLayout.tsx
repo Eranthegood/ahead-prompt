@@ -101,10 +101,17 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     'n': () => setIsNotesOpen(true),
   });
 
-  const handleOnboardingComplete = () => {
-    console.log('[Onboarding] Completed by user');
+  const handleOnboardingComplete = (data?: { productId?: string; promptId?: string }) => {
+    console.log('[Onboarding] Completed by user', data);
     localStorage.setItem('ahead-onboarding-completed', 'true');
     setShowOnboarding(false);
+    
+    // Si un produit a été créé, le sélectionner automatiquement
+    if (data?.productId) {
+      setSelectedProductId(data.productId);
+      // Réinitialiser la sélection d'epic pour voir tous les prompts du produit
+      setSelectedEpicId(undefined);
+    }
   };
 
   // Development helper: expose reset function globally
