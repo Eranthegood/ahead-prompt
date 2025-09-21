@@ -71,7 +71,7 @@ export function PromptCreationOnboardingStep({
         knowledge_context: selectedKnowledge.map(item => item.id),
       };
 
-      console.info('📝 Onboarding createPrompt called:', {
+      console.log('📝 Onboarding createPrompt called:', {
         titleLength: promptData.title.length,
         originalDescriptionLength: promptData.original_description.length,
         provider: promptData.ai_provider,
@@ -84,7 +84,7 @@ export function PromptCreationOnboardingStep({
       const prompt = await createPrompt(promptData);
 
       if (prompt) {
-        console.info('✅ Onboarding createPrompt result:', {
+        console.log('✅ Onboarding createPrompt result:', {
           promptId: prompt.id,
           status: prompt.status,
           hasGeneratedContent: !!prompt.generated_prompt
@@ -92,7 +92,7 @@ export function PromptCreationOnboardingStep({
 
         // Fallback auto-generation if status is not 'generating'
         if (prompt.status !== 'generating') {
-          console.info('🔄 Fallback auto-generation triggered from onboarding');
+          console.log('🔄 Fallback auto-generation triggered from onboarding');
           try {
             await autoGeneratePrompt(
               prompt.id,
