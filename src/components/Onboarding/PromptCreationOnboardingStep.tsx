@@ -61,7 +61,7 @@ export function PromptCreationOnboardingStep({
     try {
       const prompt = await createPrompt({
         title: title.trim(),
-        original_description: title.trim().length < 16 ? `${title.trim()} - Générer un prompt détaillé à partir de cette idée` : title.trim(),
+        original_description: `${title.trim()} - Générer un prompt détaillé et structuré à partir de cette idée`,
         product_id: selectedProduct || productId,
         epic_id: selectedEpic,
         status: 'todo',
