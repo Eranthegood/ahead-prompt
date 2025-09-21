@@ -128,32 +128,16 @@ export function PromptCreationOnboardingStep({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />
-          <h3 className="font-medium">Découvrez la création de prompt avancée</h3>
+          <h3 className="font-medium">Créez votre premier prompt</h3>
         </div>
         <p className="text-sm text-muted-foreground">
-          Cette interface vous permettra de créer tous vos futurs prompts avec des options avancées.
+          Saisissez une idée simple, l'IA va la transformer en prompt détaillé.
         </p>
-      </div>
-
-      {/* Explications des fonctionnalités */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
-          <Target className="h-4 w-4 text-primary" />
-          <span>Priorité pour organiser</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
-          <Palette className="h-4 w-4 text-primary" />
-          <span>Produit et Epic</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
-          <Bot className="h-4 w-4 text-primary" />
-          <span>IA personnalisée</span>
-        </div>
       </div>
 
       {/* Suggestions d'exemples */}
       <div className="space-y-3">
-        <Label>Choisissez un exemple ou créez le vôtre :</Label>
+        <Label>Exemples d'idées :</Label>
         <div className="flex flex-wrap gap-2">
           {suggestionExamples.map((suggestion) => (
             <Badge
