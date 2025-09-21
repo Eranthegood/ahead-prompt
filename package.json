@@ -2,16 +2,14 @@
   "name": "feedback-sidepanel",
   "version": "1.0.0",
   "description": "Application avec système de feedback discret dans le sidepanel",
+  {
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
-  },
+    "dev": "vite",
+    "build": "vite build", 
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview"
+  }
+},
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "@radix-ui/react-dialog": "^1.0.5",
