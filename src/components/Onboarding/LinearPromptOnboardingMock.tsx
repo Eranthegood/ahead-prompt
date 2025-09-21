@@ -93,14 +93,6 @@ export default function LinearPromptOnboardingMock() {
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {/* Interactive demo header */}
-        <div className="text-center space-y-2">
-          <h4 className="font-semibold text-sm">✨ Interactive Prompt Card Demo</h4>
-          <p className="text-xs text-muted-foreground">
-            Click the buttons below to explore each feature with precision tooltips!
-          </p>
-        </div>
-
         {/* Main prompt card with overlay tooltips */}
         <div className="relative">
           <div className="rounded-md border-2 border-primary/20 p-2 bg-background">
