@@ -77,6 +77,21 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     };
   }, []);
 
+  // Restore selected product selection from previous session
+  useEffect(() => {
+    const saved = localStorage.getItem('ahead-selected-product');
+    if (saved) {
+      setSelectedProductId(saved);
+    }
+  }, []);
+
+  // Persist selected product selection
+  useEffect(() => {
+    try {
+      localStorage.setItem('ahead-selected-product', selectedProductId);
+    } catch {}
+  }, [selectedProductId]);
+
   // Simple page configuration
   const config = {
     showHeader: !location.pathname.startsWith('/join-workspace'),
@@ -111,6 +126,14 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       setSelectedProductId(data.productId);
       // Réinitialiser la sélection d'epic pour voir tous les prompts du produit
       setSelectedEpicId(undefined);
+      try {
+        localStorage.setItem('ahead-selected-product', data.productId);
+      } catch {}
+    }
+
+    // Focaliser et surligner le prompt nouvellement créé
+    if (data?.promptId) {
+      window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
     }
   };
 
