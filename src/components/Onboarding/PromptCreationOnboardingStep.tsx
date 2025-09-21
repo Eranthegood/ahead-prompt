@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Zap, Loader2, CheckCircle, Sparkles, Clock } from 'lucide-react';
+import { Zap, CheckCircle, Sparkles, Clock, Target, Palette, Bot, Loader2 } from 'lucide-react';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useProducts } from '@/hooks/useProducts';
+import { useEpics } from '@/hooks/useEpics';
+import { useKnowledge } from '@/hooks/useKnowledge';
 import { useToast } from '@/hooks/use-toast';
+import { LinearActionButtons } from '@/components/ui/linear-buttons';
+import { useLinearPromptCreator } from '@/hooks/useLinearPromptCreator';
 
 interface PromptCreationOnboardingStepProps {
   productId: string;
@@ -20,41 +24,61 @@ export function PromptCreationOnboardingStep({
   productId, 
   onPromptCreated 
 }: PromptCreationOnboardingStepProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [createdPromptTitle, setCreatedPromptTitle] = useState('');
 
   const { user } = useAuth();
   const { workspace } = useWorkspace();
+  const { products } = useProducts(workspace?.id);
+  const { epics } = useEpics(workspace?.id, productId);
+  const { knowledgeItems } = useKnowledge(workspace?.id, productId);
   const { createPrompt } = usePrompts(workspace?.id, productId);
   const { toast } = useToast();
+  
+  const {
+    title,
+    setTitle,
+    priority,
+    setPriority,
+    selectedProduct,
+    setSelectedProduct,
+    selectedEpic,
+    setSelectedEpic,
+    providerConfig,
+    setProviderConfig,
+    selectedKnowledge,
+    setSelectedKnowledge,
+    resetForm
+  } = useLinearPromptCreator({
+    selectedProductId: productId,
+  });
 
   const suggestionExamples = [
     "Ajouter authentification utilisateur",
-    "Créer page d'accueil responsive",
+    "Créer page d'accueil responsive", 
     "Implémenter recherche avec filtres",
     "Optimiser performance API",
   ];
 
   const handleSuggestionClick = (suggestion: string) => {
     setTitle(suggestion);
-    setDescription(`Implémentation complète de: ${suggestion.toLowerCase()}`);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreatePrompt = async () => {
     if (!title.trim() || !workspace || isCreating) return;
 
     setIsCreating(true);
     try {
       const prompt = await createPrompt({
         title: title.trim(),
-        description: description.trim() || undefined,
-        product_id: productId,
+        product_id: selectedProduct || productId,
+        epic_id: selectedEpic,
         status: 'todo',
-        priority: 1,
+        priority,
+        ai_provider: providerConfig.provider,
+        ai_model: providerConfig.model,
+        knowledge_context: selectedKnowledge.map(item => item.id),
       });
 
       if (prompt) {
@@ -100,18 +124,36 @@ export function PromptCreationOnboardingStep({
 
   return (
     <div className="space-y-6">
+      {/* Titre et explication */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />
-          <h3 className="font-medium">Créons votre premier prompt</h3>
+          <h3 className="font-medium">Découvrez la création de prompt avancée</h3>
         </div>
         <p className="text-sm text-muted-foreground">
-          Décrivez rapidement une idée. L'IA va la transformer en prompt détaillé !
+          Cette interface vous permettra de créer tous vos futurs prompts avec des options avancées.
         </p>
       </div>
 
+      {/* Explications des fonctionnalités */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Target className="h-4 w-4 text-primary" />
+          <span>Priorité pour organiser</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Palette className="h-4 w-4 text-primary" />
+          <span>Produit et Epic</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm bg-accent/10 p-2 rounded-lg">
+          <Bot className="h-4 w-4 text-primary" />
+          <span>IA personnalisée</span>
+        </div>
+      </div>
+
+      {/* Suggestions d'exemples */}
       <div className="space-y-3">
-        <Label>Ou choisissez un exemple :</Label>
+        <Label>Choisissez un exemple ou créez le vôtre :</Label>
         <div className="flex flex-wrap gap-2">
           {suggestionExamples.map((suggestion) => (
             <Badge
@@ -126,56 +168,74 @@ export function PromptCreationOnboardingStep({
         </div>
       </div>
 
-      <Card className="border-dashed">
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="prompt-title">Titre du prompt *</Label>
-              <Input
-                id="prompt-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="ex: Ajouter authentification utilisateur"
-                maxLength={100}
-              />
-            </div>
+      {/* Interface de création intégrée */}
+      <Card className="border-2 border-dashed border-primary/20">
+        <CardHeader className="pb-4">
+          <Label className="text-base font-medium">Interface de création complète</Label>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Titre du prompt */}
+          <div className="space-y-2">
+            <Label htmlFor="prompt-title">Titre du prompt *</Label>
+            <Input
+              id="prompt-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="ex: Ajouter authentification utilisateur"
+              maxLength={100}
+              className="text-base"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="prompt-description">Description (optionnel)</Label>
-              <Textarea
-                id="prompt-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Détails supplémentaires sur votre idée..."
-                rows={3}
-                maxLength={500}
-              />
-            </div>
+          {/* Boutons d'action linéaires */}
+          <div className="space-y-2">
+            <Label>Options avancées</Label>
+            <LinearActionButtons
+              priority={priority}
+              onPriorityChange={setPriority}
+              selectedProduct={selectedProduct}
+              onProductChange={setSelectedProduct}
+              selectedEpic={selectedEpic}
+              onEpicChange={setSelectedEpic}
+              providerConfig={providerConfig}
+              onProviderChange={setProviderConfig}
+              selectedKnowledge={selectedKnowledge}
+              onKnowledgeChange={setSelectedKnowledge}
+              products={products || []}
+              epics={epics || []}
+              knowledgeItems={knowledgeItems || []}
+              onCreateProduct={() => {}}
+              onCreateEpic={() => {}}
+              onExpandToggle={() => {}}
+            />
+          </div>
 
-            <Button
-              type="submit"
-              disabled={!title.trim() || isCreating}
-              className="w-full"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Création et génération...
-                </>
-              ) : (
-                <>
-                  <Zap className="h-4 w-4 mr-2" />
-                  Créer le prompt
-                </>
-              )}
-            </Button>
-          </form>
+          {/* Bouton de création */}
+          <Button
+            onClick={handleCreatePrompt}
+            disabled={!title.trim() || isCreating}
+            className="w-full"
+            size="lg"
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Création et génération...
+              </>
+            ) : (
+              <>
+                <Zap className="h-4 w-4 mr-2" />
+                Créer le prompt
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
 
+      {/* Conseil d'utilisation */}
       <div className="bg-accent/20 p-3 rounded-lg">
         <p className="text-sm">
-          ✨ <strong>Génération AI:</strong> Votre idée sera automatiquement transformée en prompt détaillé !
+          💡 <strong>Raccourci :</strong> Utilisez <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Q</kbd> pour ouvrir cette interface rapidement !
         </p>
       </div>
     </div>
