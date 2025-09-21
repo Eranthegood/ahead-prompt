@@ -9,7 +9,8 @@ import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
 import { InteractiveOnboardingPromptCard } from '@/components/InteractiveOnboardingPromptCard';
 import LinearPromptOnboardingMock from '@/components/Onboarding/LinearPromptOnboardingMock';
-import QuickPromptOnboardingMock from '@/components/Onboarding/QuickPromptOnboardingMock';
+import { ProductCreationOnboardingStep } from '@/components/Onboarding/ProductCreationOnboardingStep';
+import { PromptCreationOnboardingStep } from '@/components/Onboarding/PromptCreationOnboardingStep';
 
 interface OnboardingModalProps {
   open: boolean;
@@ -17,127 +18,118 @@ interface OnboardingModalProps {
   onComplete: () => void;
 }
 
-const onboardingSteps = [
-  {
-    title: 'Create Prompts Lightning Fast',
-    description: 'Master the instant prompt creation workflow designed for developers.',
-    icon: <Zap className="h-8 w-8 text-primary" />,
-    content: (
-      <div className="space-y-3">
-        <QuickPromptOnboardingMock />
-      </div>
-    )
-  },
-  {
-    title: 'Product > Epic > Prompts Organization',
-    description: 'Structure your ideas with our clean hierarchy inspired by Todoist and Slack.',
-    icon: <FolderPlus className="h-8 w-8 text-primary" />,
-    content: (
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-primary rounded"></div>
-            <span className="font-medium">Product</span>
-            <span className="text-muted-foreground">- Your different projects</span>
-          </div>
-          <div className="flex items-center gap-2 ml-6">
-            <div className="w-3 h-3 bg-secondary rounded"></div>
-            <span className="font-medium">Epic</span>
-            <span className="text-muted-foreground">- Major features</span>
-          </div>
-          <div className="flex items-center gap-2 ml-12">
-            <div className="w-3 h-3 bg-accent rounded"></div>
-            <span className="font-medium">Prompts</span>
-            <span className="text-muted-foreground">- Your ideas and tasks</span>
-          </div>
-        </div>
-        <div className="bg-muted p-3 rounded-lg">
-          <p className="text-sm">Intuitive sidebar navigation, just like Todoist!</p>
-        </div>
-      </div>
-    )
-  },
-  {
-    title: 'Interactive Prompt Management',
-    description: 'Master the workflow with our precision-designed prompt cards. Every click is optimized for speed.',
-    icon: <Zap className="h-8 w-8 text-primary" />,
-    content: (
-      <div className="space-y-3">
-        <LinearPromptOnboardingMock />
-      </div>
-    )
-  },
-  {
-    title: 'Ultra-Fast Keyboard Shortcuts',
-    description: 'Work at the speed of thought with our optimized shortcuts.',
-    icon: <Keyboard className="h-8 w-8 text-primary" />,
-    content: (
-      <div className="space-y-3">
-        <div className="grid grid-cols-1 gap-2">
-          <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Quick prompt creation</span>
-            <Badge variant="secondary">Q</Badge>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Open prompt library</span>
-            <Badge variant="secondary">L</Badge>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Knowledge Box</span>
-            <Badge variant="secondary">K</Badge>
-          </div>
-          <div className="flex items-center justify-between p-2 bg-muted rounded">
-            <span className="text-sm">Quick notes</span>
-            <Badge variant="secondary">N</Badge>
-          </div>
-        </div>
-        <div className="bg-accent/20 p-3 rounded-lg">
-          <p className="text-sm">Perfect for capturing 2 AM ideas without leaving your keyboard! 🌙</p>
-        </div>
-      </div>
-    )
-  },
-  {
-    title: 'Knowledge Box & Prompt Library',
-    description: 'Store your references and organize reusable prompts.',
-    icon: <BookOpen className="h-8 w-8 text-primary" />,
-    content: (
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="font-medium flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Knowledge Box
-            </div>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Links & docs</li>
-              <li>• Design systems</li>
-              <li>• Code snippets</li>
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <div className="font-medium flex items-center gap-2">
-              <Library className="h-4 w-4" />
-              Prompt Library
-            </div>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Templates</li>
-              <li>• Reusable prompts</li>
-              <li>• Categories</li>
-              <li>• Quick access</li>
-            </ul>
-          </div>
-        </div>
-        <div className="bg-muted p-3 rounded-lg">
-          <p className="text-sm">Save time with organized templates and context-rich knowledge!</p>
-        </div>
-      </div>
-    )
-  }
-];
 
 export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
+  const [createdPromptId, setCreatedPromptId] = useState<string | null>(null);
+
+  const getOnboardingSteps = () => [
+    {
+      title: 'Créez votre premier produit',
+      description: 'Organisez vos projets avec des produits. Commençons par créer le vôtre !',
+      icon: <FolderPlus className="h-8 w-8 text-primary" />,
+      content: (
+        <ProductCreationOnboardingStep 
+          onProductCreated={(productId) => setCreatedProductId(productId)}
+        />
+      )
+    },
+    {
+      title: 'Votre premier prompt avec IA',
+      description: 'Créez un prompt et laissez l\'IA le transformer en quelque chose de génial.',
+      icon: <Zap className="h-8 w-8 text-primary" />,
+      content: createdProductId ? (
+        <PromptCreationOnboardingStep 
+          productId={createdProductId}
+          onPromptCreated={(promptId) => setCreatedPromptId(promptId)}
+        />
+      ) : (
+        <div className="text-center text-muted-foreground py-8">
+          Créez d'abord un produit à l'étape précédente
+        </div>
+      )
+    },
+    {
+      title: 'Interactive Prompt Management',
+      description: 'Master the workflow with our precision-designed prompt cards. Every click is optimized for speed.',
+      icon: <Zap className="h-8 w-8 text-primary" />,
+      content: (
+        <div className="space-y-3">
+          <LinearPromptOnboardingMock />
+        </div>
+      )
+    },
+    {
+      title: 'Ultra-Fast Keyboard Shortcuts',
+      description: 'Work at the speed of thought with our optimized shortcuts.',
+      icon: <Keyboard className="h-8 w-8 text-primary" />,
+      content: (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-2">
+            <div className="flex items-center justify-between p-2 bg-muted rounded">
+              <span className="text-sm">Quick prompt creation</span>
+              <Badge variant="secondary">Q</Badge>
+            </div>
+            <div className="flex items-center justify-between p-2 bg-muted rounded">
+              <span className="text-sm">Open prompt library</span>
+              <Badge variant="secondary">L</Badge>
+            </div>
+            <div className="flex items-center justify-between p-2 bg-muted rounded">
+              <span className="text-sm">Knowledge Box</span>
+              <Badge variant="secondary">K</Badge>
+            </div>
+            <div className="flex items-center justify-between p-2 bg-muted rounded">
+              <span className="text-sm">Quick notes</span>
+              <Badge variant="secondary">N</Badge>
+            </div>
+          </div>
+          <div className="bg-accent/20 p-3 rounded-lg">
+            <p className="text-sm">Perfect for capturing 2 AM ideas without leaving your keyboard! 🌙</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: 'Knowledge Box & Prompt Library',
+      description: 'Store your references and organize reusable prompts.',
+      icon: <BookOpen className="h-8 w-8 text-primary" />,
+      content: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="font-medium flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Knowledge Box
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Links & docs</li>
+                <li>• Design systems</li>
+                <li>• Code snippets</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <div className="font-medium flex items-center gap-2">
+                <Library className="h-4 w-4" />
+                Prompt Library
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Templates</li>
+                <li>• Reusable prompts</li>
+                <li>• Categories</li>
+                <li>• Quick access</li>
+              </ul>
+            </div>
+          </div>
+          <div className="bg-muted p-3 rounded-lg">
+            <p className="text-sm">Save time with organized templates and context-rich knowledge!</p>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const onboardingSteps = getOnboardingSteps();
 
   const nextStep = () => {
     if (currentStep < onboardingSteps.length - 1) {
