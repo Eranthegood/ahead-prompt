@@ -24,6 +24,7 @@ import { PRIORITY_OPTIONS } from '@/types';
 interface CreatePromptData {
   title: string;
   description?: string;
+  original_description?: string;
   epic_id?: string;
   product_id?: string;
   priority?: PromptPriority;
@@ -201,6 +202,7 @@ export function MobilePromptDrawer({
     return {
       title: generateTitleFromContent(content),
       description: content,
+      original_description: content, // CRITICAL: Required for auto-generation
       epic_id: finalEpicId || undefined,
       product_id: finalProductId || undefined,
       priority: selectedPriority,
@@ -240,15 +242,22 @@ export function MobilePromptDrawer({
     
     try {
       const promptData = createPromptData(content);
-      await onSave(promptData);
+      
+      // 🚨 CRITICAL UX FLOW - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
+      // Dialog MUST close immediately (< 100ms) - this is the core UX of Ahead.love
+      console.log('🚀 MobilePromptDrawer: Closing drawer immediately for fluid UX');
+      onClose();
+      
+      // Start background generation (DO NOT AWAIT!)
+      onSave(promptData).catch(error => {
+        console.error('Background prompt creation failed:', error);
+      });
       
       toast({
         title: 'Prompt created!',
         description: 'Your prompt will be generated automatically.',
         variant: 'default'
       });
-      
-      onClose();
     } catch (error) {
       console.error('Error saving prompt:', error);
       toast({

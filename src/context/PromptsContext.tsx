@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { usePromptsStore } from '@/hooks/usePromptsStore';
+import { usePrompts } from '@/hooks/usePrompts';
 import type { Prompt, PromptStatus } from '@/types';
 
 interface PromptsContextValue {
   prompts: Prompt[];
   loading: boolean;
-  createPrompt: ReturnType<typeof usePromptsStore>['createPrompt'];
+  createPrompt: (promptData: any) => Promise<any>;
   updatePromptStatus: (promptId: string, status: PromptStatus) => Promise<void>;
   updatePrompt: (promptId: string, updates: Partial<Prompt>) => Promise<void>;
   updatePromptPriority: (promptId: string, priority: number) => Promise<void>;
@@ -24,23 +24,23 @@ interface PromptsProviderProps {
 }
 
 export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId, children }: PromptsProviderProps) {
-  const promptsStore = usePromptsStore(
+  const promptsHook = usePrompts(
     workspaceId,
     selectedProductId,
     selectedEpicId
   );
 
   const value = useMemo<PromptsContextValue>(() => ({
-    prompts: promptsStore.prompts || [],
-    loading: promptsStore.loading || false,
-    createPrompt: promptsStore.createPrompt || (async () => null),
-    updatePromptStatus: promptsStore.updatePromptStatus || (async () => {}),
-    updatePrompt: promptsStore.updatePrompt || (async () => {}),
-    updatePromptPriority: promptsStore.updatePromptPriority || (async () => {}),
-    duplicatePrompt: promptsStore.duplicatePrompt || (async () => {}),
-    deletePrompt: promptsStore.deletePrompt || (async () => {}),
-    refetch: promptsStore.refetch || (async () => {}),
-  }), [promptsStore]);
+    prompts: promptsHook.prompts || [],
+    loading: promptsHook.loading || false,
+    createPrompt: promptsHook.createPrompt || (async () => null),
+    updatePromptStatus: promptsHook.updatePromptStatus || (async () => {}),
+    updatePrompt: promptsHook.updatePrompt || (async () => {}),
+    updatePromptPriority: promptsHook.updatePromptPriority || (async () => {}),
+    duplicatePrompt: promptsHook.duplicatePrompt || (async () => {}),
+    deletePrompt: promptsHook.deletePrompt || (async () => {}),
+    refetch: promptsHook.refetch || (async () => {}),
+  }), [promptsHook]);
 
   return (
     <PromptsContext.Provider value={value}>

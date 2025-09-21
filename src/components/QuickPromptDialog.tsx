@@ -351,11 +351,16 @@ export const QuickPromptDialog: React.FC<QuickPromptDialogProps> = ({
 
       // Create prompt data and save
       const promptData = createPromptData(content);
-      await onSave(promptData);
       
       // 🚨 CRITICAL UX FLOW - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
       // Dialog MUST close immediately (< 100ms) - this is the core UX of Ahead.love
+      console.log('🚀 QuickPromptDialog: Closing dialog immediately for fluid UX');
       onClose();
+      
+      // Start background generation (DO NOT AWAIT!)
+      onSave(promptData).catch(error => {
+        console.error('Background prompt creation failed:', error);
+      });
       
       // Track performance metrics
       const responseTime = Date.now() - startTime;
