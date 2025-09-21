@@ -92,10 +92,6 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
               <span className="text-sm">Knowledge Box</span>
               <Badge variant="secondary">K</Badge>
             </div>
-            <div className="flex items-center justify-between p-2 bg-muted rounded">
-              <span className="text-sm">Quick notes</span>
-              <Badge variant="secondary">N</Badge>
-            </div>
           </div>
           <div className="bg-accent/20 p-3 rounded-lg">
             <p className="text-sm">Perfect for capturing 2 AM ideas without leaving your keyboard! 🌙</p>
