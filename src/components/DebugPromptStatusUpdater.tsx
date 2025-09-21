@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useEventSubscription } from '@/hooks/useEventManager';
 
 /**
  * Debug component to monitor prompt status updates and detect potential reload causes
@@ -10,10 +11,9 @@ export function DebugPromptStatusUpdater() {
   const [lastStatusUpdate, setLastStatusUpdate] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Listen for custom events that indicate status updates
-    const handleStatusUpdate = (event: CustomEvent) => {
-      const { promptId, status, timestamp } = event.detail;
+    // Use EventManager for status updates
+    useEventSubscription('prompt-status-updated', (data) => {
+      const { promptId, status, timestamp } = data;
       setStatusUpdateCount(prev => prev + 1);
       setLastStatusUpdate(`Prompt ${promptId} → ${status} at ${timestamp}`);
       
@@ -24,11 +24,11 @@ export function DebugPromptStatusUpdater() {
         totalUpdates: statusUpdateCount + 1
       });
 
-      // Show debug info for 'done' status updates
+      // Show debug info for 'done' status updates  
       if (status === 'done') {
         console.log('[DebugPromptStatusUpdater] DONE status detected - monitoring for reload...');
         
-        // Check if page is about to reload
+        // Check if page is about to reload (native event still needed)
         const beforeUnloadHandler = () => {
           console.error('[DebugPromptStatusUpdater] PAGE RELOAD DETECTED after done status!');
           toast({
@@ -46,15 +46,7 @@ export function DebugPromptStatusUpdater() {
           console.log('[DebugPromptStatusUpdater] No reload detected - status update successful');
         }, 5000);
       }
-    };
-
-    // Custom event listener for status updates
-    window.addEventListener('prompt-status-updated', handleStatusUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener('prompt-status-updated', handleStatusUpdate as EventListener);
-    };
-  }, [statusUpdateCount, toast]);
+    }, [statusUpdateCount, toast]);
 
   // Only show in development
   if (process.env.NODE_ENV !== 'development') {

@@ -13,6 +13,7 @@ import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useEventSubscription } from '@/hooks/useEventManager';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
@@ -53,26 +54,24 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     }
   }, [user, location.pathname]);
 
-  // Manual onboarding trigger (for debugging/testing)
+  // Event subscriptions using EventManager
+  useEventSubscription('force-onboarding', () => {
+    console.log('[Onboarding] Manually triggered');
+    setShowOnboarding(true);
+  }, []);
+
+  // Native keydown events still need window listener
   useEffect(() => {
-    const handleForceOnboarding = () => {
-      console.log('[Onboarding] Manually triggered');
-      setShowOnboarding(true);
-    };
-    
     // Global shortcut Ctrl+Shift+O to force onboarding
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'O') {
         e.preventDefault();
-        handleForceOnboarding();
+        setShowOnboarding(true);
       }
     };
     
-    window.addEventListener('force-onboarding', handleForceOnboarding as EventListener);
     window.addEventListener('keydown', handleKeyDown);
-    
     return () => {
-      window.removeEventListener('force-onboarding', handleForceOnboarding as EventListener);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);

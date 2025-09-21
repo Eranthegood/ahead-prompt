@@ -13,6 +13,7 @@ import { useKnowledge } from '@/hooks/useKnowledge';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
 import { LinearActionButtons } from '@/components/ui/linear-buttons';
+import { useEventSubscription } from '@/hooks/useEventManager';
 import { useLinearPromptCreator } from '@/hooks/useLinearPromptCreator';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 
@@ -90,17 +91,13 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   }, [products]);
 
   // Listen for globally dispatched product creation events to instantly show/select
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const ce = e as CustomEvent<any>;
-      const newProduct: Product | undefined = ce.detail?.product || ce.detail;
-      if (!newProduct?.id) return;
-      setModalProducts(prev => (prev.some(p => p.id === newProduct.id) ? prev : [newProduct, ...prev]));
-      // Auto-select the newly created product
-      setSelectedProduct(newProduct.id);
-    };
-    window.addEventListener('product:created', handler as EventListener);
-    return () => window.removeEventListener('product:created', handler as EventListener);
+  // Listen for product creation events using EventManager
+  useEventSubscription('product:created', (data) => {
+    const newProduct = data?.product || data;
+    if (!newProduct?.id) return;
+    setModalProducts(prev => (prev.some(p => p.id === newProduct.id) ? prev : [newProduct, ...prev]));
+    // Auto-select the newly created product
+    setSelectedProduct(newProduct.id);
   }, [setSelectedProduct]);
 
   const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
