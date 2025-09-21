@@ -11,7 +11,7 @@ import { useWorkspace } from '@/hooks/useWorkspace';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProductCreationOnboardingStepProps {
-  onProductCreated: (productId: string) => void;
+  onProductCreated: (productId: string, productName: string) => void;
 }
 
 const productColors = [
@@ -53,7 +53,7 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
           title: "Produit créé !",
           description: `"${product.name}" est prêt pour vos prompts`,
         });
-        onProductCreated(product.id);
+        onProductCreated(product.id, product.name);
       }
     } catch (error) {
       toast({

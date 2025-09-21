@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock, Library } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock, Library, Layers, MessageSquare } from 'lucide-react';
 import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
 import { InteractiveOnboardingPromptCard } from '@/components/InteractiveOnboardingPromptCard';
 import LinearPromptOnboardingMock from '@/components/Onboarding/LinearPromptOnboardingMock';
 import { ProductCreationOnboardingStep } from '@/components/Onboarding/ProductCreationOnboardingStep';
+import { ArchitectureExplanationStep } from '@/components/Onboarding/ArchitectureExplanationStep';
 import { PromptCreationOnboardingStep } from '@/components/Onboarding/PromptCreationOnboardingStep';
 
 interface OnboardingModalProps {
@@ -22,6 +23,7 @@ interface OnboardingModalProps {
 export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [createdProductId, setCreatedProductId] = useState<string | null>(null);
+  const [createdProductName, setCreatedProductName] = useState<string>('');
   const [createdPromptId, setCreatedPromptId] = useState<string | null>(null);
 
   const getOnboardingSteps = () => [
@@ -31,14 +33,25 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
       icon: <FolderPlus className="h-8 w-8 text-primary" />,
       content: (
         <ProductCreationOnboardingStep 
-          onProductCreated={(productId) => setCreatedProductId(productId)}
+          onProductCreated={(productId, productName) => {
+            setCreatedProductId(productId);
+            setCreatedProductName(productName);
+          }}
         />
+      )
+    },
+    {
+      title: 'Comprendre l\'architecture',
+      description: 'Product → Epic → Prompt : comment tout s\'organise',
+      icon: <Layers className="h-8 w-8 text-primary" />,
+      content: (
+        <ArchitectureExplanationStep productName={createdProductName} />
       )
     },
     {
       title: 'Votre premier prompt avec IA',
       description: 'Créez un prompt et laissez l\'IA le transformer en quelque chose de génial.',
-      icon: <Zap className="h-8 w-8 text-primary" />,
+      icon: <MessageSquare className="h-8 w-8 text-primary" />,
       content: createdProductId ? (
         <PromptCreationOnboardingStep 
           productId={createdProductId}
