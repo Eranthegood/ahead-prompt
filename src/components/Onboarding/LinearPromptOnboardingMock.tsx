@@ -72,7 +72,7 @@ export default function LinearPromptOnboardingMock() {
       id: 'status',
       title: '⚡ Status Flow',
       content: 'Todo → In Progress → Done. Click the status badge to cycle through states instantly.',
-      style: { top: '-80px', left: '210px' }, // Shifted 150px right to better target status
+      style: { top: '-80px', left: '260px' }, // Shifted additional 50px right
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
