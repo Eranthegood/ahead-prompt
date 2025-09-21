@@ -403,12 +403,7 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
   };
 
   // Event subscriptions using EventManager for dialog management
-  useEventSubscription('open-knowledge-dialog', () => {
-    console.log('Opening knowledge dialog from onboarding');
-    // Use event system to open the new Knowledge Box modal
-    const event = new CustomEvent('open-knowledge-dialog');
-    window.dispatchEvent(event);
-  }, []);
+  // Knowledge dialog event is handled by dedicated modal; no local subscription to avoid loops.
 
   useEventSubscription('open-product-dialog', () => {
     console.log('Opening product dialog from onboarding');

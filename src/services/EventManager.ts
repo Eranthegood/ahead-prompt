@@ -121,11 +121,12 @@ export const eventManager = new EventManager();
 
 // React hook for easy integration
 import { useEffect } from 'react';
+import type { DependencyList } from 'react';
 
 export function useEventListener<T = any>(
   eventName: EventName, 
   callback: EventCallback<T>, 
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ): void {
   useEffect(() => {
     const unsubscribe = eventManager.on(eventName, callback);

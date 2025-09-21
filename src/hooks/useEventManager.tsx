@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import type { DependencyList } from 'react';
 import { EventName, EventCallback, eventManager } from '@/services/EventManager';
 
 /**
@@ -7,7 +8,7 @@ import { EventName, EventCallback, eventManager } from '@/services/EventManager'
 export function useEventSubscription<T = any>(
   eventName: EventName,
   callback: EventCallback<T>,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ): void {
   useEffect(() => {
     const unsubscribe = eventManager.on(eventName, callback);
