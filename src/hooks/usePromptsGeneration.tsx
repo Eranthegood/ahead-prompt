@@ -63,7 +63,12 @@ export const usePromptsGeneration = (
       return;
     }
 
-    console.log(`Auto-generating prompt for: ${promptId}`);
+    console.log(`🤖 [autoGeneratePrompt] Starting generation for prompt: ${promptId}`, {
+      contentLength: cleanContent.length,
+      provider,
+      model,
+      knowledgeContext: knowledgeContext?.length || 0
+    });
     
     // Step 0: Initial toast
     toast({
@@ -72,24 +77,37 @@ export const usePromptsGeneration = (
     });
     
     try {
-      // Step 1: Set generating status
-      setPrompts(prev => prev.map(p => 
-        p.id === promptId 
-          ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
-          : p
-      ));
+      // Check current status first
+      const currentPrompt = prompts.find(p => p.id === promptId);
+      console.log(`🔍 [autoGeneratePrompt] Current prompt status:`, {
+        promptId,
+        currentStatus: currentPrompt?.status,
+        promptExists: !!currentPrompt
+      });
 
-      const { error: statusError } = await supabase
-        .from('prompts')
-        .update({
-          status: 'generating',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', promptId);
+      // Step 1: Ensure generating status (may already be set)
+      if (currentPrompt?.status !== 'generating') {
+        console.log(`📝 [autoGeneratePrompt] Setting status to generating for ${promptId}`);
+        setPrompts(prev => prev.map(p => 
+          p.id === promptId 
+            ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
+            : p
+        ));
 
-      if (statusError) {
-        console.error(`Failed to set generating status for prompt ${promptId}:`, statusError);
-        throw statusError;
+        const { error: statusError } = await supabase
+          .from('prompts')
+          .update({
+            status: 'generating',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', promptId);
+
+        if (statusError) {
+          console.error(`❌ [autoGeneratePrompt] Failed to set generating status:`, statusError);
+          throw statusError;
+        }
+      } else {
+        console.log(`✅ [autoGeneratePrompt] Prompt already in generating status`);
       }
 
       // Step 2: Transform content
@@ -97,7 +115,7 @@ export const usePromptsGeneration = (
         ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
         : [];
 
-      console.log('🤖 Starting AI transformation:', {
+      console.log('🚀 [autoGeneratePrompt] Starting AI transformation:', {
         promptId,
         provider,
         model,
@@ -112,7 +130,7 @@ export const usePromptsGeneration = (
         )
       ]) as any;
 
-      console.log('✅ AI transformation result:', {
+      console.log('📥 [autoGeneratePrompt] AI transformation result:', {
         promptId,
         success: response.success,
         hasContent: !!response.transformedPrompt,
@@ -121,6 +139,8 @@ export const usePromptsGeneration = (
       });
       
       if (response.success && response.transformedPrompt) {
+        console.log('💾 [autoGeneratePrompt] Updating prompt with generated content');
+        
         // Step 3: Update with generated content
         setPrompts(prev => prev.map(p => 
           p.id === promptId 
@@ -134,31 +154,23 @@ export const usePromptsGeneration = (
             : p
         ));
 
-        // Update database in two calls for robustness
-        const { error: contentError } = await supabase
+        // Update database in one atomic call
+        const { error: updateError } = await supabase
           .from('prompts')
           .update({
             generated_prompt: response.transformedPrompt,
             generated_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', promptId);
-
-        if (contentError) {
-          throw contentError;
-        }
-
-        const { error: statusUpdateError } = await supabase
-          .from('prompts')
-          .update({
             status: 'todo',
             updated_at: new Date().toISOString(),
           })
           .eq('id', promptId);
 
-        if (statusUpdateError) {
-          throw statusUpdateError;
+        if (updateError) {
+          console.error('❌ [autoGeneratePrompt] Database update failed:', updateError);
+          throw updateError;
         }
+        
+        console.log('✅ [autoGeneratePrompt] Generation completed successfully for:', promptId);
         
         toast({
           title: "✅ Prompt généré !",
@@ -166,7 +178,7 @@ export const usePromptsGeneration = (
         });
 
       } else {
-        console.error('❌ Generation failed:', {
+        console.error('❌ [autoGeneratePrompt] Generation failed:', {
           promptId,
           success: response.success,
           hasTransformedPrompt: !!response.transformedPrompt,
@@ -176,7 +188,7 @@ export const usePromptsGeneration = (
       }
 
     } catch (error: any) {
-      console.error('💥 Prompt generation error:', {
+      console.error('💥 [autoGeneratePrompt] Generation error:', {
         promptId,
         error: error.message,
         stack: error.stack
