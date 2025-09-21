@@ -33,8 +33,7 @@ export default function LinearPromptOnboardingMock() {
     updated_at: new Date().toISOString(),
   });
 
-  const [activeStep, setActiveStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   const handleCopyGenerated = () => {
     // Simulate auto-move to in_progress for demo
@@ -60,63 +59,42 @@ export default function LinearPromptOnboardingMock() {
       title: '🔥 Priority Control',
       content: 'Click to set High/Normal/Low priority. High priority prompts bubble to the top!',
       position: 'left',
-      highlight: 'priority-area'
     },
     {
       id: 'copy',
       title: '📋 Magic Copy',
       content: 'One click copies to clipboard AND auto-moves to "In Progress". Zero extra steps!',
       position: 'top',
-      highlight: 'copy-button'
     },
     {
       id: 'status',
       title: '⚡ Status Flow',
       content: 'Todo → In Progress → Done. Click to cycle through states instantly.',
       position: 'right',
-      highlight: 'status-area'
     },
     {
       id: 'title',
       title: '✏️ Full Edit Mode',
       content: 'Click anywhere on the title to open detailed editing. Rich text, tags, everything!',
       position: 'bottom',
-      highlight: 'title-area'
     }
   ];
 
-  const startDemo = () => {
-    setIsPlaying(true);
-    setActiveStep(0);
-    
-    // Auto-advance through steps
-    setTimeout(() => setActiveStep(1), 2000);
-    setTimeout(() => setActiveStep(2), 4000);
-    setTimeout(() => setActiveStep(3), 6000);
-    setTimeout(() => {
-      setIsPlaying(false);
-      setActiveStep(0);
-    }, 8000);
+  const showTooltip = (stepId: string) => {
+    setActiveTooltip(stepId);
+    // Auto-hide after 4 seconds
+    setTimeout(() => setActiveTooltip(null), 4000);
   };
 
   return (
     <TooltipProvider>
       <div className="space-y-4">
         {/* Interactive demo header */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-2">
           <h4 className="font-semibold text-sm">✨ Interactive Prompt Card Demo</h4>
           <p className="text-xs text-muted-foreground">
-            Every element is clickable and optimized for speed. Try it!
+            Click the buttons below to explore each feature!
           </p>
-          
-          <Button 
-            size="sm" 
-            onClick={startDemo} 
-            disabled={isPlaying}
-            className="h-7 text-xs"
-          >
-            {isPlaying ? 'Playing Demo...' : '▶ Start Interactive Tour'}
-          </Button>
         </div>
 
         {/* Main prompt card with overlay tooltips */}
@@ -136,11 +114,11 @@ export default function LinearPromptOnboardingMock() {
           </div>
 
           {/* Interactive tooltip overlays */}
-          {interactiveSteps.map((step, index) => (
+          {interactiveSteps.map((step) => (
             <div
               key={step.id}
               className={`absolute transition-all duration-300 ${
-                isPlaying && activeStep === index 
+                activeTooltip === step.id
                   ? 'opacity-100 scale-100 z-20' 
                   : 'opacity-0 scale-95 pointer-events-none'
               }`}
@@ -171,58 +149,56 @@ export default function LinearPromptOnboardingMock() {
           ))}
         </div>
 
-        {/* Static hover tooltips for manual exploration */}
-        {!isPlaying && (
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded cursor-help hover:bg-muted">
-                  <Target className="h-3 w-3 text-primary" />
-                  <span>Priority System</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>🔥 High → 🔸 Normal → 🕐 Low<br/>High priority always stays on top!</p>
-              </TooltipContent>
-            </Tooltip>
+        {/* Interactive feature buttons */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('priority')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
+              activeTooltip === 'priority' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            }`}
+          >
+            <Target className="h-3 w-3 text-primary" />
+            <span>Priority System</span>
+          </Button>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded cursor-help hover:bg-muted">
-                  <Zap className="h-3 w-3 text-primary" />
-                  <span>Auto-Progress</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Copy button automatically moves<br/>prompts to "In Progress" state!</p>
-              </TooltipContent>
-            </Tooltip>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('copy')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
+              activeTooltip === 'copy' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            }`}
+          >
+            <Zap className="h-3 w-3 text-primary" />
+            <span>Auto-Progress</span>
+          </Button>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded cursor-help hover:bg-muted">
-                  <Clock className="h-3 w-3 text-primary" />
-                  <span>Status Flow</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Todo → In Progress → Done<br/>Click status badge to cycle through!</p>
-              </TooltipContent>
-            </Tooltip>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('status')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
+              activeTooltip === 'status' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            }`}
+          >
+            <Clock className="h-3 w-3 text-primary" />
+            <span>Status Flow</span>
+          </Button>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 p-2 bg-muted/50 rounded cursor-help hover:bg-muted">
-                  <Mouse className="h-3 w-3 text-primary" />
-                  <span>Click to Edit</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Click anywhere on title for<br/>full editing modal with rich text!</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('title')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted ${
+              activeTooltip === 'title' ? 'bg-primary/10 border-primary/20' : 'bg-muted/50'
+            }`}
+          >
+            <Mouse className="h-3 w-3 text-primary" />
+            <span>Click to Edit</span>
+          </Button>
+        </div>
 
         {/* Workflow success message */}
         <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-3 rounded-lg border border-green-500/20">
