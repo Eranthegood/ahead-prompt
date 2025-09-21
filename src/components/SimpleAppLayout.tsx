@@ -30,6 +30,7 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const { preferences, updatePreferences } = useUserPreferences();
   const appStore = useAppStoreOptional();
   const openDialog = appStore?.openDialog ?? (() => {});
+  const emit = useEventEmitter();
   
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
