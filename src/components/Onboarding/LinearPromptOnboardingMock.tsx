@@ -58,28 +58,28 @@ export default function LinearPromptOnboardingMock() {
       id: 'priority',
       title: '🔥 Priority Control',
       content: 'Click the flame/minus/clock icon to set High/Normal/Low priority. High priority prompts bubble to the top!',
-      style: { top: '-50px', left: '20px' }, // Above priority dropdown
+      style: { top: '-80px', left: '20px' }, // Well above priority dropdown
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'copy',
       title: '📋 Magic Copy',
       content: 'One click copies to clipboard AND auto-moves to "In Progress". Zero extra steps!',
-      style: { top: '-50px', left: '85px' }, // Above copy button
+      style: { top: '-80px', left: '85px' }, // Well above copy button
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'status',
       title: '⚡ Status Flow',
       content: 'Todo → In Progress → Done. Click the status badge to cycle through states instantly.',
-      style: { top: '-50px', right: '120px' }, // Above status area
+      style: { top: '-80px', right: '120px' }, // Well above status area
       arrowClass: 'bottom-[-4px] right-6'
     },
     {
       id: 'title',
       title: '✏️ Full Edit Mode',
       content: 'Click anywhere on the title area to open detailed editing modal with rich text support!',
-      style: { top: '-50px', left: '200px' }, // Above title area (center)
+      style: { top: '-80px', left: '200px' }, // Well above title area (center)
       arrowClass: 'bottom-[-4px] left-1/2 -translate-x-1/2'
     }
   ];
