@@ -62,6 +62,11 @@ function createBrowserStorage(): StorageLike {
       getItem: (k) => window.localStorage.getItem(k),
       setItem: (k, v) => {
         try {
+          // Clear corrupted auth tokens
+          if (k.includes('supabase.auth.token') && v.includes('refresh_token_not_found')) {
+            window.localStorage.removeItem(k);
+            return;
+          }
           window.localStorage.setItem(k, v);
         } catch (e) {
           try {

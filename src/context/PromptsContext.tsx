@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { usePrompts } from '@/hooks/usePrompts';
 import type { Prompt, PromptStatus } from '@/types';
+import { useEventSubscription } from '@/hooks/useEventManager';
 
 interface PromptsContextValue {
   prompts: Prompt[];
@@ -30,23 +31,15 @@ export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId
     selectedEpicId
   );
 
-  // Listen for prompt creation or explicit refetch events to refresh the list
-  useEffect(() => {
-    const handlePromptCreated = (e: CustomEvent) => {
-      console.log('[PromptsProvider] Prompt created, refreshing...', e.detail);
-      promptsHook.refetch?.();
-    };
-    const handleRefetch = () => {
-      console.log('[PromptsProvider] Refetch requested');
-      promptsHook.refetch?.();
-    };
-    
-    window.addEventListener('prompt-created', handlePromptCreated as EventListener);
-    window.addEventListener('refetch-prompts', handleRefetch as EventListener);
-    return () => {
-      window.removeEventListener('prompt-created', handlePromptCreated as EventListener);
-      window.removeEventListener('refetch-prompts', handleRefetch as EventListener);
-    };
+  // Listen for prompt creation or explicit refetch events using EventManager
+  useEventSubscription('prompt-created', (data) => {
+    console.log('[PromptsProvider] Prompt created, refreshing...', data);
+    promptsHook.refetch?.();
+  }, [promptsHook.refetch]);
+  
+  useEventSubscription('refetch-prompts', () => {
+    console.log('[PromptsProvider] Refetch requested');
+    promptsHook.refetch?.();
   }, [promptsHook.refetch]);
 
   const value = useMemo<PromptsContextValue>(() => ({
