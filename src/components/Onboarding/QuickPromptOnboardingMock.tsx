@@ -1,47 +1,80 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Flame, Minus, Clock, Zap, Type, FileText, Save } from 'lucide-react';
+import { Circle, Minus, Maximize2, X, MoreHorizontal, Settings } from 'lucide-react';
 
-// Interactive QuickPrompt dialog mock for onboarding
+// Mock AI Provider logos
+const OpenAILogo = () => (
+  <div className="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+    <span className="text-white text-xs font-bold">O</span>
+  </div>
+);
+
+const GPTLogo = () => (
+  <div className="w-4 h-4 bg-purple-500 rounded flex items-center justify-center">
+    <span className="text-white text-xs font-bold">G</span>
+  </div>
+);
+
+const ProductLogo = () => (
+  <div className="w-4 h-4 bg-gray-500 rounded-full flex items-center justify-center">
+    <Settings className="w-3 h-3 text-white" />
+  </div>
+);
+
+// Interactive QuickPrompt dialog mock matching exact screenshot
 export default function QuickPromptOnboardingMock() {
-  const [isOpen, setIsOpen] = useState(true);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState(2);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   const interactiveSteps = [
     {
       id: 'title',
-      title: '⚡ Lightning Title',
-      content: 'Type your prompt idea instantly. Keep it short and actionable!',
+      title: '⚡ Instant Title Input',
+      content: 'Type your idea instantly. This field auto-focuses when dialog opens with Q shortcut!',
       style: { top: '-80px', left: '50px' },
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
-      id: 'description',
-      title: '📝 Rich Description',
-      content: 'Add context, requirements, or details. This helps AI understand your needs perfectly.',
-      style: { top: '-80px', left: '50px' },
+      id: 'status',
+      title: '📋 Status Selection',
+      content: 'Default is Todo. Click to cycle through Todo → In Progress → Done states.',
+      style: { top: '-80px', left: '80px' },
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'priority',
-      title: '🔥 Set Priority',
-      content: 'High priority = urgent tasks that appear first. Perfect for blocking issues!',
-      style: { top: '-80px', right: '50px' },
-      arrowClass: 'bottom-[-4px] right-6'
+      title: '🔥 Priority Levels',
+      content: 'Normal by default. Click to set High/Normal/Low. High priority prompts appear first!',
+      style: { top: '-80px', left: '180px' },
+      arrowClass: 'bottom-[-4px] left-6'
     },
     {
-      id: 'save',
-      title: '💾 Save & Go',
-      content: 'One click saves your idea and you\'re ready for the next one. Zero friction workflow!',
-      style: { bottom: '-80px', right: '100px' },
+      id: 'provider',
+      title: '🤖 AI Provider',
+      content: 'Choose your AI provider. OpenAI, Claude, or others. Smart defaults based on your setup.',
+      style: { top: '-80px', left: '280px' },
+      arrowClass: 'bottom-[-4px] left-6'
+    },
+    {
+      id: 'model',
+      title: '🚀 AI Model',
+      content: 'Select specific model. GPT-4, Claude Sonnet, etc. Flagship models for best results!',
+      style: { top: '-80px', left: '380px' },
+      arrowClass: 'bottom-[-4px] left-6'
+    },
+    {
+      id: 'product',
+      title: '📁 Product Context',
+      content: 'Organize by product/project. Helps categorize and provides relevant context.',
+      style: { top: '-80px', left: '480px' },
+      arrowClass: 'bottom-[-4px] left-6'
+    },
+    {
+      id: 'create',
+      title: '💾 Create & Go',
+      content: 'One click saves your prompt. Dialog closes instantly, ready for your next idea!',
+      style: { bottom: '-80px', right: '30px' },
       arrowClass: 'top-[-4px] right-6'
     }
   ];
@@ -51,79 +84,82 @@ export default function QuickPromptOnboardingMock() {
     setTimeout(() => setActiveTooltip(null), 4000);
   };
 
-  const priorityOptions = [
-    { value: 1, label: 'High', icon: Flame, color: 'text-red-500', bgColor: 'bg-red-500/10 border-red-500/20' },
-    { value: 2, label: 'Normal', icon: Minus, color: 'text-muted-foreground', bgColor: 'bg-muted border-muted-foreground/20' },
-    { value: 3, label: 'Low', icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted border-muted-foreground/20' }
-  ];
-
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {/* Mock Quick Prompt Dialog */}
+        {/* Mock Quick Prompt Dialog - Exact Screenshot Recreation */}
         <div className="relative">
-          <div className="rounded-lg border-2 border-primary/20 bg-background p-6 shadow-lg max-w-md mx-auto">
-            <div className="space-y-4">
-              {/* Dialog Header */}
-              <div className="flex items-center gap-2 pb-2 border-b">
-                <Zap className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold">Quick Prompt Creation</h3>
+          <div className="rounded-lg bg-gray-900 text-white shadow-2xl max-w-4xl mx-auto border border-gray-700">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <div className="flex items-center gap-2 text-gray-300">
+                <Settings className="w-5 h-5" />
+                <span className="text-sm">Workspace</span>
+                <span className="text-gray-500">›</span>
+                <span className="text-white font-medium">New Prompt</span>
               </div>
-
-              {/* Title Input */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Title</label>
-                <Input
-                  placeholder="e.g., Add user authentication to landing page"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full"
-                />
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
+            </div>
 
-              {/* Description Textarea */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Description (optional)</label>
-                <Textarea
-                  placeholder="Add context, requirements, or specific details..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full min-h-[80px] resize-none"
-                />
-              </div>
+            {/* Main Content */}
+            <div className="p-6 space-y-8">
+              {/* Title Input Area */}
+              <div className="space-y-4">
+                <h1 className="text-3xl font-light text-gray-200">Prompt title</h1>
+                
+                {/* Control Bar */}
+                <div className="flex items-center gap-4 py-4">
+                  {/* Status */}
+                  <div className="flex items-center gap-2">
+                    <Circle className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-300 text-sm">Todo</span>
+                  </div>
 
-              {/* Priority Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Priority</label>
-                <div className="flex gap-2">
-                  {priorityOptions.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <Button
-                        key={option.value}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPriority(option.value)}
-                        className={`flex items-center gap-1 ${
-                          priority === option.value ? option.bgColor : 'bg-background'
-                        }`}
-                      >
-                        <Icon className={`h-3 w-3 ${option.color}`} />
-                        {option.label}
-                      </Button>
-                    );
-                  })}
+                  {/* Priority */}
+                  <div className="flex items-center gap-2">
+                    <Minus className="w-4 h-4 text-orange-500" />
+                    <span className="text-gray-300 text-sm">Normal</span>
+                  </div>
+
+                  {/* AI Provider */}
+                  <div className="flex items-center gap-2">
+                    <OpenAILogo />
+                    <span className="text-gray-300 text-sm">Openai</span>
+                  </div>
+
+                  {/* Model */}
+                  <div className="flex items-center gap-2">
+                    <GPTLogo />
+                    <span className="text-gray-300 text-sm">GPT-5 (Flagship)</span>
+                  </div>
+
+                  {/* Product */}
+                  <div className="flex items-center gap-2">
+                    <ProductLogo />
+                    <span className="text-gray-300 text-sm">Product</span>
+                  </div>
+
+                  {/* More Options */}
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" className="bg-primary">
-                  <Save className="h-3 w-3 mr-1" />
-                  Save Prompt
+              {/* Empty space for content */}
+              <div className="h-40"></div>
+
+              {/* Create Button */}
+              <div className="flex justify-end">
+                <Button className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2">
+                  Create prompt
                 </Button>
               </div>
             </div>
@@ -152,7 +188,7 @@ export default function QuickPromptOnboardingMock() {
         </div>
 
         {/* Interactive feature buttons */}
-        <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="grid grid-cols-4 gap-2 text-xs">
           <Button
             variant="ghost"
             size="sm"
@@ -161,20 +197,18 @@ export default function QuickPromptOnboardingMock() {
               activeTooltip === 'title' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <Type className="h-3 w-3 text-primary" />
             <span>Title Field</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => showTooltip('description')}
+            onClick={() => showTooltip('status')}
             className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
-              activeTooltip === 'description' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
+              activeTooltip === 'status' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <FileText className="h-3 w-3 text-primary" />
-            <span>Description</span>
+            <span>Status</span>
           </Button>
 
           <Button
@@ -185,20 +219,51 @@ export default function QuickPromptOnboardingMock() {
               activeTooltip === 'priority' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <Flame className="h-3 w-3 text-primary" />
-            <span>Priority System</span>
+            <span>Priority</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => showTooltip('save')}
+            onClick={() => showTooltip('provider')}
             className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
-              activeTooltip === 'save' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
+              activeTooltip === 'provider' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <Save className="h-3 w-3 text-primary" />
-            <span>Save & Go</span>
+            <span>AI Provider</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('model')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'model' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
+            }`}
+          >
+            <span>Model</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('product')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'product' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
+            }`}
+          >
+            <span>Product</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => showTooltip('create')}
+            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
+              activeTooltip === 'create' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
+            }`}
+          >
+            <span>Create Button</span>
           </Button>
         </div>
 
@@ -208,7 +273,7 @@ export default function QuickPromptOnboardingMock() {
             ⚡ 2-Second Capture
           </p>
           <p className="text-xs text-muted-foreground">
-            While Claude or Cursor works, your brain races ahead. Capture those ideas instantly before they vanish!
+            Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Q</kbd> anywhere to instantly open this dialog. Perfect for capturing ideas during AI wait times!
           </p>
         </div>
       </div>
