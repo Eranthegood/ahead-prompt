@@ -17,6 +17,7 @@ import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
 import { OnboardingDebug } from './debug/OnboardingDebug';
+import { PromptTestDialog } from './PromptTestDialog';
 
 interface SimpleAppLayoutProps {
   children: React.ReactNode;
@@ -258,6 +259,13 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
 
       {/* Debug utilities for development */}
       <OnboardingDebug />
+      
+      {/* Prompt generation test dialog */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <PromptTestDialog />
+        </div>
+      )}
     </div>
   );
 }
