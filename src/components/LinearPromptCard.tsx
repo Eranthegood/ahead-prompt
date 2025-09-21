@@ -47,8 +47,8 @@ export const LinearPromptCard: React.FC<LinearPromptCardProps> = ({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<PromptPriority>(2);
-  const [productId, setProductId] = useState(selectedProductId || '');
-  const [epicId, setEpicId] = useState(selectedEpicId || '');
+  const [productId, setProductId] = useState(selectedProductId || 'none');
+  const [epicId, setEpicId] = useState(selectedEpicId || 'none');
   
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,8 +65,8 @@ export const LinearPromptCard: React.FC<LinearPromptCardProps> = ({
       setTitle('');
       setDescription('');
       setPriority(2);
-      setProductId(selectedProductId || '');
-      setEpicId(selectedEpicId || '');
+      setProductId(selectedProductId || 'none');
+      setEpicId(selectedEpicId || 'none');
     }
   }, [isOpen, selectedProductId, selectedEpicId]);
 
@@ -90,8 +90,8 @@ export const LinearPromptCard: React.FC<LinearPromptCardProps> = ({
       await onSave({
         title: title.trim(),
         description: description.trim() || undefined,
-        product_id: productId || undefined,
-        epic_id: epicId || undefined,
+        product_id: productId === 'none' ? undefined : productId,
+        epic_id: epicId === 'none' ? undefined : epicId,
         priority,
       });
       onClose();
@@ -168,7 +168,7 @@ export const LinearPromptCard: React.FC<LinearPromptCardProps> = ({
                   <SelectValue placeholder="Select a product (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No product</SelectItem>
+                  <SelectItem value="none">No product</SelectItem>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       {product.name}
@@ -187,7 +187,7 @@ export const LinearPromptCard: React.FC<LinearPromptCardProps> = ({
                   <SelectValue placeholder="Select an epic (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No epic</SelectItem>
+                  <SelectItem value="none">No epic</SelectItem>
                   {epics
                     .filter(epic => epic.product_id === productId)
                     .map((epic) => (
