@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedScrollArea } from '@/components/ui/enhanced-scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { usePromptLibrary } from '@/hooks/usePromptLibrary';
+import { QuickNotePanel } from '@/components/QuickNotePanel';
 import { 
   Search, 
   Plus, 
@@ -21,7 +22,8 @@ import {
   Lightbulb,
   X,
   Crown,
-  Download
+  Download,
+  NotebookPen
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
@@ -47,6 +49,7 @@ export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptL
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [taskTemplate, setTaskTemplate] = useState('');
   const [openedViaShortcut, setOpenedViaShortcut] = useState(false);
+  const [showQuickNote, setShowQuickNote] = useState(false);
   const { toast } = useToast();
 
   // Handle opening via shortcut and auto-focus
@@ -198,6 +201,22 @@ TODO:
                   {openedViaShortcut ? '' : 'Prompt Library'}
                 </DialogTitle>
               </div>
+              
+              {/* Quick Note Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowQuickNote(!showQuickNote)}
+                className={`gap-2 h-8 px-3 transition-colors ${
+                  showQuickNote 
+                    ? 'bg-primary/10 text-primary hover:bg-primary/20' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                }`}
+                title="Toggle quick notes"
+              >
+                <NotebookPen className="w-4 h-4" />
+                <span className="text-sm">Notes</span>
+              </Button>
             </div>
           </DialogHeader>
 
@@ -256,155 +275,169 @@ TODO:
           )}
 
           {/* Content */}
-          <div className="flex-1 px-6 pb-6">
-            {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground"></div>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-center">
-                <Library className="w-12 h-12 text-muted-foreground/40 mb-4" />
-                <h3 className="font-medium text-foreground mb-2">
-                  {items.length === 0 ? 'No prompts yet' : 'No matching prompts'}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6">
-                  {items.length === 0 
-                    ? 'Create your first prompt to get started'
-                    : 'Try adjusting your search or filter'
-                  }
-                </p>
-                {items.length === 0 && (
-                  <Button 
-                    onClick={() => setShowCreateDialog(true)} 
-                    className="gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create First Prompt
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <EnhancedScrollArea className="prompt-library-scroll" showIndicators={false}>
-                <div className="space-y-1">
-                  {filteredItems.map(item => (
-                    <div
-                      key={item.id}
-                      className="group flex items-center gap-4 px-4 py-3 rounded-md hover:bg-muted/30 transition-all duration-150 cursor-pointer border border-transparent hover:border-border/50"
-                      onClick={() => setViewingItem(item)}
+          <div className="flex-1 flex gap-4 px-6 pb-6">
+            {/* Main Content Area */}
+            <div className={`flex-1 transition-all duration-300 ${showQuickNote ? 'mr-2' : ''}`}>
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground"></div>
+                </div>
+              ) : filteredItems.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <Library className="w-12 h-12 text-muted-foreground/40 mb-4" />
+                  <h3 className="font-medium text-foreground mb-2">
+                    {items.length === 0 ? 'No prompts yet' : 'No matching prompts'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    {items.length === 0 
+                      ? 'Create your first prompt to get started'
+                      : 'Try adjusting your search or filter'
+                    }
+                  </p>
+                  {items.length === 0 && (
+                    <Button 
+                      onClick={() => setShowCreateDialog(true)} 
+                      className="gap-2"
                     >
-                      {/* Icon */}
-                      <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${
-                        item.id.startsWith('system-')
-                          ? 'bg-primary/10'
-                          : 'bg-muted/50'
-                      }`}>
-                        {item.id.startsWith('system-') ? (
-                          <Crown className="w-4 h-4 text-primary" />
-                        ) : (
-                          <Lightbulb className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-foreground text-sm truncate flex items-center gap-2">
-                            {item.title}
-                            {item.id.startsWith('system-') && (
-                              <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 bg-primary/5 text-primary border-primary/20">
-                                System
-                              </Badge>
-                            )}
-                          </h3>
-                          {item.is_favorite && (
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
+                      <Plus className="w-4 h-4" />
+                      Create First Prompt
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <EnhancedScrollArea className="prompt-library-scroll" showIndicators={false}>
+                  <div className="space-y-1">
+                    {filteredItems.map(item => (
+                      <div
+                        key={item.id}
+                        className="group flex items-center gap-4 px-4 py-3 rounded-md hover:bg-muted/30 transition-all duration-150 cursor-pointer border border-transparent hover:border-border/50"
+                        onClick={() => setViewingItem(item)}
+                      >
+                        {/* Icon */}
+                        <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${
+                          item.id.startsWith('system-')
+                            ? 'bg-primary/10'
+                            : 'bg-muted/50'
+                        }`}>
+                          {item.id.startsWith('system-') ? (
+                            <Crown className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Lightbulb className="w-4 h-4 text-muted-foreground" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {item.body}
-                        </p>
-                        {item.tags.length > 0 && (
-                          <div className="flex items-center gap-1 mt-1">
-                            {item.tags.slice(0, 3).map(tag => (
-                              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 h-5">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {item.tags.length > 3 && (
-                              <span className="text-xs text-muted-foreground">+{item.tags.length - 3}</span>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-medium text-foreground text-sm truncate flex items-center gap-2">
+                              {item.title}
+                              {item.id.startsWith('system-') && (
+                                <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 bg-primary/5 text-primary border-primary/20">
+                                  System
+                                </Badge>
+                              )}
+                            </h3>
+                            {item.is_favorite && (
+                              <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
                             )}
                           </div>
-                        )}
-                      </div>
-                      
-                      {/* Actions & Shortcuts */}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopyPrompt(item);
-                          }}
-                          className="w-7 h-7 p-0 hover:bg-muted/60"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </Button>
+                          <p className="text-xs text-muted-foreground line-clamp-1">
+                            {item.body}
+                          </p>
+                          {item.tags.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1">
+                              {item.tags.slice(0, 3).map(tag => (
+                                <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 h-5">
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {item.tags.length > 3 && (
+                                <span className="text-xs text-muted-foreground">+{item.tags.length - 3}</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         
-                        {item.id.startsWith('system-') ? (
+                        {/* Actions & Shortcuts */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              copySystemPrompt(item);
+                              handleCopyPrompt(item);
                             }}
                             className="w-7 h-7 p-0 hover:bg-muted/60"
-                            title="Copy to your library"
                           >
-                            <Download className="w-3.5 h-3.5" />
+                            <Copy className="w-3.5 h-3.5" />
                           </Button>
-                        ) : (
-                          <>
+                          
+                          {item.id.startsWith('system-') ? (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleFavorite(item.id);
+                                copySystemPrompt(item);
                               }}
                               className="w-7 h-7 p-0 hover:bg-muted/60"
+                              title="Copy to your library"
                             >
-                              {item.is_favorite ? (
-                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                              ) : (
-                                <Star className="w-3.5 h-3.5" />
-                              )}
+                              <Download className="w-3.5 h-3.5" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteItem(item);
-                              }}
-                              className="w-7 h-7 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </>
-                        )}
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFavorite(item.id);
+                                }}
+                                className="w-7 h-7 p-0 hover:bg-muted/60"
+                              >
+                                {item.is_favorite ? (
+                                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                ) : (
+                                  <Star className="w-3.5 h-3.5" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteItem(item);
+                                }}
+                                className="w-7 h-7 p-0 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                        
+                        {/* Usage count */}
+                        <div className="text-xs text-muted-foreground/60 min-w-0">
+                          {item.usage_count > 0 && `${item.usage_count}x`}
+                        </div>
                       </div>
-                      
-                      {/* Usage count */}
-                      <div className="text-xs text-muted-foreground/60 min-w-0">
-                        {item.usage_count > 0 && `${item.usage_count}x`}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </EnhancedScrollArea>
-            )            }
+                    ))}
+                  </div>
+                </EnhancedScrollArea>
+              )}
+            </div>
+
+            {/* Quick Note Panel */}
+            {showQuickNote && (
+              <div className="w-80 flex-shrink-0 animate-in slide-in-from-right-5 duration-300">
+                <QuickNotePanel 
+                  isOpen={showQuickNote}
+                  onToggle={() => setShowQuickNote(false)}
+                  className="h-full"
+                />
+              </div>
+            )}
           </div>
 
           {/* Bottom Actions */}
