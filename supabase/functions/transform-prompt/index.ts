@@ -6,6 +6,36 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Function to clean HTML content
+function cleanHtmlContent(html: string): string {
+  if (!html) return '';
+  
+  let cleaned = html;
+  
+  // Decode HTML entities (including double-encoded ones)
+  cleaned = cleaned
+    .replace(/&amp;amp;/g, '&amp;')
+    .replace(/&amp;lt;/g, '&lt;')
+    .replace(/&amp;gt;/g, '&gt;')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&nbsp;/g, ' ');
+  
+  // Remove HTML tags
+  cleaned = cleaned.replace(/<[^>]*>/g, '');
+  
+  // Normalize whitespace
+  cleaned = cleaned
+    .replace(/\s+/g, ' ')
+    .trim();
+  
+  return cleaned;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -38,7 +68,10 @@ serve(async (req) => {
       );
     }
 
-    console.log('Transforming prompt for idea:', rawIdea, 'using provider:', provider);
+    // Clean and normalize the raw idea
+    const cleanRawIdea = cleanHtmlContent(rawIdea);
+    
+    console.log('Transforming prompt for idea:', cleanRawIdea, 'using provider:', provider);
     if (knowledgeContext) {
       console.log('Including knowledge context:', knowledgeContext.length, 'items');
     }
@@ -88,7 +121,7 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
           messages: [
             {
               role: 'user',
-              content: `${systemPrompt}\n\nUser request: ${rawIdea}`
+              content: `${systemPrompt}\n\nUser request: ${cleanRawIdea}`
             }
           ],
         }),
@@ -114,13 +147,13 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
         model: openaiModel,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: rawIdea }
+          { role: 'user', content: cleanRawIdea }
         ],
       };
 
       // Use appropriate token parameter based on model
       if (isNewerModel) {
-        requestBody.max_completion_tokens = 800;
+        requestBody.max_completion_tokens = 1500; // Increased for GPT-5
         // Newer models don't support temperature parameter
       } else {
         requestBody.max_tokens = 800;
@@ -149,6 +182,18 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
       const content = data.choices?.[0]?.message?.content;
       if (!content || content.trim().length === 0) {
         console.error('Empty response from OpenAI:', data);
+        console.error('Request details:', {
+          model: openaiModel,
+          cleanedInput: cleanRawIdea,
+          isNewerModel,
+          finishReason: data.choices?.[0]?.finish_reason
+        });
+        
+        // If it's a length issue, try with fallback model
+        if (data.choices?.[0]?.finish_reason === 'length') {
+          throw new Error(`OpenAI response was truncated due to token limit. Try with a shorter prompt or use a model with higher limits.`);
+        }
+        
         throw new Error('OpenAI returned an empty response. This might indicate an issue with the model or request.');
       }
       

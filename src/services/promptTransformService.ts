@@ -2,12 +2,37 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Utility function to strip HTML and normalize text
 export const stripHtmlAndNormalize = (html: string): string => {
-  return html
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with spaces
-    .replace(/&[a-zA-Z0-9#]+;/g, ' ') // Replace other HTML entities
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim()
+  if (!html) return '';
+  
+  let cleaned = html;
+  
+  // First decode HTML entities (including double-encoded ones)
+  cleaned = cleaned
+    .replace(/&amp;amp;/g, '&amp;')
+    .replace(/&amp;lt;/g, '&lt;')
+    .replace(/&amp;gt;/g, '&gt;')
+    .replace(/&amp;nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&nbsp;/g, ' ');
+  
+  // Remove HTML tags
+  cleaned = cleaned.replace(/<[^>]*>/g, '');
+  
+  // Replace remaining HTML entities with spaces
+  cleaned = cleaned.replace(/&[a-zA-Z0-9#]+;/g, ' ');
+  
+  // Normalize whitespace and line breaks
+  cleaned = cleaned
+    .replace(/\s+/g, ' ')
+    .replace(/\n\s*\n/g, '\n')
+    .trim();
+  
+  return cleaned;
 }
 
 export interface TransformPromptRequest {
@@ -43,6 +68,11 @@ export class PromptTransformService {
     try {
       // Clean and validate the input
       const cleanIdea = stripHtmlAndNormalize(rawIdea);
+      
+      console.log('🔧 PromptTransformService: Cleaning input', { 
+        original: rawIdea.substring(0, 100) + '...',
+        cleaned: cleanIdea.substring(0, 100) + '...'
+      });
       
       if (!cleanIdea || cleanIdea.length < 3) {
         return {
