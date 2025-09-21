@@ -72,8 +72,27 @@ export const usePromptsGeneration = (
     });
     
     try {
-      // Skip status update - prompt is already created with 'generating' status
-      // Step 1: Transform content
+      // Step 1: Set generating status
+      setPrompts(prev => prev.map(p => 
+        p.id === promptId 
+          ? { ...p, status: 'generating' as PromptStatus, updated_at: new Date().toISOString() }
+          : p
+      ));
+
+      const { error: statusError } = await supabase
+        .from('prompts')
+        .update({
+          status: 'generating',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', promptId);
+
+      if (statusError) {
+        console.error(`Failed to set generating status for prompt ${promptId}:`, statusError);
+        throw statusError;
+      }
+
+      // Step 2: Transform content
       const selectedKnowledgeItems = knowledgeContext 
         ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
         : [];

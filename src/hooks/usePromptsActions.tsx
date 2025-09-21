@@ -97,11 +97,7 @@ export const usePromptsActions = (
       title: promptData.title.trim(),
       description: promptData.description?.trim() || null,
       original_description: promptData.original_description?.trim() || promptData.description?.trim() || null,
-      status: promptData.status || (
-        (promptData.description?.trim().length || 0) > 15 || 
-        (promptData.original_description?.trim().length || 0) > 15 
-          ? 'generating' : 'todo'
-      ),
+      status: promptData.status || 'todo',
       priority: promptData.priority || 2,
       order_index: 0,
       epic_id: promptData.epic_id || null,
@@ -130,11 +126,7 @@ export const usePromptsActions = (
             title: promptData.title.trim(),
             description: promptData.description?.trim() || null,
             original_description: promptData.original_description?.trim() || promptData.description?.trim() || null,
-            status: promptData.status || (
-              (promptData.description?.trim().length || 0) > 15 || 
-              (promptData.original_description?.trim().length || 0) > 15 
-                ? 'generating' : 'todo'
-            ),
+            status: promptData.status || 'todo',
             priority: promptData.priority || 2,
             epic_id: promptData.epic_id || null,
             product_id: promptData.product_id || null,
