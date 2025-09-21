@@ -29,9 +29,6 @@ const onboardingSteps = [
             ⚡ From idea to organized prompt in seconds
           </p>
         </div>
-        <div className="text-sm text-muted-foreground">
-          Perfect for Bug Fixes, Features, Refactors, and Documentation
-        </div>
       </div>
     )
   },
