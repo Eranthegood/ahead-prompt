@@ -1,80 +1,48 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Circle, Minus, Maximize2, X, MoreHorizontal, Settings } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Circle, CircleDot, CheckCircle, Minus, Flame, Clock, Maximize2, X, MoreHorizontal, Settings, ChevronDown } from 'lucide-react';
 
-// Mock AI Provider logos
-const OpenAILogo = () => (
-  <div className="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
-    <span className="text-white text-xs font-bold">O</span>
-  </div>
-);
-
-const GPTLogo = () => (
-  <div className="w-4 h-4 bg-purple-500 rounded flex items-center justify-center">
-    <span className="text-white text-xs font-bold">G</span>
-  </div>
-);
-
-const ProductLogo = () => (
-  <div className="w-4 h-4 bg-gray-500 rounded-full flex items-center justify-center">
-    <Settings className="w-3 h-3 text-white" />
-  </div>
-);
-
-// Interactive QuickPrompt dialog mock matching exact screenshot
+// Interactive QuickPrompt dialog mock - compact and interactive
 export default function QuickPromptOnboardingMock() {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [status, setStatus] = useState('todo');
+  const [priority, setPriority] = useState('normal');
+  const [provider, setProvider] = useState('openai');
+  const [model, setModel] = useState('gpt-5');
+  const [product, setProduct] = useState('product');
 
   const interactiveSteps = [
     {
       id: 'title',
-      title: '⚡ Instant Title Input',
-      content: 'Type your idea instantly. This field auto-focuses when dialog opens with Q shortcut!',
-      style: { top: '-80px', left: '50px' },
+      title: '⚡ Lightning Title',
+      content: 'Auto-focused for instant typing. Press Q and start typing immediately!',
+      style: { top: '-70px', left: '20px' },
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'status',
-      title: '📋 Status Selection',
-      content: 'Default is Todo. Click to cycle through Todo → In Progress → Done states.',
-      style: { top: '-80px', left: '80px' },
+      title: '📋 Smart Status',
+      content: 'Click to cycle: Todo → In Progress → Done. Starts with Todo by default.',
+      style: { top: '-70px', left: '10px' },
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'priority',
-      title: '🔥 Priority Levels',
-      content: 'Normal by default. Click to set High/Normal/Low. High priority prompts appear first!',
-      style: { top: '-80px', left: '180px' },
-      arrowClass: 'bottom-[-4px] left-6'
-    },
-    {
-      id: 'provider',
-      title: '🤖 AI Provider',
-      content: 'Choose your AI provider. OpenAI, Claude, or others. Smart defaults based on your setup.',
-      style: { top: '-80px', left: '280px' },
-      arrowClass: 'bottom-[-4px] left-6'
-    },
-    {
-      id: 'model',
-      title: '🚀 AI Model',
-      content: 'Select specific model. GPT-4, Claude Sonnet, etc. Flagship models for best results!',
-      style: { top: '-80px', left: '380px' },
-      arrowClass: 'bottom-[-4px] left-6'
-    },
-    {
-      id: 'product',
-      title: '📁 Product Context',
-      content: 'Organize by product/project. Helps categorize and provides relevant context.',
-      style: { top: '-80px', left: '480px' },
+      title: '🔥 Priority Magic',
+      content: 'High priority prompts jump to the top of your list automatically!',
+      style: { top: '-70px', left: '90px' },
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
       id: 'create',
-      title: '💾 Create & Go',
-      content: 'One click saves your prompt. Dialog closes instantly, ready for your next idea!',
-      style: { bottom: '-80px', right: '30px' },
+      title: '💾 Instant Save',
+      content: 'One click and your idea is captured forever. Dialog closes in <100ms!',
+      style: { bottom: '-70px', right: '20px' },
       arrowClass: 'top-[-4px] right-6'
     }
   ];
@@ -84,81 +52,145 @@ export default function QuickPromptOnboardingMock() {
     setTimeout(() => setActiveTooltip(null), 4000);
   };
 
+  const statusOptions = [
+    { value: 'todo', label: 'Todo', icon: Circle, color: 'text-gray-400' },
+    { value: 'in_progress', label: 'In Progress', icon: CircleDot, color: 'text-blue-500' },
+    { value: 'done', label: 'Done', icon: CheckCircle, color: 'text-green-500' }
+  ];
+
+  const priorityOptions = [
+    { value: 'high', label: 'High', icon: Flame, color: 'text-red-500' },
+    { value: 'normal', label: 'Normal', icon: Minus, color: 'text-orange-500' },
+    { value: 'low', label: 'Low', icon: Clock, color: 'text-gray-400' }
+  ];
+
+  const currentStatus = statusOptions.find(s => s.value === status) || statusOptions[0];
+  const currentPriority = priorityOptions.find(p => p.value === priority) || priorityOptions[1];
+
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {/* Mock Quick Prompt Dialog - Exact Screenshot Recreation */}
+        {/* Compact Interactive Dialog */}
         <div className="relative">
-          <div className="rounded-lg bg-gray-900 text-white shadow-2xl max-w-4xl mx-auto border border-gray-700">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <div className="flex items-center gap-2 text-gray-300">
-                <Settings className="w-5 h-5" />
-                <span className="text-sm">Workspace</span>
+          <div className="rounded-lg bg-gray-900 text-white shadow-xl border border-gray-700 max-w-lg mx-auto">
+            {/* Compact Header */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <Settings className="w-4 h-4" />
+                <span>Workspace</span>
                 <span className="text-gray-500">›</span>
-                <span className="text-white font-medium">New Prompt</span>
+                <span className="text-white">New Prompt</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-                  <Maximize2 className="w-4 h-4" />
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
+                  <Maximize2 className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-                  <X className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
+                  <X className="w-3 h-3" />
                 </Button>
               </div>
             </div>
 
-            {/* Main Content */}
-            <div className="p-6 space-y-8">
-              {/* Title Input Area */}
-              <div className="space-y-4">
-                <h1 className="text-3xl font-light text-gray-200">Prompt title</h1>
-                
-                {/* Control Bar */}
-                <div className="flex items-center gap-4 py-4">
-                  {/* Status */}
-                  <div className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-300 text-sm">Todo</span>
-                  </div>
-
-                  {/* Priority */}
-                  <div className="flex items-center gap-2">
-                    <Minus className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-300 text-sm">Normal</span>
-                  </div>
-
-                  {/* AI Provider */}
-                  <div className="flex items-center gap-2">
-                    <OpenAILogo />
-                    <span className="text-gray-300 text-sm">Openai</span>
-                  </div>
-
-                  {/* Model */}
-                  <div className="flex items-center gap-2">
-                    <GPTLogo />
-                    <span className="text-gray-300 text-sm">GPT-5 (Flagship)</span>
-                  </div>
-
-                  {/* Product */}
-                  <div className="flex items-center gap-2">
-                    <ProductLogo />
-                    <span className="text-gray-300 text-sm">Product</span>
-                  </div>
-
-                  {/* More Options */}
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </div>
+            {/* Content */}
+            <div className="p-4 space-y-4">
+              {/* Title Input */}
+              <div className="space-y-2">
+                <label className="text-gray-200 text-lg font-light">Prompt title</label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Type your idea instantly..."
+                  className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500"
+                  autoFocus
+                />
               </div>
 
-              {/* Empty space for content */}
-              <div className="h-40"></div>
+              {/* Interactive Controls Bar */}
+              <div className="flex items-center gap-3 py-2">
+                {/* Status Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-gray-300 hover:text-white hover:bg-gray-800 px-2 py-1 h-auto"
+                    >
+                      <currentStatus.icon className={`w-4 h-4 ${currentStatus.color}`} />
+                      <span className="text-sm">{currentStatus.label}</span>
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-800 border-gray-600">
+                    {statusOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onClick={() => setStatus(option.value)}
+                        className="text-gray-300 hover:text-white hover:bg-gray-700 flex items-center gap-2"
+                      >
+                        <option.icon className={`w-4 h-4 ${option.color}`} />
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Priority Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-gray-300 hover:text-white hover:bg-gray-800 px-2 py-1 h-auto"
+                    >
+                      <currentPriority.icon className={`w-4 h-4 ${currentPriority.color}`} />
+                      <span className="text-sm">{currentPriority.label}</span>
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-800 border-gray-600">
+                    {priorityOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onClick={() => setPriority(option.value)}
+                        className="text-gray-300 hover:text-white hover:bg-gray-700 flex items-center gap-2"
+                      >
+                        <option.icon className={`w-4 h-4 ${option.color}`} />
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* AI Provider Badge */}
+                <Badge variant="outline" className="border-green-500/30 text-green-400 bg-green-500/10">
+                  <div className="w-3 h-3 bg-green-500 rounded mr-1"></div>
+                  OpenAI
+                </Badge>
+
+                {/* Model Badge */}
+                <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/10">
+                  <div className="w-3 h-3 bg-purple-500 rounded mr-1"></div>
+                  GPT-5
+                </Badge>
+
+                {/* Product Badge */}
+                <Badge variant="outline" className="border-gray-500/30 text-gray-400 bg-gray-500/10">
+                  <Settings className="w-3 h-3 mr-1" />
+                  Product
+                </Badge>
+              </div>
 
               {/* Create Button */}
-              <div className="flex justify-end">
-                <Button className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2">
+              <div className="flex justify-end pt-2">
+                <Button 
+                  className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2"
+                  onClick={() => {
+                    console.log('Prompt created:', { title, status, priority });
+                    setTitle('');
+                    setStatus('todo');
+                    setPriority('normal');
+                  }}
+                >
                   Create prompt
                 </Button>
               </div>
@@ -176,7 +208,7 @@ export default function QuickPromptOnboardingMock() {
               }`}
               style={step.style}
             >
-              <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-xl max-w-64 text-xs border border-primary/20">
+              <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-xl max-w-60 text-xs border border-primary/20">
                 <div className="font-semibold mb-1">{step.title}</div>
                 <div className="leading-relaxed">{step.content}</div>
                 
@@ -187,8 +219,8 @@ export default function QuickPromptOnboardingMock() {
           ))}
         </div>
 
-        {/* Interactive feature buttons */}
-        <div className="grid grid-cols-4 gap-2 text-xs">
+        {/* Interactive Controls */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
           <Button
             variant="ghost"
             size="sm"
@@ -208,7 +240,7 @@ export default function QuickPromptOnboardingMock() {
               activeTooltip === 'status' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <span>Status</span>
+            <span>Status & Priority</span>
           </Button>
 
           <Button
@@ -219,40 +251,7 @@ export default function QuickPromptOnboardingMock() {
               activeTooltip === 'priority' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
             }`}
           >
-            <span>Priority</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => showTooltip('provider')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
-              activeTooltip === 'provider' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
-            }`}
-          >
             <span>AI Provider</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => showTooltip('model')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
-              activeTooltip === 'model' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
-            }`}
-          >
-            <span>Model</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => showTooltip('product')}
-            className={`flex items-center gap-2 p-2 h-auto justify-start hover:bg-muted transition-all ${
-              activeTooltip === 'product' ? 'bg-primary/10 border border-primary/20 scale-105' : 'bg-muted/50'
-            }`}
-          >
-            <span>Product</span>
           </Button>
 
           <Button
@@ -273,7 +272,7 @@ export default function QuickPromptOnboardingMock() {
             ⚡ 2-Second Capture
           </p>
           <p className="text-xs text-muted-foreground">
-            Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Q</kbd> anywhere to instantly open this dialog. Perfect for capturing ideas during AI wait times!
+            Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Q</kbd> anywhere → Type → Create. Perfect for those "aha!" moments during AI wait times!
           </p>
         </div>
       </div>
