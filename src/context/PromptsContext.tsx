@@ -30,15 +30,23 @@ export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId
     selectedEpicId
   );
 
-  // Listen for prompt creation events (e.g., from onboarding) to refresh the list
+  // Listen for prompt creation or explicit refetch events to refresh the list
   useEffect(() => {
     const handlePromptCreated = (e: CustomEvent) => {
       console.log('[PromptsProvider] Prompt created, refreshing...', e.detail);
       promptsHook.refetch?.();
     };
+    const handleRefetch = () => {
+      console.log('[PromptsProvider] Refetch requested');
+      promptsHook.refetch?.();
+    };
     
     window.addEventListener('prompt-created', handlePromptCreated as EventListener);
-    return () => window.removeEventListener('prompt-created', handlePromptCreated as EventListener);
+    window.addEventListener('refetch-prompts', handleRefetch as EventListener);
+    return () => {
+      window.removeEventListener('prompt-created', handlePromptCreated as EventListener);
+      window.removeEventListener('refetch-prompts', handleRefetch as EventListener);
+    };
   }, [promptsHook.refetch]);
 
   const value = useMemo<PromptsContextValue>(() => ({
