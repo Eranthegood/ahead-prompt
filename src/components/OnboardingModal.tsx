@@ -219,7 +219,11 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
             <Button variant="ghost" onClick={handleSkip}>
               Skip
             </Button>
-            <Button onClick={nextStep} className="flex items-center gap-2">
+            <Button 
+              onClick={nextStep} 
+              className="flex items-center gap-2"
+              disabled={currentStep === 0 && !createdProductId}
+            >
               {currentStep === onboardingSteps.length - 1 ? (
                 'Get Started!'
               ) : (
