@@ -220,7 +220,7 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader className="relative">
+        <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             {step.icon}
             <div>
@@ -230,14 +230,6 @@ export function OnboardingModal({ open, onOpenChange, onComplete }: OnboardingMo
               </div>
             </div>
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute top-0 right-0"
-            onClick={handleSkip}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <Card>
