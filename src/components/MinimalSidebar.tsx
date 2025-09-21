@@ -820,6 +820,13 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
                             setIsCreateEpicOpen(true);
                           }}
                           onDeleteEpic={handleDeleteEpic}
+                          onEpicRename={async (epicId: string, newName: string) => {
+                            try {
+                              await updateEpic(epicId, { name: newName });
+                            } catch (error) {
+                              console.error('Error renaming epic:', error);
+                            }
+                          }}
                         />
                       ))
                     )}

@@ -7,6 +7,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
+import { InlineEditText } from '@/components/ui/inline-edit-text';
 import { Hash, Package, ChevronRight, BookOpen, Trash2, GripVertical, FileText, Plus, Settings, User, Trophy, Sparkles, TrendingUp, BarChart3, Github } from 'lucide-react';
 import type { Product } from '@/types';
 
@@ -48,6 +49,7 @@ interface DraggableProductItemProps {
   onOpenKnowledge: () => void;
   onCreateEpic: () => void;
   onDeleteEpic: (epicId: string) => void;
+  onEpicRename: (epicId: string, newName: string) => void;
 }
 
 export function DraggableProductItem({
@@ -63,7 +65,8 @@ export function DraggableProductItem({
   onDeleteProduct,
   onOpenKnowledge,
   onCreateEpic,
-  onDeleteEpic
+  onDeleteEpic,
+  onEpicRename
 }: DraggableProductItemProps) {
   const {
     attributes,
@@ -297,9 +300,15 @@ export function DraggableProductItem({
                           className="w-1.5 h-1.5 rounded-full flex-shrink-0" 
                           style={{ backgroundColor: epic.color || '#8B5CF6' }}
                         />
-                        <span className="truncate">
-                          {epic.name}
-                        </span>
+                        <div className="truncate flex-1">
+                          <InlineEditText
+                            value={epic.name}
+                            onSave={(newName) => onEpicRename(epic.id, newName)}
+                            className="text-xs"
+                            placeholder="Epic name..."
+                            maxLength={100}
+                          />
+                        </div>
                       </div>
                       {epic.promptCount > 0 && (
                         <Badge variant="outline" className="text-xs h-4 px-1">
