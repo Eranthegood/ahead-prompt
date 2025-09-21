@@ -10,12 +10,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      // Disable type checking in development
-      tsDecorators: true,
-      plugins: mode === 'development' ? [] : undefined
-    }),
-    mode === 'development' && componentTagger(),
+    react(),
+    // Temporarily disabled to resolve WebSocket connection issues
+    // mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -38,17 +35,5 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', '@radix-ui/react-dialog']
-  },
-  esbuild: {
-    logOverride: { 
-      'this-is-undefined-in-esm': 'silent',
-    },
-    ignoreAnnotations: true,
-    // Skip type checking entirely in esbuild
-    loader: 'tsx',
-    target: 'es2020'
-  },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(mode)
   }
 }));

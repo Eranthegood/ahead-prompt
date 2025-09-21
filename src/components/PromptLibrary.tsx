@@ -21,12 +21,16 @@ import {
   Lightbulb,
   X,
   Crown,
-  Download
+  Download,
+  StickyNote
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PromptLibraryCreateDialog } from './PromptLibraryCreateDialog';
+import { QuickNoteEditor } from './QuickNoteEditor';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useNotes } from '@/hooks/useNotes';
 import type { PromptLibraryItem } from '@/types/prompt-library';
+import type { CreateNoteData } from '@/types/notes';
 import { PROMPT_CATEGORIES } from '@/types/prompt-library';
 import { copyText } from '@/lib/clipboard';
 
@@ -39,6 +43,7 @@ interface PromptLibraryProps {
 export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptLibraryProps) {
   const { items, loading, deleteItem, toggleFavorite, incrementUsage, copySystemPrompt } = usePromptLibrary();
   const { workspace } = useWorkspace();
+  const { createNote } = useNotes(workspace?.id);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -47,6 +52,8 @@ export function PromptLibrary({ open, onOpenChange, autoFocus = false }: PromptL
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [taskTemplate, setTaskTemplate] = useState('');
   const [openedViaShortcut, setOpenedViaShortcut] = useState(false);
+  const [showNotesPanel, setShowNotesPanel] = useState(false);
+  const [creatingNote, setCreatingNote] = useState(false);
   const { toast } = useToast();
 
   // Handle opening via shortcut and auto-focus
@@ -179,6 +186,25 @@ TODO:
     }
   };
 
+  const handleCreateNote = async (data: CreateNoteData) => {
+    if (!workspace) return;
+    
+    const newNote = await createNote(data);
+    if (newNote) {
+      setCreatingNote(false);
+      toast({
+        title: 'Note created',
+        description: 'Your note has been created successfully',
+      });
+    }
+  };
+
+  const toggleNotesPanel = () => {
+    setShowNotesPanel(!showNotesPanel);
+    if (!showNotesPanel) {
+      setCreatingNote(true);
+    }
+  };
 
   return (
     <>
@@ -198,6 +224,19 @@ TODO:
                   {openedViaShortcut ? '' : 'Prompt Library'}
                 </DialogTitle>
               </div>
+              
+              {/* Quick Notes Toggle Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleNotesPanel}
+                className={`h-8 px-3 text-muted-foreground hover:text-foreground transition-colors ${
+                  showNotesPanel ? 'bg-muted/60 text-foreground' : 'bg-muted/30 hover:bg-muted/60'
+                }`}
+              >
+                <StickyNote className="w-4 h-4" />
+                <span className="ml-2 text-sm">Quick Notes</span>
+              </Button>
             </div>
           </DialogHeader>
 
@@ -255,8 +294,9 @@ TODO:
             </div>
           )}
 
-          {/* Content */}
-          <div className="flex-1 px-6 pb-6">
+          {/* Content - Split layout when notes panel is shown */}
+          <div className={`flex-1 ${showNotesPanel ? 'flex' : ''}`}>
+            <div className={`${showNotesPanel ? 'flex-1 border-r border-border' : ''} px-6 pb-6`}>
             {loading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground"></div>
@@ -404,7 +444,61 @@ TODO:
                   ))}
                 </div>
               </EnhancedScrollArea>
-            )            }
+            )}
+            </div>
+
+            {/* Quick Notes Panel */}
+            {showNotesPanel && (
+              <div className="w-80 flex flex-col bg-muted/20">
+                <div className="p-4 border-b border-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-medium text-foreground">Quick Notes</h3>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowNotesPanel(false)}
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Capture quick notes while browsing your prompt library
+                  </p>
+                </div>
+
+                <div className="flex-1 p-4">
+                  {creatingNote && workspace && (
+                    <QuickNoteEditor
+                      onSave={handleCreateNote}
+                      onCancel={() => {
+                        setCreatingNote(false);
+                        setShowNotesPanel(false);
+                      }}
+                      workspaceId={workspace.id}
+                      className="h-full"
+                    />
+                  )}
+                  
+                  {!creatingNote && (
+                    <div className="flex flex-col items-center justify-center h-32 text-center">
+                      <StickyNote className="w-8 h-8 text-muted-foreground/40 mb-2" />
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Create a quick note
+                      </p>
+                      <Button
+                        onClick={() => setCreatingNote(true)}
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        New Note
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Bottom Actions */}
