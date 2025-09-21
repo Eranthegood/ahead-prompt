@@ -14,11 +14,8 @@ import { ProductEpicSelector } from '@/components/ProductEpicSelector';
 import { usePromptMetrics } from '@/hooks/usePromptMetrics';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
-import { KnowledgeBase } from '@/components/KnowledgeBase';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
-import { useEventSubscription } from '@/hooks/useEventManager';
-import { useLinearPromptCreator } from '@/hooks/useLinearPromptCreator';
 import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
@@ -106,7 +103,6 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   selectedEpicId,
   onCreateProduct,
   onCreateEpic,
-  onProductsRefetch,
 }) => {
   // Form state - maintains user selections for product/epic assignment
   const [selectedEpic, setSelectedEpic] = useState<string | null>(selectedEpicId || null);
@@ -402,6 +398,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
   // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      // Check if focus is on an editable element (input, textarea, contenteditable)
       const activeElement = document.activeElement as HTMLElement;
       const isEditableElement = activeElement && (
         activeElement.tagName === 'INPUT' ||
@@ -410,6 +407,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
         activeElement.closest('[contenteditable="true"]')
       );
 
+      // Save if Enter is pressed and no editable element is focused
       if (!isEditableElement) {
         e.preventDefault();
         handleSave();
@@ -461,7 +459,7 @@ export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
       // Immediate form reset for better UX - no delay needed
       resetForm();
     }
-  }, [isOpen, selectedProductId, selectedEpicId]);
+  }, [isOpen, selectedProductId, selectedEpicId, editor]);
 
   if (!editor) return null;
 
