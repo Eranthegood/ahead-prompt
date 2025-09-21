@@ -1,5 +1,5 @@
-import React from 'react';
-import { Package, Layers, MessageSquare, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Package, Layers, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface ArchitectureExplanationStepProps {
   productName: string;
@@ -8,6 +8,8 @@ interface ArchitectureExplanationStepProps {
 export const ArchitectureExplanationStep: React.FC<ArchitectureExplanationStepProps> = ({
   productName
 }) => {
+  const [expandedProduct, setExpandedProduct] = useState(true);
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -17,54 +19,66 @@ export const ArchitectureExplanationStep: React.FC<ArchitectureExplanationStepPr
       </div>
 
       <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-        {/* Product Level - Level 0 */}
-        <div className="flex items-center gap-3 p-2 rounded hover:bg-accent/50">
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        {/* Product Level - Interactive */}
+        <div 
+          className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => setExpandedProduct(!expandedProduct)}
+        >
+          {expandedProduct ? (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          )}
           <Package className="h-4 w-4 text-primary" />
-          <span className="font-medium">{productName}</span>
-          <span className="text-xs text-muted-foreground ml-auto">Product</span>
+          <span className="font-medium flex-1">{productName}</span>
+          <span className="text-xs text-muted-foreground">Product</span>
         </div>
 
-        {/* Epic Level - Level 1 (indented) */}
-        <div className="flex items-center gap-3 p-2 pl-8 rounded hover:bg-accent/50">
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <Layers className="h-4 w-4 text-blue-500" />
-          <span className="font-medium">Authentification</span>
-          <span className="text-xs text-muted-foreground ml-auto">Epic</span>
-        </div>
+        {/* Epic Levels - Only show when expanded */}
+        {expandedProduct && (
+          <>
+            <div className="flex items-center gap-3 p-3 pl-8 rounded hover:bg-accent/50 cursor-pointer transition-colors">
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <Layers className="h-4 w-4 text-blue-500" />
+              <span className="font-medium flex-1">Authentification</span>
+              <span className="text-xs text-muted-foreground">Epic</span>
+            </div>
 
-        {/* Prompt Level - Level 2 (more indented) */}
-        <div className="flex items-center gap-3 p-2 pl-12 rounded hover:bg-accent/50">
-          <MessageSquare className="h-4 w-4 text-green-500" />
-          <span>Créer le formulaire de login</span>
-          <span className="text-xs text-muted-foreground ml-auto">Prompt</span>
-        </div>
-        
-        {/* Another Prompt at same level */}
-        <div className="flex items-center gap-3 p-2 pl-12 rounded hover:bg-accent/50">
-          <MessageSquare className="h-4 w-4 text-green-500" />
-          <span>Ajouter la validation des champs</span>
-          <span className="text-xs text-muted-foreground ml-auto">Prompt</span>
-        </div>
+            <div className="flex items-center gap-3 p-3 pl-8 rounded hover:bg-accent/50 cursor-pointer transition-colors">
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <Layers className="h-4 w-4 text-purple-500" />
+              <span className="font-medium flex-1">Dashboard</span>
+              <span className="text-xs text-muted-foreground">Epic</span>
+            </div>
 
-        {/* Another Epic */}
-        <div className="flex items-center gap-3 p-2 pl-8 rounded hover:bg-accent/50">
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <Layers className="h-4 w-4 text-purple-500" />
-          <span className="font-medium">Dashboard</span>
-          <span className="text-xs text-muted-foreground ml-auto">Epic</span>
-        </div>
+            <div className="flex items-center gap-3 p-3 pl-8 rounded hover:bg-accent/50 cursor-pointer transition-colors">
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <Layers className="h-4 w-4 text-orange-500" />
+              <span className="font-medium flex-1">API Integration</span>
+              <span className="text-xs text-muted-foreground">Epic</span>
+            </div>
+          </>
+        )}
+      </div>
 
-        <div className="flex items-center gap-3 p-2 pl-12 rounded hover:bg-accent/50">
-          <MessageSquare className="h-4 w-4 text-green-500" />
-          <span>Créer les graphiques de stats</span>
-          <span className="text-xs text-muted-foreground ml-auto">Prompt</span>
+      <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+        <div className="flex items-start gap-3">
+          <div className="p-1.5 rounded-full bg-primary/20">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+          </div>
+          <div className="space-y-2 text-sm">
+            <p className="text-foreground font-medium">Organisation simple et efficace</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li>• <strong>Products</strong> : Vos projets (Apps, Sites web, etc.)</li>
+              <li>• <strong>Epics</strong> : Les grandes fonctionnalités du projet</li>
+              <li>• <strong>Prompts</strong> : Vos tâches spécifiques (vous allez en créer un !)</li>
+            </ul>
+          </div>
         </div>
       </div>
 
       <div className="text-center text-sm text-muted-foreground">
-        Cette organisation vous permet de retrouver facilement tous vos prompts<br/>
-        <strong>Créons maintenant votre premier prompt !</strong>
+        <strong>Étape suivante : Créer votre premier prompt dans {productName}</strong>
       </div>
     </div>
   );
