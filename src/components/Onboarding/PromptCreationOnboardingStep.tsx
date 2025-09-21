@@ -77,6 +77,8 @@ export function PromptCreationOnboardingStep({
           title: "Prompt créé et génération lancée !",
           description: "L'IA génère un prompt détaillé en arrière-plan",
         });
+        // Notify the app to refresh prompts and select the new one
+        window.dispatchEvent(new CustomEvent('prompt-created', { detail: { promptId: prompt.id, productId: selectedProduct || productId } }));
         onPromptCreated(prompt.id);
       }
     } catch (error) {
