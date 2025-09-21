@@ -34,6 +34,8 @@ export default function LinearPromptOnboardingMock() {
   });
 
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [statusAnchorLeft, setStatusAnchorLeft] = useState<number | null>(null);
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
   const handleCopyGenerated = () => {
     // Simulate auto-move to in_progress for demo
@@ -90,11 +92,28 @@ export default function LinearPromptOnboardingMock() {
     setTimeout(() => setActiveTooltip(null), 4000);
   };
 
+  React.useEffect(() => {
+    const compute = () => {
+      const root = wrapperRef.current;
+      if (!root) return;
+      const statusBtn = root.querySelector('button.w-full') as HTMLElement | null;
+      if (statusBtn) {
+        const rootRect = root.getBoundingClientRect();
+        const statusRect = statusBtn.getBoundingClientRect();
+        const centerLeft = statusRect.left - rootRect.left + statusRect.width / 2;
+        setStatusAnchorLeft(centerLeft);
+      }
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, [mockPrompt.status]);
+
   return (
     <TooltipProvider>
       <div className="space-y-4">
         {/* Main prompt card with overlay tooltips */}
-        <div className="relative">
+        <div className="relative" ref={wrapperRef}>
           <div className="rounded-md border-2 border-primary/20 p-2 bg-background">
             <LinearPromptItem
               prompt={mockPrompt}
@@ -110,25 +129,33 @@ export default function LinearPromptOnboardingMock() {
           </div>
 
           {/* Interactive tooltip overlays with precise positioning */}
-          {interactiveSteps.map((step) => (
-            <div
-              key={step.id}
-              className={`absolute transition-all duration-300 ${
-                activeTooltip === step.id
-                  ? 'opacity-100 scale-100 z-20 animate-scale-in' 
-                  : 'opacity-0 scale-95 pointer-events-none'
-              }`}
-              style={step.style}
-            >
-              <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-xl max-w-64 text-xs border border-primary/20">
-                <div className="font-semibold mb-1">{step.title}</div>
-                <div className="leading-relaxed">{step.content}</div>
-                
-                {/* Precise arrow pointer */}
-                <div className={`absolute w-2 h-2 bg-primary rotate-45 ${step.arrowClass}`} />
+          {interactiveSteps.map((step) => {
+            const dynamicStyle = step.id === 'status' && statusAnchorLeft != null
+              ? { top: '-80px', left: `${statusAnchorLeft}px`, transform: 'translateX(-50%)' as const }
+              : step.style;
+            const arrowClass = step.id === 'status' 
+              ? 'bottom-[-4px] left-1/2 -translate-x-1/2' 
+              : step.arrowClass;
+            return (
+              <div
+                key={step.id}
+                className={`absolute transition-all duration-300 ${
+                  activeTooltip === step.id
+                    ? 'opacity-100 scale-100 z-20 animate-scale-in' 
+                    : 'opacity-0 scale-95 pointer-events-none'
+                }`}
+                style={dynamicStyle}
+              >
+                <div className="bg-primary text-primary-foreground p-3 rounded-lg shadow-xl max-w-64 text-xs border border-primary/20">
+                  <div className="font-semibold mb-1">{step.title}</div>
+                  <div className="leading-relaxed">{step.content}</div>
+                  
+                  {/* Precise arrow pointer */}
+                  <div className={`absolute w-2 h-2 bg-primary rotate-45 ${arrowClass}`} />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Interactive feature buttons */}
