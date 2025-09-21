@@ -16,6 +16,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
+import { OnboardingDebug } from './debug/OnboardingDebug';
 
 interface SimpleAppLayoutProps {
   children: React.ReactNode;
@@ -39,10 +40,42 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   // Check if user has seen onboarding
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('ahead-onboarding-completed');
+    console.log('[Onboarding Debug]', {
+      hasSeenOnboarding,
+      user: !!user,
+      pathname: location.pathname,
+      shouldShow: !hasSeenOnboarding && user
+    });
+    
     if (!hasSeenOnboarding && user) {
+      console.log('[Onboarding] Showing onboarding for new user');
       setShowOnboarding(true);
     }
-  }, [user]);
+  }, [user, location.pathname]);
+
+  // Manual onboarding trigger (for debugging/testing)
+  useEffect(() => {
+    const handleForceOnboarding = () => {
+      console.log('[Onboarding] Manually triggered');
+      setShowOnboarding(true);
+    };
+    
+    // Global shortcut Ctrl+Shift+O to force onboarding
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+        e.preventDefault();
+        handleForceOnboarding();
+      }
+    };
+    
+    window.addEventListener('force-onboarding', handleForceOnboarding as EventListener);
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('force-onboarding', handleForceOnboarding as EventListener);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Simple page configuration
   const config = {
@@ -69,9 +102,26 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   });
 
   const handleOnboardingComplete = () => {
+    console.log('[Onboarding] Completed by user');
     localStorage.setItem('ahead-onboarding-completed', 'true');
     setShowOnboarding(false);
   };
+
+  // Development helper: expose reset function globally
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      (window as any).resetOnboarding = () => {
+        console.log('[Onboarding] Reset via window.resetOnboarding()');
+        localStorage.removeItem('ahead-onboarding-completed');
+        setShowOnboarding(true);
+      };
+      
+      (window as any).forceOnboarding = () => {
+        console.log('[Onboarding] Forced via window.forceOnboarding()');
+        setShowOnboarding(true);
+      };
+    }
+  }, []);
 
   // Listen for knowledge dialog events
   useEffect(() => {
@@ -198,6 +248,9 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
         onOpenChange={setShowOnboarding}
         onComplete={handleOnboardingComplete}
       />
+
+      {/* Debug utilities for development */}
+      <OnboardingDebug />
     </div>
   );
 }
