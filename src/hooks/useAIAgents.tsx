@@ -35,10 +35,10 @@ export function useAIAgents(workspaceId: string) {
         description: "L'agent AI a été créé avec succès"
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
-        description: "Impossible de créer l'agent: " + error.message,
+        description: "Impossible de créer l'agent: " + (error?.message || 'Erreur inconnue'),
         variant: "destructive"
       });
     }
@@ -55,10 +55,10 @@ export function useAIAgents(workspaceId: string) {
         description: `L'agent a été ${isActive ? 'activé' : 'désactivé'} avec succès`
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
-        description: "Impossible de modifier l'agent: " + error.message,
+        description: "Impossible de modifier l'agent: " + (error?.message || 'Erreur inconnue'),
         variant: "destructive"
       });
     }
@@ -74,10 +74,10 @@ export function useAIAgents(workspaceId: string) {
         description: "L'agent a été supprimé avec succès"
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer l'agent: " + error.message,
+        description: "Impossible de supprimer l'agent: " + (error?.message || 'Erreur inconnue'),
         variant: "destructive"
       });
     }
