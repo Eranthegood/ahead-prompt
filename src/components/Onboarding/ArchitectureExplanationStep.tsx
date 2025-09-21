@@ -12,12 +12,6 @@ export const ArchitectureExplanationStep: React.FC<ArchitectureExplanationStepPr
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <p className="text-muted-foreground">
-          Voici comment s'organisent vos projets dans Ahead.love
-        </p>
-      </div>
-
       <div className="bg-muted/30 rounded-lg p-4 space-y-2">
         {/* Product Level - Interactive */}
         <div 
@@ -82,10 +76,6 @@ export const ArchitectureExplanationStep: React.FC<ArchitectureExplanationStepPr
             </ul>
           </div>
         </div>
-      </div>
-
-      <div className="text-center text-sm text-muted-foreground">
-        <strong>Étape suivante : Créer votre premier prompt dans {productName}</strong>
       </div>
     </div>
   );
