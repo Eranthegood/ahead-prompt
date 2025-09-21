@@ -54,6 +54,7 @@ import { PromptLibrary } from './PromptLibrary';
 import { KnowledgeAccessGuard } from './KnowledgeAccessGuard';
 import { NotesDialog } from './NotesDialog';
 import { useWorkspacePremiumAccess } from '@/hooks/useWorkspacePremiumAccess';
+import { FeedbackButton } from './FeedbackButton';
 
 interface MinimalSidebarProps {
   workspace: Workspace;
@@ -842,6 +843,17 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
             <SidebarGroup className="mt-6">
               <SidebarGroupContent>
                 <CompactGamificationDisplay stats={stats} achievements={achievements} />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+
+          {/* Feedback Button - Discrete placement */}
+          {!isCollapsed && (
+            <SidebarGroup className="mt-4">
+              <SidebarGroupContent>
+                <div className="flex justify-center">
+                  <FeedbackButton />
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
           )}
