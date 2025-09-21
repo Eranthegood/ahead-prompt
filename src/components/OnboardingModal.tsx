@@ -65,8 +65,8 @@ const onboardingSteps = [
     )
   },
   {
-    title: 'Smart Kanban Workflow',
-    description: 'Preview the exact Linear Prompt Card used across the app with mock data.',
+    title: 'Interactive Prompt Management',
+    description: 'Master the workflow with our precision-designed prompt cards. Every click is optimized for speed.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-3">
