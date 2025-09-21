@@ -9,6 +9,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useToast } from '@/hooks/use-toast';
+import { useEventEmitter } from '@/hooks/useEventManager';
 interface CreatePromptData {
   title: string;
   description?: string;
@@ -44,6 +45,8 @@ export function OnboardingPromptCreator({
   const { createPrompt } = (promptsCtx || usePrompts(workspace?.id, productId)) as { createPrompt: (data: CreatePromptData) => Promise<any> };
   const { toast } = useToast();
 
+  const emit = useEventEmitter();
+  
   const handleSave = async (promptData: CreatePromptData) => {
     try {
       const prompt = await createPrompt(promptData);
@@ -58,9 +61,9 @@ export function OnboardingPromptCreator({
         });
         
         // Notify the app to refresh prompts and select the new one
-        window.dispatchEvent(new CustomEvent('prompt-created', { 
-          detail: { promptId: prompt.id, productId: promptData.product_id || productId } 
-        }));
+        emit('prompt-created', { 
+          promptId: prompt.id, productId: promptData.product_id || productId 
+        });
         
         onPromptCreated(prompt.id);
         return prompt;

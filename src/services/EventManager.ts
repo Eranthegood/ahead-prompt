@@ -14,6 +14,7 @@ export type EventName =
   | 'open-product-dialog'
   | 'open-epic-dialog'
   | 'open-quick-prompt'
+  | 'open-prompt-library'
   | 'force-onboarding';
 
 export type EventCallback<T = any> = (data?: T) => void;

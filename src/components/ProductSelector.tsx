@@ -11,6 +11,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { Package, Plus, Palette, BookOpen } from 'lucide-react';
 // Removed KnowledgeModal import - using event-based approach
 import type { Product, Workspace } from '@/types';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface ProductSelectorProps {
   workspace: Workspace;
@@ -35,6 +36,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
   showAllOption = true,
 }) => {
   const { products, createProduct } = useProducts(workspace.id);
+  const emit = useEventEmitter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newProductName, setNewProductName] = useState('');
   const [newProductDescription, setNewProductDescription] = useState('');
@@ -62,7 +64,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
         if (createKnowledge) {
           setIsCreateDialogOpen(false);
           // Open Knowledge Box Modal through event system
-          window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
+          emit('open-knowledge-dialog');
         } else {
           handleCloseDialogs();
         }

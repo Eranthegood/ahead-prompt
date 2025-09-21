@@ -8,6 +8,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useEpics } from '@/hooks/useEpics';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface OnboardingChecklistProps {
   workspace: Workspace;
@@ -29,6 +30,7 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
   const { epics } = useEpics(workspace.id);
   const { knowledgeItems } = useKnowledge(workspace.id);
   const { prompts } = usePrompts(workspace.id);
+  const emit = useEventEmitter();
 
   // Debug: Log current data state
   console.log('OnboardingChecklist - Current data:', {
@@ -52,28 +54,28 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
         title: 'Create your first product',
         description: 'Organize your projects and prompts by creating a product workspace',
         completed: (products?.length || 0) > 0,
-        action: () => window.dispatchEvent(new CustomEvent('open-product-dialog'))
+        action: () => emit('open-product-dialog')
       },
       {
         id: 'epic',
         title: 'Create your first epic',
         description: 'Group related features and organize your development workflow',
         completed: (epics?.length || 0) > 0,
-        action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-epic-dialog')) : undefined
+        action: (products?.length || 0) > 0 ? () => emit('open-epic-dialog') : undefined
       },
       {
         id: 'knowledge',
         title: 'Add your knowledge base',
         description: 'Store docs, links, and context to enhance your AI prompts',
         completed: (knowledgeItems?.length || 0) > 0,
-        action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')) : undefined
+        action: (products?.length || 0) > 0 ? () => emit('open-knowledge-dialog') : undefined
       },
       {
         id: 'prompt',
         title: 'Create your first prompt',
         description: 'Start capturing your development ideas and next moves',
         completed: (prompts?.length || 0) > 0,
-        action: () => window.dispatchEvent(new CustomEvent('open-quick-prompt'))
+        action: () => emit('open-quick-prompt')
       }
     ];
 
@@ -102,28 +104,28 @@ export const OnboardingChecklist = ({ workspace, onComplete }: OnboardingCheckli
       title: 'Create your first product',
       description: 'Organize your projects and prompts by creating a product workspace',
       completed: (products?.length || 0) > 0,
-      action: () => window.dispatchEvent(new CustomEvent('open-product-dialog'))
+      action: () => emit('open-product-dialog')
     },
     {
       id: 'epic',
       title: 'Create your first epic',
       description: 'Group related features and organize your development workflow',
       completed: (epics?.length || 0) > 0,
-      action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-epic-dialog')) : undefined
+      action: (products?.length || 0) > 0 ? () => emit('open-epic-dialog') : undefined
     },
     {
       id: 'knowledge',
       title: 'Add your knowledge base',
       description: 'Store docs, links, and context to enhance your AI prompts',
       completed: (knowledgeItems?.length || 0) > 0,
-      action: (products?.length || 0) > 0 ? () => window.dispatchEvent(new CustomEvent('open-knowledge-dialog')) : undefined
+      action: (products?.length || 0) > 0 ? () => emit('open-knowledge-dialog') : undefined
     },
     {
       id: 'prompt',
       title: 'Create your first prompt',
       description: 'Start capturing your development ideas and next moves',
       completed: (prompts?.length || 0) > 0,
-      action: () => window.dispatchEvent(new CustomEvent('open-quick-prompt'))
+      action: () => emit('open-quick-prompt')
     }
   ];
 

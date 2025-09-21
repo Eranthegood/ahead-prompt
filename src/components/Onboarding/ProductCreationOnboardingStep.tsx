@@ -8,6 +8,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useToast } from '@/hooks/use-toast';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface ProductCreationOnboardingStepProps {
   onProductCreated: (productId: string, productName: string) => void;
@@ -34,6 +35,8 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
   const { createProduct } = useProducts(workspace?.id);
   const { toast } = useToast();
 
+  const emit = useEventEmitter();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !workspace || isCreating) return;
@@ -53,7 +56,7 @@ export function ProductCreationOnboardingStep({ onProductCreated }: ProductCreat
           description: `"${product.name}" est prêt pour vos prompts`,
         });
         // Notify the rest of the app (e.g., sidebar) to refresh and select the new product
-        window.dispatchEvent(new CustomEvent('product-created', { detail: { productId: product.id } }));
+        emit('product-created', { productId: product.id });
         onProductCreated(product.id, product.name);
       }
     } catch (error) {

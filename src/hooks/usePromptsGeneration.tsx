@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useKnowledge } from '@/hooks/useKnowledge';
 import { PromptTransformService, stripHtmlAndNormalize } from '@/services/promptTransformService';
 import type { Prompt, PromptStatus } from '@/types';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 export const usePromptsGeneration = (
   workspaceId: string | undefined,
@@ -13,6 +14,7 @@ export const usePromptsGeneration = (
 ) => {
   const { toast } = useToast();
   const { knowledgeItems } = useKnowledge(workspaceId || '', selectedProductId);
+  const emit = useEventEmitter();
 
   // Revert status helper
   const revertStatusToTodo = useCallback(async (promptId: string, reason: string) => {
@@ -178,7 +180,7 @@ export const usePromptsGeneration = (
         });
         
         // Notify provider/UI to refresh
-        window.dispatchEvent(new CustomEvent('refetch-prompts'));
+        emit('refetch-prompts');
 
 
       } else {

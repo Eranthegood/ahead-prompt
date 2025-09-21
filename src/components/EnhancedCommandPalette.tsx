@@ -36,6 +36,7 @@ import type { PromptLibraryItem } from '@/types/prompt-library';
 import { useToast } from '@/hooks/use-toast';
 import { PromptDetailDialog } from '@/components/PromptDetailDialog';
 import { Badge } from '@/components/ui/badge';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface EnhancedCommandPaletteProps {
   open: boolean;
@@ -81,9 +82,11 @@ export function EnhancedCommandPalette({
     }
   }, [injectedQuery, query, onSetSearchQuery]);
 
+  const emit = useEventEmitter();
+  
   const handleCreatePrompt = () => {
     // Déclencher l'ouverture du QuickPromptDialog
-    window.dispatchEvent(new CustomEvent('open-quick-prompt'));
+    emit('open-quick-prompt');
     onOpenChange(false);
   };
 
@@ -128,7 +131,7 @@ export function EnhancedCommandPalette({
               break;
             case 'prompt-library':
               // Déclencher l'ouverture de la Prompt Library
-              window.dispatchEvent(new CustomEvent('open-prompt-library'));
+              emit('open-prompt-library');
               break;
             case 'shortcuts':
               onNavigate?.('/keyboard-shortcuts');

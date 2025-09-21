@@ -13,7 +13,7 @@ import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useEventSubscription } from '@/hooks/useEventManager';
+import { useEventSubscription, useEventEmitter } from '@/hooks/useEventManager';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
@@ -132,13 +132,13 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
 
     // Force refetch des prompts après l'onboarding pour assurer la synchronisation
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('refetch-prompts'));
+      emit('refetch-prompts');
     }, 100);
 
     // Focaliser et surligner le prompt nouvellement créé
     if (data?.promptId) {
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
+        emit('prompt-focus', { promptId: data.promptId, productId: data?.productId });
       }, 200);
     }
   };

@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { useKnowledge, KNOWLEDGE_CATEGORIES, KnowledgeCategory } from "@/hooks/useKnowledge";
 import type { Workspace, KnowledgeItem, Product } from "@/types";
 import { copyText } from '@/lib/clipboard';
+import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface KnowledgeBaseProps {
   workspace: Workspace;
@@ -82,14 +83,16 @@ export function KnowledgeBase({ workspace, product }: KnowledgeBaseProps) {
     );
   };
 
+  const emit = useEventEmitter();
+
   const handleEdit = (item: KnowledgeItem) => {
     // Open Knowledge Box Modal through event system
-    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
+    emit('open-knowledge-dialog');
   };
 
   const handleCreate = () => {
     // Open Knowledge Box Modal through event system
-    window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
+    emit('open-knowledge-dialog');
   };
 
   // Remove handleModalClose function as we no longer use modal
