@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen,
 import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
 import { InteractiveOnboardingPromptCard } from '@/components/InteractiveOnboardingPromptCard';
+import LinearPromptOnboardingMock from '@/components/Onboarding/LinearPromptOnboardingMock';
 
 interface OnboardingModalProps {
   open: boolean;
@@ -65,72 +66,11 @@ const onboardingSteps = [
   },
   {
     title: 'Smart Kanban Workflow',
-    description: 'Your prompts automatically evolve: Todo → In Progress → Done with priority management.',
+    description: 'Preview the exact Linear Prompt Card used across the app with mock data.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
-      <div className="space-y-4">
-        {/* Workflow states - use app-consistent list layout */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div className="flex items-center gap-2">
-              {React.createElement(getStatusIcon('todo').icon, { className: `w-4 h-4 ${getStatusIcon('todo').color}` })}
-              <span className="font-medium">Todo</span>
-            </div>
-            <span className="text-xs text-muted-foreground">New ideas</span>
-          </div>
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div className="flex items-center gap-2">
-              {React.createElement(getStatusIcon('in_progress').icon, { className: `w-4 h-4 ${getStatusIcon('in_progress').color}` })}
-              <span className="font-medium">In Progress</span>
-            </div>
-            <span className="text-xs text-muted-foreground">Copied (Cmd+C)</span>
-          </div>
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div className="flex items-center gap-2">
-              {React.createElement(getStatusIcon('done').icon, { className: `w-4 h-4 ${getStatusIcon('done').color}` })}
-              <span className="font-medium">Done</span>
-            </div>
-            <span className="text-xs text-muted-foreground">Completed ✨</span>
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="space-y-3">
-          <div className="text-center">
-            <h4 className="font-semibold text-sm mb-2">✨ Try it yourself!</h4>
-            <p className="text-xs text-muted-foreground mb-3">
-              Click the copy button, change priority, or update status to see the workflow in action
-            </p>
-          </div>
-
-          <InteractiveOnboardingPromptCard />
-
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <p className="text-sm">
-              <strong>Magic:</strong> Copy a prompt (📋) and watch it automatically move to "In Progress"!
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-md border p-3">
-          <p className="text-sm font-medium mb-2">Priority System:</p>
-          <div className="flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1">
-              <Flame className="w-3 h-3 text-destructive" />
-              High
-            </span>
-            <span className="flex items-center gap-1">
-              <Minus className="w-3 h-3 text-muted-foreground" />
-              Normal
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-muted-foreground" />
-              Low
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">High priority prompts appear at the top of each column</p>
-        </div>
+      <div className="space-y-3">
+        <LinearPromptOnboardingMock />
       </div>
     )
   },
