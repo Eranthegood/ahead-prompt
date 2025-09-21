@@ -69,32 +69,33 @@ const onboardingSteps = [
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
       <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <div className="text-center p-3 bg-yellow-500/10 rounded">
-            <div className="flex items-center justify-center gap-2 font-medium text-yellow-600 dark:text-yellow-400">
-              <Circle className="w-4 h-4" />
-              Todo
+        {/* Workflow states - use app-consistent list layout */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center gap-2">
+              {React.createElement(getStatusIcon('todo').icon, { className: `w-4 h-4 ${getStatusIcon('todo').color}` })}
+              <span className="font-medium">Todo</span>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">New ideas</div>
+            <span className="text-xs text-muted-foreground">New ideas</span>
           </div>
-          <div className="text-center p-3 bg-blue-500/10 rounded">
-            <div className="flex items-center justify-center gap-2 font-medium text-blue-600 dark:text-blue-400">
-              <CircleDot className="w-4 h-4" />
-              In Progress
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center gap-2">
+              {React.createElement(getStatusIcon('in_progress').icon, { className: `w-4 h-4 ${getStatusIcon('in_progress').color}` })}
+              <span className="font-medium">In Progress</span>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">Copied (Cmd+C)</div>
+            <span className="text-xs text-muted-foreground">Copied (Cmd+C)</span>
           </div>
-          <div className="text-center p-3 bg-green-500/10 rounded">
-            <div className="flex items-center justify-center gap-2 font-medium text-green-600 dark:text-green-400">
-              <CheckCircle className="w-4 h-4 fill-current" />
-              Done
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center gap-2">
+              {React.createElement(getStatusIcon('done').icon, { className: `w-4 h-4 ${getStatusIcon('done').color}` })}
+              <span className="font-medium">Done</span>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">Completed ✨</div>
+            <span className="text-xs text-muted-foreground">Completed ✨</span>
           </div>
         </div>
-        
+
         <Separator />
-        
+
         <div className="space-y-3">
           <div className="text-center">
             <h4 className="font-semibold text-sm mb-2">✨ Try it yourself!</h4>
@@ -102,17 +103,17 @@ const onboardingSteps = [
               Click the copy button, change priority, or update status to see the workflow in action
             </p>
           </div>
-          
+
           <InteractiveOnboardingPromptCard />
-          
+
           <div className="bg-primary/10 p-3 rounded-lg">
             <p className="text-sm">
               <strong>Magic:</strong> Copy a prompt (📋) and watch it automatically move to "In Progress"!
             </p>
           </div>
         </div>
-        
-        <div className="bg-accent/20 p-3 rounded-lg">
+
+        <div className="rounded-md border p-3">
           <p className="text-sm font-medium mb-2">Priority System:</p>
           <div className="flex items-center gap-4 text-xs">
             <span className="flex items-center gap-1">
@@ -120,7 +121,7 @@ const onboardingSteps = [
               High
             </span>
             <span className="flex items-center gap-1">
-              <Minus className="w-3 h-3 text-orange-500" />
+              <Minus className="w-3 h-3 text-muted-foreground" />
               Normal
             </span>
             <span className="flex items-center gap-1">
