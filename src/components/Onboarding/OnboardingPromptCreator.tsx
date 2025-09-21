@@ -32,7 +32,6 @@ export function OnboardingPromptCreator({
   productId, 
   onPromptCreated 
 }: OnboardingPromptCreatorProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [createdPromptTitle, setCreatedPromptTitle] = useState('');
 
@@ -109,32 +108,18 @@ export function OnboardingPromptCreator({
         </p>
       </div>
 
-      {/* Interface de création */}
-      <Card className="border-2 border-dashed border-primary/20">
-        <CardContent className="p-6">
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="w-full"
-            size="lg"
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            Ouvrir l'interface de création
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Conseil d'utilisation */}
       <div className="bg-accent/20 p-3 rounded-lg">
         <p className="text-sm">
-          💡 <strong>Raccourci :</strong> Utilisez <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Q</kbd> pour ouvrir cette interface rapidement !
+          💡 <strong>Raccourci :</strong> Utilisez <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Q</kbd> pour ouvrir cette interface rapidement après l'onboarding !
         </p>
       </div>
 
-      {/* LinearPromptCreator - même composant que l'app normale */}
+      {/* LinearPromptCreator - même composant que l'app normale, ouvert par défaut */}
       {workspace && (
         <LinearPromptCreator
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
+          isOpen={true}
+          onClose={() => {}} // Pas de fermeture possible pendant l'onboarding
           onSave={handleSave}
           workspace={workspace}
           products={products || []}
