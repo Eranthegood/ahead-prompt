@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { usePrompts } from '@/hooks/usePrompts';
 import type { Prompt, PromptStatus } from '@/types';
 
@@ -29,17 +29,6 @@ export function PromptsProvider({ workspaceId, selectedProductId, selectedEpicId
     selectedProductId,
     selectedEpicId
   );
-
-  // Listen for prompt creation events (e.g., from onboarding) to refresh the list
-  useEffect(() => {
-    const handlePromptCreated = (e: CustomEvent) => {
-      console.log('[PromptsProvider] Prompt created, refreshing...', e.detail);
-      promptsHook.refetch?.();
-    };
-    
-    window.addEventListener('prompt-created', handlePromptCreated as EventListener);
-    return () => window.removeEventListener('prompt-created', handlePromptCreated as EventListener);
-  }, [promptsHook.refetch]);
 
   const value = useMemo<PromptsContextValue>(() => ({
     prompts: promptsHook.prompts || [],

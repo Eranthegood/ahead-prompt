@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge, Loader2 } from 'lucide-react';
+import { Hash, Package, Calendar, MoreHorizontal, Edit, Copy, Trash2, Minus, Sparkles, Flame, Check, GitBranch, Clock, Zap, GitMerge } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromptContextMenu } from '@/components/PromptContextMenu';
 import { TruncatedTitle } from '@/components/ui/truncated-title';
@@ -203,9 +203,7 @@ export function PromptCard({
         <Card 
           className={`group hover:shadow-md transition-all duration-200 cursor-pointer ${
             isHovered ? 'ring-2 ring-primary/30 shadow-lg' : ''
-          } ${!isUsable ? 'opacity-60' : ''} ${isSliding ? 'animate-slide-out-right' : ''} ${
-            prompt.status === 'generating' ? 'ring-2 ring-purple-500/40 shadow-purple-500/10' : ''
-          }`}
+          } ${!isUsable ? 'opacity-60' : ''} ${isSliding ? 'animate-slide-out-right' : ''}`}
           onMouseEnter={() => onHover?.(prompt.id)}
           onMouseLeave={() => onHover?.(null)}
         >
@@ -264,14 +262,6 @@ export function PromptCard({
                   {prompt.epic && (
                     <Badge variant="outline" className="text-xs px-1 py-0 font-normal opacity-60">
                       {prompt.epic.name}
-                    </Badge>
-                  )}
-                  
-                  {/* Generating Status Badge */}
-                  {prompt.status === 'generating' && (
-                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-purple-100 text-purple-700 border-purple-300">
-                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                      En génération...
                     </Badge>
                   )}
                 </div>

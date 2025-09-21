@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -69,25 +69,6 @@ export function MinimalPromptList({
   // Drawer states  
   const [drawerPrompt, setDrawerPrompt] = useState<(Prompt & { product?: any; epic?: any }) | null>(null);
   const [drawerType, setDrawerType] = useState<'send' | null>(null);
-
-  // Focus and highlight a specific prompt when requested
-  useEffect(() => {
-    const handler = (e: CustomEvent) => {
-      const { promptId } = (e as any).detail || {};
-      if (!promptId) return;
-      const el = document.querySelector(`[data-prompt-id="${promptId}"]`) as HTMLElement | null;
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const prev = el.style.boxShadow;
-        el.style.boxShadow = '0 0 0 3px hsl(var(--primary) / 0.5)';
-        setTimeout(() => {
-          el.style.boxShadow = prev || '';
-        }, 1200);
-      }
-    };
-    window.addEventListener('prompt-focus', handler as EventListener);
-    return () => window.removeEventListener('prompt-focus', handler as EventListener);
-  }, []);
 
   // Derive effective product when only epic is selected
   const effectiveProductId = useMemo(() => {
@@ -488,7 +469,7 @@ export function MinimalPromptList({
                 </div>
                 <div className="space-y-px">
                   {epicPrompts.map((prompt) => (
-                  <div key={prompt.id} data-prompt-id={prompt.id}>
+                  <div key={prompt.id}>
                     <LinearPromptItem
                       prompt={prompt}
                       onPromptClick={handlePromptClick}
@@ -586,7 +567,7 @@ export function MinimalPromptList({
                 }
                 
                 return (
-                  <div key={item.id} data-prompt-id={item.id}>
+                  <div key={item.id}>
                     <LinearPromptItem
                       prompt={item}
                       onPromptClick={handlePromptClick}

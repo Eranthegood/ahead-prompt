@@ -138,7 +138,7 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
     } else {
       // OpenAI provider
       const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-      const openaiModel = model || 'gpt-4o-mini'; // Use more stable model by default
+      const openaiModel = model || 'gpt-4o';
       
       // Check if it's a newer model that requires different parameters
       const isNewerModel = openaiModel.includes('gpt-5') || openaiModel.includes('gpt-4.1') || openaiModel.includes('o3') || openaiModel.includes('o4');
@@ -153,7 +153,7 @@ Markdown format ready to copy-paste. Respond ONLY with the transformed prompt, n
 
       // Use appropriate token parameter based on model
       if (isNewerModel) {
-        requestBody.max_completion_tokens = 3000; // Significantly increased for GPT-5 reasoning tokens
+        requestBody.max_completion_tokens = 1500; // Increased for GPT-5
         // Newer models don't support temperature parameter
       } else {
         requestBody.max_tokens = 800;

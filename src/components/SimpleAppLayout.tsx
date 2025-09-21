@@ -77,21 +77,6 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     };
   }, []);
 
-  // Restore selected product selection from previous session
-  useEffect(() => {
-    const saved = localStorage.getItem('ahead-selected-product');
-    if (saved) {
-      setSelectedProductId(saved);
-    }
-  }, []);
-
-  // Persist selected product selection
-  useEffect(() => {
-    try {
-      localStorage.setItem('ahead-selected-product', selectedProductId);
-    } catch {}
-  }, [selectedProductId]);
-
   // Simple page configuration
   const config = {
     showHeader: !location.pathname.startsWith('/join-workspace'),
@@ -116,25 +101,10 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     'n': () => setIsNotesOpen(true),
   });
 
-  const handleOnboardingComplete = (data?: { productId?: string; promptId?: string }) => {
-    console.log('[Onboarding] Completed by user', data);
+  const handleOnboardingComplete = () => {
+    console.log('[Onboarding] Completed by user');
     localStorage.setItem('ahead-onboarding-completed', 'true');
     setShowOnboarding(false);
-    
-    // Si un produit a été créé, le sélectionner automatiquement
-    if (data?.productId) {
-      setSelectedProductId(data.productId);
-      // Réinitialiser la sélection d'epic pour voir tous les prompts du produit
-      setSelectedEpicId(undefined);
-      try {
-        localStorage.setItem('ahead-selected-product', data.productId);
-      } catch {}
-    }
-
-    // Focaliser et surligner le prompt nouvellement créé
-    if (data?.promptId) {
-      window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
-    }
   };
 
   // Development helper: expose reset function globally

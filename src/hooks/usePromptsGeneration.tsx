@@ -54,22 +54,11 @@ export const usePromptsGeneration = (
     const cleanContent = stripHtmlAndNormalize(content);
     
     if (cleanContent.length <= 15) {
-      console.warn('❌ Content too short after cleaning:', { 
-        promptId,
-        original: content, 
-        cleaned: cleanContent,
-        threshold: 15
-      });
+      console.log(`Content too short for auto-generation: ${cleanContent.length} characters`);
       return;
     }
 
     console.log(`Auto-generating prompt for: ${promptId}`);
-    
-    // Step 0: Initial toast
-    toast({
-      title: "🤖 Génération en cours...",
-      description: "Votre prompt est en cours de transformation par l'IA.",
-    });
     
     try {
       // Step 1: Set generating status
@@ -96,14 +85,6 @@ export const usePromptsGeneration = (
       const selectedKnowledgeItems = knowledgeContext 
         ? knowledgeItems.filter(item => knowledgeContext.includes(item.id))
         : [];
-
-      console.log('🤖 Starting AI transformation:', {
-        promptId,
-        provider,
-        model,
-        contentLength: cleanContent.length,
-        knowledgeItemsCount: selectedKnowledgeItems.length
-      });
         
       const response = await Promise.race([
         PromptTransformService.transformPrompt(content, selectedKnowledgeItems, provider, model),
@@ -111,14 +92,6 @@ export const usePromptsGeneration = (
           setTimeout(() => reject(new Error('Transform timeout')), 30000)
         )
       ]) as any;
-
-      console.log('✅ AI transformation result:', {
-        promptId,
-        success: response.success,
-        hasContent: !!response.transformedPrompt,
-        contentLength: response.transformedPrompt?.length || 0,
-        error: response.error
-      });
       
       if (response.success && response.transformedPrompt) {
         // Step 3: Update with generated content
@@ -161,31 +134,21 @@ export const usePromptsGeneration = (
         }
         
         toast({
-          title: "✅ Prompt généré !",
+          title: "Prompt généré !",
           description: "Le prompt a été transformé et est maintenant prêt à être utilisé.",
         });
 
       } else {
-        console.error('❌ Generation failed:', {
-          promptId,
-          success: response.success,
-          hasTransformedPrompt: !!response.transformedPrompt,
-          error: response.error || 'No transformed content received'
-        });
         await revertStatusToTodo(promptId, "Transform service failed");
       }
 
     } catch (error: any) {
-      console.error('💥 Prompt generation error:', {
-        promptId,
-        error: error.message,
-        stack: error.stack
-      });
+      console.error(`Auto-generation failed for prompt ${promptId}:`, error);
       await revertStatusToTodo(promptId, `Auto-generation error: ${error.message}`);
       
       toast({
         variant: "destructive",
-        title: "❌ Erreur de génération",
+        title: "Erreur de génération",
         description: "Impossible de générer le prompt. Veuillez réessayer.",
       });
     }

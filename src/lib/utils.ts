@@ -53,10 +53,3 @@ export function isPromptUsable(prompt: Prompt): boolean {
   // Otherwise, check if description is sufficient (at least 10 characters)
   return !!(prompt.description && prompt.description.trim().length >= 10);
 }
-
-/**
- * Determines if a prompt should be visible in the UI (includes generating prompts)
- */
-export function isPromptVisible(prompt: Prompt): boolean {
-  return true; // All prompts are visible, including generating ones
-}

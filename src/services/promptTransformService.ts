@@ -122,11 +122,10 @@ export class PromptTransformService {
         });
 
         if (provider === 'openai') {
-          // Try with stable gpt-4o-mini model as fallback
-          const fallback = await invokeTransform('gpt-4o-mini');
+          const fallbackModel = undefined; // Let the edge function default to gpt-4o
+          const fallback = await invokeTransform(fallbackModel);
           data = fallback.data;
           error = fallback.error;
-          console.log('🔄 Fallback attempt with gpt-4o-mini:', { error: error?.message, hasContent: !!data?.transformedPrompt });
         }
       }
 
