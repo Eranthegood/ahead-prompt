@@ -9,6 +9,7 @@ import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
 import { InteractiveOnboardingPromptCard } from '@/components/InteractiveOnboardingPromptCard';
 import LinearPromptOnboardingMock from '@/components/Onboarding/LinearPromptOnboardingMock';
+import QuickPromptOnboardingMock from '@/components/Onboarding/QuickPromptOnboardingMock';
 
 interface OnboardingModalProps {
   open: boolean;
@@ -19,19 +20,11 @@ interface OnboardingModalProps {
 const onboardingSteps = [
   {
     title: 'Create Prompts Lightning Fast',
-    description: 'Capture your AI prompt ideas instantly while waiting for code generation.',
+    description: 'Master the instant prompt creation workflow designed for developers.',
     icon: <Zap className="h-8 w-8 text-primary" />,
     content: (
-      <div className="space-y-4 text-center">
-        <p className="text-muted-foreground">
-          Press <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Q</kbd> to instantly create a new prompt. 
-          No more losing brilliant ideas during those 2-4 minute AI wait times.
-        </p>
-        <div className="bg-primary/10 p-4 rounded-lg">
-          <p className="text-sm font-medium">
-            ⚡ From idea to organized prompt in seconds
-          </p>
-        </div>
+      <div className="space-y-3">
+        <QuickPromptOnboardingMock />
       </div>
     )
   },
