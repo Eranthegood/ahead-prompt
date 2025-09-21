@@ -14,7 +14,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 // Removed KnowledgeModal import - using event-based approach
 import { useToast } from '@/hooks/use-toast';
 import type { Product, Workspace } from '@/types';
-import { useEventEmitter } from '@/hooks/useEventManager';
 
 interface ProductManagementProps {
   workspace: Workspace;
@@ -45,7 +44,6 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
 }) => {
   const { tier } = useSubscription();
   const { toast } = useToast();
-  const emit = useEventEmitter();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   
@@ -128,13 +126,13 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
           console.log('[ProductManagement] Products now available:', products.length + 1);
 
           // Dispatch global event so other UIs can update instantly (local echo)
-          emit('product:created', { product: newProduct });
+          window.dispatchEvent(new CustomEvent('product:created', { detail: { product: newProduct } }));
           
           if (createKnowledge) {
             setCreatedProduct(newProduct);
             setIsCreateDialogOpen(false);
             // Open Knowledge Box Modal through event system
-            emit('open-knowledge-dialog');
+            window.dispatchEvent(new CustomEvent('open-knowledge-dialog'));
           } else {
             handleCloseDialog();
           }

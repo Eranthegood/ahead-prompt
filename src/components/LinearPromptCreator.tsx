@@ -1,6 +1,20 @@
-import React from 'react';
-import { LinearPromptDialogLegacy } from './LinearPromptDialogLegacy';
-import type { Workspace, Epic, Product, PromptPriority } from '@/types';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Expand, X, ChevronRight, Paperclip, Folder } from 'lucide-react';
+import { ProductIcon } from '@/components/ui/product-icon';
+import { useToast } from '@/hooks/use-toast';
+import { generateTitleFromContent, extractTextFromHTML } from '@/lib/titleUtils';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { usePromptMetrics } from '@/hooks/usePromptMetrics';
+import { useKnowledge } from '@/hooks/useKnowledge';
+import { RedditPixelService } from '@/services/redditPixelService';
+import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
+import { LinearActionButtons } from '@/components/ui/linear-buttons';
+import { useLinearPromptCreator } from '@/hooks/useLinearPromptCreator';
+import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
 
 interface CreatePromptData {
   title: string;
@@ -30,24 +44,336 @@ interface LinearPromptCreatorProps {
   onProductsRefetch?: () => void;
 }
 
-/**
- * LinearPromptCreator - Wrapper around QuickPromptDialog for backward compatibility
- * 
- * This component maintains the same API as the original LinearPromptCreator
- * but now uses QuickPromptDialog as the underlying implementation to avoid
- * UI duplication and maintain consistency across the app.
- * 
- * All functionality is now handled by QuickPromptDialog including:
- * - Rich text editing with formatting toolbar
- * - Product/Epic selection and management
- * - Knowledge context integration
- * - AI provider selection
- * - Auto-save and draft management
- * - Animation and UX enhancements
- */
-export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = (props) => {
-  return <LinearPromptDialogLegacy {...props} />;
-};
+export const LinearPromptCreator: React.FC<LinearPromptCreatorProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  workspace,
+  epics = [],
+  products = [],
+  selectedProductId,
+  selectedEpicId,
+  onCreateProduct,
+  onCreateEpic,
+  onProductsRefetch,
+}) => {
+  const { toast } = useToast();
+  const { trackPromptCreation } = usePromptMetrics();
+  // knowledgeItems will be initialized after hook to avoid TS order issues
+  
+  const {
+    title,
+    setTitle,
+    priority,
+    setPriority,
+    selectedProduct,
+    setSelectedProduct,
+    selectedEpic,
+    setSelectedEpic,
+    providerConfig,
+    setProviderConfig,
+    selectedKnowledge,
+    setSelectedKnowledge,
+    isExpanded,
+    setIsExpanded,
+    resetForm,
+  } = useLinearPromptCreator({ selectedProductId, selectedEpicId });
 
-// Export types for backward compatibility
-export type { CreatePromptData, LinearPromptCreatorProps };
+  // Knowledge items depend on currently selected product (after hook init)
+  const { knowledgeItems } = useKnowledge(workspace.id, selectedProduct || selectedProductId);
+
+  // Local-echo product list for instant availability
+  const [modalProducts, setModalProducts] = useState<Product[]>(products);
+  // Keep in sync with upstream products but allow immediate inserts via event
+  useEffect(() => {
+    setModalProducts(products);
+  }, [products]);
+
+  // Listen for globally dispatched product creation events to instantly show/select
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<any>;
+      const newProduct: Product | undefined = ce.detail?.product || ce.detail;
+      if (!newProduct?.id) return;
+      setModalProducts(prev => (prev.some(p => p.id === newProduct.id) ? prev : [newProduct, ...prev]));
+      // Auto-select the newly created product
+      setSelectedProduct(newProduct.id);
+    };
+    window.addEventListener('product:created', handler as EventListener);
+    return () => window.removeEventListener('product:created', handler as EventListener);
+  }, [setSelectedProduct]);
+
+  const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Rich text editor for expanded mode
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
+      },
+    },
+  });
+
+  // Auto-save functionality  
+  const { clearDraft } = useAutoSave({
+    key: `linear-prompt-draft-${workspace.id}-${workspace.owner_id}`,
+    editor,
+    isOpen,
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
+
+  // Filter epics based on selected product
+  const filteredEpics = epics.filter(epic => 
+    !selectedProduct || epic.product_id === selectedProduct
+  );
+
+  const createPromptData = (content: string): CreatePromptData => {
+    const actualProduct = selectedProduct || selectedProductId;
+    const actualEpic = selectedEpic || selectedEpicId;
+
+    // Auto-assign product if epic is selected but no product
+    let finalProductId = actualProduct;
+    if (actualEpic && !actualProduct) {
+      const epic = epics.find(e => e.id === actualEpic);
+      if (epic?.product_id) {
+        finalProductId = epic.product_id;
+      }
+    }
+
+    // Strip HTML from content for plain text description
+    const plainTextContent = extractTextFromHTML(content);
+    
+    // Keep original content (HTML or title) for AI generation
+    const originalContent = content.trim() || title.trim();
+
+    console.log('🚀 Creating prompt data:', {
+      originalContent: originalContent.substring(0, 100) + '...',
+      plainTextContent: plainTextContent.substring(0, 100) + '...',
+      hasKnowledge: selectedKnowledge.length > 0,
+      provider: providerConfig.provider,
+      model: providerConfig.model
+    });
+
+    return {
+      title: title.trim() || generateTitleFromContent(plainTextContent),
+      description: plainTextContent,
+      original_description: originalContent, // 🔥 This is key for generation!
+      epic_id: actualEpic,
+      product_id: finalProductId,
+      priority,
+      knowledge_context: selectedKnowledge.length > 0 ? selectedKnowledge.map(k => k.id) : undefined,
+      ai_provider: providerConfig.provider,
+      ai_model: providerConfig.model,
+    };
+  };
+
+  const handleSave = async () => {
+    const content = isExpanded ? editor?.getHTML() || '' : title;
+    
+    if (!content.trim()) {
+      toast({
+        title: "Content required",
+        description: "Please enter a prompt title or description.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+
+      // Show generation animation if knowledge items are selected
+      if (selectedKnowledge.length > 0) {
+        setShowGenerationAnimation(true);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setShowGenerationAnimation(false);
+      }
+
+      const promptData = createPromptData(content);
+      
+      // 🚨 CRITICAL UX FLOW - DO NOT MODIFY WITHOUT READING PROMPT_GENERATION_CRITICAL.md
+      // Dialog MUST close immediately (< 100ms) - this is the core UX of Ahead.love
+      console.log('🚀 LinearPromptCreator: Closing dialog immediately for fluid UX');
+      onClose();
+      
+      // Start background generation (DO NOT AWAIT!)
+      onSave(promptData).catch(error => {
+        console.error('Background prompt creation failed:', error);
+      });
+
+      // Track metrics
+      trackPromptCreation(200, {
+        hasKnowledgeContext: selectedKnowledge.length > 0,
+        priority,
+        hasEpic: !!selectedEpic,
+        hasProduct: !!selectedProduct,
+      });
+
+      // Track Reddit Pixel conversion
+      if (workspace.created_at) {
+        const accountAge = Date.now() - new Date(workspace.created_at).getTime();
+        const isFirstDay = accountAge < 24 * 60 * 60 * 1000;
+        
+        if (isFirstDay) {
+          RedditPixelService.trackFirstPromptCreated(workspace.id);
+        } else {
+          RedditPixelService.trackPromptCreated(Date.now().toString(), workspace.id);
+        }
+      }
+
+      toast({
+        title: "Prompt created",
+        description: "Your prompt has been saved successfully.",
+      });
+
+      // Reset form
+      resetForm();
+      editor?.commands.clearContent();
+    } catch (error) {
+      console.error('Error creating prompt:', error);
+      toast({
+        title: "Error creating prompt",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+    } else if (e.key === 'f' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      setIsExpanded(!isExpanded);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, isExpanded, handleSave, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {showGenerationAnimation && (
+        <PromptGenerationAnimation
+          isVisible={showGenerationAnimation}
+          onComplete={() => setShowGenerationAnimation(false)}
+          currentStep="processing"
+        />
+      )}
+      
+      <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div 
+          className="border border-border rounded-lg w-full max-w-4xl mx-auto shadow-lg linear-prompt-creator max-h-[90vh] overflow-y-auto"
+          style={{ backgroundColor: '#16161c' }}
+        >
+        {/* Header with breadcrumb */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center gap-2 text-sm">
+            <ProductIcon className="w-4 h-4 text-primary" />
+            <span className="text-muted-foreground">Workspace</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <span className="text-foreground">New Prompt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="h-8 w-8 p-0"
+            >
+              <Expand className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="h-8 w-8 p-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="p-6 space-y-6">
+          {/* Title input */}
+          <input 
+            type="text" 
+            placeholder="Prompt title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="text-2xl font-medium bg-transparent border-none outline-none text-foreground placeholder-muted-foreground w-full"
+            autoFocus
+          />
+          
+          {/* Expanded rich text editor */}
+          {isExpanded && (
+            <div className="space-y-4 border-t border-border pt-6">
+              <div className="min-h-[200px] border border-border rounded-md">
+                <EditorContent 
+                  editor={editor} 
+                  className="prose prose-sm max-w-none p-4 rounded-md"
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Linear action buttons */}
+          <LinearActionButtons
+            priority={priority}
+            onPriorityChange={setPriority}
+            selectedProduct={selectedProduct}
+            onProductChange={setSelectedProduct}
+            selectedEpic={selectedEpic}
+            onEpicChange={setSelectedEpic}
+            providerConfig={providerConfig}
+            onProviderChange={setProviderConfig}
+            products={modalProducts}
+            epics={filteredEpics}
+            onCreateProduct={onCreateProduct}
+            onCreateEpic={onCreateEpic}
+            knowledgeItems={knowledgeItems}
+            selectedKnowledge={selectedKnowledge}
+            onKnowledgeChange={setSelectedKnowledge}
+            onExpandToggle={() => setIsExpanded(!isExpanded)}
+            onProductDropdownOpen={() => onProductsRefetch?.()}
+          />
+        </div>
+
+        {/* Footer actions */}
+        <div className="flex items-center justify-end p-4 border-t border-border">
+          <div className="flex items-center gap-3">
+            <Button 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              onClick={handleSave}
+              disabled={isGenerating || (!title.trim() && !editor?.getHTML()?.trim())}
+            >
+              {isGenerating ? 'Creating...' : 'Create prompt'}
+            </Button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </>
+  );
+};

@@ -9,7 +9,6 @@ import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ThemeInitializer } from "@/components/ThemeInitializer";
 import { SimpleAppLayout } from "@/components/SimpleAppLayout";
-import { CentralizedDialogs } from "@/components/CentralizedDialogs";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -54,7 +53,6 @@ function App() {
             <BrowserRouter>
               <MixpanelProvider>
                 <SimpleAppLayout>
-                  <CentralizedDialogs />
                   <Routes>
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/" element={<Home />} />

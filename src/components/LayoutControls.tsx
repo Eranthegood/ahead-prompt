@@ -1,7 +1,7 @@
 // Separated layout controls from AppLayout
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LinearPromptCard } from './LinearPromptCard';
+import { LinearPromptCreator } from './LinearPromptCreator';
 import { MobilePromptDrawer } from './MobilePromptDrawer';
 import { MobilePromptFAB } from './MobilePromptFAB';
 import { PromptLibrary } from './PromptLibrary';
@@ -35,7 +35,6 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
     'cmd+n': () => openDialog('quickPrompt'),
     'ctrl+n': () => openDialog('quickPrompt'),
     'q': () => openDialog('quickPrompt'),
-    'shift+q': () => openDialog('quickPrompt'),
     'll': () => openDialog('promptLibraryCreate'),
   });
 
@@ -55,7 +54,7 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
 
   return (
     <>
-      <LinearPromptCard
+      <LinearPromptCreator
         isOpen={state.dialogs.quickPrompt && !isMobile}
         onClose={() => closeDialog('quickPrompt')}
         onSave={handleSavePrompt}

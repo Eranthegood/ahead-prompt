@@ -19,7 +19,6 @@ import { useAppStore } from '@/store/AppStore';
 import { Loader2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { copyText } from '@/lib/clipboard';
-import { useEventSubscription } from '@/hooks/useEventManager';
 
 // Declare Supademo global function
 declare global {
@@ -58,12 +57,6 @@ const Dashboard = ({ selectedProductId, selectedEpicId }: DashboardProps = {}) =
     createPrompt,
     refetch: refetchPrompts
   } = promptsContext || {};
-
-  // Listen for refetch events from onboarding completion using EventManager
-  useEventSubscription('refetch-prompts', () => {
-    console.log('[Dashboard] Refetching prompts after onboarding');
-    refetchPrompts?.();
-  }, [refetchPrompts]);
 
   // Provide safe fallback if createPrompt is not available yet
   const handleCreatePrompt = createPrompt || (async () => {

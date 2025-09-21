@@ -13,9 +13,8 @@ import { LayoutControls } from './LayoutControls';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useEventSubscription, useEventEmitter } from '@/hooks/useEventManager';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
-import { useAppStore } from '@/store/AppStore';
+import { useAppStoreOptional } from '@/store/AppStore';
 import Dashboard from './Dashboard';
 import { OnboardingDebug } from './debug/OnboardingDebug';
 
@@ -28,13 +27,12 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
   const { preferences, updatePreferences } = useUserPreferences();
-  const { state: appState, openDialog, closeDialog } = useAppStore();
-  const emit = useEventEmitter();
+  const appStore = useAppStoreOptional();
+  const openDialog = appStore?.openDialog ?? (() => {});
   
-  // Use AppStore for dialog state instead of local state
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
   const [selectedEpicId, setSelectedEpicId] = useState<string | undefined>();
-  // Remove local dialog states - using AppStore now
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('workspace');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -55,24 +53,26 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     }
   }, [user, location.pathname]);
 
-  // Event subscriptions using EventManager
-  useEventSubscription('force-onboarding', () => {
-    console.log('[Onboarding] Manually triggered');
-    setShowOnboarding(true);
-  }, []);
-
-  // Native keydown events still need window listener
+  // Manual onboarding trigger (for debugging/testing)
   useEffect(() => {
+    const handleForceOnboarding = () => {
+      console.log('[Onboarding] Manually triggered');
+      setShowOnboarding(true);
+    };
+    
     // Global shortcut Ctrl+Shift+O to force onboarding
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'O') {
         e.preventDefault();
-        setShowOnboarding(true);
+        handleForceOnboarding();
       }
     };
     
+    window.addEventListener('force-onboarding', handleForceOnboarding as EventListener);
     window.addEventListener('keydown', handleKeyDown);
+    
     return () => {
+      window.removeEventListener('force-onboarding', handleForceOnboarding as EventListener);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -112,11 +112,9 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
   useGlobalShortcuts({
     '/l': () => openDialog('promptLibrary'),
     'l': () => openDialog('promptLibrary'), // Simple 'L' shortcut
-    'k': () => openDialog('knowledgeDialog'),
+    'k': () => setIsKnowledgeModalOpen(true),
     'n': () => setIsNotesOpen(true),
   });
-
-  // Note: Command palette and other dialog shortcuts are handled by AppStore events
 
   const handleOnboardingComplete = (data?: { productId?: string; promptId?: string }) => {
     console.log('[Onboarding] Completed by user', data);
@@ -133,16 +131,9 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       } catch {}
     }
 
-    // Force refetch des prompts après l'onboarding pour assurer la synchronisation
-    setTimeout(() => {
-      emit('refetch-prompts');
-    }, 100);
-
     // Focaliser et surligner le prompt nouvellement créé
     if (data?.promptId) {
-      setTimeout(() => {
-        emit('prompt-focus', { promptId: data.promptId, productId: data?.productId });
-      }, 200);
+      window.dispatchEvent(new CustomEvent('prompt-focus', { detail: { promptId: data.promptId, productId: data?.productId } }));
     }
   };
 
@@ -162,10 +153,35 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
     }
   }, []);
 
-  // Note: Knowledge dialog events now handled by AppStore automatically
+  // Listen for knowledge dialog events
+  useEffect(() => {
+    const handleOpenKnowledge = (event?: CustomEvent) => {
+      setIsKnowledgeModalOpen(true);
+      // If event has productId, set the active section to that product
+      if (event?.detail?.productId) {
+        setActiveSection(event.detail.productId);
+      } else {
+        // Default to workspace section
+        setActiveSection('workspace');
+      }
+    };
+    
+    window.addEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
+    return () => window.removeEventListener('open-knowledge-dialog', handleOpenKnowledge as EventListener);
+  }, []);
 
-  // Global keyboard shortcut handler for quick prompt creation - now handled by AppStore
-  // Note: All dialog events now handled by AppStore automatically
+  // Global keyboard shortcut handler for quick prompt creation
+  useEffect(() => {
+    const handler = () => {
+      openDialog('quickPrompt');
+    };
+    // @ts-ignore - custom event name
+    window.addEventListener('open-quick-prompt', handler as EventListener);
+    return () => {
+      // @ts-ignore - custom event name  
+      window.removeEventListener('open-quick-prompt', handler as EventListener);
+    };
+  }, [openDialog]);
 
   // Loading states
   if (config.showSidebar && (!user || !workspace)) {
@@ -242,11 +258,11 @@ export function SimpleAppLayout({ children }: SimpleAppLayoutProps) {
       )}
 
       {/* Knowledge Box Modal */}
-        <KnowledgeBoxModal
-          open={appState.dialogs.knowledgeDialog}
-          onOpenChange={(open) => !open && closeDialog('knowledgeDialog')}
-          defaultSection={activeSection}
-        />
+      <KnowledgeBoxModal
+        open={isKnowledgeModalOpen}
+        onOpenChange={setIsKnowledgeModalOpen}
+        defaultSection={activeSection}
+      />
 
       {/* Notes Dialog */}
       <NotesDialog

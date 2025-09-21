@@ -13,7 +13,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useEventSubscription } from '@/hooks/useEventManager';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -402,34 +401,59 @@ export function MinimalSidebar({ workspace, selectedProductId, selectedEpicId, o
     window.dispatchEvent(event);
   };
 
-  // Event subscriptions using EventManager for dialog management
-  // Knowledge dialog event is handled by dedicated modal; no local subscription to avoid loops.
+  // Add event listeners for onboarding checklist actions
+  useEffect(() => {
+    const handleOpenKnowledgeDialog = () => {
+      console.log('Opening knowledge dialog from onboarding');
+      // Use event system to open the new Knowledge Box modal
+      const event = new CustomEvent('open-knowledge-dialog');
+      window.dispatchEvent(event);
+    };
 
-  useEventSubscription('open-product-dialog', () => {
-    console.log('Opening product dialog from onboarding');
-    setIsCreateProductOpen(true);
-  }, []);
+    const handleOpenProductDialog = () => {
+      console.log('Opening product dialog from onboarding');
+      setIsCreateProductOpen(true);
+    };
 
-  useEventSubscription('open-epic-dialog', () => {
-    console.log('Opening epic dialog from onboarding');
-    // If we have products, set the first one as selected for epic creation
-    if (products && products.length > 0) {
-      setSelectedProductForEpic(products[0].id);
-    }
-    setIsCreateEpicOpen(true);
-  }, [products]);
+    const handleOpenEpicDialog = () => {
+      console.log('Opening epic dialog from onboarding');
+      // If we have products, set the first one as selected for epic creation
+      if (products && products.length > 0) {
+        setSelectedProductForEpic(products[0].id);
+      }
+      setIsCreateEpicOpen(true);
+    };
 
-  useEventSubscription('open-quick-prompt', () => {
-    console.log('Opening quick prompt from onboarding');
-    onQuickAdd();
-  }, [onQuickAdd]);
+    const handleOpenQuickPrompt = () => {
+      console.log('Opening quick prompt from onboarding');
+      onQuickAdd();
+    };
 
-  // Listen for product creation events using EventManager
-  useEventSubscription('product-created', (data) => {
-    refetch?.();
-    if (data?.productId) {
-      onProductSelect(data.productId);
-    }
+    // Add event listeners
+    window.addEventListener('open-knowledge-dialog', handleOpenKnowledgeDialog);
+    window.addEventListener('open-product-dialog', handleOpenProductDialog);
+    window.addEventListener('open-epic-dialog', handleOpenEpicDialog);
+    window.addEventListener('open-quick-prompt', handleOpenQuickPrompt);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('open-knowledge-dialog', handleOpenKnowledgeDialog);
+      window.removeEventListener('open-product-dialog', handleOpenProductDialog);
+      window.removeEventListener('open-epic-dialog', handleOpenEpicDialog);
+      window.removeEventListener('open-quick-prompt', handleOpenQuickPrompt);
+    };
+  }, [products, onQuickAdd]);
+
+  // Listen for product creation events (e.g., from onboarding) to refresh the list
+  useEffect(() => {
+    const handleProductCreated = (e: CustomEvent) => {
+      refetch?.();
+      if ((e as any)?.detail?.productId) {
+        onProductSelect((e as any).detail.productId);
+      }
+    };
+    window.addEventListener('product-created', handleProductCreated as EventListener);
+    return () => window.removeEventListener('product-created', handleProductCreated as EventListener);
   }, [refetch, onProductSelect]);
 
   // Handle drag end for product reordering

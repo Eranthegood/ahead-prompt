@@ -225,17 +225,13 @@ async function automateTaskTransitions(workspaceId: string, entityId: string, en
       let statusChanged = false;
       let reason = '';
 
-      // Rule 1: "To Do" → "In Progress" when Cursor agent starts (DISABLED)
-      // This rule was causing automatic status changes when prompts are sent to Cursor
-      // Uncomment the following lines if you want to re-enable automatic status transitions:
-      /*
+      // Rule 1: "To Do" → "In Progress" when Cursor agent starts
       if (prompt.status === 'todo' && prompt.cursor_agent_id && 
           (prompt.cursor_agent_status === 'RUNNING' || prompt.cursor_agent_status === 'CREATING')) {
         updates.status = 'in_progress';
         statusChanged = true;
         reason = 'Cursor agent started working on task';
       }
-      */
 
       // Rule 2: "In Progress" → "Done" when PR is merged
       if ((prompt.status === 'in_progress' || prompt.status === 'pr_created') && 

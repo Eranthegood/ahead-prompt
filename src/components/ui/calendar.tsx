@@ -52,9 +52,9 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />, // eslint-disable-line @typescript-eslint/no-unused-vars
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />, // eslint-disable-line @typescript-eslint/no-unused-vars
-      } as any}
+        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
+        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+      }}
       {...props}
     />
   );
