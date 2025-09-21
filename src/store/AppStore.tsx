@@ -97,6 +97,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   const actions = useMemo(() => ({
     openDialog: (dialog: keyof AppState['dialogs']) => {
+      console.log('[AppStore] OPEN_DIALOG:', dialog);
       dispatch({ type: 'OPEN_DIALOG', dialog });
       // Also emit event for backwards compatibility
       emit(`open-${dialog === 'quickPrompt' ? 'quick-prompt' : 

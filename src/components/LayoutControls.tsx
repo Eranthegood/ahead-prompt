@@ -35,6 +35,7 @@ export function LayoutControls({ workspace, selectedProductId, selectedEpicId }:
     'cmd+n': () => openDialog('quickPrompt'),
     'ctrl+n': () => openDialog('quickPrompt'),
     'q': () => openDialog('quickPrompt'),
+    'shift+q': () => openDialog('quickPrompt'),
     'll': () => openDialog('promptLibraryCreate'),
   });
 
