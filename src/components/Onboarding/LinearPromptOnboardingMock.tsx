@@ -65,7 +65,7 @@ export default function LinearPromptOnboardingMock() {
       id: 'copy',
       title: '📋 Magic Copy',
       content: 'One click copies to clipboard AND auto-moves to "In Progress". Zero extra steps!',
-      style: { top: '-80px', left: '85px' }, // Well above copy button
+      style: { top: '-80px', left: '35px' }, // Shifted 50px left to target copy button
       arrowClass: 'bottom-[-4px] left-6'
     },
     {
