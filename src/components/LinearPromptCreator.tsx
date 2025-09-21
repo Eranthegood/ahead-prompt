@@ -16,7 +16,7 @@ import { useKnowledge } from '@/hooks/useKnowledge';
 import { ProviderSelector, ProviderConfig } from '@/components/ProviderSelector';
 import { RedditPixelService } from '@/services/redditPixelService';
 import { PromptGenerationAnimation } from '@/components/PromptGenerationAnimation';
-import type { Workspace, Epic, Product, PromptPriority, KnowledgeItem } from '@/types';
+import type { Workspace, Epic, Product, PromptPriority } from '@/types';
 import { PRIORITY_OPTIONS } from '@/types';
 
 interface CreatePromptData {
