@@ -3,9 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { ChevronLeft, ChevronRight, Zap, Search, Keyboard, FolderPlus, BookOpen, StickyNote, X, Circle, CircleDot, CheckCircle, Flame, Minus, Clock, Library } from 'lucide-react';
 import { getPriorityDisplay } from '@/lib/utils';
 import { getStatusIcon } from '@/components/ui/status-icon';
+import { InteractiveOnboardingPromptCard } from '@/components/InteractiveOnboardingPromptCard';
 
 interface OnboardingModalProps {
   open: boolean;
@@ -90,6 +92,26 @@ const onboardingSteps = [
             <div className="text-xs text-muted-foreground mt-1">Completed ✨</div>
           </div>
         </div>
+        
+        <Separator />
+        
+        <div className="space-y-3">
+          <div className="text-center">
+            <h4 className="font-semibold text-sm mb-2">✨ Try it yourself!</h4>
+            <p className="text-xs text-muted-foreground mb-3">
+              Click the copy button, change priority, or update status to see the workflow in action
+            </p>
+          </div>
+          
+          <InteractiveOnboardingPromptCard />
+          
+          <div className="bg-primary/10 p-3 rounded-lg">
+            <p className="text-sm">
+              <strong>Magic:</strong> Copy a prompt (📋) and watch it automatically move to "In Progress"!
+            </p>
+          </div>
+        </div>
+        
         <div className="bg-accent/20 p-3 rounded-lg">
           <p className="text-sm font-medium mb-2">Priority System:</p>
           <div className="flex items-center gap-4 text-xs">
@@ -107,11 +129,6 @@ const onboardingSteps = [
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-2">High priority prompts appear at the top of each column</p>
-        </div>
-        <div className="bg-primary/10 p-3 rounded-lg">
-          <p className="text-sm">
-            <strong>Tip:</strong> Copy a prompt (Cmd+C) and it automatically moves to "In Progress"!
-          </p>
         </div>
       </div>
     )
