@@ -98,24 +98,24 @@ async function autoStatusUpdate(workspaceId: string, entityId: string, entityTyp
 
       if (error) throw error;
 
-      // Rule: If prompt was just copied, move to "in_progress"
-      if (prompt.status === 'todo') {
-        await supabase
-          .from('prompts')
-          .update({ 
-            status: 'in_progress',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', entityId);
+      // Rule: If prompt was just copied, move to "in_progress" - DISABLED
+      // if (prompt.status === 'todo') {
+      //   await supabase
+      //     .from('prompts')
+      //     .update({ 
+      //       status: 'in_progress',
+      //       updated_at: new Date().toISOString()
+      //     })
+      //     .eq('id', entityId);
 
-        updatedEntities.push({
-          id: entityId,
-          type: 'prompt',
-          old_status: 'todo',
-          new_status: 'in_progress',
-          reason: 'Auto-updated on copy action'
-        });
-      }
+      //   updatedEntities.push({
+      //     id: entityId,
+      //     type: 'prompt',
+      //     old_status: 'todo',
+      //     new_status: 'in_progress',
+      //     reason: 'Auto-updated on copy action'
+      //   });
+      // }
     } else if (entityType === 'epic') {
       // Auto-update epic status based on prompt completion rates
       const { data: epic, error } = await supabase
@@ -225,13 +225,13 @@ async function automateTaskTransitions(workspaceId: string, entityId: string, en
       let statusChanged = false;
       let reason = '';
 
-      // Rule 1: "To Do" → "In Progress" when Cursor agent starts
-      if (prompt.status === 'todo' && prompt.cursor_agent_id && 
-          (prompt.cursor_agent_status === 'RUNNING' || prompt.cursor_agent_status === 'CREATING')) {
-        updates.status = 'in_progress';
-        statusChanged = true;
-        reason = 'Cursor agent started working on task';
-      }
+      // Rule 1: "To Do" → "In Progress" when Cursor agent starts - DISABLED
+      // if (prompt.status === 'todo' && prompt.cursor_agent_id && 
+      //     (prompt.cursor_agent_status === 'RUNNING' || prompt.cursor_agent_status === 'CREATING')) {
+      //   updates.status = 'in_progress';
+      //   statusChanged = true;
+      //   reason = 'Cursor agent started working on task';
+      // }
 
       // Rule 2: "In Progress" → "Done" when PR is merged
       if ((prompt.status === 'in_progress' || prompt.status === 'pr_created') && 
