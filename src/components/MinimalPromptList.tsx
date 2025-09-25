@@ -240,14 +240,14 @@ export function MinimalPromptList({
       const ok = await copyText(content);
       if (!ok) throw new Error('Clipboard copy failed');
       
-      // Auto-change status from todo to in_progress when copied
-      if (prompt.status === 'todo') {
-        await updatePromptStatus(prompt.id, 'in_progress');
-      }
+      // Auto-change status from todo to in_progress when copied - DISABLED
+      // if (prompt.status === 'todo') {
+      //   await updatePromptStatus(prompt.id, 'in_progress');
+      // }
       
       toast({
         title: 'Copied to clipboard',
-        description: prompt.status === 'todo' ? 'Prompt copied and moved to In Progress' : 'Prompt content has been copied'
+        description: 'Prompt content has been copied'
       });
     } catch (error) {
       console.error('Error copying to clipboard:', error);
@@ -278,10 +278,10 @@ export function MinimalPromptList({
         const ok = await copyText(prompt.generated_prompt);
         if (!ok) throw new Error('Clipboard copy failed');
         
-        // Auto-change status from todo to in_progress when copied
-        if (prompt.status === 'todo') {
-          await updatePromptStatus(prompt.id, 'in_progress');
-        }
+        // Auto-change status from todo to in_progress when copied - DISABLED
+        // if (prompt.status === 'todo') {
+        //   await updatePromptStatus(prompt.id, 'in_progress');
+        // }
         
         toast({
           title: 'Generated prompt copied',
@@ -308,10 +308,10 @@ export function MinimalPromptList({
         const ok = await copyText(response.transformedPrompt);
         if (!ok) throw new Error('Clipboard copy failed');
         
-        // Auto-change status from todo to in_progress when copied
-        if (prompt.status === 'todo') {
-          await updatePromptStatus(prompt.id, 'in_progress');
-        }
+        // Auto-change status from todo to in_progress when copied - DISABLED
+        // if (prompt.status === 'todo') {
+        //   await updatePromptStatus(prompt.id, 'in_progress');
+        // }
         
         toast({
           title: 'Generated prompt copied',
