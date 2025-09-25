@@ -90,6 +90,7 @@ export function EpicCard({
       epic={epic}
       onAddPrompt={(id) => handleAddPromptContext()}
       onEditEpic={(e) => onEdit?.(e)}
+      onRenameEpic={undefined}
       onDeleteEpic={(e) => onDelete?.(e.id)}
       onConfigureGit={(id) => handleConfigureGitContext()}
       onToggleComplete={(e) => handleToggleCompleteContext()}

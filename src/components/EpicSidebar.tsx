@@ -22,6 +22,7 @@ import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 import { ProductContextMenu } from '@/components/ProductContextMenu';
 import { EpicContextMenu } from '@/components/EpicContextMenu';
+import { InlineEpicRename } from '@/components/InlineEpicRename';
 import { 
   ChevronRight, 
   ChevronDown, 
@@ -49,11 +50,12 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
   const collapsed = state === 'collapsed';
   
   const { products, loading: productsLoading, deleteProduct } = useProducts(workspace.id);
-  const { epics, loading: epicsLoading, createEpic, deleteEpic } = useEpics(workspace.id);
+  const { epics, loading: epicsLoading, createEpic, deleteEpic, updateEpic } = useEpics(workspace.id);
   const { prompts, loading: promptsLoading, createPrompt } = usePrompts(workspace.id);
   
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [expandedEpics, setExpandedEpics] = useState<Set<string>>(new Set());
+  const [renamingEpicId, setRenamingEpicId] = useState<string | null>(null);
 
   // Group data by hierarchy
   const productsWithData = products.map(product => {
@@ -135,6 +137,24 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
     if (window.confirm(`Are you sure you want to delete "${epic.name}"? This will also delete all associated prompts.`)) {
       await deleteEpic(epic.id);
     }
+  };
+
+  const handleStartRename = (epic: Epic) => {
+    setRenamingEpicId(epic.id);
+  };
+
+  const handleRenameEpic = async (epicId: string, newName: string) => {
+    try {
+      await updateEpic(epicId, { name: newName });
+      setRenamingEpicId(null);
+    } catch (error) {
+      console.error('Error renaming epic:', error);
+      throw error;
+    }
+  };
+
+  const handleCancelRename = () => {
+    setRenamingEpicId(null);
   };
 
   const handleConfigureGit = (itemId: string) => {
@@ -274,6 +294,7 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                      epic={epic}
                                      onAddPrompt={handleAddPrompt}
                                      onEditEpic={handleEditEpic}
+                                     onRenameEpic={handleStartRename}
                                      onDeleteEpic={handleDeleteEpic}
                                      onConfigureGit={handleConfigureGit}
                                      onToggleComplete={handleToggleEpicComplete}
@@ -286,13 +307,22 @@ export function EpicSidebar({ workspace, selectedProductId, onProductSelect }: E
                                             style={{ backgroundColor: epic.color || '#8B5CF6' }}
                                           />
                                           <Hash className="h-4 w-4 flex-shrink-0" />
-                                          <AdaptiveTitle 
-                                            reservedSpace={40}
-                                            minSize={11}
-                                            maxSize={13}
-                                          >
-                                            {epic.name}
-                                          </AdaptiveTitle>
+                                          {renamingEpicId === epic.id ? (
+                                            <InlineEpicRename
+                                              epic={epic}
+                                              onSave={handleRenameEpic}
+                                              onCancel={handleCancelRename}
+                                              className="flex-1 min-w-0"
+                                            />
+                                          ) : (
+                                            <AdaptiveTitle 
+                                              reservedSpace={40}
+                                              minSize={11}
+                                              maxSize={13}
+                                            >
+                                              {epic.name}
+                                            </AdaptiveTitle>
+                                          )}
                                         </div>
                                         <div className="flex items-center gap-1 flex-shrink-0">
                                           <Badge variant="outline" className="text-xs">
