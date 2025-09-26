@@ -14,7 +14,8 @@ import {
   Github,
   GitBranch,
   CheckCircle,
-  RotateCcw
+  RotateCcw,
+  Edit
 } from 'lucide-react';
 import { Epic } from '@/types';
 
@@ -23,6 +24,7 @@ interface EpicContextMenuProps {
   epic: Epic;
   onAddPrompt: (epicId: string) => void;
   onEditEpic: (epic: Epic) => void;
+  onRenameEpic?: (epic: Epic) => void;
   onDeleteEpic: (epic: Epic) => void;
   onConfigureGit?: (epicId: string) => void;
   onToggleComplete?: (epic: Epic) => void;
@@ -33,6 +35,7 @@ export function EpicContextMenu({
   epic,
   onAddPrompt,
   onEditEpic,
+  onRenameEpic,
   onDeleteEpic,
   onConfigureGit,
   onToggleComplete,
@@ -60,6 +63,15 @@ export function EpicContextMenu({
           <Edit3 className="h-4 w-4" />
           Edit Epic
         </ContextMenuItem>
+        {onRenameEpic && (
+          <ContextMenuItem 
+            onClick={() => onRenameEpic(epic)}
+            className="flex items-center gap-2"
+          >
+            <Edit className="h-4 w-4" />
+            Rename Epic
+          </ContextMenuItem>
+        )}
         {onConfigureGit && (
           <ContextMenuItem 
             onClick={() => onConfigureGit(epic.id)}
